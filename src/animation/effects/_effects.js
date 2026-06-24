@@ -8,6 +8,7 @@ import { blastLock } from "./template/blast-lock.js";
 import { bless } from "./active-effect/bless.js";
 import { blurredVision } from "./active-effect/blurred-vision.js";
 import { burnMask } from "../mask/burn-mask.js";
+import { burningJet } from "./template/burning-jet.js";
 import { call } from "./token/call.js";
 import { curseOfTheWerewolf } from "./token/curse-of-the-werewolf.js";
 import { callLightning } from "./token/call-lightning.js";

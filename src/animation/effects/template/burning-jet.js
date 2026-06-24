@@ -1,4 +1,6 @@
+import { closest } from '../../../lib/filemanager.js';
 import { templates } from '../../../lib/templates.js';
+import { autoanimations } from '../../../integration/autoanimations.js';
 
 //Last Updated: 8/7/2023
 //Author: EskieMoh#2969
@@ -17,8 +19,14 @@ async function create(token, config, options) {
         icon: 'icons/magic/fire/blast-jet-stream-splash.webp',
         label: 'Burning Jet'
     };
+    
     let [position, _] = await templates.getPosition(template, cfg);
     if (!position) { return; }
+
+    const distance = Math.max(
+        Math.abs(token.x - position.x) / canvas.grid.size,
+        Math.abs(token.y - position.y) / canvas.grid.size
+    );
 
     let seq = new Sequence()
       .animation()
@@ -81,7 +89,7 @@ async function create(token, config, options) {
       .duration(2000)
       .scaleToObject(1, {considerTokenScale: true})
       .moveSpeed(1800)
-      .waitUntilFinished(-2000+distance*100)
+      .waitUntilFinished(-2000+distance*100) // distance is now defined
 
       .effect()
       .file("animated-spell-effects-cartoon.fire.40")
@@ -98,7 +106,8 @@ async function create(token, config, options) {
       .on(token)
       .opacity(1)
       .teleportTo(position)
-      .snapToGrid()
+      .snapToGrid();
+      
     return seq;
 }
 
@@ -107,8 +116,11 @@ async function play(token, config = {}) {
     if (seq) return seq.play();
 }
 
-export const hitTheDirt = {
+export const burningJet = {
     create,
     play,
     default_config: DEFAULT_CONFIG,
 };
+
+autoanimations.register('Burning Jet', 'template', 'eskie.effect.burningJet', DEFAULT_CONFIG);
+autoanimations.register('Burning Jet', 'effect', 'eskie.effect.burningJet', DEFAULT_CONFIG);

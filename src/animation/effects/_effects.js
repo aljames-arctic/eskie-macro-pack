@@ -128,6 +128,7 @@ export const effect = {
     blastLock,
     bless,
     blurredVision,
+    burningJet,
     call,
     callLightning,
     curseOfTheWerewolf,

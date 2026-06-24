@@ -79,7 +79,7 @@ async function create(token, config, options) {
       .atLocation(token)
       .moveTowards(position, {ease:"easeOutCubic", rotate:false})
       .duration(2000)
-      .scaleToObject(1.2, {considerTokenScale: true})
+      .scaleToObject(1, {considerTokenScale: true})
       .moveSpeed(1800)
       .waitUntilFinished(-2000+distance*100)
 

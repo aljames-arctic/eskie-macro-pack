@@ -185,11 +185,7 @@ async function createLocal(object, tileIds, config = {}) {
             if (game.user.isGM) {
                 return Promise.all([
                     sceneRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } }),
-                    objectRevealMask.update({
-                        alpha: 1,
-                        hidden: false,
-                        video: { autoplay: true }
-                    })
+                    objectRevealMask.update({ alpha: 1, hidden: false, video: { autoplay: true } })
                 ]);
             }
         })

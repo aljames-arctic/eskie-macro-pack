@@ -27,16 +27,19 @@ Hooks.once('init', async () => {
         }
 
         const util = {
-                        dialog,
-                        file,
-                        time,
-                        token,
-                    };
+            dialog,
+            file,
+            time,
+            token,
+        };
 
         // Setup dependency API
-        setupApiCalls( animation );
+        setupApiCalls(animation);
+        log.debug('Setup animation api');
         setupApiCalls({ util });
-        setupApiCalls( socket );
+        log.debug('Setup util calls');
+        setupApiCalls(socket);
+        log.debug('Setup socket calls');
     }
 
     setupModule();
@@ -45,8 +48,10 @@ Hooks.once('init', async () => {
 
 Hooks.once('ready', async () => {
     status.ready = true;
-    if (status.ready && status.aaReady)
+    if (status.ready && status.aaReady) {
         await autoanimations.submit();
+        log.debug('Setup automated animations');
+    }
 
     // Load enabled world scripts for the player
     loadWorldScripts();

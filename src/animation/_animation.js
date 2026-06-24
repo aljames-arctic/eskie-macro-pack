@@ -13,3 +13,5 @@ export const animation = {
     traps,
     utils,
 };
+
+console.warn('Initializing animation', animation);

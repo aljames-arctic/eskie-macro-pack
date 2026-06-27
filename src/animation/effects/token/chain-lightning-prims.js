@@ -5,6 +5,7 @@ import { closest } from "../../../lib/filemanager.js";
 import { primMST } from "../../../lib/algorithms.js";
 import { tokens } from "../../../lib/tokens.js";
 import { settingsOverride } from "../../../lib/settings.js";
+import { log } from "../../../lib/logger.js";
 
 const DEFAULT_CONFIG = {
     releaseDelay: 200,
@@ -28,7 +29,7 @@ function create(token, targetTokens, config = {}) {
     config = settingsOverride(config);
     config = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     if (!targetTokens || targetTokens.length === 0) {
-        console.warn("Chain Lightning (Adjacent): No targets provided.");
+        log.warn("Chain Lightning (Adjacent): No targets provided.");
         return new Sequence();
     }
 

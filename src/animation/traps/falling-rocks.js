@@ -6,14 +6,16 @@
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
+import { MODULE_ID } from '../../lib/constants.js';
 
 const DEFAULT_CONFIG = {
+    label: 'Falling Rocks',
     dustBrightness: 0.8,
 };
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { dustBrightness } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { label, dustBrightness } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     if (!tile) return new Sequence();
 
@@ -60,7 +62,7 @@ async function create(tile, targets, config = {}) {
 
         // Persistent rock rubble on the tile
         .effect()
-        .name(`falling-rocks-rubble-${tile.id}`)
+        .name(`${label}-${tile.id}`)
         .delay(3500)
         .file(closest(`jb2a.falling_rocks.endframe.top.1x1.grey.${num}`))
         .atLocation(tile)
@@ -99,9 +101,13 @@ async function create(tile, targets, config = {}) {
         .shake({ duration: 500, strength: 2, rotation: false });
 
     if (finalTargets.length > 0) {
+        const currentPinnedIds = tile.document.getFlag(MODULE_ID, `${label} - pinned`) ?? [];
+        const finalTargetIds = finalTargets.map(token => token.id);
+        await tile.document.setFlag(MODULE_ID, `${label} - pinned`, [...currentPinnedIds, ...finalTargetIds]);
+        
         finalTargets.forEach(target => {
             const targetName = target.name || target.document?.name || 'Token';
-            const buryEffectName = `falling-rocks-buried-${target.id}`;
+            const buryEffectName = `${label}-${target.name}-${target.id}`;
 
             seq = seq
                 // Persistent copy sprite under rocks
@@ -134,8 +140,39 @@ async function play(tile, targets, config = {}) {
 }
 
 async function stop(tile, config = {}) {
-    // Clear rock rubble on tile
-    await Sequencer.EffectManager.endEffects({ name: `falling-rocks-rubble-${tile.id}` });
+    const { label } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const id = tile.id; // Or however you define the 'id' variable used in the flag key
+    
+    // 1. Retrieve the pinned IDs from the tile's flags (fallback to an empty array if none)
+    const pinnedIds = tile.document.getFlag(MODULE_ID, `${label} - pinned`) ?? [];
+
+    // 2. Clear rock rubble effect on the tile
+    await Sequencer.EffectManager.endEffects({ name: `${label}-${tile.id}` });
+
+    if (pinnedIds.length > 0) {
+        // 3. Convert IDs to actual canvas token objects, filtering out any that no longer exist
+        const tokensToClean = pinnedIds
+            .map(tokenId => canvas.tokens.get(tokenId))
+            .filter(token => token !== undefined);
+
+        // 4. Trigger the unbury sequence for all tokens simultaneously and wait for them to finish
+        const cleanPromises = tokensToClean.map(token => cleanToken(token, config));
+        await Promise.all(cleanPromises);
+
+        // 5. Clean up the flag so these tokens aren't accidentally processed again later
+        await tile.document.unsetFlag(MODULE_ID, `${label} - pinned`);
+    }
+}
+
+async function cleanToken(token, config = {}) {
+    const { label } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    await Sequencer.EffectManager.endEffects({ name: `${label}-${token.name}-${token.id}` });
+    // Restore token opacity
+    return new Sequence()
+        .animation()
+        .on(token)
+        .opacity(1)
+        .play();
 }
 
 async function setup(config = {}) {
@@ -144,6 +181,7 @@ async function setup(config = {}) {
 
 export const fallingRocks = {
     create,
+    cleanToken, // Clears the opacity flag of a token
     play,
     stop,
     setup,

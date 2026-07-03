@@ -1,0 +1,89 @@
+<form class="eskie-recommended-modules-container">
+    <header class="eskie-world-scripts-header">
+        <div class="eskie-header-icon">
+            <i class="fa-solid fa-puzzle-piece"></i>
+        </div>
+        <div class="eskie-header-text">
+            <h2>{{localize "EMP.recommendedModules.menuTitle"}}</h2>
+            <p class="notes">{{menuHint}}</p>
+        </div>
+    </header>
+
+    <hr />
+
+    <div class="eskie-recommended-modules-scroll-area">
+        {{#each categories}}
+        <div class="eskie-category-group">
+            <div class="eskie-category-header">
+                <i class="{{icon}}"></i>
+                <h3>{{name}}</h3>
+            </div>
+
+            {{#if subcategories}}
+                {{#each subcategories}}
+                <div class="eskie-subcategory-group">
+                    <div class="eskie-subcategory-header">
+                        <div class="eskie-subcategory-title-row">
+                            <i class="{{icon}}"></i>
+                            <h4>{{name}}</h4>
+                        </div>
+                        {{#if subStatus}}
+                        <span class="eskie-subcategory-status {{subStatus.statusClass}}">
+                            <i class="{{subStatus.statusIcon}}"></i> {{subStatus.statusLabel}}
+                        </span>
+                        {{/if}}
+                    </div>
+                    <div class="eskie-recommended-modules-list">
+                        {{#each modules}}
+                        <div class="eskie-module-card {{statusClass}}">
+                            <div class="eskie-card-icon-wrapper">
+                                <i class="{{icon}}"></i>
+                            </div>
+                            <div class="eskie-card-details">
+                                <div class="eskie-card-title-row">
+                                    <h3 class="eskie-card-title">{{name}}</h3>
+                                </div>
+                                <p class="eskie-card-description">{{description}}</p>
+                            </div>
+                            <div class="eskie-card-status-wrapper">
+                                <span class="eskie-status-badge {{statusClass}}">
+                                    <i class="{{statusIcon}}"></i> {{statusLabel}}
+                                </span>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+                {{/each}}
+            {{else}}
+                <div class="eskie-recommended-modules-list">
+                    {{#each modules}}
+                    <div class="eskie-module-card {{statusClass}}">
+                        <div class="eskie-card-icon-wrapper">
+                            <i class="{{icon}}"></i>
+                        </div>
+                        <div class="eskie-card-details">
+                            <div class="eskie-card-title-row">
+                                <h3 class="eskie-card-title">{{name}}</h3>
+                            </div>
+                            <p class="eskie-card-description">{{description}}</p>
+                        </div>
+                        <div class="eskie-card-status-wrapper">
+                            <span class="eskie-status-badge {{statusClass}}">
+                                <i class="{{statusIcon}}"></i> {{statusLabel}}
+                            </span>
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            {{/if}}
+        </div>
+        {{/each}}
+    </div>
+
+    <footer class="eskie-world-scripts-footer">
+        <button type="submit" name="submit" class="eskie-btn-primary">
+            <i class="fa-solid fa-check"></i> {{localize "EMP.recommendedModules.closeButton"}}
+        </button>
+    </footer>
+</form>

@@ -93,6 +93,7 @@ async function create(token, config = {}) {
 
         .effect()
             .copySprite(token)
+            .spriteRotation(-token.document.rotation)
             .atLocation(token)   
             .scaleToObject(0.9, { considerTokenScale: true })
             .opacity(0.5)
@@ -111,6 +112,7 @@ async function create(token, config = {}) {
         .effect()
             .name(`${token.document.name} Step of the Wind (Jump)`)
             .copySprite(token)
+            .spriteRotation(-token.document.rotation)
             .atLocation(token)
             .scaleToObject(1, { considerTokenScale: true })
             .opacity(1)

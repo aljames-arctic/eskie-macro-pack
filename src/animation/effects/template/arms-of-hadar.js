@@ -33,6 +33,7 @@ async function create(token, config = {}) {
                 .effect()
                 .name(`${target.name} ${id}`)
                 .copySprite(target)
+                .spriteRotation(-target.document.rotation)
                 .atLocation(target)
                 .scaleToObject(1, { considerTokenScale: true })
                 .fadeOut(100)
@@ -140,6 +141,7 @@ async function create(token, config = {}) {
 
                     .effect()
                     .copySprite(target)
+                    .spriteRotation(-target.document.rotation)
                     .atLocation(target)
                     .scaleToObject(target.document.width, { considerTokenScale: true })
                     .moveTowards({ x: newX, y: newY }, { rotate: false, ease: "easeOutBack" })
@@ -150,6 +152,7 @@ async function create(token, config = {}) {
 
                     .effect()
                     .copySprite(target)
+                    .spriteRotation(-target.document.rotation)
                     .atLocation(target)
                     .scaleToObject(target.document.width, { considerTokenScale: true })
                     .moveTowards({ x: newX, y: newY }, { rotate: false, ease: "easeOutBack" })
@@ -158,6 +161,7 @@ async function create(token, config = {}) {
 
                     .effect()
                     .copySprite(target)
+                    .spriteRotation(-target.document.rotation)
                     .atLocation({ x: newX, y: newY })
                     .scaleToObject(1, { considerTokenScale: true })
                     .moveTowards(target, { rotate: false, ease: "easeOutBack" })

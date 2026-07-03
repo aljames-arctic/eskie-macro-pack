@@ -27,6 +27,7 @@ async function create(target, config = {}) {
 
     sequence = sequence.effect()
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .scaleToObject(1, { considerTokenScale: true })
         .duration(500)
         .scaleOut(0, 500, { ease: "easeInOutElastic" })
@@ -55,6 +56,7 @@ async function create(target, config = {}) {
     
     sequence = sequence.effect()
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .scaleToObject(1, { considerTokenScale: true })
         .scaleIn(0, 500, { ease: "easeInOutElastic" })
         .rotateIn(180, 300, { ease: "easeOutCubic" })

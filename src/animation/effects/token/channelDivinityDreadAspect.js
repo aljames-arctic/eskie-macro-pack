@@ -142,6 +142,7 @@ async function create(token, targets, config = {}) {
 
         sequence.effect()
             .copySprite(target)
+            .spriteRotation(-target.document.rotation)
             .attachTo(target)
             .scaleToObject(1, { considerTokenScale: true })
             .fadeIn(500)

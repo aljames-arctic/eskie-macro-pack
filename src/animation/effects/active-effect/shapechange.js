@@ -84,6 +84,7 @@ async function createShapechange(token, config = {}) {
         // Ghost of the current token image — stretches and squashes as it warps.
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .attachTo(token)
         .fadeIn(500)
         .fadeOut(500)
@@ -163,6 +164,7 @@ async function createShapechange(token, config = {}) {
         // Copy of the current token sprite — blurred and darkened during the climax.
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .delay(2400)
         .attachTo(token)
         .duration(2000)

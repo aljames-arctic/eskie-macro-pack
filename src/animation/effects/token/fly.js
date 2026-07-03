@@ -24,6 +24,7 @@ async function create(token, config = {}) {
 
     seq = seq.effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .name(`${id} - ${token.id}`)
         .atLocation(token)
         .scaleToObject(1, { considerTokenScale: true })
@@ -38,6 +39,7 @@ async function create(token, config = {}) {
 
     seq = seq.effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .name(`${id} - ${token.id}`)
         .atLocation(token)
         .scaleToObject(0.9, { considerTokenScale: true })

@@ -63,6 +63,7 @@ async function create(token, target, config = {}) {
     // Create effect copy of target and pull it toward location  
     sequence.effect()
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .zIndex(0)
         .animateProperty('sprite', 'position.x', { from: 0, to: offsetX, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })
         .animateProperty('sprite', 'position.y', { from: 0, to: offsetY, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })

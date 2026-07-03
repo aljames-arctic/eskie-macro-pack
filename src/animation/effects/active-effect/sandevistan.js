@@ -130,6 +130,7 @@ async function travelSequence(token, tile, config = {}, options = {}) {
         else seq = seq.persist();
         seq = seq.delay(msPerImage * i)
             .copySprite(token)
+            .spriteRotation(-token.document.rotation)
             .scaleToObject(1, { considerTokenScale: true })
             .belowTokens()
             .opacity(1)

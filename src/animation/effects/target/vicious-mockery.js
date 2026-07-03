@@ -155,6 +155,7 @@ async function createViciousMockeryImpact(target, word, config = {}) {
         .effect()
         .delay(600)
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .attachTo(target)
         .scaleToObject(1, { considerTokenScale: true })
         .fadeIn(200)

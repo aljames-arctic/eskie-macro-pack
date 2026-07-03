@@ -16,6 +16,7 @@ async function create(token, config = {}) {
     let seq = new Sequence()
       .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .attachTo(token)
         .scaleToObject(1, { considerTokenScale: true })
         .duration(1500) 
@@ -30,6 +31,7 @@ async function create(token, config = {}) {
      
       .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .attachTo(token)
         .scaleToObject(1, { considerTokenScale: true })
         .duration(750) 

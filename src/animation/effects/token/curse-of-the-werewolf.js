@@ -97,6 +97,7 @@ async function create(target, config = {}) {
         // Ghost of the current token — glowing red, fading in as the curse takes hold.
         .effect()
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .attachTo(target)
         .scaleToObject(1, { considerTokenScale: true })
         .fadeIn(250)
@@ -110,6 +111,7 @@ async function create(target, config = {}) {
         // Subtle stretch-squash ghost of the current form — the body beginning to change.
         .effect()
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .attachTo(target)
         .fadeIn(500)
         .fadeOut(500)

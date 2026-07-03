@@ -67,6 +67,7 @@ async function create(token, config = {}) {
 
         .effect()
             .copySprite(token)
+            .spriteRotation(-token.document.rotation)
             .atLocation(token)
             .scaleToObject(1, { considerTokenScale: true })
             .filter("ColorMatrix", {saturate: -1, brightness:10})
@@ -121,6 +122,7 @@ async function create(token, config = {}) {
 
         .effect()
             .copySprite(token)
+            .spriteRotation(-token.document.rotation)
             .atLocation(token)
             .scaleToObject(1, { considerTokenScale: true })
             .filter("ColorMatrix", {saturate: -1, brightness:10})

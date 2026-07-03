@@ -263,6 +263,7 @@ function create(token, config = {}) {
         .effect()
             .name(`${id} ${token.name}`)
             .copySprite(token)
+            .spriteRotation(-token.document.rotation)
             .attachTo(token)
             .scaleToObject(1, { considerTokenScale: true })
             .mask(token)

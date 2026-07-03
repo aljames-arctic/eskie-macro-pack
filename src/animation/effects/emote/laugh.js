@@ -67,6 +67,7 @@ async function create(token, config = {}) {
         .effect()
         .name(id)
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .scaleToObject(1, { considerTokenScale: true })
         .atLocation(token)
         .attachTo(token, { bindAlpha: false })

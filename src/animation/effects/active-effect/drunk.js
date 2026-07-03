@@ -68,6 +68,7 @@ async function create(token, config = {}) {
         // Sway effect attached to token
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .scaleToObject(1, { considerTokenScale: true })
         .name(label)
         .atLocation(token)

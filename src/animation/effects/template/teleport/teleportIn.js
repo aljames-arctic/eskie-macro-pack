@@ -48,6 +48,7 @@ function create(token, targets, config = {}) {
 
     sequence = sequence.effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .atLocation(token)
         .scaleToObject(1.1, { considerTokenScale: true })
         .filter("ColorMatrix", { saturate: -1, brightness: 10 })
@@ -58,6 +59,7 @@ function create(token, targets, config = {}) {
     targets.forEach(target => {
         sequence = sequence.effect()
             .copySprite(target)
+            .spriteRotation(-target.document.rotation)
             .atLocation(target)
             .scaleToObject(1.1, { considerTokenScale: true })
             .filter("ColorMatrix", { saturate: -1, brightness: 10 })

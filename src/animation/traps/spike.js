@@ -76,6 +76,7 @@ async function create(tile, targets, config = {}) {
                 // Shaking token effect when struck by trap
                 .effect()
                 .copySprite(target)
+                .spriteRotation(-target.document.rotation)
                 .scaleToObject(1, { considerTokenScale: true })
                 .fadeIn(250)
                 .fadeOut(750)

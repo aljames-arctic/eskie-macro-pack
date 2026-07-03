@@ -108,6 +108,7 @@ function createTarget(target, config = {}) {
             // Effects on the targets
             sequence.effect()
                 .copySprite(target)
+                .spriteRotation(-target.document.rotation)
                 .atLocation(target)
                 .scaleToObject(1, { considerTokenScale: true })
                 .filter("ColorMatrix", { brightness: 5, saturate: -1 })

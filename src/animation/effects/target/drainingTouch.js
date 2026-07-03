@@ -67,6 +67,7 @@ async function create(token, target, config = {}) {
 
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .atLocation(token)
         .mirrorX(token.document.mirrorX)
         .scaleToObject(1, { considerTokenScale: true })
@@ -111,6 +112,7 @@ async function create(token, target, config = {}) {
         // Target grows pale
         .effect()
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .attachTo(target)
         .scaleToObject(1, { considerTokenScale: true })
         .filter("ColorMatrix", { saturate: -1 })
@@ -193,6 +195,7 @@ async function play(token, target, config = {}) {
             .effect()
             .name(`Incorporeal ${token.document.name}`)
             .copySprite(token)
+            .spriteRotation(-token.document.rotation)
             .attachTo(token, { bindAlpha: false })
             .scaleToObject(1, { considerTokenScale: true })
             .opacity(0.65)

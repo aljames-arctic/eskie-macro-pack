@@ -21,10 +21,11 @@
                 </div>
                 <div class="eskie-aa-chip-grid">
                     {{#each missingEntries}}
-                    <div class="eskie-aa-chip">
+                    <label class="eskie-aa-chip toggleable">
+                        <input type="checkbox" name="missing_{{id}}" checked />
                         <span class="eskie-chip-label">{{label}}</span>
                         <span class="eskie-chip-menu">{{menu}}</span>
-                    </div>
+                    </label>
                     {{/each}}
                 </div>
             </div>

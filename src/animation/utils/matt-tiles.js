@@ -41,6 +41,7 @@ async function start(token, code, config = {}) {
 
     const MATTtriggers = ["exit", "manual"];
     const MATTactions = [{
+        id: foundry.utils.randomID(),
         action: 'runcode',
         data: { code: code ?? `console.error(arguments)` },
     }];
@@ -218,6 +219,7 @@ if (playPath && typeof token !== 'undefined') {
             'flags.monks-active-tiles.active': true,
             'flags.monks-active-tiles.trigger': config.trigger || ['enter'],
             'flags.monks-active-tiles.actions': [{
+                id: foundry.utils.randomID(),
                 action: 'runcode',
                 data: { code },
             }],

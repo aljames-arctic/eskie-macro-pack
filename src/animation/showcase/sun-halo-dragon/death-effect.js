@@ -24,6 +24,7 @@ function create(token, config = {}) {
         .effect()
             .delay(delay-1000)
             .copySprite(token)
+            .spriteRotation(-token.document.rotation)
             .atLocation(token)
             .scaleToObject(1, { considerTokenScale: true })
             .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true})
@@ -56,6 +57,7 @@ function create(token, config = {}) {
         // Top half mask copy
         .effect()
             .copySprite(token)
+            .spriteRotation(-token.document.rotation)
             .name(`${token.document.name}Top`)
             .scaleToObject(1, { considerTokenScale: true })
             .atLocation(token)
@@ -80,6 +82,7 @@ function create(token, config = {}) {
         // Bottom half mask copy
         .effect()
             .copySprite(token)
+            .spriteRotation(-token.document.rotation)
             .name(`${token.document.name}Bottom`)
             .scaleToObject(1, { considerTokenScale: true })
             .atLocation(token)

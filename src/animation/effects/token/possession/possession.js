@@ -33,6 +33,7 @@ async function create(token, target, config = {}) {
 
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .atLocation(target)
         .mirrorX(token.document.mirrorX)
         .animateProperty("spriteContainer", "position.y", { from: -1, to: 0, duration: 750, gridUnits: true, ease: "easeOutExpo" })
@@ -80,6 +81,7 @@ async function create(token, target, config = {}) {
         .delay(500)
         .name(`${id} - ${target.uuid}`)
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .attachTo(target, { bindAlpha: false })
         .belowTokens()
         .mirrorX(token.document.mirrorX)

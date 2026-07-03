@@ -172,6 +172,7 @@ async function create(source, target, config = {}) {
     sequence.effect()
         .delay(100)
         .copySprite(source)
+        .spriteRotation(-source.document.rotation)
         .animateProperty('sprite', 'position.x', {
             from: 0,
             to: nxt * canvas.grid.size * 0.2,
@@ -188,6 +189,7 @@ async function create(source, target, config = {}) {
     sequence.effect()
         .delay(100)
         .copySprite(source)
+        .spriteRotation(-source.document.rotation)
         .animateProperty('sprite', 'position.x', {
             from: nxt * canvas.grid.size * 0.2,
             to: 0,
@@ -241,6 +243,7 @@ async function create(source, target, config = {}) {
     // Target Knockback
     sequence.effect()
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .animateProperty('sprite', 'position.x', {
             from: 0,
             to: nx * pushDistance * 0.15,
@@ -258,6 +261,7 @@ async function create(source, target, config = {}) {
     sequence.effect()
         .delay(100)
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .animateProperty('sprite', 'position.x', {
             from: nx * pushDistance * 0.15,
             to: 0,

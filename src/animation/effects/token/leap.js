@@ -65,6 +65,7 @@ async function createLeap(token, config = {}) {
 
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .atLocation(token)
         .scaleToObject(1, { considerTokenScale: true })
         .opacity(1)
@@ -76,6 +77,7 @@ async function createLeap(token, config = {}) {
 
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .atLocation(token)
         .scaleToObject(1, { considerTokenScale: true })
         .opacity(0.5)

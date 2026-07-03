@@ -36,6 +36,7 @@ async function createEnlarge(token, config = {}) {
 
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .atLocation(token)
         .scaleToObject(1, { considerTokenScale: true })
         .scaleToObject(2)
@@ -53,6 +54,7 @@ async function createEnlarge(token, config = {}) {
 
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .atLocation(token)
         .scaleToObject(1, { considerTokenScale: true })
         .loopProperty("sprite", "rotation", { from: -10, to: 10, duration: 75, pingPong: true, delay: 200 })
@@ -77,6 +79,7 @@ async function createEnlarge(token, config = {}) {
 
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .atLocation(token)
         .scaleToObject(1, { considerTokenScale: true })
         .duration(3000)
@@ -162,6 +165,7 @@ async function createReduce(token, config = {}) {
 
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .atLocation(token)
         .scaleToObject(2, { considerTokenScale: true })
         .duration(500)
@@ -178,6 +182,7 @@ async function createReduce(token, config = {}) {
 
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .atLocation(token)
         .scaleToObject(1, { considerTokenScale: true })
         .loopProperty("sprite", "rotation", { from: -10, to: 10, duration: 75, pingPong: true, delay: 200 })
@@ -202,6 +207,7 @@ async function createReduce(token, config = {}) {
 
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .atLocation(token)
         .scaleToObject(1, { considerTokenScale: true })
         .duration(3000)

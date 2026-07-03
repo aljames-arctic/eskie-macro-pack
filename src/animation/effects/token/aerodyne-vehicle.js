@@ -35,6 +35,7 @@ async function create(token, config = {}) {
 
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: 0, y: -0.2 }, gridUnits: true })
         .size({ width: w, height: h })
@@ -49,6 +50,7 @@ async function create(token, config = {}) {
 
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .name(EFFECT_NAME)
         .atLocation(token)
         .size({ width: w, height: h })

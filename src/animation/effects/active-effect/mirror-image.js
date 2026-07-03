@@ -45,6 +45,7 @@ async function createMirrorImage(token, config = {}) {
 
         .effect()
             .copySprite(token)
+            .spriteRotation(-token.document.rotation)
             .atLocation(token)
             .scaleToObject(1, { considerTokenScale: true })
             .belowTokens()
@@ -56,6 +57,7 @@ async function createMirrorImage(token, config = {}) {
 
         .effect()
             .copySprite(token)
+            .spriteRotation(-token.document.rotation)
             .atLocation(token)
             .scaleToObject(1, { considerTokenScale: true })
             .belowTokens()
@@ -71,6 +73,7 @@ async function createMirrorImage(token, config = {}) {
         .effect()
             .name(`${label} (1)`) // Unique name for stopping
             .copySprite(token)
+            .spriteRotation(-token.document.rotation)
             .atLocation(token)
             .scaleToObject(1, { considerTokenScale: true })
             .anchor({ x: 0.9 + (imageNumber * 0.05) })
@@ -89,6 +92,7 @@ async function createMirrorImage(token, config = {}) {
         .effect()
             .name(`${label} (2)`) // Unique name for stopping
             .copySprite(token)
+            .spriteRotation(-token.document.rotation)
             .scaleToObject(1, { considerTokenScale: true })
             .playIf(imageNumber >= 2)
             .atLocation(token)
@@ -108,6 +112,7 @@ async function createMirrorImage(token, config = {}) {
         .effect()
             .name(`${label} (3)`) // Unique name for stopping
             .copySprite(token)
+            .spriteRotation(-token.document.rotation)
             .scaleToObject(1, { considerTokenScale: true })
             .playIf(imageNumber === 3)
             .atLocation(token)

@@ -64,6 +64,7 @@ function create(token, target, config = {}) {
 
         .effect()
             .copySprite(target)
+            .spriteRotation(-target.document.rotation)
             .atLocation(target)
             .scaleToObject(1, { considerTokenScale: true })
             .attachTo(target)
@@ -121,6 +122,7 @@ function create(token, target, config = {}) {
         seq = seq.effect()
             .name(label)
             .copySprite(target)
+            .spriteRotation(-target.document.rotation)
             .scaleToObject(1, { considerTokenScale: true })
             .delay(1500)
             .fadeIn(10000)

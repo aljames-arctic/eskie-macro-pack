@@ -27,6 +27,7 @@ function proneCreate(token, target, config = {}) {
 
         .effect()
             .copySprite(target)
+            .spriteRotation(-target.document.rotation)
             .attachTo(target, {bindAlpha:false, bindRotation:false,local:false})
             .scaleToObject(0.9, { considerTokenScale: true })
             .zIndex(0.1)
@@ -49,6 +50,7 @@ function proneCreate(token, target, config = {}) {
         
         .effect()
             .copySprite(target)
+            .spriteRotation(-target.document.rotation)
             .attachTo(target, {bindAlpha:false, bindRotation:false,local:false})
             .scaleToObject(1, { considerTokenScale: true })
             .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", delay:100, gridUnits: true })

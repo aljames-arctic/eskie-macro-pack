@@ -47,6 +47,7 @@ async function create(tile, targets, config = {}) {
                 // Burning token shake effect
                 .effect()
                 .copySprite(target)
+                .spriteRotation(-target.document.rotation)
                 .delay(2000)
                 .attachTo(target)
                 .scaleToObject(1, { considerTokenScale: true })

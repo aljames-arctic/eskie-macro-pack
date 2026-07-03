@@ -144,6 +144,7 @@ async function createBanish(target, config = {}) {
 
     sequence.effect()
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .animateProperty("spriteContainer", "position.y", { from: 0, to: -15, duration: 250, ease: "easeInOutBack" })
@@ -151,6 +152,7 @@ async function createBanish(target, config = {}) {
 
     sequence.effect()
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .animateProperty("spriteContainer", "position.y", { from: -15, to: 0, duration: 2000, ease: "easeInOutBack" })
@@ -162,6 +164,7 @@ async function createBanish(target, config = {}) {
 
     sequence.effect()
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .animateProperty("spriteContainer", "position.y", { from: 0, to: -40, duration: 500, ease: "easeInOutBack" })
@@ -169,6 +172,7 @@ async function createBanish(target, config = {}) {
 
     sequence.effect()
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .animateProperty("spriteContainer", "position.y", { from: -40, to: -15, duration: 2000, ease: "easeInOutBack" })
@@ -180,6 +184,7 @@ async function createBanish(target, config = {}) {
 
     sequence.effect()
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .animateProperty("spriteContainer", "position.y", { from: -15, to: -200, duration: 750, ease: "easeInOutBack" })
@@ -257,6 +262,7 @@ async function createReturn(target, config = {}) {
         .waitUntilFinished(-4000);
     sequence.effect()
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .animateProperty("spriteContainer", "position.y", { from: -75, to: 0, duration: 500, ease: "easeOutBounce" })

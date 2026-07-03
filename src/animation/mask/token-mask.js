@@ -179,13 +179,12 @@ async function createLocal(object, tileIds, animationId, config = {}) {
 
     seq = seq.effect()
         .name(label)
-        .copySprite(object);
-        .spriteRotation(-object.document.rotation)
+        .copySprite(object)
+        .spriteRotation(-object.document.rotation);
     if (tint && tint !== 'none') seq = seq.tint(tint);
     seq = seq
         .attachTo(object, { bindAlpha: false, bindVisibility: false, bindRotation: true })
         .scaleToObject(1, { considerTokenScale: true })
-        .spriteRotation(-object.document.rotation)
         .mask(objectRevealMask)
         .persist()
         .locally(true)

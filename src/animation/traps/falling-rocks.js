@@ -121,19 +121,6 @@ async function create(tile, targets, config = {}) {
                 .animation()
                 .on(target)
                 .opacity(0)
-
-                // Wait for falling rocks to finish; tile rubble endframe already persists
-                .wait(3500)
-
-                // Clean up buried target visual effects
-                .thenDo(function () {
-                    Sequencer.EffectManager.endEffects({ name: buryEffectName, object: target });
-                })
-
-                // Restore token opacity
-                .animation()
-                .on(target)
-                .opacity(1);
         });
     }
 

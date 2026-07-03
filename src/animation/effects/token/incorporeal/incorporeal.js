@@ -53,6 +53,7 @@ async function create(token, config = {}) {
     seq.effect()
         .name(`${id} - ${token.uuid}`)
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .attachTo(token, { bindAlpha: false })
         .scaleToObject(1, { considerTokenScale: true })
         .opacity(0.65)

@@ -80,6 +80,7 @@ async function create(tile, targets, config = {}) {
                     // Shaking copy sprite for target hit feedback
                     .effect()
                     .copySprite(target)
+                    .spriteRotation(-target.document.rotation)
                     .attachTo(target)
                     .scaleToObject(1, { considerTokenScale: true })
                     .fadeIn(250)
@@ -100,6 +101,7 @@ async function create(tile, targets, config = {}) {
                     // Green poison tint effect
                     .effect()
                     .copySprite(target)
+                    .spriteRotation(-target.document.rotation)
                     .delay(250)
                     .attachTo(target)
                     .scaleToObject(1, { considerTokenScale: true })
@@ -112,6 +114,7 @@ async function create(tile, targets, config = {}) {
                     // Poison hit token shake
                     .effect()
                     .copySprite(target)
+                    .spriteRotation(-target.document.rotation)
                     .delay(250)
                     .attachTo(target)
                     .scaleToObject(1, { considerTokenScale: true })
@@ -131,6 +134,7 @@ async function create(tile, targets, config = {}) {
                 seq = seq
                     .effect()
                     .copySprite(target)
+                    .spriteRotation(-target.document.rotation)
                     .delay(250)
                     .attachTo(target)
                     .scaleToObject(1, { considerTokenScale: true })

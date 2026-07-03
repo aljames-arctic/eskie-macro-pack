@@ -121,6 +121,7 @@ function movement1create(red, blue, config = {}) {
         .effect()
             .name("gob")
             .copySprite(blue)
+            .spriteRotation(-blue.document.rotation)
             .scaleToObject(1, {considerTokenScale:true})
             .moveTowards(b2, {delay:1000, ease: "easeOutQuint", rotate:false})
             .loopProperty("sprite", "position.x", { from: 0.05, to: 0, duration: 50, pingPong: true, gridUnits: true, delay: 1500})
@@ -130,6 +131,7 @@ function movement1create(red, blue, config = {}) {
         .effect()
             .name("gob")
             .copySprite(red)
+            .spriteRotation(-red.document.rotation)
             .scaleToObject(1, {considerTokenScale:true})
             .moveTowards(r2, {delay:1000, ease: "easeOutQuint", rotate:false})
             .loopProperty("sprite", "position.x", { from: -0.05, to: 0, duration: 50, pingPong: true, gridUnits: true, delay: 1500})
@@ -335,6 +337,7 @@ function movement2create(red, blue, config = {}) {
     .effect()
         .name("gob")
         .copySprite(blue)
+        .spriteRotation(-blue.document.rotation)
         .scaleToObject(1, {considerTokenScale:true})
         .animateProperty("spriteContainer", "position.x", { from: 0, to: 2, duration: 500, delay: 1000, gridUnits: true, ease: "easeOutQuint"})
         //1st attack
@@ -354,6 +357,7 @@ function movement2create(red, blue, config = {}) {
     .effect()
         .name("gob")
         .copySprite(red)
+        .spriteRotation(-red.document.rotation)
         .scaleToObject(1, {considerTokenScale:true})
         .moveTowards(r3, {delay:1000, ease: "easeOutQuint", rotate:false})
         //1st defend
@@ -504,6 +508,7 @@ function movement2create(red, blue, config = {}) {
     .effect()
         .delay(4050)
         .copySprite(red)
+        .spriteRotation(-red.document.rotation)
         .scaleToObject(1, {considerTokenScale:true})
         .atLocation(r3)
         .scaleToObject(1)
@@ -594,6 +599,7 @@ function movement3create(red, blue, config = {}) {
             .effect()
             .name("gob")
             .copySprite(red)
+            .spriteRotation(-red.document.rotation)
             .scaleToObject(1, {considerTokenScale:true})
             .animateProperty("spriteContainer", "position.x", { from: 0, to: -3, duration: 500, delay: 1000, gridUnits: true, ease: "easeOutQuint"})
             //1st attack
@@ -620,6 +626,7 @@ function movement3create(red, blue, config = {}) {
         .effect()
             .name("gob")
             .copySprite(blue)
+            .spriteRotation(-blue.document.rotation)
             .scaleToObject(1, {considerTokenScale:true})
             //1st defend
             .animateProperty("spriteContainer", "position.y", { from: 0, to: 0.75, duration: 250, delay: 2000, gridUnits: true, ease: "easeOutCubic"})
@@ -646,6 +653,7 @@ function movement3create(red, blue, config = {}) {
         .effect()
             .name("gob")
             .copySprite(red)
+            .spriteRotation(-red.document.rotation)
             .scaleToObject(1, {considerTokenScale:true})
             .animateProperty("spriteContainer", "position.x", { from: 0, to: -3, duration: 500, delay: 1000, gridUnits: true, ease: "easeOutQuint"})
             //1st attack
@@ -670,6 +678,7 @@ function movement3create(red, blue, config = {}) {
         .effect()
             .name("gob")
             .copySprite(blue)
+            .spriteRotation(-blue.document.rotation)
             .scaleToObject(1, {considerTokenScale:true})
             //1st defend
             .animateProperty("spriteContainer", "position.y", { from: 0, to: 0.75, duration: 250, delay: 2000, gridUnits: true, ease: "easeOutCubic"})

@@ -21,6 +21,7 @@ async function create(token, config = {}) {
         .effect()
         .name(EFFECT_NAME)
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .atLocation(token)
         .attachTo(token, { bindRotation: false, bindVisibility: false })
         .opacity(0.5)

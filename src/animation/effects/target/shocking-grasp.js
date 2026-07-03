@@ -80,6 +80,7 @@ async function createShockingGrasp(token, target, config = {}) {
 
         .effect()
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .attachTo(target)
         .scaleToObject(1, { considerTokenScale: true })
         .fadeIn(250)

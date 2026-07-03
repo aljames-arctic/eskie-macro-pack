@@ -80,6 +80,7 @@ async function createStunningStrike(token, target, config = {}) {
 
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .atLocation(token)
         .scaleToObject(1, { considerTokenScale: true })
         .mirrorX(token.document.mirrorX)
@@ -129,6 +130,7 @@ async function createStunningStrike(token, target, config = {}) {
 
         .effect()
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .fadeIn(200)

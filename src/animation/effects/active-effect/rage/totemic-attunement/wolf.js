@@ -46,6 +46,7 @@ function create(token, target, config = {}) {
         .effect()
             .delay(150)
             .copySprite(target)
+            .spriteRotation(-target.document.rotation)
             .attachTo(target)
             .scaleToObject(1, { considerTokenScale: true })
             .duration(1000) 
@@ -97,6 +98,7 @@ function create(token, target, config = {}) {
 
         .effect()
             .copySprite(token)
+            .spriteRotation(-token.document.rotation)
             .atLocation(token)
             .scaleToObject(1, { considerTokenScale: true })
             .animateProperty("sprite", "position.x", { from: 0, to: mid.x, duration: 250, ease:"easeOutExpo",delay:200})
@@ -129,6 +131,7 @@ function create(token, target, config = {}) {
 
         .effect()
             .copySprite(target)
+            .spriteRotation(-target.document.rotation)
             .attachTo(target, {bindAlpha:false, bindRotation:false,local:false})
             .scaleToObject(0.9, { considerTokenScale: true })
             .zIndex(0.1)
@@ -151,6 +154,7 @@ function create(token, target, config = {}) {
 
         .effect()
             .copySprite(target)
+            .spriteRotation(-target.document.rotation)
             .attachTo(target, {bindAlpha:false, bindRotation:false,local:false})
             .scaleToObject(1, { considerTokenScale: true })
             .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", delay:100, gridUnits: true })

@@ -51,6 +51,7 @@ function create(token, config = {}) {
     .effect()
         .name(label)
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .attachTo(token, {bindAlpha: false})
         .scaleToObject(1, { considerTokenScale: true })
         .fadeIn(500)

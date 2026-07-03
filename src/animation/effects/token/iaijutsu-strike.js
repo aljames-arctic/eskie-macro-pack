@@ -56,6 +56,7 @@ function deathAnimation(target) {
     sequence.effect()
         .name(`IaijutsuStrike ${target.name} Top`)
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .shape("polygon", {
@@ -77,6 +78,7 @@ function deathAnimation(target) {
     sequence.effect()
         .name(`IaijutsuStrike ${target.name} Bottom`)
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .shape("polygon", {

@@ -98,6 +98,7 @@ async function createSuggestion(token, target, config = {}) {
 
         .effect()
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .attachTo(target, { bindAlpha: false })
         .scaleToObject(1, { considerTokenScale: true })
         .belowTokens()

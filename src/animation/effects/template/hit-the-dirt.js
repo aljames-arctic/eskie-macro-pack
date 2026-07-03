@@ -39,6 +39,7 @@ async function create(token, config, options) {
 
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .atLocation(token)
         .scaleToObject(0.85, { considerTokenScale: true })
         .moveTowards(position, { delay: 100, rotate: false, ease: "easeOutQuint" })
@@ -62,6 +63,7 @@ async function create(token, config, options) {
         // Animate the token jumping
         .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .atLocation(token)
         .scaleToObject(1, { considerTokenScale: true })
         .moveTowards(position, { delay: 100, rotate: false, ease: "easeOutQuint" })    // Horizontal Movement

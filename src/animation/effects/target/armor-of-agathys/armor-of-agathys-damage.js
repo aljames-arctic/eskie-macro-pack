@@ -28,6 +28,7 @@ async function create(token, target, config = {}) {
 
     sequence.effect()
         .copySprite(target)
+        .spriteRotation(-target.document.rotation)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .fadeIn(100)

@@ -62,6 +62,7 @@ function create(token, target, config = {}) {
     
     .effect()
         .copySprite(token)
+        .spriteRotation(-token.document.rotation)
         .atLocation(token)
         .scaleToObject(1, { considerTokenScale: true })
         .duration(900)

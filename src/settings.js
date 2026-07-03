@@ -1,11 +1,21 @@
 import { MODULE_ID } from "./lib/constants.js";
 import { autorecUpdateFormApplication } from "./integration/autoanimations/updateMenu.js";
 import { WorldScriptsFormApplication } from "./world-scripts/worldScriptsMenu.js";
+import { RecommendedModulesFormApplication } from "./recommended-modules/recommendedModulesMenu.js";
 import { log } from './lib/logger.js';
 
 /* Initialize Module Settings */
 Hooks.once('init', function() {
     log.info('Initializing Eskie Macro Pack settings');
+
+    // Recommended Modules Guide Menu
+    game.settings.registerMenu(MODULE_ID, 'recommendedModules', {
+        name: 'EMP.settings.recommendedModules.name',
+        label: 'EMP.settings.recommendedModules.label',
+        icon: 'fa-solid fa-puzzle-piece',
+        type: RecommendedModulesFormApplication,
+        restricted: false
+    });
 
     // World Scripts Configuration Menu
     game.settings.registerMenu(MODULE_ID, 'worldScripts', {

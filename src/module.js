@@ -10,6 +10,7 @@ import { loadWorldScripts } from './world-scripts/loader.js';
 
 // Import module settings to also run its initialization code
 import './settings.js';
+import { RecommendedModulesFormApplication } from './recommended-modules/recommendedModulesMenu.js';
 import { log } from './lib/logger.js';
 
 const status = {
@@ -31,6 +32,7 @@ Hooks.once('init', async () => {
                         file,
                         time,
                         token,
+                        openRecommendedModules: () => new RecommendedModulesFormApplication().render(true)
                     };
 
         // Setup dependency API

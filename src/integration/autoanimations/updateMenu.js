@@ -63,10 +63,11 @@ export async function generateAutorecUpdate(autorec) {
     log.debug("The following custom effects will be preserved.", customNew);
     log.groupEnd();
     
-    // Create lists for the dialog
-    let missingEntriesList = Object.values(missingEntries).flat().map(e => `${e.label} <i class="emp-animations-muted">(${e.menu})</i>`).sort();
-    let updatedEntriesList = Object.values(updatedEntries).flat().map(e => `${e.label} <i class="emp-animations-muted">(${e.menu})</i>`).sort();
-    let customEntriesList = Object.values(custom).flat().map(e => `${e.label} <i class="emp-animations-muted">(${e.menu})</i>`).sort();
+    // Create structured lists for the dialog
+    const formatEntry = (e) => ({ label: e.label, menu: e.menu || "preset" });
+    const missingEntriesList = Object.values(missingEntries).flat().map(formatEntry).sort((a, b) => a.label.localeCompare(b.label));
+    const updatedEntriesList = Object.values(updatedEntries).flat().map(formatEntry).sort((a, b) => a.label.localeCompare(b.label));
+    const customEntriesList = Object.values(custom).flat().map(formatEntry).sort((a, b) => a.label.localeCompare(b.label));
 
     // Construct the new settings that will be saved
     let newSettings = {};
@@ -89,62 +90,11 @@ export async function generateAutorecUpdate(autorec) {
         customEntriesList,
     };
 }
-    
-async function generateAutorecUpdateHTML(autorec) {
-    const {
-        missingEntriesList,
-        updatedEntriesList,
-        customEntriesList,
-    } = await generateAutorecUpdate(autorec);
-    let html = `<h1 style="text-align: center; font-weight: bold;">Eskie Macro Pack AA Integration Update Menu</h1>`;
-
-    if (missingEntriesList.length || updatedEntriesList.length || customEntriesList.length) {
-        if (missingEntriesList.length) {
-            html += `
-            <div class="emp-animations-autorec-update-child">
-                <p class="emp-animations-autorec-update-text">${game.i18n.localize("EMP.updateMenu.added")}</p>
-                <ul class="emp-animations-autorec-update-ul ${missingEntriesList.length % 3 === 0 ? "emp-animations-columns-3" : ""}">
-                    ${missingEntriesList.map((x) => `<li>${x}</li>`).join("")}
-                </ul>
-            </div>
-            `;
-        }
-        if (customEntriesList.length) {
-            html += `
-            <div class="emp-animations-autorec-update-child">
-                <p class="emp-animations-autorec-update-text">${game.i18n.localize("EMP.updateMenu.custom")}</p>
-                <p class="emp-animations-autorec-update-text">${game.i18n.localize("EMP.updateMenu.customHint")}</p>
-                <ul class="emp-animations-autorec-update-ul ${customEntriesList.length % 3 === 0 ? "emp-animations-columns-3" : ""}">
-                    ${customEntriesList.map((x) => `<li>${x}</li>`).join("")}
-                </ul>
-            </div>
-            `;
-        }
-        if (updatedEntriesList.length) {
-            html += `
-            <div class="emp-animations-autorec-update-child">
-                <p class="emp-animations-autorec-update-text">${game.i18n.localize("EMP.updateMenu.updated")}</p>
-                <ul class="emp-animations-autorec-update-ul ${updatedEntriesList.length % 3 === 0 ? "emp-animations-columns-3" : ""}">
-                    ${updatedEntriesList.map((x) => `<li>${x}</li>`).join("")}
-                </ul>
-            </div>
-            `;
-        }
-        html += `<p style="text-align: center; font-size: 1.2em; font-weight: bold;">${game.i18n.localize("EMP.updateMenu.warning")}</p>`;
-    } else {
-        html = `<p class="emp-animations-autorec-update-text">${game.i18n.localize("EMP.updateMenu.nothing")}</p>`;
-    }
-    return html;
-}
 
 export class autorecUpdateFormApplication extends FormApplication {
     constructor(autorec) {
         super();
         this.autorec = autorec ?? EMP_AA_Menu;
-    }
-
-    async html() {
-        return await generateAutorecUpdateHTML(this.autorec);
     }
 
     async settings() {
@@ -153,17 +103,32 @@ export class autorecUpdateFormApplication extends FormApplication {
 
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
-            classes: ["form"],
+            classes: ["eskie-world-scripts-form", "eskie-aa-update-form"],
             popOut: true,
             template: `modules/${MODULE_ID}/src/integration/autoanimations/autorecUpdateMenu.html`,
             id: "empAutorecUpdateMenu",
-            title: "Eskie Macro Pack AA Update",
+            title: "EMP.updateMenu.menuTitle",
+            width: 640,
+            height: "auto",
+            closeOnSubmit: true
         });
     }
 
     async getData() {
-        // Send data to the template
-        return { literallyEverything: await this.html() };
+        const {
+            missingEntriesList,
+            updatedEntriesList,
+            customEntriesList,
+        } = await this.settings();
+
+        const hasChanges = !!(missingEntriesList.length || updatedEntriesList.length || customEntriesList.length);
+
+        return {
+            missingEntries: missingEntriesList,
+            updatedEntries: updatedEntriesList,
+            customEntries: customEntriesList,
+            hasChanges
+        };
     }
 
     async activateListeners(html) {
@@ -172,16 +137,18 @@ export class autorecUpdateFormApplication extends FormApplication {
             updatedEntriesList,
             customEntriesList,
         } = await this.settings();
-        if (!(missingEntriesList.length || updatedEntriesList.length || customEntriesList.length))
-            $('[name="update"]').remove();
+
+        if (!(missingEntriesList.length || updatedEntriesList.length || customEntriesList.length)) {
+            html.find('[name="update"]').remove();
+        }
         super.activateListeners(html);
 
         html.find('button[name="cancel"]').on('click', () => this.close());
     }
 
     async _updateObject(event) {
-        $(".emp-animations-autorec-update-buttons").attr("disabled", true);
-        if (event.submitter.name === "update") {
+        $(".emp-animations-autorec-update-footer button").attr("disabled", true);
+        if (event.submitter && event.submitter.name === "update") {
             log.group("Autorecognition Menu Update");
             const { newSettings } = await this.settings();
             if (Object.keys(newSettings).length === 0)

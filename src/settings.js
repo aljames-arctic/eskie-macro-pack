@@ -26,13 +26,16 @@ Hooks.once('init', function() {
         restricted: true
     });
 
-    game.settings.registerMenu(MODULE_ID, 'autorecUpdate', {
-        name: 'EMP.settings.autorecUpdate.name',
-        label: 'EMP.settings.autorecUpdate.label',
-        icon: 'fa-solid fa-wrench',
-        type: autorecUpdateFormApplication,
-        restricted: true
-    });
+    // Register AA Autorec Update Menu only if Automated Animations is active
+    if (game.modules.get("autoanimations")?.active) {
+        game.settings.registerMenu(MODULE_ID, 'autorecUpdate', {
+            name: 'EMP.settings.autorecUpdate.name',
+            label: 'EMP.settings.autorecUpdate.label',
+            icon: 'fa-solid fa-wrench',
+            type: autorecUpdateFormApplication,
+            restricted: true
+        });
+    }
 
     game.settings.register(MODULE_ID, 'enableSounds', {
         name: 'EMP.settings.enableSounds.name',
@@ -74,4 +77,11 @@ Hooks.once('init', function() {
         },
         default: 'warn'
     });
+});
+
+// Ensure AA Autorec Update button is hidden if Automated Animations is disabled
+Hooks.on('renderSettingsConfig', function(app, html, data) {
+    if (!game.modules.get("autoanimations")?.active) {
+        html.find(`[data-key="${MODULE_ID}.autorecUpdate"]`).closest('.form-group').remove();
+    }
 });

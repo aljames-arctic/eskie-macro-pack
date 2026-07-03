@@ -122,20 +122,8 @@ async function create(tile, targets, config = {}) {
                 .on(target)
                 .opacity(0)
 
-                // Rock endframe covering the target
-                .effect()
-                .delay(3500)
-                .name(buryEffectName)
-                .file(closest(`jb2a.falling_rocks.endframe.top.1x1.grey.${num}`))
-                .spriteRotation(-(target.document?.rotation ?? target.rotation ?? 0))
-                .attachTo(target, { bindAlpha: false })
-                .size({ width: tile.document.width * 2.5, height: tile.document.height * 2.5 })
-                .mirrorX(mirrorX)
-                .mirrorY(mirrorY)
-                .fadeOut(500)
-                .belowTokens()
-                .persist()
-                .waitUntilFinished()
+                // Wait for falling rocks to finish; tile rubble endframe already persists
+                .wait(3500)
 
                 // Clean up buried target visual effects
                 .thenDo(function () {

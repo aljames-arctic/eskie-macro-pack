@@ -493,5 +493,187 @@ input:checked + .eskie-slider:before {
     line-height: 1.3;
 }
 
+/* ============================================================================
+   AUTOMATED ANIMATIONS UPDATE MENU STYLES
+   ============================================================================ */
+
+.eskie-aa-update-scroll-area {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.eskie-aa-update-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(30, 30, 36, 0.6);
+    border: 1px solid rgba(167, 139, 250, 0.15);
+    border-radius: 8px;
+    padding: 14px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.eskie-aa-update-card.added {
+    border-color: rgba(34, 197, 94, 0.3);
+    background: rgba(34, 197, 94, 0.04);
+}
+
+.eskie-aa-update-card.updated {
+    border-color: rgba(167, 139, 250, 0.3);
+    background: rgba(167, 139, 250, 0.04);
+}
+
+.eskie-aa-update-card.conflict {
+    border-color: rgba(234, 179, 8, 0.3);
+    background: rgba(234, 179, 8, 0.04);
+}
+
+.eskie-aa-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.eskie-aa-update-card.added .eskie-aa-card-header i { color: #4ade80; }
+.eskie-aa-update-card.updated .eskie-aa-card-header i { color: #c084fc; }
+.eskie-aa-update-card.conflict .eskie-aa-card-header i { color: #facc15; }
+
+.eskie-aa-card-header h3 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #f8fafc;
+    border: none;
+}
+
+.eskie-aa-card-hint {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #cbd5e1;
+    line-height: 1.35;
+}
+
+.eskie-aa-chip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.eskie-aa-chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    background: rgba(15, 15, 20, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.82rem;
+}
+
+.eskie-chip-label {
+    color: #f1f5f9;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.eskie-chip-menu {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 4px;
+    padding: 1px 5px;
+    text-transform: capitalize;
+    flex-shrink: 0;
+}
+
+.eskie-aa-warning-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 5px;
+}
+
+.eskie-aa-warning-box i {
+    font-size: 1.4rem;
+    color: #f87171;
+    flex-shrink: 0;
+}
+
+.eskie-aa-warning-box p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #fca5a5;
+    line-height: 1.35;
+    font-weight: 500;
+}
+
+.eskie-aa-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    gap: 12px;
+    text-align: center;
+}
+
+.eskie-aa-empty-state i {
+    font-size: 3rem;
+    color: #4ade80;
+    text-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
+}
+
+.eskie-aa-empty-state p {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+.eskie-aa-button-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    width: 100%;
+}
+
+.eskie-btn-secondary {
+    background: rgba(51, 65, 85, 0.6) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(148, 163, 184, 0.25) !important;
+    border-radius: 6px !important;
+    padding: 8px 16px !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    height: auto !important;
+    line-height: normal !important;
+}
+
+.eskie-btn-secondary:hover {
+    background: rgba(71, 85, 105, 0.8) !important;
+    border-color: rgba(148, 163, 184, 0.4) !important;
+    color: #ffffff !important;
+}
+
 
 

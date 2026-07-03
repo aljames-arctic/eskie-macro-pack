@@ -2,7 +2,7 @@ import { MODULE_ID } from "../../lib/constants.js";
 import { EMP_AA_Menu } from "../autoanimations.js";
 import { log } from '../../lib/logger.js';
 
-export async function generateAutorecUpdate(autorec) {
+export async function generateAutorecUpdate(autorec, excludedIds = new Set()) {
     log.group("Autorecognition Menu Check", 'debug');
     let settings = {};
     const menuKeys = ["melee", "range", "ontoken", "templatefx", "preset", "aura", "aefx"];
@@ -64,16 +64,17 @@ export async function generateAutorecUpdate(autorec) {
     log.groupEnd();
     
     // Create structured lists for the dialog
-    const formatEntry = (e) => ({ label: e.label, menu: e.menu || "preset" });
+    const formatEntry = (e) => ({ id: e.id, label: e.label, menu: e.menu || "preset" });
     const missingEntriesList = Object.values(missingEntries).flat().map(formatEntry).sort((a, b) => a.label.localeCompare(b.label));
     const updatedEntriesList = Object.values(updatedEntries).flat().map(formatEntry).sort((a, b) => a.label.localeCompare(b.label));
     const customEntriesList = Object.values(custom).flat().map(formatEntry).sort((a, b) => a.label.localeCompare(b.label));
 
-    // Construct the new settings that will be saved
+    // Construct the new settings that will be saved (filtering out excluded missing entries)
     let newSettings = {};
     for (const key of menuKeys) {
+        const missingForCategory = (missingEntries[key] ?? []).filter(e => !excludedIds.has(e.id));
         const newEntriesForKey = [
-            ...(missingEntries[key] ?? []),
+            ...missingForCategory,
             ...(updatedEntries[key] ?? []),
             ...(custom[key] ?? []),
             ...(same[key] ?? []),
@@ -97,8 +98,8 @@ export class autorecUpdateFormApplication extends FormApplication {
         this.autorec = autorec ?? EMP_AA_Menu;
     }
 
-    async settings() {
-        return await generateAutorecUpdate(this.autorec);
+    async settings(excludedIds = new Set()) {
+        return await generateAutorecUpdate(this.autorec, excludedIds);
     }
 
     static get defaultOptions() {
@@ -146,11 +147,22 @@ export class autorecUpdateFormApplication extends FormApplication {
         html.find('button[name="cancel"]').on('click', () => this.close());
     }
 
-    async _updateObject(event) {
+    async _updateObject(event, formData) {
         $(".emp-animations-autorec-update-footer button").attr("disabled", true);
         if (event.submitter && event.submitter.name === "update") {
             log.group("Autorecognition Menu Update");
-            const { newSettings } = await this.settings();
+
+            const excludedIds = new Set();
+            if (formData) {
+                for (const [key, value] of Object.entries(formData)) {
+                    if (key.startsWith("missing_") && !value) {
+                        const entryId = key.replace("missing_", "");
+                        excludedIds.add(entryId);
+                    }
+                }
+            }
+
+            const { newSettings } = await this.settings(excludedIds);
             if (Object.keys(newSettings).length === 0)
                 return log.debug("Nothing to update!");
 

@@ -576,6 +576,31 @@ input:checked + .eskie-slider:before {
     font-size: 0.82rem;
 }
 
+.eskie-aa-chip.toggleable {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+.eskie-aa-chip.toggleable input[type="checkbox"] {
+    accent-color: #22c55e;
+    cursor: pointer;
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.eskie-aa-chip.toggleable:has(input[type="checkbox"]:not(:checked)) {
+    opacity: 0.45;
+    background: rgba(10, 10, 15, 0.3);
+    border-color: rgba(255, 255, 255, 0.04);
+}
+
+.eskie-aa-chip.toggleable:hover {
+    border-color: rgba(34, 197, 94, 0.4);
+}
+
 .eskie-chip-label {
     color: #f1f5f9;
     font-weight: 500;

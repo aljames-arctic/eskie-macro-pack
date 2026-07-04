@@ -155,7 +155,7 @@ function processModule(mod) {
         statusKey = "active";
         statusClass = "active";
         statusIcon = "fa-solid fa-check-circle";
-        statusLabel = activeMod ? activeMod.title : game.i18n.localize("EMP.recommendedModules.status.active");
+        statusLabel = game.i18n.localize("EMP.recommendedModules.status.active");
     } else if (isInstalled) {
         statusKey = "disabled";
         statusClass = "disabled";

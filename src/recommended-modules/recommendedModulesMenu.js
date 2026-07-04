@@ -183,7 +183,7 @@ export class RecommendedModulesFormApplication extends FormApplication {
             title: "EMP.recommendedModules.menuTitle",
             template: `modules/${MODULE_ID}/src/recommended-modules/recommendedModulesMenu.html`,
             classes: ["eskie-world-scripts-form", "eskie-recommended-modules-form"],
-            width: 660,
+            width: 600,
             height: "auto",
             closeOnSubmit: true
         });

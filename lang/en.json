@@ -59,7 +59,7 @@
             },
             "modules": {
                 "eskieEffects": {
-                    "name": "Eskie Effects",
+                    "name": "Eskie Effects (Patreon or Free)",
                     "description": "Custom visual assets, textures, token masks, and sound effects designed specifically for Eskie Macro Pack animations."
                 },
                 "jb2a": {
@@ -67,11 +67,11 @@
                     "description": "Essential collection of high-quality spell, attack, ambient, and template animations used by EMP macros and Automated Animations presets."
                 },
                 "jaamod": {
-                    "name": "Jinker's Animated Art (JAA / Free)",
+                    "name": "Jinker's Animated Art",
                     "description": "Free animated graphics and template animations for spell, attack, and scene visual effects."
                 },
                 "bossLoot": {
-                    "name": "Boss Loot Assets",
+                    "name": "Boss Loot Assets (Patreon or Free)",
                     "description": "High-resolution impact textures, spell graphics, particle overlays, and audio tracks for EMP traps and cinematic effects."
                 },
                 "psfx": {

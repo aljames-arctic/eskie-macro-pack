@@ -300,14 +300,14 @@ input:checked + .eskie-slider:before {
 .eskie-recommended-modules-container {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
 }
 
 .eskie-recommended-modules-scroll-area {
     display: flex;
     flex-direction: column;
-    gap: 18px;
-    max-height: 540px;
+    gap: 12px;
+    max-height: 480px;
     overflow-y: auto;
     padding-right: 6px;
 }
@@ -315,28 +315,28 @@ input:checked + .eskie-slider:before {
 .eskie-category-group {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
 }
 
 .eskie-category-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 6px 12px;
+    gap: 8px;
+    padding: 4px 8px;
     background: rgba(167, 139, 250, 0.1);
-    border-left: 4px solid #a78bfa;
+    border-left: 3px solid #a78bfa;
     border-radius: 4px;
 }
 
 .eskie-category-header i {
-    font-size: 1.15rem;
+    font-size: 0.95rem;
     color: #c084fc;
     text-shadow: 0 0 8px rgba(192, 132, 252, 0.4);
 }
 
 .eskie-category-header h3 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     font-weight: 700;
     color: #ffffff;
     border: none;
@@ -347,8 +347,8 @@ input:checked + .eskie-slider:before {
 .eskie-subcategory-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-left: 10px;
+    gap: 4px;
+    margin-left: 8px;
 }
 
 .eskie-subcategory-header {
@@ -356,38 +356,38 @@ input:checked + .eskie-slider:before {
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    padding: 4px 6px;
+    padding: 2px 4px;
     border-bottom: 1px solid rgba(167, 139, 250, 0.18);
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .eskie-subcategory-title-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .eskie-subcategory-header i {
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     color: #a78bfa;
 }
 
 .eskie-subcategory-header h4 {
     margin: 0;
-    font-size: 0.92rem;
+    font-size: 0.82rem;
     font-weight: 600;
     color: #cbd5e1;
     border: none;
 }
 
 .eskie-subcategory-status {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 600;
-    padding: 2px 8px;
+    padding: 1px 6px;
     border-radius: 12px;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
 }
 
 .eskie-subcategory-status.active {
@@ -405,19 +405,34 @@ input:checked + .eskie-slider:before {
 .eskie-recommended-modules-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
 }
 
 .eskie-module-card {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
     background: rgba(30, 30, 36, 0.55);
     border: 1px solid rgba(167, 139, 250, 0.12);
-    border-radius: 8px;
-    padding: 12px 14px;
+    border-radius: 6px;
+    padding: 7px 10px;
     transition: all 0.25s ease;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.eskie-module-card .eskie-card-icon-wrapper {
+    width: 32px;
+    height: 32px;
+    font-size: 0.95rem;
+}
+
+.eskie-module-card .eskie-card-title {
+    font-size: 0.88rem;
+}
+
+.eskie-module-card .eskie-card-description {
+    font-size: 0.75rem;
+    line-height: 1.25;
 }
 
 .eskie-module-card:hover {
@@ -428,18 +443,18 @@ input:checked + .eskie-slider:before {
 }
 
 .eskie-category-badge {
-    font-size: 0.68rem;
+    font-size: 0.65rem;
     font-weight: 700;
     color: #a78bfa;
     background: rgba(167, 139, 250, 0.12);
     border: 1px solid rgba(167, 139, 250, 0.25);
     border-radius: 4px;
-    padding: 2px 7px;
+    padding: 1px 5px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
 }
 
 .eskie-card-status-wrapper {
@@ -449,13 +464,13 @@ input:checked + .eskie-slider:before {
 }
 
 .eskie-status-badge {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
-    padding: 4px 10px;
+    padding: 3px 8px;
     border-radius: 20px;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     text-transform: capitalize;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }

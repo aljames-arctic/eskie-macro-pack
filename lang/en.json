@@ -36,7 +36,7 @@
             "menuHint": "The following modules enhance Eskie Macro Pack by supplying visual assets, audio effects, animations, or advanced automation.",
             "closeButton": "Close Guide",
             "status": {
-                "active": "Active",
+                "active": "Installed",
                 "disabled": "Disabled",
                 "missing": "Not Installed",
                 "supported": "Supported (1 Active)",

@@ -75,7 +75,8 @@ Hooks.once('init', function() {
             'info': 'EMP.settings.logVerbosity.choices.info',
             'debug': 'EMP.settings.logVerbosity.choices.debug'
         },
-        default: 'warn'
+        default: 'warn',
+        onChange: (value) => log.setVerbosity(value)
     });
 });
 

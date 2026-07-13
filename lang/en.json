@@ -127,17 +127,17 @@
             "cancelButton": "Cancel"
         },
         "traps": {
-            "fire": {
-                "title": "Fire"
-            },
-            "pitfall": {
-                "title": "Pitfall"
-            },
-            "fallingSky": {
-                "title": "Falling from the Sky"
-            },
-            "spike": {
-                "title": "Spike"
+            "name": {
+                "bullRushStatue": "Bull Rush Statue",
+                "electricDoor": "Electric Door",
+                "fallingRocks": "Falling Rocks",
+                "fallingSky": "Falling from the Sky",
+                "fire": "Fire",
+                "floodingRoom": "Flooding Room",
+                "pitfall": "Pitfall",
+                "projectile": "Projectile",
+                "rollingBoulder": "Rolling Boulder",
+                "spike": "Spike"
             },
             "common": {
                 "continue": "Continue",
@@ -165,7 +165,6 @@
                 "noExtraTiles": "EMP | No {name} selected. Trap setup cancelled."
             },
             "projectile": {
-                "title": "Projectile",
                 "chooseTypeTitle": "Projectile Trap Setup: Choose Type",
                 "chooseTypeContent": "<p>Choose the projectile type for this trap.</p>",
                 "noTypeChosen": "EMP | No projectile type chosen. Setup cancelled.",

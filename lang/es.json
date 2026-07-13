@@ -12,14 +12,11 @@
             }
         },
         "traps": {
-            "fire": {
-                "title": "Fuego"
-            },
-            "pitfall": {
-                "title": "Foso"
-            },
-            "spike": {
-                "title": "Púas"
+            "name": {
+                "fire": "Fuego",
+                "pitfall": "Foso",
+                "projectile": "Proyectil",
+                "spike": "Púas"
             },
             "common": {
                 "continue": "Continuar",
@@ -47,7 +44,6 @@
                 "noExtraTiles": "EMP | Ningún {name} seleccionado. Configuración de la trampa cancelada."
             },
             "projectile": {
-                "title": "Proyectil",
                 "chooseTypeTitle": "Configuración de Trampa de Proyectiles: Escoge un Tipo",
                 "chooseTypeContent": "<p>Escoge el tipo de proyectil para esta trampa.</p>",
                 "noTypeChosen": "EMP | No se ha seleccionado ningún tipo de proyectil. Configuración cancelada.",

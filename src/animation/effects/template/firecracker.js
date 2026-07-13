@@ -82,4 +82,4 @@ export const firecracker = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Firecracker", "template", "eskie.effect.firecracker", DEFAULT_CONFIG);
+autoanimations.register("firecracker", "template", "eskie.effect.firecracker", DEFAULT_CONFIG, "0.0.0", "Firecracker");

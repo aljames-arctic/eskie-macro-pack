@@ -127,4 +127,4 @@ export const grease = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Grease", "template", "eskie.effect.grease", DEFAULT_CONFIG);
+autoanimations.register("grease", "template", "eskie.effect.grease", DEFAULT_CONFIG, "0.0.0", "Grease");

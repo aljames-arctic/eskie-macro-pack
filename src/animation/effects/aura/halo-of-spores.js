@@ -159,5 +159,5 @@ export const haloOfSpores = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Halo of Spores", "aura", "eskie.effect.haloOfSpores.aura", DEFAULT_CONFIG);
-autoanimations.register(CONCENTRATING("Halo of Spores"), "effect", "eskie.effect.haloOfSpores.aura", DEFAULT_CONFIG);
+autoanimations.register("haloOfSpores", "aura", "eskie.effect.haloOfSpores.aura", DEFAULT_CONFIG, "0.0.0", "Halo of Spores");
+autoanimations.register(CONCENTRATING("haloOfSpores", "Halo of Spores"), "effect", "eskie.effect.haloOfSpores.aura", DEFAULT_CONFIG);

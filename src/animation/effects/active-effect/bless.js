@@ -173,5 +173,5 @@ export const bless = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Bless", "token", "eskie.effect.bless.cast", DEFAULT_CONFIG);
-autoanimations.register("Bless", "effect", "eskie.effect.bless.effect", DEFAULT_CONFIG);
+autoanimations.register("bless", "token", "eskie.effect.bless.cast", DEFAULT_CONFIG, "0.0.0", "Bless");
+autoanimations.register("bless", "effect", "eskie.effect.bless.effect", DEFAULT_CONFIG, "0.0.0", "Bless");

@@ -106,4 +106,4 @@ export const chromaticOrb = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Chromatic Orb", "ranged-target", "eskie.effect.chromaticOrb", DEFAULT_CONFIG);
+autoanimations.register("chromaticOrb", "ranged-target", "eskie.effect.chromaticOrb", DEFAULT_CONFIG, "0.0.0", "Chromatic Orb");

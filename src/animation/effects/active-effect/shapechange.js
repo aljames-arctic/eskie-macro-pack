@@ -319,4 +319,4 @@ export const shapechange = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register('Shapechange', 'effect', 'eskie.effect.shapechange', DEFAULT_CONFIG, '0.1.0');
+autoanimations.register("shapechange", 'effect', 'eskie.effect.shapechange', DEFAULT_CONFIG, '0.1.0', "Shapechange");

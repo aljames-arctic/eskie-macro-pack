@@ -106,4 +106,4 @@ export const hookAndPull = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Hook and Pull", "ranged-target", "eskie.effect.hookAndPull", DEFAULT_CONFIG);
+autoanimations.register("hookAndPull", "ranged-target", "eskie.effect.hookAndPull", DEFAULT_CONFIG, "0.0.0", "Hook and Pull");

@@ -160,5 +160,5 @@ export const sneakAttack = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Sneak Attack", "ranged-target", "eskie.effect.sneakAttack", DEFAULT_CONFIG);
-autoanimations.register("Sneak Attack", "melee-target", "eskie.effect.sneakAttack", DEFAULT_CONFIG);
+autoanimations.register("sneakAttack", "ranged-target", "eskie.effect.sneakAttack", DEFAULT_CONFIG, "0.0.0", "Sneak Attack");
+autoanimations.register("sneakAttack", "melee-target", "eskie.effect.sneakAttack", DEFAULT_CONFIG, "0.0.0", "Sneak Attack");

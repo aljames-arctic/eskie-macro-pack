@@ -164,4 +164,4 @@ export const sandevistan = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Sandevistan", "effect", "eskie.effect.sandevistan", DEFAULT_CONFIG);
+autoanimations.register("sandevistan", "effect", "eskie.effect.sandevistan", DEFAULT_CONFIG, "0.0.0", "Sandevistan");

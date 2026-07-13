@@ -56,4 +56,4 @@ export const blurredVision = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Blurred Vision", "effect", "eskie.effect.blurredVision", DEFAULT_CONFIG);
+autoanimations.register("blurredVision", "effect", "eskie.effect.blurredVision", DEFAULT_CONFIG, "0.0.0", "Blurred Vision");

@@ -154,4 +154,4 @@ export const drainingKiss = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Draining Kiss", "melee-target", "eskie.effect.drainingKiss", DEFAULT_CONFIG);
+autoanimations.register("drainingKiss", "melee-target", "eskie.effect.drainingKiss", DEFAULT_CONFIG, "0.0.0", "Draining Kiss");

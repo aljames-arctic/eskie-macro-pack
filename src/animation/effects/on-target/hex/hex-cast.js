@@ -91,4 +91,4 @@ export const hexCast = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Hexed", "effect", "eskie.effect.hex.cast", DEFAULT_CONFIG);
+autoanimations.register("hexed", "effect", "eskie.effect.hex.cast", DEFAULT_CONFIG, "0.0.0", "Hexed");

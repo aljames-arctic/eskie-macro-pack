@@ -181,5 +181,5 @@ export const spikeGrowth = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Spike Growth", "template", "eskie.effect.spikeGrowth", DEFAULT_CONFIG);
-autoanimations.register(CONCENTRATING("Spike Growth"), "effect", "eskie.effect.spikeGrowth", DEFAULT_CONFIG);
+autoanimations.register("spikeGrowth", "template", "eskie.effect.spikeGrowth", DEFAULT_CONFIG, "0.0.0", "Spike Growth");
+autoanimations.register(CONCENTRATING("spikeGrowth", "Spike Growth"), "effect", "eskie.effect.spikeGrowth", DEFAULT_CONFIG);

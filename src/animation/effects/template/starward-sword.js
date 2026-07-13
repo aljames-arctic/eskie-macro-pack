@@ -545,4 +545,4 @@ export const starwardSword = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Starward Sword", "template", "eskie.effect.starwardSword", DEFAULT_CONFIG);
+autoanimations.register("starwardSword", "template", "eskie.effect.starwardSword", DEFAULT_CONFIG, "0.0.0", "Starward Sword");

@@ -236,5 +236,5 @@ export const gate = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Gate", "template", "eskie.effect.gate", DEFAULT_CONFIG);
-autoanimations.register(CONCENTRATING("Gate"), "effect", "eskie.effect.gate", DEFAULT_CONFIG);
+autoanimations.register("gate", "template", "eskie.effect.gate", DEFAULT_CONFIG, "0.0.0", "Gate");
+autoanimations.register(CONCENTRATING("gate", "Gate"), "effect", "eskie.effect.gate", DEFAULT_CONFIG);

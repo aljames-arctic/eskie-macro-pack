@@ -300,4 +300,4 @@ export const fireBlast = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register('Fire Blast', 'ranged-target', 'eskie.effect.fireBlast', DEFAULT_CONFIG, '0.1.0');
+autoanimations.register("fireBlast", 'ranged-target', 'eskie.effect.fireBlast', DEFAULT_CONFIG, '0.1.0', "Fire Blast");

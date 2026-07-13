@@ -122,4 +122,4 @@ export const fightingSpirit = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Fighting Spirit", "effect", "eskie.effect.fightingSpirit", DEFAULT_CONFIG);
+autoanimations.register("fightingSpirit", "effect", "eskie.effect.fightingSpirit", DEFAULT_CONFIG, "0.0.0", "Fighting Spirit");

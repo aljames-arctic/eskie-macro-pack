@@ -272,4 +272,4 @@ export const tashasCausticBrew = {
     default_config: DEFAULT_CONFIG_CAST,
 };
 
-autoanimations.register("Tasha's Caustic Brew", "template", "eskie.effect.tashasCausticBrew", DEFAULT_CONFIG_CAST, '0.1.0');
+autoanimations.register("tashasCausticBrew", "template", "eskie.effect.tashasCausticBrew", DEFAULT_CONFIG_CAST, '0.1.0', "Tasha's Caustic Brew");

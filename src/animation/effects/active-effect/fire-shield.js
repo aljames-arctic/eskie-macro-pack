@@ -98,4 +98,4 @@ export const fireShield = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Fire Shield", "effect", "eskie.effect.fireShield", DEFAULT_CONFIG);
+autoanimations.register("fireShield", "effect", "eskie.effect.fireShield", DEFAULT_CONFIG, "0.0.0", "Fire Shield");

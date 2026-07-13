@@ -220,5 +220,5 @@ export const faerieFire = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Faerie Fire", "template", "eskie.effect.faerieFire.template", DEFAULT_CONFIG);
-autoanimations.register("Faerie Fire", "effect", "eskie.effect.faerieFire.effect", DEFAULT_CONFIG);
+autoanimations.register("faerieFire", "template", "eskie.effect.faerieFire.template", DEFAULT_CONFIG, "0.0.0", "Faerie Fire");
+autoanimations.register("faerieFire", "effect", "eskie.effect.faerieFire.effect", DEFAULT_CONFIG, "0.0.0", "Faerie Fire");

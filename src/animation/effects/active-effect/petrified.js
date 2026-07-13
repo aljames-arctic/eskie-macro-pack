@@ -77,4 +77,4 @@ export const petrified = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Petrified", "effect", "eskie.effect.petrified", DEFAULT_CONFIG);
+autoanimations.register("petrified", "effect", "eskie.effect.petrified", DEFAULT_CONFIG, "0.0.0", "Petrified");

@@ -108,5 +108,5 @@ export const hitTheDirt = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register('Hit the Dirt', 'template', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG);
-autoanimations.register('Hit the Dirt', 'effect', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG);
+autoanimations.register("hitTheDirt", 'template', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, "0.0.0", "Hit the Dirt");
+autoanimations.register("hitTheDirt", 'effect', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, "0.0.0", "Hit the Dirt");

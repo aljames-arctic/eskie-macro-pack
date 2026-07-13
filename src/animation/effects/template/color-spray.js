@@ -127,4 +127,4 @@ export const colorSpray = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register('Color Spray', 'template', 'eskie.effect.colorSpray', DEFAULT_CONFIG, '1.0');
+autoanimations.register("colorSpray", 'template', 'eskie.effect.colorSpray', DEFAULT_CONFIG, '1.0', "Color Spray");

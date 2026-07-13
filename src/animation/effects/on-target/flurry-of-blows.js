@@ -90,5 +90,5 @@ export const flurryOfBlows = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Flurry Of Blows", "melee-target", "eskie.effect.flurryOfBlows", DEFAULT_CONFIG);
+autoanimations.register("flurryOfBlows", "melee-target", "eskie.effect.flurryOfBlows", DEFAULT_CONFIG, "0.0.0", "Flurry Of Blows");
 

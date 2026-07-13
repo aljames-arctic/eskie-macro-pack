@@ -80,4 +80,4 @@ export const divineSmite = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Divine Smite", "melee-target", "eskie.effect.divineSmite", DEFAULT_CONFIG);
+autoanimations.register("divineSmite", "melee-target", "eskie.effect.divineSmite", DEFAULT_CONFIG, "0.0.0", "Divine Smite");

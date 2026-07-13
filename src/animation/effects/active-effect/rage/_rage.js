@@ -69,4 +69,4 @@ export const rage = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Rage", "effect", "eskie.effect.rage", DEFAULT_CONFIG, '1.0.0');
+autoanimations.register("rage", "effect", "eskie.effect.rage", DEFAULT_CONFIG, '1.0.0', "Rage");

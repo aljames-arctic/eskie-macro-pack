@@ -123,4 +123,4 @@ export const drunk = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Drunk", "effect", "eskie.effect.emote.drunk", DEFAULT_CONFIG);
+autoanimations.register("drunk", "effect", "eskie.effect.emote.drunk", DEFAULT_CONFIG, "0.0.0", "Drunk");

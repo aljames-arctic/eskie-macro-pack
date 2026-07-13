@@ -320,4 +320,4 @@ export const speakWithDead = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Speak with Dead", "effect", "eskie.effect.speakWithDead", DEFAULT_CONFIG);
+autoanimations.register("speakWithDead", "effect", "eskie.effect.speakWithDead", DEFAULT_CONFIG, "0.0.0", "Speak with Dead");

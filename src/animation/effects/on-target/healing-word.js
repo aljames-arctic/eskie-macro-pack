@@ -149,5 +149,5 @@ export const healingWord = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Healing Word", "ranged-target", "eskie.effect.healingWord", DEFAULT_CONFIG);
-autoanimations.register("Mass Healing Word", "ranged-target", "eskie.effect.healingWord", DEFAULT_CONFIG);
+autoanimations.register("healingWord", "ranged-target", "eskie.effect.healingWord", DEFAULT_CONFIG, "0.0.0", "Healing Word");
+autoanimations.register("massHealingWord", "ranged-target", "eskie.effect.healingWord", DEFAULT_CONFIG, "0.0.0", "Mass Healing Word");

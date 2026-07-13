@@ -111,4 +111,4 @@ export const magicMissile = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Magic Missile", "ranged-target", "eskie.effect.magicMissile", DEFAULT_CONFIG);
+autoanimations.register("magicMissile", "ranged-target", "eskie.effect.magicMissile", DEFAULT_CONFIG, "0.0.0", "Magic Missile");

@@ -3,6 +3,7 @@ import { dependency } from "../lib/dependency.js";
 import { defaultMenuSettings } from "./autoanimations/defaultMenuSettings.js";
 import { autorecUpdateFormApplication, generateAutorecUpdate } from "./autoanimations/updateMenu.js";
 import { log } from '../lib/logger.js';
+import { localize, format } from "../lib/utils.js";
 
 export const EMP_AA_Menu = {
     melee: [],
@@ -46,11 +47,13 @@ function standardizeTrigger(trigger) {
  * @param {string} macroName - The name of the globally exposed wrapper function.
  * @returns {object} The autorec entry.
  */
-function createAutorecEntry(label, trigger, animation, config, version = "0.0.0") {
+function createAutorecEntry(key, trigger, animation, config, version = "0.0.0", fallback = key) {
     trigger = standardizeTrigger(trigger);
     const defaultMenu = defaultMenuSettings[trigger];
     const defaultEntry = defaultMenu[0];
     const compendium = `Compendium.${MODULE_ID}.eskie-aa-integration`;
+
+    const localizedLabel = (key.includes(":") || key.includes(" ")) ? key : localize(`EMP.effects.${key}`, fallback);
 
     let name = "UNSPECIFIED MACRO";
     switch(trigger) {
@@ -82,7 +85,7 @@ function createAutorecEntry(label, trigger, animation, config, version = "0.0.0"
 
     const entry = {
         id: foundry.utils.randomID(),
-        label: label,
+        label: localizedLabel,
         macro: {
             enable: true,
             name: name,
@@ -90,7 +93,7 @@ function createAutorecEntry(label, trigger, animation, config, version = "0.0.0"
             playWhen: "2"
         },
         metaData: {
-            label: label,
+            label: localizedLabel,
             menu: trigger,
             name: "Eskie Macro Pack",
             version: version
@@ -135,9 +138,9 @@ function JSONformatObject(obj, depth = 1) {
  * @param {string} version - The version of the animation entry.
  * @returns {void}
  */
-async function register(name, trigger, animation, config, version) {
+async function register(key, trigger, animation, config, version = "0.0.0", fallback = key) {
     trigger = standardizeTrigger(trigger);
-    const entry = createAutorecEntry(name, trigger, animation, config, version);
+    const entry = createAutorecEntry(key, trigger, animation, config, version, fallback);
     if (!entry) return;
     EMP_AA_Menu[trigger].push(entry);
 }
@@ -156,12 +159,12 @@ async function submit() {
     const shouldUpdate = moduleVersion == developmentVersion || foundry.utils.isNewerVersion(moduleVersion, lastUpdate);
     if (!shouldUpdate) return;
 
-    if (!dependency.isActivated({ id: "autoanimations", min: "6.5.1" }, "EMP | Automated Animations integration skipped.")) { return; }
+    if (!dependency.isActivated({ id: "autoanimations", min: "6.5.1" }, localize("EMP.autoanimations.skipped", "EMP | Automated Animations integration skipped."))) { return; }
     const { missingEntriesList, updatedEntriesList, customEntriesList } = await generateAutorecUpdate(EMP_AA_Menu);
     if (missingEntriesList.length || updatedEntriesList.length || customEntriesList.length) {
         new autorecUpdateFormApplication(EMP_AA_Menu).render(true);
     } else {
-        log.info("All Eskie Macro animations are up to date!");
+        log.info(localize("EMP.updateMenu.nothing", "All Eskie Macro Pack animations are up to date!"));
     }
 
     if (moduleVersion != developmentVersion)
@@ -173,6 +176,7 @@ export const autoanimations = {
     submit,
 };
 
-export function CONCENTRATING(name) {
-    return `Concentrating: ${name}`;
+export function CONCENTRATING(key, fallback = key) {
+    const localizedName = (key.includes(":") || key.includes(" ")) ? key : localize(`EMP.effects.${key}`, fallback);
+    return format("EMP.effects.concentratingPrefix", { name: localizedName }, `Concentrating: ${localizedName}`);
 }

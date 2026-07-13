@@ -213,4 +213,4 @@ export const mirrorImage = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Mirror Image", "effect", "eskie.effect.mirrorImage", DEFAULT_CONFIG);
+autoanimations.register("mirrorImage", "effect", "eskie.effect.mirrorImage", DEFAULT_CONFIG, "0.0.0", "Mirror Image");

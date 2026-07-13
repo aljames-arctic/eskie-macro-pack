@@ -98,4 +98,4 @@ export const dimensionDoor = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Dimension Door", "template", "eskie.effect.dimensionDoor", DEFAULT_CONFIG);
+autoanimations.register("dimensionDoor", "template", "eskie.effect.dimensionDoor", DEFAULT_CONFIG, "0.0.0", "Dimension Door");

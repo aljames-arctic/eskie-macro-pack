@@ -84,4 +84,4 @@ export const hide = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Hide", "effect", "eskie.effect.hide", DEFAULT_CONFIG);
+autoanimations.register("hide", "effect", "eskie.effect.hide", DEFAULT_CONFIG, "0.0.0", "Hide");

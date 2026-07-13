@@ -102,4 +102,4 @@ export const benignTransportation = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Benign Transportation", "ranged-target", "eskie.effect.benignTransportation", DEFAULT_CONFIG);
+autoanimations.register("benignTransportation", "ranged-target", "eskie.effect.benignTransportation", DEFAULT_CONFIG, "0.0.0", "Benign Transportation");

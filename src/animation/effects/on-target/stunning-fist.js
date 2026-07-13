@@ -198,4 +198,4 @@ export const stunningFist = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Stunning Fist", "melee-target", "eskie.effect.stunningFist", DEFAULT_CONFIG)
+autoanimations.register("stunningFist", "melee-target", "eskie.effect.stunningFist", DEFAULT_CONFIG, "0.0.0", "Stunning Fist")

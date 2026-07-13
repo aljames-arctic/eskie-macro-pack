@@ -142,4 +142,4 @@ export const stepOfTheWindMove = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Step of the Wind", "effect", "eskie.effect.stepOfTheWind.move", DEFAULT_CONFIG);
+autoanimations.register("stepOfTheWind", "effect", "eskie.effect.stepOfTheWind.move", DEFAULT_CONFIG, "0.0.0", "Step of the Wind");

@@ -67,4 +67,4 @@ export const angry = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Angry", "effect", "eskie.effect.emote.angry", DEFAULT_CONFIG);
+autoanimations.register("angry", "effect", "eskie.effect.emote.angry", DEFAULT_CONFIG, "0.0.0", "Angry");

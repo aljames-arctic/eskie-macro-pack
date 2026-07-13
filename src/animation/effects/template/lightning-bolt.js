@@ -133,4 +133,4 @@ export const lightningBolt = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Lightning Bolt", "template", "eskie.effect.lightningBolt", DEFAULT_CONFIG);
+autoanimations.register("lightningBolt", "template", "eskie.effect.lightningBolt", DEFAULT_CONFIG, "0.0.0", "Lightning Bolt");

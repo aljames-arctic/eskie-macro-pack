@@ -213,4 +213,4 @@ export const armsOfHadar = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Arms of Hadar", "template", "eskie.effect.armsOfHadar", DEFAULT_CONFIG);
+autoanimations.register("armsOfHadar", "template", "eskie.effect.armsOfHadar", DEFAULT_CONFIG, "0.0.0", "Arms of Hadar");

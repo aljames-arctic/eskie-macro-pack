@@ -122,4 +122,4 @@ export const dash = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Dash", "effect", "eskie.effect.dash", DEFAULT_CONFIG);
+autoanimations.register("dash", "effect", "eskie.effect.dash", DEFAULT_CONFIG, "0.0.0", "Dash");

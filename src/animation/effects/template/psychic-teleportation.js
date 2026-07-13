@@ -160,4 +160,4 @@ export const psychicTeleportation = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Psychic Teleportation", "template", "eskie.effect.psychicTeleportation", DEFAULT_CONFIG);
+autoanimations.register("psychicTeleportation", "template", "eskie.effect.psychicTeleportation", DEFAULT_CONFIG, "0.0.0", "Psychic Teleportation");

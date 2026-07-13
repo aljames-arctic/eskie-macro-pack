@@ -87,4 +87,4 @@ export const charmed = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Charmed", "effect", "eskie.effect.charmed", DEFAULT_CONFIG);
+autoanimations.register("charmed", "effect", "eskie.effect.charmed", DEFAULT_CONFIG, "0.0.0", "Charmed");

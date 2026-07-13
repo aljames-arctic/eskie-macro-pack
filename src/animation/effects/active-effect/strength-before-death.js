@@ -292,4 +292,4 @@ export const strengthBeforeDeath = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Strength Before Death", "effect", "eskie.effect.strengthBeforeDeath", DEFAULT_CONFIG);
+autoanimations.register("strengthBeforeDeath", "effect", "eskie.effect.strengthBeforeDeath", DEFAULT_CONFIG, "0.0.0", "Strength Before Death");

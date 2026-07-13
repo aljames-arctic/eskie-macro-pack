@@ -124,4 +124,4 @@ export const rapidStrike = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Rapid Strike", "melee-target", "eskie.effect.rapidStrike", DEFAULT_CONFIG);
+autoanimations.register("rapidStrike", "melee-target", "eskie.effect.rapidStrike", DEFAULT_CONFIG, "0.0.0", "Rapid Strike");

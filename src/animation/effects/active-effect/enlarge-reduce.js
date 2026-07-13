@@ -283,5 +283,5 @@ export const enlargeReduce = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Enlarged", "effect", "eskie.effect.enlargeReduce.enlarge", DEFAULT_CONFIG);
-autoanimations.register("Reduced", "effect", "eskie.effect.enlargeReduce.reduce", DEFAULT_CONFIG);
+autoanimations.register("enlarged", "effect", "eskie.effect.enlargeReduce.enlarge", DEFAULT_CONFIG, "0.0.0", "Enlarged");
+autoanimations.register("reduced", "effect", "eskie.effect.enlargeReduce.reduce", DEFAULT_CONFIG, "0.0.0", "Reduced");

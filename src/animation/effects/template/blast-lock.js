@@ -178,4 +178,4 @@ export const blastLock = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Blast Lock", "template", "eskie.effect.blastLock", DEFAULT_CONFIG);
+autoanimations.register("blastLock", "template", "eskie.effect.blastLock", DEFAULT_CONFIG, "0.0.0", "Blast Lock");

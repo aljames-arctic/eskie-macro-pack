@@ -148,5 +148,5 @@ export const silence = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("Silence", "template", "eskie.effect.silence", DEFAULT_CONFIG);
-autoanimations.register(CONCENTRATING("Silence"), "effect", "eskie.effect.silence", DEFAULT_CONFIG);
+autoanimations.register("silence", "template", "eskie.effect.silence", DEFAULT_CONFIG, "0.0.0", "Silence");
+autoanimations.register(CONCENTRATING("silence", "Silence"), "effect", "eskie.effect.silence", DEFAULT_CONFIG);

@@ -1,3 +1,7 @@
+[![Foundry VTT Version](https://img.shields.io/badge/Foundry%20VTT-v12+-orange.svg)](https://foundryvtt.com/)
+
+[![Latest Module Downloads](https://img.shields.io/github/downloads/aljames-arctic/eskie-macro-pack/latest/module.zip?style=flat-square&label=latest%20downloads&color=blue)](https://github.com/aljames-arctic/eskie-macro-pack/releases) [![Total Module Downloads](https://img.shields.io/github/downloads-pre/aljames-arctic/eskie-macro-pack/module.zip?style=flat-square&label=total%20downloads&color=success)](https://github.com/aljames-arctic/eskie-macro-pack/releases)
+
 # Eskie Macro Package (EMP)
 
 ## Summary

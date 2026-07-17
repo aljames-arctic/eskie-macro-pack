@@ -156,10 +156,10 @@ async function createBanish(target, config = {}) {
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .animateProperty("spriteContainer", "position.y", { from: -15, to: 0, duration: 2000, ease: "easeInOutBack" })
-        .animateProperty("sprite", "rotation", { from: 0, to: 8, duration: 500, ease: "easeOutCubic" })
-        .animateProperty("sprite", "rotation", { from: 0, to: -16, duration: 500, delay: 500, ease: "easeOutCubic" })
-        .animateProperty("sprite", "rotation", { from: 0, to: 16, duration: 500, delay: 1000, ease: "easeOutCubic" })
-        .animateProperty("sprite", "rotation", { from: 0, to: -16, duration: 500, delay: 1500, ease: "easeInCubic" })
+        .animateProperty('spriteContainer', "rotation", { from: 0, to: 8, duration: 500, ease: "easeOutCubic" })
+        .animateProperty('spriteContainer', "rotation", { from: 0, to: -16, duration: 500, delay: 500, ease: "easeOutCubic" })
+        .animateProperty('spriteContainer', "rotation", { from: 0, to: 16, duration: 500, delay: 1000, ease: "easeOutCubic" })
+        .animateProperty('spriteContainer', "rotation", { from: 0, to: -16, duration: 500, delay: 1500, ease: "easeInCubic" })
         .waitUntilFinished(-100);
 
     sequence.effect()
@@ -176,10 +176,10 @@ async function createBanish(target, config = {}) {
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .animateProperty("spriteContainer", "position.y", { from: -40, to: -15, duration: 2000, ease: "easeInOutBack" })
-        .animateProperty("sprite", "rotation", { from: 0, to: 8, duration: 500, ease: "easeOutCubic" })
-        .animateProperty("sprite", "rotation", { from: 0, to: -16, duration: 500, delay: 500, ease: "easeOutCubic" })
-        .animateProperty("sprite", "rotation", { from: 0, to: 16, duration: 500, delay: 1000, ease: "easeOutCubic" })
-        .animateProperty("sprite", "rotation", { from: 0, to: -16, duration: 500, delay: 1500, ease: "easeInCubic" })
+        .animateProperty('spriteContainer', "rotation", { from: 0, to: 8, duration: 500, ease: "easeOutCubic" })
+        .animateProperty('spriteContainer', "rotation", { from: 0, to: -16, duration: 500, delay: 500, ease: "easeOutCubic" })
+        .animateProperty('spriteContainer', "rotation", { from: 0, to: 16, duration: 500, delay: 1000, ease: "easeOutCubic" })
+        .animateProperty('spriteContainer', "rotation", { from: 0, to: -16, duration: 500, delay: 1500, ease: "easeInCubic" })
         .waitUntilFinished(-100);
 
     sequence.effect()

@@ -55,9 +55,9 @@ async function create(token, targets, config = {}) {
         .duration(1000)
         .fadeOut(800)
         .scaleIn(0, 1000, { ease: "easeOutCubic" })
-        .animateProperty("sprite", "width", { from: 0, to: 0.25, duration: 500, gridUnits: true, ease: "easeOutBack" })
-        .animateProperty("sprite", "height", { from: 0, to: 1.0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-        .animateProperty("sprite", "position.y", { from: 0, to: -0.6, duration: 1000, gridUnits: true })
+        .animateProperty('spriteContainer', "width", { from: 0, to: 0.25, duration: 500, gridUnits: true, ease: "easeOutBack" })
+        .animateProperty('spriteContainer', "height", { from: 0, to: 1.0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
+        .animateProperty('spriteContainer', "position.y", { from: 0, to: -0.6, duration: 1000, gridUnits: true })
         .filter("ColorMatrix", { saturate: 1, hue: 20 })
         .zIndex(0.3);
 
@@ -160,8 +160,8 @@ async function create(token, targets, config = {}) {
             .duration(1000)
             .fadeOut(800)
             .scaleIn(0, 1000, { ease: "easeOutCubic" })
-            .animateProperty("sprite", "width", { from: 0, to: 0.25, duration: 500, gridUnits: true, ease: "easeOutBack" })
-            .animateProperty("sprite", "height", { from: 0, to: 1.0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
+            .animateProperty('spriteContainer', "width", { from: 0, to: 0.25, duration: 500, gridUnits: true, ease: "easeOutBack" })
+            .animateProperty('spriteContainer', "height", { from: 0, to: 1.0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
             .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.6, duration: 1000, gridUnits: true })
             .filter("ColorMatrix", { saturate: 1, hue: 20 })
             .zIndex(0.3);

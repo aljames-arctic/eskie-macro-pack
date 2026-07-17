@@ -40,7 +40,7 @@ async function create(token, config = {}) {
         .atLocation(token, { offset: { x: 0, y: -0.2 }, gridUnits: true })
         .size({ width: w, height: h })
         .opacity(1)
-        .animateProperty('spriteContainer', 'position.y', { from: 20, to: 0, duration: 500 })
+        .animateProperty('sprite', 'position.y', { from: 20, to: 0, duration: 500 })
         .loopProperty('sprite', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
         .attachTo(token, { gridUnits: true, bindRotation: true, bindAlpha: false })
         .animateProperty('spriteContainer', 'rotation', { from: 0, to: 0, duration: 0 })

@@ -37,8 +37,8 @@ async function create(token, target, config = {}) {
         .duration(1000)
         .fadeOut(800)
         .scaleIn(0, 1000, { ease: "easeOutCubic" })
-        .animateProperty('spriteContainer', "width", { from: 0, to: 0.25, duration: 500, gridUnits: true, ease: "easeOutBack" })
-        .animateProperty('spriteContainer', "height", { from: 0, to: 1.0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
+        .animateProperty("sprite", "width", { from: 0, to: 0.25, duration: 500, gridUnits: true, ease: "easeOutBack" })
+        .animateProperty("sprite", "height", { from: 0, to: 1.0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
         .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.6, duration: 1000, gridUnits: true })
         .filter("ColorMatrix", { saturate: 1, hue: 20 })
         .zIndex(0.3);

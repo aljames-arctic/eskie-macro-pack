@@ -55,7 +55,7 @@ function proneCreate(token, target, config = {}) {
             .scaleToObject(1, { considerTokenScale: true })
             .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", delay:100, gridUnits: true })
             .animateProperty("spriteContainer", "position.y", { from: 0, to: 0.5, duration: 250, ease: "easeOutCubic", delay:600, gridUnits: true })
-            .animateProperty('spriteContainer', "rotation", { from: 0, to: 90, duration: 250, ease: "easeOutCubic", delay:100 })  
+            .animateProperty("sprite", "rotation", { from: 0, to: 90, duration: 250, ease: "easeOutCubic", delay:100 })  
             .duration(1200)
             .waitUntilFinished(-500)
 

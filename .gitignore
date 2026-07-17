@@ -3,3 +3,6 @@
 **/*LOCK
 **/*LOG
 **/*LOG.old
+**/*.ldb
+**/*.log
+**/CURRENT

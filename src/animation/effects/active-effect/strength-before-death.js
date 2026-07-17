@@ -88,7 +88,7 @@ function create(token, config = {}) {
             .attachTo(token)
             .scaleToObject(2.2)
             .animateProperty('spriteContainer', "scale.y", { from: 0, to: 1.5, duration: 1500,  ease: "easeOutQuint" })
-            .animateProperty('spriteContainer', "position.y", { from: 0, to: -0.25, duration: 1500,  ease: "easeOutQuint", gridUnits:true })
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.25, duration: 1500,  ease: "easeOutQuint", gridUnits:true })
             .belowTokens()
             .duration(1750)
             .fadeOut(1000)
@@ -106,7 +106,7 @@ function create(token, config = {}) {
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(1000, {ease:"easeOutQuint"})
             .spriteRotation(20)
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutCubic"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutCubic"})
             .belowTokens()
             .persist()
 
@@ -119,7 +119,7 @@ function create(token, config = {}) {
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(1000, {ease:"easeOutSine"})
             .duration(1250)
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-1,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-1,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
             .opacity(0.8)
 
         .effect()
@@ -129,7 +129,7 @@ function create(token, config = {}) {
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(1000, {ease:"easeOutSine"})
             .duration(1250)
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-1,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-1,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
             .opacity(0.8)
 
         .effect()
@@ -139,7 +139,7 @@ function create(token, config = {}) {
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(1000, {ease:"easeOutSine"})
             .duration(1250)
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-1,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-1,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
             .opacity(0.8)
 
         .effect()
@@ -149,7 +149,7 @@ function create(token, config = {}) {
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(1000, {ease:"easeOutSine"})
             .duration(1250)
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-1,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-1,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
             .opacity(0.8)
 
         .effect()
@@ -159,7 +159,7 @@ function create(token, config = {}) {
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(1000, {ease:"easeOutSine"})
             .duration(1250)
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-1,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-1,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
             .opacity(0.8)
 
         .effect()
@@ -169,7 +169,7 @@ function create(token, config = {}) {
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(1000, {ease:"easeOutSine"})
             .duration(1250)
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-1,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-1,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
             .opacity(0.8)
 
         .effect()
@@ -179,7 +179,7 @@ function create(token, config = {}) {
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(1000, {ease:"easeOutSine"})
             .duration(1250)
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-1,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-1,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
             .opacity(0.8)
 
         .effect()
@@ -189,7 +189,7 @@ function create(token, config = {}) {
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(1000, {ease:"easeOutSine"})
             .duration(1250)
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-1,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-1,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
             .opacity(0.8)
 
         .effect()
@@ -199,7 +199,7 @@ function create(token, config = {}) {
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(3000, {ease:"easeOutSine"})
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
     
         .effect()
             .delay(50,250)
@@ -208,7 +208,7 @@ function create(token, config = {}) {
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(3000, {ease:"easeOutSine"})
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
 
         .effect()
             .delay(50,250)
@@ -217,7 +217,7 @@ function create(token, config = {}) {
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(3000, {ease:"easeOutSine"})
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
 
         .effect()
             .delay(50,250)
@@ -226,7 +226,7 @@ function create(token, config = {}) {
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(3000, {ease:"easeOutSine"})
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
 
         .effect()
             .file(closest("eskie.nature.flower.particle.01.red"))
@@ -234,7 +234,7 @@ function create(token, config = {}) {
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(3000, {ease:"easeOutSine"})
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
 
         .effect()
             .file(closest("eskie.nature.flower.particle.01.red"))
@@ -242,7 +242,7 @@ function create(token, config = {}) {
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(3000, {ease:"easeOutSine"})
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
 
         .effect()
             .file(closest("eskie.nature.flower.particle.01.red"))
@@ -250,7 +250,7 @@ function create(token, config = {}) {
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(3000, {ease:"easeOutSine"})
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
 
         .effect()
             .file(closest("eskie.nature.flower.particle.01.red"))
@@ -258,7 +258,7 @@ function create(token, config = {}) {
             .scaleToObject(1.5)
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(3000, {ease:"easeOutSine"})
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutSine"})
 
         .effect()
             .name(`${id} ${token.name}`)
@@ -268,9 +268,9 @@ function create(token, config = {}) {
             .scaleToObject(1, { considerTokenScale: true })
             .mask(token)
             .opacity(0.25)
-            .loopProperty("sprite", "scale.y", { from: 1, to: 1.25, duration: 2000,  ease: "easeInOutSine" })
-            .loopProperty("sprite", "scale.x", { from: 1, to: 1.25, duration: 2000,  ease: "easeInOutSine" })
-            .loopProperty("sprite", "alpha", { from: 0.25, to: -0.25, duration: 2000,  ease: "easeInOutSine" })
+            .loopProperty('sprite', "scale.y", { from: 1, to: 1.25, duration: 2000,  ease: "easeInOutSine" })
+            .loopProperty('sprite', "scale.x", { from: 1, to: 1.25, duration: 2000,  ease: "easeInOutSine" })
+            .loopProperty('sprite', "alpha", { from: 0.25, to: -0.25, duration: 2000,  ease: "easeInOutSine" })
             .persist()
     return seq;
 }

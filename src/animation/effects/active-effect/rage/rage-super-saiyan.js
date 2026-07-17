@@ -55,7 +55,7 @@ function create(token, config = {}) {
         .size(1.75, { gridUnits: true })
         .rotate(90)
         .opacity(1)
-        .loopProperty("sprite", "position.y", { from: -5, to: 5, duration: 50, pingPong: true })
+        .loopProperty('spriteContainer', 'position.y', { from: -5, to: 5, duration: 50, pingPong: true })
         .duration(8000)
         .fadeOut(3000)
         .tint(util.hexValue(color));
@@ -69,8 +69,8 @@ function create(token, config = {}) {
         .opacity(1)
         .fadeIn(200)
         .fadeOut(3000)
-        .loopProperty("sprite", "position.x", { from: -5, to: 5, duration: 50, pingPong: true })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: -100, duration: 6000, pingPong: true, delay: 2000 })
+        .loopProperty('spriteContainer', 'position.x', { from: -5, to: 5, duration: 50, pingPong: true })
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -100, duration: 6000, pingPong: true, delay: 2000 })
         .duration(8000);
 
     seq = seq

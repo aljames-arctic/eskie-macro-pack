@@ -40,8 +40,8 @@ async function createSuggestion(token, target, config = {}) {
                 .attachTo(target, { offset: offsets[i], gridUnits: true, bindRotation: false })
                 .scaleToObject(0.4)
                 .scaleIn(0, 250, { ease: "easeOutBack" })
-                .animateProperty('spriteContainer', 'position.x', { from: -0, to: -offsets[i].x, duration: 500, gridUnits: true, delay: 500, ease: "easeInBack" })
-                .animateProperty('spriteContainer', 'position.y', { from: -0, to: -offsets[i].y, duration: 500, gridUnits: true, delay: 500, ease: "easeInBack" })
+                .animateProperty("spriteContainer", "position.x", { from: -0, to: -offsets[i].x, duration: 500, gridUnits: true, delay: 500, ease: "easeInBack" })
+                .animateProperty("spriteContainer", "position.y", { from: -0, to: -offsets[i].y, duration: 500, gridUnits: true, delay: 500, ease: "easeInBack" })
                 .zIndex(1)
                 .duration(1150)
 

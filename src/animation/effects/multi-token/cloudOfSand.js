@@ -33,7 +33,7 @@ function _createCloudEffect(position, file, { size, opacity, rotate, zIndex, rot
         .fadeIn(500)
         .filter("ColorMatrix", { hue: -25 })
         .belowTokens()
-        .loopProperty('sprite', "rotation", { from: 0, to: 360, duration: rotationDuration })
+        .loopProperty("sprite", "rotation", { from: 0, to: 360, duration: rotationDuration })
         .persist(persist)
         .opacity(opacity)
         .rotate(rotate)
@@ -97,7 +97,7 @@ async function create(position, config = {}) {
         .fadeIn(1000, { ease: "easeInCubic" })
         .filter("ColorMatrix", { hue: -25 })
         .belowTokens()
-        .loopProperty('sprite', "rotation", { from: 0, to: 360, duration: 1500 })
+        .loopProperty("sprite", "rotation", { from: 0, to: 360, duration: 1500 })
         .fadeOut(1500)
         .duration(7500)
 

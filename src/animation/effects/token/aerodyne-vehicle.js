@@ -41,9 +41,9 @@ async function create(token, config = {}) {
         .size({ width: w, height: h })
         .opacity(1)
         .animateProperty('spriteContainer', 'position.y', { from: 20, to: 0, duration: 500 })
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
+        .loopProperty('sprite', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
         .attachTo(token, { gridUnits: true, bindRotation: true, bindAlpha: false })
-        .animateProperty('sprite', 'rotation', { from: 0, to: 0, duration: 0 })
+        .animateProperty('spriteContainer', 'rotation', { from: 0, to: 0, duration: 0 })
         .aboveLighting()
         .zIndex(2)
         .persist()
@@ -59,7 +59,7 @@ async function create(token, config = {}) {
         .filter('ColorMatrix', { brightness: -1 })
         .filter('Blur', { blurX: 5, blurY: 10 })
         .attachTo(token, { offset: { x: 0, y: 0.25 }, gridUnits: true, bindRotation: true, bindAlpha: false })
-        .animateProperty('sprite', 'rotation', { from: 0, to: 0, duration: 0 })
+        .animateProperty('spriteContainer', 'rotation', { from: 0, to: 0, duration: 0 })
         .zIndex(0)
         .persist()
 
@@ -74,7 +74,7 @@ async function create(token, config = {}) {
         .filter('Blur', { blurX: 10, blurY: 10 })
         .persist()
         .playbackRate(5)
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
+        .loopProperty('sprite', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
         .spriteRotation(tokenRotation)
         .zIndex(0)
 
@@ -88,7 +88,7 @@ async function create(token, config = {}) {
         .filter('Blur', { blurX: 10, blurY: 10 })
         .persist()
         .playbackRate(5)
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
+        .loopProperty('sprite', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
         .spriteRotation(tokenRotation)
         .zIndex(0)
 
@@ -102,7 +102,7 @@ async function create(token, config = {}) {
         .filter('Blur', { blurX: 10, blurY: 10 })
         .persist()
         .playbackRate(5)
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
+        .loopProperty('sprite', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
         .spriteRotation(tokenRotation)
         .zIndex(0)
 
@@ -116,7 +116,7 @@ async function create(token, config = {}) {
         .filter('Blur', { blurX: 10, blurY: 10 })
         .persist()
         .playbackRate(5)
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
+        .loopProperty('sprite', 'position.y', { from: 0, to: -20, duration: 2500, pingPong: true, delay: 500 })
         .spriteRotation(tokenRotation)
         .zIndex(0);
 

@@ -73,7 +73,7 @@ async function create(token, config = {}) {
         .attachTo(token, { align: 'center', edge: 'outer', bindVisibility: false, offset: { x: -0.39, y: 0.24 }, gridUnits: true, bindRotation: false })
         .size({ width: 0.4, height: 0.1 }, { gridUnits: true })
         .aboveLighting()
-        .loopProperty('spriteContainer', 'position.y', { values: [0, 13.5, 27, 13.5, 40.5, 0, 27, 0, 40.5], duration: 60, pingPong: false })
+        .loopProperty('sprite', 'position.y', { values: [0, 13.5, 27, 13.5, 40.5, 0, 27, 0, 40.5], duration: 60, pingPong: false })
         .persist()
         .zIndex(1);
 
@@ -85,7 +85,7 @@ async function create(token, config = {}) {
         .attachTo(token, { align: 'center', edge: 'outer', bindVisibility: false, offset: { x: -0.54, y: 0.385 }, gridUnits: true, bindRotation: false })
         .size({ width: 0.38, height: 0.09 }, { gridUnits: true })
         .aboveLighting()
-        .loopProperty('spriteContainer', 'position.y', { values: [13.5, 0, 40.5, 27, 0, 40.5, 13.5, 0], duration: 60, pingPong: false })
+        .loopProperty('sprite', 'position.y', { values: [13.5, 0, 40.5, 27, 0, 40.5, 13.5, 0], duration: 60, pingPong: false })
         .persist()
         .rotate(90)
         .zIndex(1);

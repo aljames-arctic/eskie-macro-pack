@@ -145,7 +145,7 @@ async function create(token, config = {}) {
         .opacity(0.35)
         .size({ width: width, height: height }, { gridUnits: true })
         .fadeIn(5000, { ease: "easeInExpo" })
-        .loopProperty('sprite', "rotation", { from: 0, to: 360, duration: 180000 })
+        .loopProperty("sprite", "rotation", { from: 0, to: 360, duration: 180000 })
         .filter("ColorMatrix", { saturate: saturation })
         .belowTokens()
         .persist()

@@ -36,10 +36,10 @@ async function create(token, config = {}) {
     drunkEffect = drunkEffect
         .scaleToObject(0.7)
         .zeroSpriteRotation()
-        .loopProperty('spriteContainer', 'position.x', { from: 0, to: -0.02, duration: 2000, pingPong: true, gridUnits: true, ease: "linear" })
-        .loopProperty('spriteContainer', 'position.y', { from: 0.15, to: -0.15, duration: 6000, pingPong: false, gridUnits: true, ease: "easeOutSine" })
-        .loopProperty('sprite', "width", { from: 0, to: 0.1, duration: 6000, pingPong: false, gridUnits: true, ease: "easeOutCubic" })
-        .loopProperty('sprite', "height", { from: 0, to: 0.1, duration: 6000, pingPong: false, gridUnits: true, ease: "easeOutCubic" })
+        .loopProperty("sprite", "position.x", { from: 0, to: -0.02, duration: 2000, pingPong: true, gridUnits: true, ease: "linear" })
+        .loopProperty("sprite", "position.y", { from: 0.15, to: -0.15, duration: 6000, pingPong: false, gridUnits: true, ease: "easeOutSine" })
+        .loopProperty("sprite", "width", { from: 0, to: 0.1, duration: 6000, pingPong: false, gridUnits: true, ease: "easeOutCubic" })
+        .loopProperty("sprite", "height", { from: 0, to: 0.1, duration: 6000, pingPong: false, gridUnits: true, ease: "easeOutCubic" })
         .loopProperty("alphaFilter", "alpha", { values: [-1, 1, 1, 1, 1, -1], duration: 1000, pingPong: true, ease: "easeOutCubic" })
         .attachTo(token, { bindAlpha: false, bindRotation: false })
         .private()
@@ -55,9 +55,9 @@ async function create(token, config = {}) {
         .name(label)
         .opacity(0.85)
         .scaleToObject(0.5)
-        .loopProperty('spriteContainer', 'position.x', { from: -20, to: 20, duration: 2500, pingPong: true, ease: "easeInOutSine" })
-        .loopProperty('spriteContainer', 'position.y', { values: [0, 20, 0, 20], duration: 2500, pingPong: true })
-        .loopProperty('sprite', "rotation", { from: -10, to: 10, duration: 2500, pingPong: true, ease: "easeInOutSine" });
+        .loopProperty("spriteContainer", "position.x", { from: -20, to: 20, duration: 2500, pingPong: true, ease: "easeInOutSine" })
+        .loopProperty("sprite", "position.y", { values: [0, 20, 0, 20], duration: 2500, pingPong: true })
+        .loopProperty("sprite", "rotation", { from: -10, to: 10, duration: 2500, pingPong: true, ease: "easeInOutSine" });
     drunkEffect = (duration > 0) ? drunkEffect.duration(duration) : drunkEffect.persist();
     drunkEffect = drunkEffect
         .atLocation(token)
@@ -72,9 +72,9 @@ async function create(token, config = {}) {
         .scaleToObject(1, { considerTokenScale: true })
         .name(label)
         .atLocation(token)
-        .loopProperty('spriteContainer', 'position.x', { from: -20, to: 20, duration: 2500, pingPong: true, ease: "easeInOutSine" })
-        .loopProperty('spriteContainer', 'position.y', { values: [0, 20, 0, 20], duration: 2500, pingPong: true })
-        .loopProperty('sprite', "rotation", { from: -10, to: 10, duration: 2500, pingPong: true, ease: "easeInOutSine" });
+        .loopProperty("spriteContainer", "position.x", { from: -20, to: 20, duration: 2500, pingPong: true, ease: "easeInOutSine" })
+        .loopProperty("sprite", "position.y", { values: [0, 20, 0, 20], duration: 2500, pingPong: true })
+        .loopProperty("sprite", "rotation", { from: -10, to: 10, duration: 2500, pingPong: true, ease: "easeInOutSine" });
     drunkEffect = (duration > 0) ? drunkEffect.duration(duration) : drunkEffect.persist();
     drunkEffect = drunkEffect
         .attachTo(token, { bindAlpha: false })

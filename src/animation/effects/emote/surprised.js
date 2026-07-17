@@ -50,7 +50,7 @@ async function create(token, config = {}) {
         .spriteOffset({ x: effect[0].x * tokenWidth, y: effect[0].y * tokenWidth }, { gridUnits: true, local: true })
         .scaleIn(0, 500, { ease: "easeOutElastic" })
         .scaleOut(0, 500, { ease: "easeOutExpo" })
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -15, duration: 750, pingPong: true })
+        .loopProperty("sprite", "position.y", { from: 0, to: -15, duration: 750, pingPong: true })
         .scaleToObject(effect[0].scale)
         .attachTo(token, { bindAlpha: false })
         .waitUntilFinished();
@@ -78,7 +78,7 @@ async function exclaim(token, {id = 'surprised', duration = 0, anchor = { x: 0.5
         .anchor(anchor)
         .scaleIn(0, 500, {ease: "easeOutElastic"})
         .scaleOut(0, 500, {ease: "easeOutExpo"})
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -15, duration: 750, pingPong: true})
+        .loopProperty("sprite", "position.y", { from: 0, to: -15, duration: 750, pingPong: true})
         .scaleToObject(0.6)
         .attachTo(token, {bindAlpha: false});
     seq = (duration >= 0) ? seq.duration(duration) : seq.persist();

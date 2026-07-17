@@ -60,8 +60,8 @@ async function createCloud(token, config = {}) {
         .scaleIn(0, 1000, { ease: "easeOutCubic" })
         .filter("ColorMatrix", { brightness: 0, hue: hue })
         .filter("Blur", { blurX: 5, blurY: 10 })
-        .animateProperty('spriteContainer', "width", { from: 0, to: -0.25, duration: 2500, gridUnits: true, ease: "easeInOutBack" })
-        .animateProperty('spriteContainer', "height", { from: 0, to: -0.25, duration: 2500, gridUnits: true, ease: "easeInOutBack" })
+        .animateProperty("sprite", "width", { from: 0, to: -0.25, duration: 2500, gridUnits: true, ease: "easeInOutBack" })
+        .animateProperty("sprite", "height", { from: 0, to: -0.25, duration: 2500, gridUnits: true, ease: "easeInOutBack" })
         .belowTokens();
 
     sequence.effect()
@@ -73,8 +73,8 @@ async function createCloud(token, config = {}) {
         .fadeIn(1500)
         .scaleIn(0, 1500, { ease: "easeOutCubic" })
         .filter("ColorMatrix", { hue: hue })
-        .animateProperty('spriteContainer', "width", { from: 0, to: 0.5, duration: 2500, gridUnits: true, ease: "easeOutBack" })
-        .animateProperty('spriteContainer', "height", { from: 0, to: 1, duration: 2500, gridUnits: true, ease: "easeOutBack" })
+        .animateProperty("sprite", "width", { from: 0, to: 0.5, duration: 2500, gridUnits: true, ease: "easeOutBack" })
+        .animateProperty("sprite", "height", { from: 0, to: 1, duration: 2500, gridUnits: true, ease: "easeOutBack" })
         .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.45, duration: 2500, gridUnits: true });
 
     sequence.effect()
@@ -84,8 +84,8 @@ async function createCloud(token, config = {}) {
         .playbackRate(1)
         .duration(1500)
         .scaleIn(0, 1500, { ease: "easeOutCubic" })
-        .animateProperty('spriteContainer', "width", { from: 0, to: 0.5, duration: 2500, gridUnits: true, ease: "easeOutBack" })
-        .animateProperty('spriteContainer', "height", { from: 0, to: 0.5, duration: 2500, gridUnits: true, ease: "easeOutBack" })
+        .animateProperty("sprite", "width", { from: 0, to: 0.5, duration: 2500, gridUnits: true, ease: "easeOutBack" })
+        .animateProperty("sprite", "height", { from: 0, to: 0.5, duration: 2500, gridUnits: true, ease: "easeOutBack" })
         .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.25, duration: 2500, gridUnits: true, ease: "easeOutBack" })
         .waitUntilFinished(-200);
 

@@ -53,7 +53,7 @@ function create(token, targets, config = {}) {
         .scaleToObject(1.1, { considerTokenScale: true })
         .filter("ColorMatrix", { saturate: -1, brightness: 10 })
         .filter("Blur", { blurX: 5, blurY: 10 })
-        .animateProperty('spriteContainer', 'position.y', { from: -1000, to: 0, duration: 500, ease: "easeOutCubic" })
+        .animateProperty("spriteContainer", "position.y", { from: -1000, to: 0, duration: 500, ease: "easeOutCubic" })
         .duration(500)
         .attachTo(token, { bindAlpha: false });
     targets.forEach(target => {
@@ -64,7 +64,7 @@ function create(token, targets, config = {}) {
             .scaleToObject(1.1, { considerTokenScale: true })
             .filter("ColorMatrix", { saturate: -1, brightness: 10 })
             .filter("Blur", { blurX: 5, blurY: 10 })
-            .animateProperty('spriteContainer', 'position.y', { from: -1000, to: 0, duration: 500, ease: "easeOutCubic" })
+            .animateProperty("spriteContainer", "position.y", { from: -1000, to: 0, duration: 500, ease: "easeOutCubic" })
             .duration(500)
             .attachTo(target, { bindAlpha: false });
     });

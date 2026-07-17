@@ -97,7 +97,7 @@ function create(token, targetTokens, config = {}) {
                     .fadeIn(250)
                     .fadeOut(750)
                     .belowTokens()
-                    .animateProperty('sprite', 'height', { from: -2, to: -1, duration: 200, gridUnits: true })
+                    .animateProperty('spriteContainer', "height", { from: -2, to: -1, duration: 200, gridUnits: true })
                     .opacity(0.75);
             }
         }
@@ -157,7 +157,7 @@ function create(token, targetTokens, config = {}) {
                     .scaleToObject(1, { considerTokenScale: true })
                     .fadeIn(250)
                     .fadeOut(1500)
-                    .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
+                    .loopProperty('sprite', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
                     .duration(4000)
                     .opacity(0.25);
 

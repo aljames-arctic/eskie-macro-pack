@@ -55,7 +55,7 @@ async function create(token, config = {}) {
         .spriteOffset({ x: (effect[0].x * tokenWidth) * facingFactor, y: (effect[0].y * tokenWidth) }, { gridUnits: true, local: true })
         .scaleToObject(effect[0].scale)
         .mirrorX(mirrorFace)
-        .loopProperty('spriteContainer', 'position.y', { from: -0.05, to: 0.05, duration: 3000, gridUnits: true, pingPong: true })
+        .loopProperty("sprite", "position.y", { from: -0.05, to: 0.05, duration: 3000, gridUnits: true, pingPong: true })
         .attachTo(token, { bindAlpha: false })
         .waitUntilFinished();
 

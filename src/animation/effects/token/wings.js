@@ -58,8 +58,8 @@ async function createWings(token, config = {}) {
         .scaleToObject(1, { considerTokenScale: true })
         .zIndex(0.1)
         .persist()
-        .animateProperty('spriteContainer', 'position.y', { from: 0.5 + (0.1 * swayMulti), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-        .loopProperty('spriteContainer', 'position.y', { values: [0.075 * swayMulti, 0.1 * swayMulti, 0.025 * swayMulti, 0, 0.025 * swayMulti, 0.05 * swayMulti], duration: (3000 / speedMulti) / 6, gridUnits: true, ease: "linear", pingPong: true })
+        .animateProperty("spriteContainer", "position.y", { from: 0.5 + (0.1 * swayMulti), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
+        .loopProperty("spriteContainer", "position.y", { values: [0.075 * swayMulti, 0.1 * swayMulti, 0.025 * swayMulti, 0, 0.025 * swayMulti, 0.05 * swayMulti], duration: (3000 / speedMulti) / 6, gridUnits: true, ease: "linear", pingPong: true })
 
         .effect()
         .name(`${id} - ${token.id}`) // Unique name for stopping
@@ -69,8 +69,8 @@ async function createWings(token, config = {}) {
         .attachTo(token, { offset: { y: offset.y - 0.5 - (0.1 * swayMulti), x: offset.x }, gridUnits: true, bindAlpha: false })
         .scaleToObject(3 * wingSize)
         .persist()
-        .animateProperty('spriteContainer', 'position.y', { from: 0.5 + (0.1 * swayMulti), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-        .loopProperty('spriteContainer', 'position.y', { values: [0.075 * swayMulti, 0.1 * swayMulti, 0.025 * swayMulti, 0, 0.025 * swayMulti, 0.05 * swayMulti], duration: (3000 / speedMulti) / 6, gridUnits: true, ease: "linear", pingPong: true })
+        .animateProperty("spriteContainer", "position.y", { from: 0.5 + (0.1 * swayMulti), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
+        .loopProperty("spriteContainer", "position.y", { values: [0.075 * swayMulti, 0.1 * swayMulti, 0.025 * swayMulti, 0, 0.025 * swayMulti, 0.05 * swayMulti], duration: (3000 / speedMulti) / 6, gridUnits: true, ease: "linear", pingPong: true })
         .playbackRate(speedMulti)
         .filter("ColorMatrix", { hue: hue })
         .waitUntilFinished()

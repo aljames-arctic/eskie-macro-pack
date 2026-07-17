@@ -97,7 +97,7 @@ function createDamageEffect(token, target, config = {}) {
         .scaleToObject(1, { considerTokenScale: true })
         .fadeIn(200)
         .fadeOut(500)
-        .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
+        .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
         .scaleToObject(1, { considerTokenScale: true })
         .duration(1500)
         .opacity(0.25)

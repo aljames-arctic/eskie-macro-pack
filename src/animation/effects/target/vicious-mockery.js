@@ -105,7 +105,7 @@ async function createViciousMockeryImpact(target, word, config = {}) {
         .zIndex(0)
         .animateProperty("spriteContainer", "position.x", { from: -0.6, to: 0, duration: 600, gridUnits: true, ease: "easeInExpo" })
         .animateProperty("spriteContainer", "position.y", { from: -0.6, to: 0, duration: 600, gridUnits: true, ease: "easeInExpo" })
-        .animateProperty("sprite", "rotation", { from: 0, to: 45, duration: 10, ease: "easeOutElastic" })
+        .animateProperty('spriteContainer', "rotation", { from: 0, to: 45, duration: 10, ease: "easeOutElastic" })
         .scaleIn(0, 500, { ease: "easeOutElastic" })
         .filter("ColorMatrix", { hue: 50 })
 
@@ -118,7 +118,7 @@ async function createViciousMockeryImpact(target, word, config = {}) {
         .zIndex(1)
         .animateProperty("spriteContainer", "position.x", { from: -0.6, to: 0, duration: 600, gridUnits: true, ease: "easeInExpo" })
         .animateProperty("spriteContainer", "position.y", { from: -0.6, to: 0, duration: 600, gridUnits: true, ease: "easeInExpo" })
-        .animateProperty("sprite", "rotation", { from: 0, to: 45, duration: 10, ease: "easeOutElastic" })
+        .animateProperty('spriteContainer', "rotation", { from: 0, to: 45, duration: 10, ease: "easeOutElastic" })
         .scaleIn(0, 500, { ease: "easeOutElastic" })
         .zIndex(2)
 
@@ -129,8 +129,8 @@ async function createViciousMockeryImpact(target, word, config = {}) {
         .fadeOut(1000)
         .animateProperty("spriteContainer", "position.x", { from: -0.6, to: 0, duration: 600, gridUnits: true, ease: "easeInExpo" })
         .animateProperty("spriteContainer", "position.y", { from: -0.6, to: 0, duration: 600, gridUnits: true, ease: "easeInExpo" })
-        .animateProperty("sprite", "rotation", { from: 0, to: 45, duration: 10, ease: "easeOutElastic" })
-        .animateProperty("sprite", "rotation", { from: -2.5, to: 2.5, duration: 500, ease: "easeOutElastic", delay: 650 })
+        .animateProperty('spriteContainer', "rotation", { from: 0, to: 45, duration: 10, ease: "easeOutElastic" })
+        .animateProperty('spriteContainer', "rotation", { from: -2.5, to: 2.5, duration: 500, ease: "easeOutElastic", delay: 650 })
         .scaleIn(0, 500, { ease: "easeOutElastic" })
         .filter("Glow", { color: 0x6820ee })
         .zIndex(2)

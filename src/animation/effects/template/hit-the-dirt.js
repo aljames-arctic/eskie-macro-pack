@@ -68,9 +68,9 @@ async function create(token, config, options) {
         .scaleToObject(1, { considerTokenScale: true })
         .moveTowards(position, { delay: 100, rotate: false, ease: "easeOutQuint" })    // Horizontal Movement
         .duration(1300)
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.8, duration: 550, delay: 100, gridUnits: true, ease: "easeOutQuint" })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: 0.8, duration: 550, delay: 650, gridUnits: true, ease: "easeOutQuad" })
-        .animateProperty("sprite", "rotation", { from: 0, to: 90, duration: 500, delay: 100, ease: "easeOutCubic" })
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.8, duration: 550, delay: 100, gridUnits: true, ease: "easeOutQuint" })
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: 0.8, duration: 550, delay: 650, gridUnits: true, ease: "easeOutQuad" })
+        .animateProperty('sprite', 'rotation', { from: 0, to: 90, duration: 500, delay: 100, ease: "easeOutCubic" })
         .waitUntilFinished(-200)
 
         // Update the actual token

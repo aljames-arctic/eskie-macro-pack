@@ -91,7 +91,7 @@ async function createShapechange(token, config = {}) {
         .scaleToObject(1, { considerTokenScale: true })
         .animateProperty('sprite', 'width', { from: (token.document.width * 1.1) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
         .animateProperty('sprite', 'height', { from: (token.document.width) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
-        .loopProperty('sprite', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
+        .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
         .opacity(0.65)
         .repeats(3, 800, 800)
 
@@ -104,7 +104,7 @@ async function createShapechange(token, config = {}) {
         .scaleToObject(1, { considerTokenScale: true })
         .animateProperty('sprite', 'width', { from: (token.document.width * 1.1) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
         .animateProperty('sprite', 'height', { from: (token.document.width) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
-        .loopProperty('sprite', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
+        .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
         .opacity(0.25)
         .filter('ColorMatrix', { brightness: 0.75 })
 
@@ -118,7 +118,7 @@ async function createShapechange(token, config = {}) {
         .scaleToObject(1, { considerTokenScale: true })
         .animateProperty('sprite', 'width', { from: (token.document.width * 1.1) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
         .animateProperty('sprite', 'height', { from: (token.document.width) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
-        .loopProperty('sprite', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
+        .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
         .opacity(0.5)
         .filter('ColorMatrix', { brightness: 0.5 })
 
@@ -132,7 +132,7 @@ async function createShapechange(token, config = {}) {
         .scaleToObject(1, { considerTokenScale: true })
         .animateProperty('sprite', 'width', { from: (token.document.width * 1.1) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
         .animateProperty('sprite', 'height', { from: (token.document.width) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
-        .loopProperty('sprite', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
+        .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
         .opacity(0.75)
         .filter('ColorMatrix', { brightness: 0.25 })
 
@@ -157,7 +157,7 @@ async function createShapechange(token, config = {}) {
         .scaleToObject(1, { considerTokenScale: true })
         .animateProperty('sprite', 'width', { from: (token.document.width * 1.1) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
         .animateProperty('sprite', 'height', { from: (token.document.width) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
-        .loopProperty('sprite', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
+        .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
         .opacity(0.75)
         .filter('ColorMatrix', { brightness: 0.2 })
 
@@ -173,7 +173,7 @@ async function createShapechange(token, config = {}) {
         .scaleToObject(1, { considerTokenScale: true })
         .animateProperty('sprite', 'width', { from: (token.document.width * 1.1) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
         .animateProperty('sprite', 'height', { from: (token.document.width) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
-        .loopProperty('sprite', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
+        .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
         .opacity(1)
         .filter('ColorMatrix', { brightness: 0 })
         .filter('Blur', { blurX: 5, blurY: 5 })
@@ -246,7 +246,7 @@ async function createRevert(token, config = {}) {
         .duration(5000)
         .fadeOut(4000, { ease: 'easeInSine' })
         .scaleToObject(1, { considerTokenScale: true })
-        .loopProperty('sprite', 'position.x', { from: -0.005, to: 0.005, duration: 500, pingPong: true, gridUnits: true, delay: 1000 })
+        .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 500, pingPong: true, gridUnits: true, delay: 1000 })
 
         .wait(500)
 
@@ -261,7 +261,7 @@ async function createRevert(token, config = {}) {
         .scaleIn(0, 1000, { ease: 'easeOutCubic' })
         .animateProperty('sprite', 'width', { from: 0, to: 0.25, duration: 500, gridUnits: true, ease: 'easeOutBack' })
         .animateProperty('sprite', 'height', { from: 0, to: 1.0, duration: 1000, gridUnits: true, ease: 'easeOutBack' })
-        .animateProperty('sprite', 'position.y', { from: -0, to: -0.6, duration: 1000, gridUnits: true })
+        .animateProperty('spriteContainer', 'position.y', { from: -0, to: -0.6, duration: 1000, gridUnits: true })
         .filter('ColorMatrix', { saturate: -0, brightness: 0 })
         .belowTokens()
         .randomizeMirrorX()

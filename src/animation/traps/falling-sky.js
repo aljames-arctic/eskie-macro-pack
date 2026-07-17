@@ -122,7 +122,7 @@ async function create(tile, targets, config = {}) {
                 .attachTo(target, { offset: { y: -0.4 * targetWidth + 0.2 * targetWidth }, gridUnits: true, bindAlpha: false })
                 .scaleToObject(0.25, { considerTokenScale: false })
                 .scaleIn(0, 250, { ease: 'easeOutBack' })
-                .loopProperty('sprite', 'position.y', { from: 0, to: 0.025, duration: 500, pingPong: true, gridUnits: true, ease: 'easeInSine' })
+                .loopProperty('spriteContainer', 'position.y', { from: 0, to: 0.025, duration: 500, pingPong: true, gridUnits: true, ease: 'easeInSine' })
                 .tint(game.user?.color?.css ?? '#ffffff')
                 .opacity(0.9)
                 .duration(1000)

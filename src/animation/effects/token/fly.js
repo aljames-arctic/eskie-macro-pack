@@ -31,8 +31,8 @@ async function create(token, config = {}) {
         .opacity(1)
         .duration(800)
         .anchor({ x: 0.55, y: 0.9 })
-        .animateProperty("spriteContainer", "position.y", { from: 50, to: 0, duration: 500 })
-        .loopProperty("sprite", "position.y", { from: 0, to: -50, duration: 2500, pingPong: true, delay: 500 })
+        .animateProperty('spriteContainer', 'position.y', { from: 50, to: 0, duration: 500 })
+        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -50, duration: 2500, pingPong: true, delay: 500 })
         .attachTo(token, { bindAlpha: false })
         .zIndex(2)
         .persist();

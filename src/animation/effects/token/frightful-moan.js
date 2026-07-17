@@ -51,7 +51,7 @@ async function create(token, config = {}) {
         .opacity(0.4)
         .filter("ColorMatrix", { saturate: -1, brightness: 1.1 })
         .aboveLighting()
-        .loopProperty("sprite", "position.x", { from: 0.01, to: -0.01, gridUnits: true, pingPong: true, duration: 50 })
+        .loopProperty('spriteContainer', 'position.x', { from: 0.01, to: -0.01, gridUnits: true, pingPong: true, duration: 50 })
         .zIndex(1)
 
         .effect()
@@ -61,7 +61,7 @@ async function create(token, config = {}) {
         .repeats(8, 450, 450)
         .opacity(0.25)
         .filter("ColorMatrix", { saturate: -1 })
-        .loopProperty("sprite", "position.x", { from: 0.01, to: -0.01, gridUnits: true, pingPong: true, duration: 50 })
+        .loopProperty('spriteContainer', 'position.x', { from: 0.01, to: -0.01, gridUnits: true, pingPong: true, duration: 50 })
         .aboveLighting()
         .zIndex(0)
 

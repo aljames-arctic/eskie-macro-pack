@@ -48,8 +48,8 @@ async function create(token, targets = [], config = {}) {
             .spriteRotation(-token.document.rotation)
             .scaleToObject(1, {considerTokenScale:true})
             .atLocation(token)
-            .animateProperty("spriteContainer", "position.x", { from: 0, to: xdelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
-            .animateProperty("spriteContainer", "position.y", { from: 0, to: ydelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
+            .animateProperty('spriteContainer', 'position.x', { from: 0, to: xdelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: ydelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
             .duration(3500)
 
         .effect()
@@ -57,8 +57,8 @@ async function create(token, targets = [], config = {}) {
             .spriteRotation(-token.document.rotation)
             .scaleToObject(1, {considerTokenScale:true})
             .atLocation(token)
-            .animateProperty("spriteContainer", "position.x", { from: 0, to: xdelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
-            .animateProperty("spriteContainer", "position.y", { from: 0, to: ydelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
+            .animateProperty('spriteContainer', 'position.x', { from: 0, to: xdelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: ydelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
             .duration(2000+150+500)
             .fadeIn(100,{delay: 2500+150})
             .fadeOut(250)
@@ -102,9 +102,9 @@ async function create(token, targets = [], config = {}) {
             .scaleToObject(2.1)
             .zIndex(0.1)
             .belowTokens()
-            .animateProperty("spriteContainer", "position.x", { from: 0, to: xdelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
-            .animateProperty("spriteContainer", "position.y", { from: 0, to: ydelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
-            .animateProperty("spriteContainer", "rotation", { from: 0, to: 90, duration: 50, ease: "easeOutQuint",delay: 2000+50 })
+            .animateProperty('spriteContainer', 'position.x', { from: 0, to: xdelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: ydelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
+            .animateProperty('sprite', 'rotation', { from: 0, to: 90, duration: 50, ease: "easeOutQuint",delay: 2000+50 })
 
 
         // Dragon Eyes
@@ -161,7 +161,7 @@ async function create(token, targets = [], config = {}) {
             .file(closest("eskie.particle.04.orange"))
             .atLocation(token)
             .scaleToObject(5)
-            .animateProperty("spriteContainer", "position.x", { from: 0, to: -7.5, duration: 500, gridUnits: true, ease: "easeOutQuint" })
+            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -7.5, duration: 500, gridUnits: true, ease: "easeOutQuint" })
             .belowTokens()
             .playIf(!impact)
 

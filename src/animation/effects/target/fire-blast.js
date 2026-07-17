@@ -68,7 +68,7 @@ async function create(source, target, config = {}) {
         .fadeIn(200)
         .fadeOut(400)
         .aboveInterface()
-        .animateProperty('sprite', 'position.x', { from: 0, to: 0.5, duration: 1200, gridUnits: true, ease: 'easeInOutQuad' })
+        .animateProperty('spriteContainer', 'position.x', { from: 0, to: 0.5, duration: 1200, gridUnits: true, ease: 'easeInOutQuad' })
         .loopProperty('spriteContainer', 'rotation', { from: 0, to: 360, duration: 2000, ease: 'linear' })
         .loopProperty('sprite', 'rotation', { from: 0, to: 360, duration: 2000, ease: 'linear' });
 
@@ -173,13 +173,13 @@ async function create(source, target, config = {}) {
         .delay(100)
         .copySprite(source)
         .spriteRotation(-source.document.rotation)
-        .animateProperty('sprite', 'position.x', {
+        .animateProperty('spriteContainer', 'position.x', {
             from: 0,
             to: nxt * canvas.grid.size * 0.2,
             duration: knockbackDuration,
             ease: 'easeOutExpo'
         })
-        .animateProperty('sprite', 'position.y', {
+        .animateProperty('spriteContainer', 'position.y', {
             from: 0,
             to: nyt * canvas.grid.size * 0.2,
             duration: knockbackDuration,
@@ -190,13 +190,13 @@ async function create(source, target, config = {}) {
         .delay(100)
         .copySprite(source)
         .spriteRotation(-source.document.rotation)
-        .animateProperty('sprite', 'position.x', {
+        .animateProperty('spriteContainer', 'position.x', {
             from: nxt * canvas.grid.size * 0.2,
             to: 0,
             duration: returnDuration,
             ease: 'easeInQuart'
         })
-        .animateProperty('sprite', 'position.y', {
+        .animateProperty('spriteContainer', 'position.y', {
             from: nyt * canvas.grid.size * 0.2,
             to: 0,
             duration: returnDuration,
@@ -244,13 +244,13 @@ async function create(source, target, config = {}) {
     sequence.effect()
         .copySprite(target)
         .spriteRotation(-target.document.rotation)
-        .animateProperty('sprite', 'position.x', {
+        .animateProperty('spriteContainer', 'position.x', {
             from: 0,
             to: nx * pushDistance * 0.15,
             duration: knockbackDuration,
             ease: 'easeOutExpo'
         })
-        .animateProperty('sprite', 'position.y', {
+        .animateProperty('spriteContainer', 'position.y', {
             from: 0,
             to: ny * pushDistance * 0.15,
             duration: knockbackDuration,
@@ -262,13 +262,13 @@ async function create(source, target, config = {}) {
         .delay(100)
         .copySprite(target)
         .spriteRotation(-target.document.rotation)
-        .animateProperty('sprite', 'position.x', {
+        .animateProperty('spriteContainer', 'position.x', {
             from: nx * pushDistance * 0.15,
             to: 0,
             duration: returnDuration,
             ease: 'easeInQuart'
         })
-        .animateProperty('sprite', 'position.y', {
+        .animateProperty('spriteContainer', 'position.y', {
             from: ny * pushDistance * 0.15,
             to: 0,
             duration: returnDuration,

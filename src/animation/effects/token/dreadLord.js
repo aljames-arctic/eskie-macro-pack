@@ -61,9 +61,9 @@ async function create(token, config = {}) {
         .duration(1000)
         .fadeOut(800)
         .scaleIn(0, 1000, { ease: "easeOutCubic" })
-        .animateProperty('spriteContainer', "width", { from: 0, to: 0.25, duration: 500, gridUnits: true, ease: "easeOutBack" })
-        .animateProperty('spriteContainer', "height", { from: 0, to: 1.0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.6, duration: 1000, gridUnits: true })
+        .animateProperty('sprite', 'width', { from: 0, to: 0.25, duration: 500, gridUnits: true, ease: "easeOutBack" })
+        .animateProperty('sprite', 'height', { from: 0, to: 1.0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.6, duration: 1000, gridUnits: true })
         .filter("ColorMatrix", { saturate: 1, hue: 20 })
         .zIndex(0.3);
 
@@ -165,7 +165,7 @@ async function create(token, config = {}) {
         .scaleOut(0, 6500, { ease: "easeInSine" })
         .filter("ColorMatrix", { brightness: 0 })
         .rotate(90)
-        .loopProperty("sprite", "rotation", { from: 0, to: 360, duration: 20000 })
+        .loopProperty('sprite', "rotation", { from: 0, to: 360, duration: 20000 })
         .belowTokens()
         .persist()
         .zIndex(0.3);

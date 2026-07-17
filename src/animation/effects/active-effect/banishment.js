@@ -71,9 +71,9 @@ async function createBanish(target, config = {}) {
             .delay(runeDelay)
             .playbackRate(0.65)
             .rotate(rune.rotation)
-            .animateProperty("spriteContainer", "rotation", { from: rune.rotation, to: 720 + rune.rotation, duration: RUNE_DATA.rotationDuration, delay: animationDelay, ease: "easeInBack" })
-            .animateProperty("spriteContainer", "position.x", { from: 0, to: RUNE_DATA.merge.x - rune.offset.x, duration: RUNE_DATA.animDuration, delay: animationDelay + RUNE_DATA.rotationDuration, ease: "easeInBack" })
-            .animateProperty("spriteContainer", "position.y", { from: 0, to: RUNE_DATA.merge.y - rune.offset.y, duration: RUNE_DATA.animDuration, delay: animationDelay + RUNE_DATA.rotationDuration, ease: "easeInBack" })
+            .animateProperty('sprite', 'rotation', { from: rune.rotation, to: 720 + rune.rotation, duration: RUNE_DATA.rotationDuration, delay: animationDelay, ease: "easeInBack" })
+            .animateProperty('spriteContainer', 'position.x', { from: 0, to: RUNE_DATA.merge.x - rune.offset.x, duration: RUNE_DATA.animDuration, delay: animationDelay + RUNE_DATA.rotationDuration, ease: "easeInBack" })
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: RUNE_DATA.merge.y - rune.offset.y, duration: RUNE_DATA.animDuration, delay: animationDelay + RUNE_DATA.rotationDuration, ease: "easeInBack" })
             .duration(RUNE_DATA.animDuration + animationDelay - 800)
             .zIndex(0.1);
         runeDelay += RUNE_DATA.animDuration;
@@ -147,7 +147,7 @@ async function createBanish(target, config = {}) {
         .spriteRotation(-target.document.rotation)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: -15, duration: 250, ease: "easeInOutBack" })
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -15, duration: 250, ease: "easeInOutBack" })
         .waitUntilFinished(-100);
 
     sequence.effect()
@@ -155,11 +155,11 @@ async function createBanish(target, config = {}) {
         .spriteRotation(-target.document.rotation)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty("spriteContainer", "position.y", { from: -15, to: 0, duration: 2000, ease: "easeInOutBack" })
-        .animateProperty('spriteContainer', "rotation", { from: 0, to: 8, duration: 500, ease: "easeOutCubic" })
-        .animateProperty('spriteContainer', "rotation", { from: 0, to: -16, duration: 500, delay: 500, ease: "easeOutCubic" })
-        .animateProperty('spriteContainer', "rotation", { from: 0, to: 16, duration: 500, delay: 1000, ease: "easeOutCubic" })
-        .animateProperty('spriteContainer', "rotation", { from: 0, to: -16, duration: 500, delay: 1500, ease: "easeInCubic" })
+        .animateProperty('spriteContainer', 'position.y', { from: -15, to: 0, duration: 2000, ease: "easeInOutBack" })
+        .animateProperty('sprite', 'rotation', { from: 0, to: 8, duration: 500, ease: "easeOutCubic" })
+        .animateProperty('sprite', 'rotation', { from: 0, to: -16, duration: 500, delay: 500, ease: "easeOutCubic" })
+        .animateProperty('sprite', 'rotation', { from: 0, to: 16, duration: 500, delay: 1000, ease: "easeOutCubic" })
+        .animateProperty('sprite', 'rotation', { from: 0, to: -16, duration: 500, delay: 1500, ease: "easeInCubic" })
         .waitUntilFinished(-100);
 
     sequence.effect()
@@ -167,7 +167,7 @@ async function createBanish(target, config = {}) {
         .spriteRotation(-target.document.rotation)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: -40, duration: 500, ease: "easeInOutBack" })
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -40, duration: 500, ease: "easeInOutBack" })
         .waitUntilFinished(-100);
 
     sequence.effect()
@@ -175,11 +175,11 @@ async function createBanish(target, config = {}) {
         .spriteRotation(-target.document.rotation)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty("spriteContainer", "position.y", { from: -40, to: -15, duration: 2000, ease: "easeInOutBack" })
-        .animateProperty('spriteContainer', "rotation", { from: 0, to: 8, duration: 500, ease: "easeOutCubic" })
-        .animateProperty('spriteContainer', "rotation", { from: 0, to: -16, duration: 500, delay: 500, ease: "easeOutCubic" })
-        .animateProperty('spriteContainer', "rotation", { from: 0, to: 16, duration: 500, delay: 1000, ease: "easeOutCubic" })
-        .animateProperty('spriteContainer', "rotation", { from: 0, to: -16, duration: 500, delay: 1500, ease: "easeInCubic" })
+        .animateProperty('spriteContainer', 'position.y', { from: -40, to: -15, duration: 2000, ease: "easeInOutBack" })
+        .animateProperty('sprite', 'rotation', { from: 0, to: 8, duration: 500, ease: "easeOutCubic" })
+        .animateProperty('sprite', 'rotation', { from: 0, to: -16, duration: 500, delay: 500, ease: "easeOutCubic" })
+        .animateProperty('sprite', 'rotation', { from: 0, to: 16, duration: 500, delay: 1000, ease: "easeOutCubic" })
+        .animateProperty('sprite', 'rotation', { from: 0, to: -16, duration: 500, delay: 1500, ease: "easeInCubic" })
         .waitUntilFinished(-100);
 
     sequence.effect()
@@ -187,7 +187,7 @@ async function createBanish(target, config = {}) {
         .spriteRotation(-target.document.rotation)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty("spriteContainer", "position.y", { from: -15, to: -200, duration: 750, ease: "easeInOutBack" })
+        .animateProperty('spriteContainer', 'position.y', { from: -15, to: -200, duration: 750, ease: "easeInOutBack" })
         .scaleOut(0, 750)
         .duration(375)
         .waitUntilFinished(-150);
@@ -222,7 +222,7 @@ async function createBanish(target, config = {}) {
         .duration(2000)
         .fadeIn(500)
         .fadeOut(750)
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: 75, duration: 3000 });
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: 75, duration: 3000 });
 
     return sequence;
 }
@@ -265,7 +265,7 @@ async function createReturn(target, config = {}) {
         .spriteRotation(-target.document.rotation)
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty("spriteContainer", "position.y", { from: -75, to: 0, duration: 500, ease: "easeOutBounce" })
+        .animateProperty('spriteContainer', 'position.y', { from: -75, to: 0, duration: 500, ease: "easeOutBounce" })
         .scaleIn(0.25, 500)
         .fadeIn(250)
         .delay(1500)

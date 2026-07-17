@@ -24,8 +24,8 @@ function create(token, config = {}) {
             .fadeIn(1000)
             .fadeOut(500)
             .belowTokens()
-            .loopProperty("sprite", "scale.x", { from:1, to: 0.975, duration: 1500,  pingPong:true})
-            .loopProperty("sprite", "scale.y", { from: 1, to: 0.975, duration: 1500, pingPong:true})
+            .loopProperty('sprite', "scale.x", { from:1, to: 0.975, duration: 1500,  pingPong:true})
+            .loopProperty('sprite', "scale.y", { from: 1, to: 0.975, duration: 1500, pingPong:true})
             .persist()
         
         .effect()
@@ -56,7 +56,7 @@ function create(token, config = {}) {
             .spriteRotation(20)
             .belowTokens()
             .opacity(0.5)
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutCubic"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutCubic"})
 
         .effect()
             .name(label)
@@ -66,7 +66,7 @@ function create(token, config = {}) {
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(1000, {ease:"easeOutQuint"})
             .spriteRotation(20)
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutCubic"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutCubic"})
             .belowTokens()
             .persist()
 
@@ -79,7 +79,7 @@ function create(token, config = {}) {
             .fadeOut(1000, {ease:"easeOutSine"})
             .spriteRotation(20)
             .duration(1250)
-            .animateProperty('spriteContainer', "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutCubic"})
+            .animateProperty('spriteContainer', 'position.y', {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutCubic"})
             .zIndex(0)
 
         .effect()
@@ -90,8 +90,8 @@ function create(token, config = {}) {
             .scaleIn(0, 250, {ease: "easeOutQuint"})
             .filter("ColorMatrix", { hue: -30, saturate:0.5})
             .playbackRate(2)
-            .loopProperty("sprite", "scale.x", { from: 1, to: 1.15, duration: 1500,  pingPong:true})
-            .loopProperty("sprite", "scale.y", { from: 1, to: 1.15, duration: 1500, pingPong:true})
+            .loopProperty('sprite', "scale.x", { from: 1, to: 1.15, duration: 1500,  pingPong:true})
+            .loopProperty('sprite', "scale.y", { from: 1, to: 1.15, duration: 1500, pingPong:true})
             .persist()
             .zIndex(0)
 

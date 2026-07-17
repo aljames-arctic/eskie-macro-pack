@@ -44,8 +44,8 @@ function create(users = [], config = {}){
             .belowTiles()
             .filter("Blur", { blurX: blur, blurY: blur })
             .opacity(opacity)
-            .loopProperty("spriteContainer", "position.x", { from: -drift, to: drift, duration: durationX, pingPong: true })
-            .loopProperty("spriteContainer", "position.y", { from: -drift, to: drift, duration: durationY, pingPong: true })
+            .loopProperty('spriteContainer', 'position.x', { from: -drift, to: drift, duration: durationX, pingPong: true })
+            .loopProperty('spriteContainer', 'position.y', { from: -drift, to: drift, duration: durationY, pingPong: true })
             .forUsers(users.id)
             .persist()
     return seq;

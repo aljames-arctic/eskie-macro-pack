@@ -27,7 +27,7 @@ function create(token, config = {}) {
             .spriteRotation(-token.document.rotation)
             .atLocation(token)
             .scaleToObject(1, { considerTokenScale: true })
-            .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true})
+            .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true})
             .duration(250)
             .opacity(0.5)
             .zIndex(3)

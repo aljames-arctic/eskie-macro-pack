@@ -116,7 +116,7 @@ async function createTarget(source, config = {}) {
             .attachTo(target)
             .fadeIn(200)
             .fadeOut(500)
-            .loopProperty('sprite', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
+            .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
             .scaleToObject(target.document.texture.scaleX)
             .duration(1800)
             .opacity(0.25)

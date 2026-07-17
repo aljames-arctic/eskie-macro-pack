@@ -37,7 +37,7 @@ async function create(token, config = {}) {
         .scaleToObject(1.25)
         .rotateIn(180, 600, {ease: "easeOutCubic"})
         .scaleIn(0, 600, {ease: "easeOutCubic"})
-        .loopProperty("sprite", "rotation", { from: 0, to: -360, duration: 10000})
+        .loopProperty('sprite', "rotation", { from: 0, to: -360, duration: 10000})
         .belowTokens()
         .persist()
         .fadeOut(2000)
@@ -49,7 +49,7 @@ async function create(token, config = {}) {
         .scaleToObject(1.25)
         .rotateIn(180, 600, {ease: "easeOutCubic"})
         .scaleIn(0, 600, {ease: "easeOutCubic"})
-        .loopProperty("sprite", "rotation", { from: 0, to: -360, duration: 10000})
+        .loopProperty('sprite', "rotation", { from: 0, to: -360, duration: 10000})
         .belowTokens(true)
         .filter("ColorMatrix", {saturate:-1, brightness:2})
         .filter("Blur", { blurX: 5, blurY: 10 })
@@ -66,7 +66,7 @@ async function create(token, config = {}) {
         .fadeOut(1000)
         .duration(1000)
         .size(1.75, {gridUnits: true})
-        .animateProperty("spriteContainer", "position.y", {  from:0 , to: -0.5, gridUnits:true, duration: 1000})
+        .animateProperty('spriteContainer', 'position.y', {  from:0 , to: -0.5, gridUnits:true, duration: 1000})
         .zIndex(1);
     
     seq.thenDo(function(){

@@ -58,8 +58,8 @@ function create(token, config = {}) {
       .file(closest(`eskie.wings.bird.01`))
       .attachTo(token,{offset:{y:-0.5-(0.1*sway)},gridUnits:true, bindAlpha:false})
       .scaleToObject(3*wingSize)
-      .animateProperty("sprite", "position.y", { from: 0.5+(0.1*sway), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-      .loopProperty("spriteContainer", "position.y", { values:[0.075*sway,0.1*sway,0.025*sway,0,0.025*sway,0.05*sway], duration: 1000, gridUnits: true, ease: "linear",pingPong: true })
+      .animateProperty('spriteContainer', 'position.y', { from: 0.5+(0.1*sway), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
+      .loopProperty('spriteContainer', 'position.y', { values:[0.075*sway,0.1*sway,0.025*sway,0,0.025*sway,0.05*sway], duration: 1000, gridUnits: true, ease: "linear",pingPong: true })
       .playbackRate(2);
       if (flaps > 0) seq = seq.loopOptions({ loops: flaps, loopDelay:1000, endOnLastLoop:true });
       seq = seq.fadeIn(500, {ease:"easeOutCubic", delay:350})
@@ -75,8 +75,8 @@ function create(token, config = {}) {
       .file(closest(`eskie.wings.bird.01`))
       .attachTo(token,{offset:{y:-0.5-(0.1*sway)},gridUnits:true, bindAlpha:false})
       .scaleToObject(3*wingSize)
-      .animateProperty("sprite", "position.y", { from: 0.5+(0.1*sway), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-      .loopProperty("spriteContainer", "position.y", { values:[0.075*sway,0.1*sway,0.025*sway,0,0.025*sway,0.05*sway], duration: 1000, gridUnits: true, ease: "linear",pingPong: true })
+      .animateProperty('spriteContainer', 'position.y', { from: 0.5+(0.1*sway), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
+      .loopProperty('spriteContainer', 'position.y', { values:[0.075*sway,0.1*sway,0.025*sway,0,0.025*sway,0.05*sway], duration: 1000, gridUnits: true, ease: "linear",pingPong: true })
       .playbackRate(2);
       if (flaps > 0) seq = seq.loopOptions({ loops: flaps, loopDelay:1000, endOnLastLoop:true });
       seq = seq.fadeIn(500, {ease:"easeOutCubic", delay:350})
@@ -93,8 +93,8 @@ function create(token, config = {}) {
       .name(label)
       .file(closest(`eskie.buff.loop.simple.${color}`))
       .attachTo(token,{offset:{y:-0.5-(0.1*sway)},gridUnits:true, bindAlpha: false})
-      .animateProperty("sprite", "position.y", { from: 0.5+(0.1*sway), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-      .loopProperty("spriteContainer", "position.y", { values:[0.075*sway,0.1*sway,0.025*sway,0,0.025*sway,0.05*sway], duration: 1000, gridUnits: true, ease: "linear",pingPong: true })
+      .animateProperty('spriteContainer', 'position.y', { from: 0.5+(0.1*sway), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
+      .loopProperty('spriteContainer', 'position.y', { values:[0.075*sway,0.1*sway,0.025*sway,0,0.025*sway,0.05*sway], duration: 1000, gridUnits: true, ease: "linear",pingPong: true })
       .scaleToObject(1)
       .opacity(0.5)
       .filter("ColorMatrix", {saturate: 1})
@@ -107,8 +107,8 @@ function create(token, config = {}) {
       .name(label)
       .file(closest(`eskie.aura.token.generic.02.${color}`))
       .attachTo(token,{offset:{y:-0.5-(0.1*sway)},gridUnits:true, bindAlpha: false})
-      .animateProperty("sprite", "position.y", { from: 0.5+(0.1*sway), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-      .loopProperty("spriteContainer", "position.y", { values:[0.075*sway,0.1*sway,0.025*sway,0,0.025*sway,0.05*sway], duration: 1000, gridUnits: true, ease: "linear",pingPong: true })
+      .animateProperty('spriteContainer', 'position.y', { from: 0.5+(0.1*sway), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
+      .loopProperty('spriteContainer', 'position.y', { values:[0.075*sway,0.1*sway,0.025*sway,0,0.025*sway,0.05*sway], duration: 1000, gridUnits: true, ease: "linear",pingPong: true })
       .scaleToObject(2.1)
       .zIndex(0.2)
       .timeRange(500, 2500)
@@ -122,8 +122,8 @@ function create(token, config = {}) {
       .scaleToObject(1, { considerTokenScale: true })
       .zIndex(0.1)
       .persist()
-      .animateProperty("sprite", "position.y", { from: 0.5+(0.1*sway), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-      .loopProperty("spriteContainer", "position.y", { values:[0.075*sway,0.1*sway,0.025*sway,0,0.025*sway,0.05*sway], duration: 1000, gridUnits: true, ease: "linear",pingPong: true })
+      .animateProperty('spriteContainer', 'position.y', { from: 0.5+(0.1*sway), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
+      .loopProperty('spriteContainer', 'position.y', { values:[0.075*sway,0.1*sway,0.025*sway,0,0.025*sway,0.05*sway], duration: 1000, gridUnits: true, ease: "linear",pingPong: true })
 
     return seq;
 }

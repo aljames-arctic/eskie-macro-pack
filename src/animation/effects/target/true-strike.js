@@ -144,7 +144,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .size(1, { gridUnits: true })
         .opacity(1)
         .duration(1500)
-        .loopProperty("sprite", "position.x", { from: -5, to: 5, duration: 50, pingPong: true })
+        .loopProperty('spriteContainer', 'position.x', { from: -5, to: 5, duration: 50, pingPong: true })
         .fadeOut(3000)
         .zIndex(1)
 
@@ -153,8 +153,8 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .atLocation(token)
         .anchor({ x: 0.25 })
         .rotateTowards(target)
-        .animateProperty("sprite", "scale.y", { from: 0.5, to: 1, duration: 50, pingPong: false })
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: -500, duration: 5000 })
+        .animateProperty('spriteContainer', "scale.y", { from: 0.5, to: 1, duration: 50, pingPong: false })
+        .animateProperty('spriteContainer', 'position.x', { from: 0, to: -500, duration: 5000 })
         .scaleToObject()
 
         .effect()
@@ -163,8 +163,8 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .rotateTowards(target)
         .anchor({ x: -0.25 })
         .scaleToObject(0.75)
-        .animateProperty("sprite", "scale.y", { from: 0.25, to: 0.75, duration: 50, pingPong: false })
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: -500, duration: 5000 })
+        .animateProperty('spriteContainer', "scale.y", { from: 0.25, to: 0.75, duration: 50, pingPong: false })
+        .animateProperty('spriteContainer', 'position.x', { from: 0, to: -500, duration: 5000 })
         .delay(25)
 
         .effect()
@@ -172,8 +172,8 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .atLocation(token)
         .anchor({ x: -1.25 })
         .rotateTowards(target)
-        .animateProperty("sprite", "scale.y", { from: 0.25, to: 0.5, duration: 50, pingPong: false })
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: -500, duration: 5000 })
+        .animateProperty('spriteContainer', "scale.y", { from: 0.25, to: 0.5, duration: 50, pingPong: false })
+        .animateProperty('spriteContainer', 'position.x', { from: 0, to: -500, duration: 5000 })
         .scaleToObject(0.5)
         .delay(40)
 
@@ -222,7 +222,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .fadeOut(500)
         .scaleToObject(1.5)
         .atLocation(target)
-        .animateProperty("spriteContainer", "position.x", { from: -250, to: -1000, duration: 5000 })
+        .animateProperty('spriteContainer', 'position.x', { from: -250, to: -1000, duration: 5000 })
         .duration(2000)
         .delay(0)
 

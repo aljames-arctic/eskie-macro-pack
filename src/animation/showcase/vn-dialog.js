@@ -58,7 +58,7 @@ async function create(token, config = {}) {
             .screenSpace()
             .screenSpaceScale({ x: 1.0, y: 1.0 })
             .screenSpaceAnchor(actorAnchor)
-            .animateProperty('sprite', 'position.x', {
+            .animateProperty('spriteContainer', 'position.x', {
                 from: slideFrom,
                 to: 0,
                 duration: 500,

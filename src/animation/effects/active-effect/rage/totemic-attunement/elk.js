@@ -45,7 +45,7 @@ function proneCreate(token, target, config = {}) {
             .opacity(1)
             .zIndex(1)
             .belowTokens()
-            .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", gridUnits: true })
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", gridUnits: true })
             .filter("ColorMatrix", { saturate:1 })
         
         .effect()
@@ -53,9 +53,9 @@ function proneCreate(token, target, config = {}) {
             .spriteRotation(-target.document.rotation)
             .attachTo(target, {bindAlpha:false, bindRotation:false,local:false})
             .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", delay:100, gridUnits: true })
-            .animateProperty("spriteContainer", "position.y", { from: 0, to: 0.5, duration: 250, ease: "easeOutCubic", delay:600, gridUnits: true })
-            .animateProperty("sprite", "rotation", { from: 0, to: 90, duration: 250, ease: "easeOutCubic", delay:100 })  
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", delay:100, gridUnits: true })
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: 0.5, duration: 250, ease: "easeOutCubic", delay:600, gridUnits: true })
+            .animateProperty('sprite', 'rotation', { from: 0, to: 90, duration: 250, ease: "easeOutCubic", delay:100 })  
             .duration(1200)
             .waitUntilFinished(-500)
 

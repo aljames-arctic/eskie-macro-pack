@@ -65,8 +65,8 @@ async function create(token, target, config = {}) {
         .copySprite(target)
         .spriteRotation(-target.document.rotation)
         .zIndex(0)
-        .animateProperty('sprite', 'position.x', { from: 0, to: offsetX, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })
-        .animateProperty('sprite', 'position.y', { from: 0, to: offsetY, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })
+        .animateProperty('spriteContainer', 'position.x', { from: 0, to: offsetX, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: offsetY, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })
         .duration(700 + timingAdjust)
         .waitUntilFinished(-100)
         .playIf(!missed);

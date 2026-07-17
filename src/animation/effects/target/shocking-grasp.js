@@ -32,7 +32,7 @@ async function createShockingGrasp(token, target, config = {}) {
         .scale(0.25)
         .endTime(4000)
         .playbackRate(3)
-        .animateProperty("spriteContainer", "position.x", { from: -0.3, to: 0, duration: 750, gridUnits: true, ease: "easeInBack" })
+        .animateProperty('spriteContainer', 'position.x', { from: -0.3, to: 0, duration: 750, gridUnits: true, ease: "easeInBack" })
         .waitUntilFinished(-300)
 
         .effect()
@@ -85,7 +85,7 @@ async function createShockingGrasp(token, target, config = {}) {
         .scaleToObject(1, { considerTokenScale: true })
         .fadeIn(250)
         .fadeOut(1500)
-        .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
+        .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
         .duration(4000)
         .opacity(0.25);
 

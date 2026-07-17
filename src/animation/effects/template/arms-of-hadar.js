@@ -86,7 +86,7 @@ async function create(token, config = {}) {
         .atLocation(token)
         .duration(1000)
         .size(1.75, { gridUnits: true })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, gridUnits: true, duration: 1000 })
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.5, gridUnits: true, duration: 1000 })
         .filter("ColorMatrix", { brightness: -1 })
         .zIndex(1)
 
@@ -121,8 +121,8 @@ async function create(token, config = {}) {
         .atLocation(token)
         .randomRotation()
         .scaleIn(0, 750, { ease: "easeOutCirc" })
-        .animateProperty("sprite", "width", { from: 5.5, to: 0, duration: 1500, delay: 1000, gridUnits: true, ease: "easeOutCirc" })
-        .animateProperty("sprite", "height", { from: 5.5, to: 0, duration: 1500, delay: 1000, gridUnits: true, ease: "easeOutCirc" })
+        .animateProperty('sprite', 'width', { from: 5.5, to: 0, duration: 1500, delay: 1000, gridUnits: true, ease: "easeOutCirc" })
+        .animateProperty('sprite', 'height', { from: 5.5, to: 0, duration: 1500, delay: 1000, gridUnits: true, ease: "easeOutCirc" })
         .fadeOut(500)
         .size(6, { gridUnits: true })
         .belowTokens()
@@ -146,7 +146,7 @@ async function create(token, config = {}) {
                     .scaleToObject(target.document.width, { considerTokenScale: true })
                     .moveTowards({ x: newX, y: newY }, { rotate: false, ease: "easeOutBack" })
                     .duration(750)
-                    .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 175, pingPong: true, gridUnits: true })
+                    .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 175, pingPong: true, gridUnits: true })
                     .opacity(0.15)
                     .zIndex(0.1)
 

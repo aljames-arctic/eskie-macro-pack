@@ -665,7 +665,7 @@ function movement3create(red, blue, config = {}) {
             //3rd attack
             .animateProperty("spriteContainer", "position.x", { from: 0, to: -1.5, duration: 500, delay: 3500, gridUnits: true, ease: "easeOutCubic"})
             .animateProperty("spriteContainer", "position.x", { from: 0, to: -0.5, duration: 250, delay: 4000, gridUnits: true, ease: "easeOutSine"})
-            .animateProperty("sprite", "rotation", { from: 0, to: -360, duration: 500, delay: 3650, ease: "easeOutCubic"})
+            .animateProperty('spriteContainer', "rotation", { from: 0, to: -360, duration: 500, delay: 3650, ease: "easeOutCubic"})
             .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, duration: 500, delay: 3500, gridUnits: true, ease: "easeOutCubic"})
             .animateProperty("spriteContainer", "position.y", { from: 0, to: 0.5, duration: 250, delay: 4000, gridUnits: true, ease: "easeOutSine"})
             //4th defend
@@ -688,7 +688,7 @@ function movement3create(red, blue, config = {}) {
             .animateProperty("spriteContainer", "position.x", { from: 0, to: -1.25, duration: 250, delay: 3250, gridUnits: true, ease: "easeOutQuint"})
             //3rd defend
             .animateProperty("spriteContainer", "position.x", { from: 0, to: -0.5, duration: 250, delay: 4000, gridUnits: true, ease: "easeOutCubic"})
-            .animateProperty("sprite", "rotation", { from: 0, to: -360, duration: 500, delay: 4100, ease: "easeOutCubic"})
+            .animateProperty('spriteContainer', "rotation", { from: 0, to: -360, duration: 500, delay: 4100, ease: "easeOutCubic"})
             .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, duration: 500, delay: 4000, gridUnits: true, ease: "easeOutCubic"})
             //4th attack
             .animateProperty("spriteContainer", "position.x", { from: 0, to: -1.5, duration: 500, delay: 5250, gridUnits: true, ease: "easeOutSine"})

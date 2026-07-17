@@ -56,7 +56,7 @@ function create(token, config = {}) {
             .spriteRotation(20)
             .belowTokens()
             .opacity(0.5)
-            .animateProperty("sprite", "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutCubic"})
+            .animateProperty('spriteContainer', "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutCubic"})
 
         .effect()
             .name(label)
@@ -66,7 +66,7 @@ function create(token, config = {}) {
             .fadeIn(250, {ease:"easeOutQuint"})
             .fadeOut(1000, {ease:"easeOutQuint"})
             .spriteRotation(20)
-            .animateProperty("sprite", "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutCubic"})
+            .animateProperty('spriteContainer', "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutCubic"})
             .belowTokens()
             .persist()
 
@@ -79,7 +79,7 @@ function create(token, config = {}) {
             .fadeOut(1000, {ease:"easeOutSine"})
             .spriteRotation(20)
             .duration(1250)
-            .animateProperty("sprite", "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutCubic"})
+            .animateProperty('spriteContainer', "position.y", {from: 0, to:-0.5,  duration: 1000, gridUnits: true, ease:"easeOutCubic"})
             .zIndex(0)
 
         .effect()

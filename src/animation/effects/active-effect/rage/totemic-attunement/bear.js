@@ -24,7 +24,7 @@ function targetSequence(target, config = {}) {
         .spriteRotation(-target.document.rotation)
         .duration(2500) 
         .fadeOut(1000)
-        .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 25, gridUnits:true, pingPong:true})
+        .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 25, gridUnits:true, pingPong:true})
         .tint("#ff0000")
         .opacity(0.35)
 

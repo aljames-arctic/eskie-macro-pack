@@ -71,7 +71,7 @@ async function createLeap(token, config = {}) {
         .opacity(1)
         .duration(1000)
         .anchor({ x: 0.5, y: 1 })
-        .loopProperty('spriteContainer', 'position.y', { values: [50, 0, 50], duration: 500 })
+        .loopProperty("sprite", "position.y", { values: [50, 0, 50], duration: 500 })
         .moveTowards(position, { rotate: false })
         .zIndex(2)
 

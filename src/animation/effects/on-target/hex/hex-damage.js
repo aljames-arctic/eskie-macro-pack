@@ -18,9 +18,9 @@ async function create(token, target, config = {}) {
         .fadeOut(500)
         .scaleIn(0, 1000, { ease: "easeOutCubic" })
         .filter("ColorMatrix", { hue: 0 })
-        .animateProperty('sprite', 'width', { from: 0, to: 0.5, duration: 500, gridUnits: true, ease: "easeOutBack" })
-        .animateProperty('sprite', 'height', { from: 0, to: 1.5, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -1, duration: 1000, gridUnits: true })
+        .animateProperty('spriteContainer', "width", { from: 0, to: 0.5, duration: 500, gridUnits: true, ease: "easeOutBack" })
+        .animateProperty('spriteContainer', "height", { from: 0, to: 1.5, duration: 1000, gridUnits: true, ease: "easeOutBack" })
+        .animateProperty("spriteContainer", "position.y", { from: 0, to: -1, duration: 1000, gridUnits: true })
         .zIndex(0.2);
 
     sequence.effect()
@@ -43,7 +43,7 @@ async function create(token, target, config = {}) {
         .attachTo(target)
         .scaleToObject(1, { considerTokenScale: true })
         .fadeOut(300)
-        .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 175, pingPong: true, gridUnits: true })
+        .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 175, pingPong: true, gridUnits: true })
         .scaleToObject(target.document.texture.scaleX)
         .duration(500)
         .tint("#dcace3")

@@ -30,10 +30,10 @@ function create(token, config = {}) {
         .scaleToObject(1, { considerTokenScale: true })
         .rotate(0)
         .duration(750)
-        .animateProperty('sprite', 'width', { from: 0, to: 0.05, duration: 400, gridUnits: true, ease: "easeOutCubic" })
-        .animateProperty('sprite', 'height', { from: 0, to: 0.05, duration: 400, gridUnits: true, ease: "easeOutCubic" })
-        .animateProperty('sprite', 'width', { from: 0, to: -0.05, duration: 250, gridUnits: true, ease: "easeOutCubic", delay: 500 })
-        .animateProperty('sprite', 'height', { from: 0, to: -0.05, duration: 250, gridUnits: true, ease: "easeOutCubic", delay: 500 })
+        .animateProperty('spriteContainer', "width", { from: 0, to: 0.05, duration: 400, gridUnits: true, ease: "easeOutCubic" })
+        .animateProperty('spriteContainer', "height", { from: 0, to: 0.05, duration: 400, gridUnits: true, ease: "easeOutCubic" })
+        .animateProperty('spriteContainer', "width", { from: 0, to: -0.05, duration: 250, gridUnits: true, ease: "easeOutCubic", delay: 500 })
+        .animateProperty('spriteContainer', "height", { from: 0, to: -0.05, duration: 250, gridUnits: true, ease: "easeOutCubic", delay: 500 })
         .zIndex(1)
         .waitUntilFinished(-450);
 
@@ -54,7 +54,7 @@ function create(token, config = {}) {
         .scaleToObject(1, { considerTokenScale: true })
         .duration(3500)
         .fadeOut(1500)
-        .loopProperty('spriteContainer', 'position.y', { from: -0.035, to: 0.035, duration: 25, gridUnits: true, pingPong: true })
+        .loopProperty("sprite", "position.y", { from: -0.035, to: 0.035, duration: 25, gridUnits: true, pingPong: true })
         .filter("ColorMatrix", { brightness: 0 })
         .filter("Blur", { blurX: 0, blurY: 10 })
         .belowTokens()

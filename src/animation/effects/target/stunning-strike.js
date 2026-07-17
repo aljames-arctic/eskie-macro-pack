@@ -84,10 +84,10 @@ async function createStunningStrike(token, target, config = {}) {
         .atLocation(token)
         .scaleToObject(1, { considerTokenScale: true })
         .mirrorX(token.document.mirrorX)
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: middle.x, duration: 100, ease: "easeOutExpo" })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: middle.y, duration: 100, ease: "easeOutExpo" })
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: -middle.x, duration: 350, ease: "easeInOutQuad", fromEnd: true })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: -middle.y, duration: 350, ease: "easeInOutQuad", fromEnd: true })
+        .animateProperty('spriteContainer', 'position.x', { from: 0, to: middle.x, duration: 100, ease: "easeOutExpo" })
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: middle.y, duration: 100, ease: "easeOutExpo" })
+        .animateProperty('spriteContainer', 'position.x', { from: 0, to: -middle.x, duration: 350, ease: "easeInOutQuad", fromEnd: true })
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -middle.y, duration: 350, ease: "easeInOutQuad", fromEnd: true })
         .duration(600)
 
         .animation()
@@ -135,7 +135,7 @@ async function createStunningStrike(token, target, config = {}) {
         .scaleToObject(1, { considerTokenScale: true })
         .fadeIn(200)
         .fadeOut(500)
-        .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
+        .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
         .duration(1500)
         .opacity(0.25)
 

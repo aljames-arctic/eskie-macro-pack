@@ -72,7 +72,7 @@ async function create(token, target, config = {}) {
         .scaleToObject(1, { considerTokenScale: true })
         .fadeIn(200)
         .fadeOut(200)
-        .loopProperty("sprite", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true})
+        .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true})
         .duration(1750)
         .opacity(0.25);
 

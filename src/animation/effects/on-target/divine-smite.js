@@ -22,7 +22,7 @@ async function create(token, target, config = {}) {
         .duration(2000)
         .fadeOut(800)
         .fadeIn(1000)
-        .animateProperty('spriteContainer', "height", { from: 0, to: 2, duration: 3000, gridUnits:true, ease:"easeOutBack"})
+        .animateProperty('sprite', 'height', { from: 0, to: 2, duration: 3000, gridUnits:true, ease:"easeOutBack"})
         .filter("Blur", { blurX: 0, blurY: 15 })
         .opacity(2)
         .zIndex(0.2);

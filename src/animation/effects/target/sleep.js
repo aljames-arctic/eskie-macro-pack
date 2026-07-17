@@ -37,7 +37,7 @@ async function create(targets, config = {}) {
         .atLocation(config.position)
         .duration(3000)
         .size(5.5, { gridUnits: true })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: 100, duration: 3000 })
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: 100, duration: 3000 })
         .zIndex(5);
 
     // Target effects

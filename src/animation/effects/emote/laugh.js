@@ -56,8 +56,8 @@ async function create(token, config = {}) {
         .file(closest(effect[0].img))
         .atLocation(token, { offset: { x: (effect[0].x * tokenWidth * facingFactor), y: effect[0].y * tokenWidth }, gridUnits: true, local: true })
         .attachTo(token, { bindAlpha: false })
-        .loopProperty("sprite", "rotation", { from: 0, to: -15 * facingFactor, duration: 250, ease: "easeOutCubic" })
-        .loopProperty("sprite", "position.y", { from: 0, to: -0.025, duration: 250, gridUnits: true, pingPong: false })
+        .loopProperty('sprite', "rotation", { from: 0, to: -15 * facingFactor, duration: 250, ease: "easeOutCubic" })
+        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -0.025, duration: 250, gridUnits: true, pingPong: false })
         .scaleToObject(effect[0].scale)
         .mirrorX(mirrorFace)
         .private();
@@ -71,9 +71,9 @@ async function create(token, config = {}) {
         .scaleToObject(1, { considerTokenScale: true })
         .atLocation(token)
         .attachTo(token, { bindAlpha: false })
-        .loopProperty("sprite", "position.y", { from: 0, to: -0.01, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
-        .loopProperty("sprite", "width", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
-        .loopProperty("sprite", "height", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
+        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -0.01, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
+        .loopProperty('sprite', "width", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
+        .loopProperty('sprite', "height", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
         .mirrorY(token.document.mirrorX)
         .waitUntilFinished(-200)
     laughEffect = (duration > 0) ? laughEffect.duration(duration) : laughEffect.persist();

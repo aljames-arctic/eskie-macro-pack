@@ -57,8 +57,8 @@ async function create(target, config = {}) {
         .duration(1000)
         .fadeOut(800)
         .scaleIn(0, 1000, { ease: 'easeOutCubic' })
-        .animateProperty('spriteContainer', 'width', { from: 0, to: 0.25, duration: 500, gridUnits: true, ease: 'easeOutBack' })
-        .animateProperty('spriteContainer', 'height', { from: 0, to: 1.0, duration: 1000, gridUnits: true, ease: 'easeOutBack' })
+        .animateProperty('sprite', 'width', { from: 0, to: 0.25, duration: 500, gridUnits: true, ease: 'easeOutBack' })
+        .animateProperty('sprite', 'height', { from: 0, to: 1.0, duration: 1000, gridUnits: true, ease: 'easeOutBack' })
         .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.6, duration: 1000, gridUnits: true })
         .filter('ColorMatrix', { brightness: 0 })
         .opacity(0.8)
@@ -116,9 +116,9 @@ async function create(target, config = {}) {
         .fadeIn(500)
         .fadeOut(500)
         .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('spriteContainer', 'width', { from: target.document.width * target.document.texture.scaleX, to: (target.document.width * 1.06) * target.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
-        .animateProperty('spriteContainer', 'height', { from: target.document.width * target.document.texture.scaleX, to: (target.document.width * 1.06) * target.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
-        .loopProperty('sprite', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
+        .animateProperty('sprite', 'width', { from: target.document.width * target.document.texture.scaleX, to: (target.document.width * 1.06) * target.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
+        .animateProperty('sprite', 'height', { from: target.document.width * target.document.texture.scaleX, to: (target.document.width * 1.06) * target.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
+        .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
         .opacity(0.4);
 
     // Ghost of the werewolf form — the beast briefly surfacing through the curse.
@@ -130,9 +130,9 @@ async function create(target, config = {}) {
             .fadeIn(500)
             .fadeOut(500)
             .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty('spriteContainer', 'width', { from: target.document.width * target.document.texture.scaleX, to: (target.document.width * 1.06) * target.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
-            .animateProperty('spriteContainer', 'height', { from: target.document.width * target.document.texture.scaleX, to: (target.document.width * 1.06) * target.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
-            .loopProperty('sprite', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
+            .animateProperty('sprite', 'width', { from: target.document.width * target.document.texture.scaleX, to: (target.document.width * 1.06) * target.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
+            .animateProperty('sprite', 'height', { from: target.document.width * target.document.texture.scaleX, to: (target.document.width * 1.06) * target.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
+            .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
             .opacity(0.4);
     }
 

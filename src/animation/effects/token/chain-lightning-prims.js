@@ -97,7 +97,7 @@ function create(token, targetTokens, config = {}) {
                     .fadeIn(250)
                     .fadeOut(750)
                     .belowTokens()
-                    .animateProperty('spriteContainer', "height", { from: -2, to: -1, duration: 200, gridUnits: true })
+                    .animateProperty("sprite", "height", { from: -2, to: -1, duration: 200, gridUnits: true })
                     .opacity(0.75);
             }
         }

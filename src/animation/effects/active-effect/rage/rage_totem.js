@@ -49,10 +49,10 @@ function create(token, config = {}) {
         .attachTo(token)
         .scaleToObject(1, { considerTokenScale: true })
         .duration(750) 
-        .animateProperty('spriteContainer', "width", { from: 0, to: 0.05, duration: 400, gridUnits:true, ease: "easeOutCubic"})
-        .animateProperty('spriteContainer', "height", { from: 0, to:  0.05, duration: 400, gridUnits:true, ease: "easeOutCubic"})
-        .animateProperty('spriteContainer', "width", { from: 0.05, to: 0, duration: 250, gridUnits:true, ease: "easeOutCubic", delay: 500})
-        .animateProperty('spriteContainer', "height", { from: 0.05, to: 0, duration: 250, gridUnits:true, ease: "easeOutCubic", delay: 500})
+        .animateProperty("sprite", "width", { from: 0, to: 0.05, duration: 400, gridUnits:true, ease: "easeOutCubic"})
+        .animateProperty("sprite", "height", { from: 0, to:  0.05, duration: 400, gridUnits:true, ease: "easeOutCubic"})
+        .animateProperty("sprite", "width", { from: 0.05, to: 0, duration: 250, gridUnits:true, ease: "easeOutCubic", delay: 500})
+        .animateProperty("sprite", "height", { from: 0.05, to: 0, duration: 250, gridUnits:true, ease: "easeOutCubic", delay: 500})
         .zIndex(1)  
         .waitUntilFinished(-450)  
       
@@ -85,7 +85,7 @@ function create(token, config = {}) {
         .scaleIn(0.3, 2500, {ease: "easeOutSine"})
         .opacity(0.35)
         .belowTokens()
-        .animateProperty('spriteContainer', "position.y", { from: 0, to: -0.5, duration: 2000, gridUnits:true,ease:"easeOutCubic"})
+        .animateProperty("sprite", "position.y", { from: 0, to: -0.5, duration: 2000, gridUnits:true,ease:"easeOutCubic"})
         .fadeOut(1500, {ease:"easeInSine"})
         .zIndex(5)      
       

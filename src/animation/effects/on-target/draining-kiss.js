@@ -26,8 +26,8 @@ function create(token, target, config = {}) {
             .filter("ColorMatrix", { hue: -30 })
             .scaleIn(0, 200, { ease: "linear" })
             .duration(duration)
-            .animateProperty('spriteContainer', "scale.x", { from: Math.abs((token.x - target.x) / canvas.grid.size), to: 0, duration: 300, ease: "easeInOutBack" })
-            .animateProperty('spriteContainer', "scale.y", { from: Math.abs((token.y - target.y) / canvas.grid.size), to: 0, duration: 300, ease: "easeInOutBack" })
+            .animateProperty("sprite", "scale.x", { from: Math.abs((token.x - target.x) / canvas.grid.size), to: 0, duration: 300, ease: "easeInOutBack" })
+            .animateProperty("sprite", "scale.y", { from: Math.abs((token.y - target.y) / canvas.grid.size), to: 0, duration: 300, ease: "easeInOutBack" })
             .zIndex(3)
 
         .effect()

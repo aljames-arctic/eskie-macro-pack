@@ -1,17 +1,11 @@
 import { animation } from './animation/_animation.js';
 import { autoanimations } from './integration/autoanimations.js';
 import { socketlibapi } from './integration/socketlib.js';
-import { dialog } from './lib/dialog.js';
-import { file } from './lib/filemanager.js';
-import { time } from './lib/time.js';
-import { tokens as token } from './lib/tokens.js';
-import { socket } from './integration/socketlib.js';
+
 import { loadWorldScripts } from './world-scripts/loader.js';
-import { standaloneMacros } from './lib/standalone-macros.js';
 
 // Import module settings to also run its initialization code
 import './settings.js';
-import { RecommendedModulesFormApplication } from './recommended-modules/recommendedModulesMenu.js';
 import { log } from './lib/logger.js';
 
 const status = {
@@ -28,20 +22,16 @@ Hooks.once('init', async () => {
             );
         }
 
-        const util = {
-                        dialog,
-                        file,
-                        time,
-                        token,
-                        openRecommendedModules: () => new RecommendedModulesFormApplication().render(true),
-                        syncStandaloneMacros: standaloneMacros.sync
-                    };
+        const { effect, mask, overlay, showcase, traps } = animation;
 
-        // Setup dependency API
-        setupApiCalls( animation );
-        setupApiCalls({ util });
-        setupApiCalls({ standaloneMacros });
-        setupApiCalls( socket );
+        // Expose only active sequencer play/animation APIs on globalThis.eskie
+        setupApiCalls({
+            effect,
+            traps,
+            mask,
+            overlay,
+            showcase
+        });
     }
 
     setupModule();

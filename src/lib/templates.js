@@ -110,23 +110,23 @@ function detectTemplateProperties(target) {
     let width = 5;
 
     if (doc.documentName === "Region" || doc.shapes) {
-        const shape = doc.shapes?.[0] || {};
+        const shape = doc.shapes?.[0] ?? {};
         const st = shape.type;
         if (st === "rectangle" || st === "polygon") {
             type = "rect";
         } else {
             type = "circle";
         }
-        distance = shape.radius || shape.distance || 20;
+        distance = shape.radius ?? shape.distance ?? 20;
     } else {
-        const t = doc.t || "circle";
+        const t = doc.t ?? "circle";
         if (t === "cone") type = "cone";
         else if (t === "ray") type = "ray";
         else type = "circle";
 
-        distance = doc.distance || 20;
-        angle = doc.angle || 53.13;
-        width = doc.width || 5;
+        distance = doc.distance ?? 20;
+        angle = doc.angle ?? 53.13;
+        width = doc.width ?? 5;
     }
 
     return { type, distance, radius: distance, angle, width };
@@ -137,7 +137,7 @@ function detectTemplateProperties(target) {
  */
 async function handleDrawPreview(placeable) {
     const doc = placeable.document ?? placeable;
-    log.debug(`handleDrawPreview | Hook fired for doc.id=${doc.id || "preview"}`);
+    log.debug(`handleDrawPreview | Hook fired for doc.id=${doc.id ?? "preview"}`);
     // Only intercept preview instances (uncreated documents) for the local owner
     if (doc.id || !isOwner(doc)) {
         log.debug(`handleDrawPreview | Skipping non-preview or non-owned placeable (doc.id=${doc.id})`);
@@ -150,7 +150,7 @@ async function handleDrawPreview(placeable) {
         return;
     }
 
-    log.info(`handleDrawPreview | Intercepting template preview for "${entry.itemName}"`);
+    log.debug(`handleDrawPreview | Intercepting template preview for "${entry.itemName}"`);
 
     // 1. Immediately hide the Foundry template preview completely so we do Sequencer visuals instead
     placeable.visible = false;
@@ -453,7 +453,7 @@ async function getPosition(template, config = {}) {
                 secondary = { x: primary.x, y: primary.y };
             }
         } else {
-            log.info(`getPosition: Falling back to legacy MeasuredTemplate support (pre-V14). This support will be removed in Foundry V16.`);
+            log.warn(`getPosition: Falling back to legacy MeasuredTemplate support (pre-V14). This support will be removed in Foundry V16.`);
             // Legacy MeasuredTemplate support
             const farpoint = template.object.ray.B;
             secondary = { x: farpoint.x, y: farpoint.y };

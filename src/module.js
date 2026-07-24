@@ -7,6 +7,7 @@ import { time } from './lib/time.js';
 import { tokens as token } from './lib/tokens.js';
 import { socket } from './integration/socketlib.js';
 import { loadWorldScripts } from './world-scripts/loader.js';
+import { standaloneMacros } from './lib/standalone-macros.js';
 
 // Import module settings to also run its initialization code
 import './settings.js';
@@ -32,12 +33,14 @@ Hooks.once('init', async () => {
                         file,
                         time,
                         token,
-                        openRecommendedModules: () => new RecommendedModulesFormApplication().render(true)
+                        openRecommendedModules: () => new RecommendedModulesFormApplication().render(true),
+                        syncStandaloneMacros: standaloneMacros.sync
                     };
 
         // Setup dependency API
         setupApiCalls( animation );
         setupApiCalls({ util });
+        setupApiCalls({ standaloneMacros });
         setupApiCalls( socket );
     }
 

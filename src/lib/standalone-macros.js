@@ -54,7 +54,7 @@ async function discoverMacroFiles(modulePath) {
  * @param {string} [options.packName] - Full collection name of the target pack.
  * @returns {Promise<void>}
  */
-export async function syncStandaloneMacros(options = {}) {
+export async function updateMacroCompendiums(options = {}) {
     const packName = options.packName ?? 'eskie-macros.eskie-standalone-macros';
     const pack = game.packs.get(packName);
 
@@ -129,5 +129,5 @@ export async function syncStandaloneMacros(options = {}) {
 }
 
 export const standaloneMacros = {
-    sync: syncStandaloneMacros
+    sync: updateMacroCompendiums
 };

@@ -1,8 +1,11 @@
 import { animation } from './animation/_animation.js';
 import { autoanimations } from './integration/autoanimations.js';
-import { socketlibapi } from './integration/socketlib.js';
-
+import { socketlibapi, socket } from './integration/socketlib.js';
 import { loadWorldScripts } from './world-scripts/loader.js';
+import { MODULE_ID } from './lib/constants.js';
+import { crosshair } from './crosshair/_crosshairs.js';
+import { standaloneMacros } from './lib/standalone-macros.js';
+import { template } from './lib/templates.js';
 
 // Import module settings to also run its initialization code
 import './settings.js';
@@ -32,6 +35,18 @@ Hooks.once('init', async () => {
             overlay,
             showcase
         });
+
+        // Attach module internal utilities and tools to game.modules.get('eskie-macros').api
+        const moduleRecord = game.modules.get(MODULE_ID);
+        if (moduleRecord) {
+            moduleRecord.api = {
+                crosshair,
+                socket,
+                standaloneMacros,
+                template,
+                templates: template
+            };
+        }
     }
 
     setupModule();

@@ -61,6 +61,16 @@
                 "PLAYER": "OBSERVER",
                 "ASSISTANT": "OWNER"
             }
+        },
+        {
+            "name": "eskie-standalone-macros",
+            "label": "Standalone Macros",
+            "path": "packs/eskie-standalone-macros",
+            "type": "Macro",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            }
         }
     ],
     "styles": [

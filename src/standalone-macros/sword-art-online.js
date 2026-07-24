@@ -25,7 +25,7 @@ if (isPlaying) {
     let revealOverlayPath = revealOverlay;
     try { 
         const entry = Sequencer.Database.getEntry(revealOverlay);
-        revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file || entry?.files?.[0] || revealOverlay);
+        revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file ?? entry?.files?.[0] ?? revealOverlay);
     } catch (e) {}
 
     let sequence = new Sequence()

@@ -17,8 +17,8 @@ import { log } from '../lib/logger.js';
 async function playRollAnimation(token, config = {}) {
     if (!token) return;
 
-    const rollType = config.rollType || "default";
-    const outcome = config.outcome || "indeterminant";
+    const rollType = config.rollType ?? "default";
+    const outcome = config.outcome ?? "indeterminant";
 
     let color = "white";
     if (outcome === "success") color = "green";
@@ -124,8 +124,8 @@ export class RollTracker {
         const rolls = this.activeAdapter.extractRolls(message);
         if (rolls.length === 0) return [];
 
-        const flavorText = message.flavor?.toLowerCase() || "";
-        const contentText = message.content || "";
+        const flavorText = message.flavor?.toLowerCase() ?? "";
+        const contentText = message.content ?? "";
         const contentLower = contentText.toLowerCase();
         const combinedText = `${flavorText} ${contentLower}`;
 
@@ -159,8 +159,8 @@ export class RollTracker {
             if (htmlTarget) return htmlTarget;
         }
         return canvas.tokens.get(message.speaker.token) 
-               || canvas.tokens.controlled[0] 
-               || game.user.character?.getActiveTokens()[0];
+               ?? canvas.tokens.controlled[0] 
+               ?? game.user.character?.getActiveTokens()[0];
     }
 
     /**
@@ -197,7 +197,7 @@ export class RollTracker {
         const localFired = this.localAnimatedTokens.get(messageId);
 
         // Retrieve the list of token IDs that have already animated for this message
-        const firedTokens = message.flags?.world?.rollAnimatedTokens || [];
+        const firedTokens = message.flags?.world?.rollAnimatedTokens ?? [];
         
         // Checking newFiredTokens and localFired dynamically prevents race conditions
         // during rapid updates where multiple hooks fire before database flag write completes.
@@ -213,7 +213,7 @@ export class RollTracker {
 
             // Trigger the sequence
             playRollAnimation(token, {
-                rollType: roll.ability || "default",
+                rollType: roll.ability ?? "default",
                 outcome: roll.outcome
             });
 

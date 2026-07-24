@@ -10,8 +10,8 @@ export class GenericAdapter extends BaseSystemAdapter {
     }
 
     qualifyMessage(message) {
-        const flavorText = message.flavor?.toLowerCase() || "";
-        const contentText = message.content || "";
+        const flavorText = message.flavor?.toLowerCase() ?? "";
+        const contentText = message.content ?? "";
         const contentLower = contentText.toLowerCase();
         const combinedText = `${flavorText} ${contentLower}`;
 

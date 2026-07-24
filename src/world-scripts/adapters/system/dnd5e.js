@@ -24,7 +24,7 @@ export class Dnd5eAdapter extends BaseSystemAdapter {
         // 1. Midi-QOL Saves Display HTML Check (High Priority)
         // Midi-QOL main workflow cards (messageType: "attack" / "item") can dynamically contain target saving throw outcomes
         if (midiQolAdapter.isActive()) {
-            const contentText = message.content || "";
+            const contentText = message.content ?? "";
             if (contentText.includes("midi-qol") && contentText.includes("midi-qol-saves-display")) {
                 return "saving throw";
             }
@@ -45,7 +45,7 @@ export class Dnd5eAdapter extends BaseSystemAdapter {
         // 4. Midi-QOL Flags
         if (midiQolAdapter.isActive()) {
             const midiFlags = message.flags?.["midi-qol"];
-            const messageType = midiFlags?.messageType || midiFlags?.type;
+            const messageType = midiFlags?.messageType ?? midiFlags?.type;
             if (messageType) {
                 if (messageType === "save") return "saving throw";
                 if (messageType === "check") return "ability check";

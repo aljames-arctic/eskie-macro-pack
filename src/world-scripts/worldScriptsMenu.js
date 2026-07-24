@@ -25,7 +25,7 @@ export class WorldScriptsFormApplication extends FormApplication {
     }
 
     async getData(options) {
-        const currentConfig = game.settings.get(MODULE_ID, "worldScriptsConfig") || {};
+        const currentConfig = game.settings.get(MODULE_ID, "worldScriptsConfig") ?? {};
         const activeSystem = game.system.title;
         
         const scripts = WORLD_SCRIPTS_REGISTRY.map(script => {

@@ -35,13 +35,13 @@ export class Pf2eAdapter extends BaseSystemAdapter {
             }
 
             // Extract ability robustly: first from context, then from modifiers list, and finally fallback to modifierName
-            let rawAbility = pf2eContext.ability || null;
+            let rawAbility = pf2eContext.ability ?? null;
             if (!rawAbility && pf2eFlags) {
                 const abilityModifier = pf2eFlags.modifiers?.find(m => m.type === "ability");
                 if (abilityModifier) {
                     rawAbility = abilityModifier.ability; // e.g., 'con', 'dex', 'wis'
                 } else {
-                    rawAbility = pf2eFlags.modifierName || null; // e.g., 'fortitude', 'reflex', 'will'
+                    rawAbility = pf2eFlags.modifierName ?? null; // e.g., 'fortitude', 'reflex', 'will'
                 }
             }
 
@@ -49,7 +49,7 @@ export class Pf2eAdapter extends BaseSystemAdapter {
                 source: "pf2e-flags",
                 rawAbility: rawAbility,
                 outcome: outcome,
-                tokenId: message.speaker.token || null
+                tokenId: message.speaker.token ?? null
             });
         }
 

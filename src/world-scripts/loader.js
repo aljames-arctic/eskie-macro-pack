@@ -27,7 +27,7 @@ export function loadWorldScripts() {
  * Can be called whenever settings are updated to toggle features instantly without a reload!
  */
 export function updateWorldScripts() {
-    const config = game.settings.get(MODULE_ID, "worldScriptsConfig") || {};
+    const config = game.settings.get(MODULE_ID, "worldScriptsConfig") ?? {};
     
     for (const [scriptId, scriptInstance] of Object.entries(worldScripts)) {
         const shouldEnable = !!config[scriptId];

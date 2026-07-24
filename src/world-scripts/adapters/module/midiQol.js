@@ -6,7 +6,7 @@ export const midiQolAdapter = {
     },
     extractRolls(message) {
         const rolls = [];
-        const contentText = message.content || "";
+        const contentText = message.content ?? "";
         const midiFlags = message.flags?.["midi-qol"];
 
         // Add debug logging
@@ -20,7 +20,7 @@ export const midiQolAdapter = {
         });
 
         // Ignore attack, damage, and item usage cards (unless they dynamically contain a target saves display)
-        const messageType = midiFlags?.messageType || midiFlags?.type;
+        const messageType = midiFlags?.messageType ?? midiFlags?.type;
         const hasSavesDisplay = contentText.includes("midi-qol-saves-display");
         if (messageType && ["attack", "damage", "item"].includes(messageType) && !hasSavesDisplay) {
             log.debug(`Midi-QOL: Ignoring attack/damage/item messageType: "${messageType}"`);

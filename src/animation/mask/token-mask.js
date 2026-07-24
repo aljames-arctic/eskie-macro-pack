@@ -389,7 +389,7 @@ async function stopLocal(object, config = {}) {
  */
 async function stop(object, config = {}) {
     // Stop all active token mask sessions currently registered on this object
-    const masks = object.document.getFlag('eskie-macros', 'token-masks') || {};
+    const masks = object.document.getFlag('eskie-macros', 'token-masks') ?? {};
     const activeAnimationIds = Object.keys(masks);
     if (activeAnimationIds.length > 0) {
         for (const [animationId, tileIds] of Object.entries(masks)) {
@@ -400,7 +400,7 @@ async function stop(object, config = {}) {
             });
 
             // Clean up the database immediately via GM
-            await socketlib.executeAsGM('cleanUpTokenMask', object.id, animationId, tileIds, config.deleteObject || false);
+            await socketlib.executeAsGM('cleanUpTokenMask', object.id, animationId, tileIds, config.deleteObject ?? false);
 
             // Resolve the tracker if it exists on this client
             const tracker = tokenMaskTracker.get(animationId);

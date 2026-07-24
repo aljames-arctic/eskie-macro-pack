@@ -1,7 +1,7 @@
 // Original Author: .eskie
 // Modular Conversion: bakanabaka
 
-import { utils } from '../../utils/_utils.js';
+import { utils } from '../../utils/index.js';
 import { closest } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 

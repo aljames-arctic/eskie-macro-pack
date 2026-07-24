@@ -1,9 +1,9 @@
-import { animation } from './animation/_animation.js';
+import { animation } from './animation/index.js';
 import { autoanimations } from './integration/autoanimations.js';
 import { socketlibapi, socket } from './integration/socketlib.js';
 import { loadWorldScripts } from './world-scripts/loader.js';
 import { MODULE_ID } from './lib/constants.js';
-import { crosshair } from './crosshair/_crosshairs.js';
+import { crosshair } from './crosshair/index.js';
 import { standaloneMacros } from './lib/standalone-macros.js';
 import { template } from './lib/templates.js';
 

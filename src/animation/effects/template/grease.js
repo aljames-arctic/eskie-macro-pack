@@ -3,7 +3,7 @@
 //Modular by: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
-import { templates } from "../../../lib/templates.js";
+import { template } from "../../../lib/templates.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
 
 const DEFAULT_CONFIG = {
@@ -21,7 +21,7 @@ async function create(token, config = {}) {
         icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm', 
         label: 'Grease'
     };
-    let [primary, secondary] = await templates.getPosition(template, cfg);
+    let [primary, secondary] = await template.getPosition(template, cfg);
     if (!primary) { return; }
 
     let position = primary;

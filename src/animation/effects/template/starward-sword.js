@@ -1,5 +1,5 @@
 import { closest } from "../../../lib/filemanager.js";
-import { templates } from '../../../lib/templates.js';
+import { template } from '../../../lib/templates.js';
 import { autoanimations } from "../../../integration/autoanimations.js";
 
 const DEFAULT_CONFIG = {
@@ -22,7 +22,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
         icon: 'icons/svg/sword.svg',
         label: 'Starward Sword'
     };
-    let [position, _] = await templates.getPosition(mConfig.template, cfg);
+    let [position, _] = await template.getPosition(mConfig.template, cfg);
     if (!position) { return; }
 
     if (!targets || targets.length === 0) {

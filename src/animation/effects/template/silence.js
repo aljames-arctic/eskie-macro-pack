@@ -4,7 +4,7 @@
 ** */
 
 import { closest } from "../../../lib/filemanager.js";
-import { templates } from '../../../lib/templates.js';
+import { template } from '../../../lib/templates.js';
 import { autoanimations, CONCENTRATING } from "../../../integration/autoanimations.js";
 
 const DEFAULT_CONFIG = {
@@ -30,7 +30,7 @@ async function createSilence(token, config = {}) {
         icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm', 
         label: 'Silence'
     };
-    let [position, _] = await templates.getPosition(template, cfg);
+    let [position, _] = await template.getPosition(template, cfg);
     if (!position) { return; }
 
     const sequence = new Sequence();

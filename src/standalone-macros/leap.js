@@ -83,7 +83,7 @@ sequence.effect()
     .zIndex(1);
 
 sequence.effect()
-    .file(closest("jb2a.impact.01.orange"))
+    .file(closest("jb2a.impact.001.orange"))
     .atLocation(token)
     .scaleToObject(1.5)
     .belowTokens()

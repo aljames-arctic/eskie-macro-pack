@@ -13,22 +13,52 @@ When a user asks to convert an effect from the `src/animation/` directory into a
 2. **Handle Multiple Variants**: Check if the effect has multiple variants (e.g., `rage` has `_rage.js` which exports `v1`, `v2`, `v3`, etc.). 
    > **CRITICAL**: If the user specifies an effect with multiple variants (such as the Rage effect), **STOP** and ask the user to clarify which version they want output before proceeding. Do not guess or output all variants.
 3. **Extract the Sequence**: Extract the core `new Sequence()` logic from the `create` or `play` functions of the effect.
-4. **Remove Module Dependencies**: 
-   - Remove any `import` statements (like `import { closest }` or `import { autoanimations }`).
-   - Macros run directly in Foundry VTT and do not support ES module imports in the same way.
-   - For `closest()`, remove the function call and just use the string (e.g., change `closest('jb2a.magic_missile')` to `'jb2a.magic_missile'`). Sequencer natively handles these strings when the JB2A module is installed.
-5. **Set up Target/Source Variables**: 
+4. **Remove Module Dependencies & Use Standalone `closest()` Helper**:
+   - Remove top-level ES module `import` statements (like `import { closest }` or `import { autoanimations }`).
+   - Define a standalone `closest` helper snippet at the top of the macro so Patreon/Free JB2A asset paths resolve dynamically in live Foundry environments:
+     ```javascript
+     const closest = (path) => {
+         if (typeof eskie !== "undefined" && eskie.util?.file?.closest) return eskie.util.file.closest(path);
+         const apiClosest = game.modules?.get("eskie-macros")?.api?.util?.closest;
+         if (typeof apiClosest === "function") return apiClosest(path);
+         return path;
+     };
+     ```
+   - Always wrap `.file(...)` and `.sound(...)` database keys with `closest(...)` (e.g. `.file(closest("jb2a.magic_missile"))`).
+5. **CRITICAL: Zero Sequence Path Hallucinations & Key Verification**:
+   - **Never invent, hallucinate, or guess JB2A, BLFX, or PSFX sequence paths.**
+   - Every database key string (`jb2a.*`, `blfx.*`, `psfx.*`) used in `.file(...)` or `.sound(...)` must exist in standard JB2A / Sequencer packs.
+   - **Common JB2A Naming Rules**:
+     - Generic impact numbers are 3-digit zero-padded: `"jb2a.impact.001.orange"`, `"jb2a.impact.005.blue"` (NEVER two-digit `"jb2a.impact.01.orange"`).
+     - Ground cracks fall under the `impact.` prefix: `"jb2a.impact.ground_crack.01.orange"` (NEVER `"jb2a.ground_cracks.orange.01"`).
+     - Magic signs completion uses `.intro.` / `.loop.` / `.outro.` or `.complete.01`: e.g. `"jb2a.magic_signs.circle.02.necromancy.intro.dark_purple"` (NEVER `.complete.dark_purple`).
+     - Portals use `.vortex.` or `.ring.vortex.`: e.g. `"jb2a.portals.vertical.vortex.yellow"` (NEVER `.portals.vertical.ring.yellow`).
+     - Fireplace is single word: `"jb2a.fireplace.01.orange"` (NEVER `"jb2a.fire_place..."`).
+     - Fog is `"jb2a.fog.01.grey"` (NEVER `"jb2a.fog_of_war..."`).
+     - Fireball is `"jb2a.fireball.fireball.orange"` (NEVER `"jb2a.fireball.meteor..."`).
+   - If adding extra flare or presets to a macro (like Wing Type choices or explosion cascades), verify every sequence string against known JB2A keys.
+6. **Dynamic Variations vs Mustache Interpolation**:
+   - Avoid passing static Mustache syntax strings (`"jb2a.impact.{{color}}"`) into `.file(...)` when wrapped in `closest()`.
+   - Instead, use a dynamic JavaScript arrow function callback inside `.file(...)`:
+     ```javascript
+     const colors = ["jb2a.impact.001.yellow", "jb2a.impact.005.orange", "jb2a.impact.004.blue"];
+     seq.effect().file(() => closest(colors[Math.floor(Math.random() * colors.length)]));
+     ```
+7. **Canonical Sequencer Options**:
+   - Use `bindRotation: false` (not `followRotation: false`) inside `.attachTo()` or `.atLocation()` option objects.
+8. **Preserve Audio Sequences**:
+   - Do not omit `.sound(...)` sequences present in the modular effect source. Include sound volume/enable settings.
+9. **Set up Target/Source Variables**: 
    - In a module, `source`, `token`, or `target` are passed as arguments.
-   - In a macro, you must define these at the top of the script using Foundry globals (e.g., `const token = canvas.tokens.controlled[0];` or `const target = game.user.targets.first();`).
+   - In a macro, define these at the top of the script using Foundry globals (e.g. `const token = canvas.tokens.controlled[0];` or `const target = game.user.targets.first();`).
    - Add safety checks to return early if the necessary tokens are not selected.
    - **Note**: Remember the project rule: *If adding or changing an if statement that immediately returns, it should be a single line. For example: `if (!token) return ui.notifications.warn("No token");`*
-6. **Implement Toggle Functionality (Play/Stop)**:
+10. **Implement Toggle Functionality (Play/Stop)**:
    - The first time the macro is called, the effect should be played.
    - If the original effect includes a `stop()` function, or if it persists an effect on a token using `.persist()`, the macro should function as a toggle.
    - The second time the macro is called, the effect should be stopped using the logic from the `stop()` function (e.g. `Sequencer.EffectManager.endEffects({ name: label, object: token })`).
    - Use `Sequencer.EffectManager.getEffects({ name: label, object: token }).length > 0` to check if the effect is currently playing.
-7. **Output the Macro**: Write the resulting JavaScript code into `src/standalone-macros/` following the naming convention of the existing files. For effects with multiple variants, the filename should   
-    include the variant name (e.g. `rage-electric.js`, `rage-super-saiyan.js`, etc.).
+11. **Output the Macro**: Write the resulting JavaScript code into `src/standalone-macros/` following the naming convention of the existing files. For effects with multiple variants, the filename should include the variant name (e.g. `rage-electric.js`, `rage-super-saiyan.js`, etc.).
 
 ## Concrete Example: Before & After
 

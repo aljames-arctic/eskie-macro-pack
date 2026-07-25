@@ -38,7 +38,7 @@ async function createSilence(token, config = {}) {
     const sequence = new Sequence();
     sequence
         .effect()
-        .file(closest("jb2a.moonbeam.01.outro.yellow"))
+        .file(closest("jb2a.moonbeam.01.outro.rainbow"))
         .atLocation(position)
         .size(0.75, { gridUnits: true })
         .startTime(500)
@@ -75,7 +75,7 @@ async function createSilence(token, config = {}) {
 
         .effect()
         .name(`Silence ${token.document.name} ${id}`) // Unique name for stopping
-        .file(closest("jb2a.markers.bubble.complete.blue"))
+        .file(closest("jb2a.markers.bubble.01.complete.blue"))
         .atLocation(position)
         .size(size, { gridUnits: true })
         .opacity(0.2)
@@ -89,7 +89,7 @@ async function createSilence(token, config = {}) {
 
         .effect()
         .name(`Silence ${token.document.name} ${id}`) // Unique name for stopping
-        .file(closest("jb2a.wall_of_force.sphere.grey"))
+        .file(closest("jb2a.wall_of_force.sphere.blue"))
         .atLocation(position)
         .size(size, { gridUnits: true })
         .opacity(0.2)
@@ -104,7 +104,7 @@ async function createSilence(token, config = {}) {
 
         .effect()
         .name(`Silence ${token.document.name} ${id}`) // Unique name for stopping
-        .file(closest("jb2a.extras.tmfx.runes.circle.simple.illusion"))
+        .file(closest("jb2a.template_circle.symbol.normal.runes.blue"))
         .atLocation(position)
         .size(2, { gridUnits: true })
         .scaleIn(0, 500, { ease: "easeOutElastic" })

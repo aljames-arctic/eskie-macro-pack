@@ -72,11 +72,11 @@ seq.effect()
     .filter("Blur", { blurX: 15, blurY: 0 });
 
 seq.sound()
-    .file("psfx.2nd-level-spells.misty-step.v1.intro.fire")
+    .file(closest("psfx.2nd-level-spells.misty-step.v1.intro.fire"))
     .volume(0.5);
 
 seq.effect()
-    .file(closest("eskie.screen_overlay.speed_lines.horizontal.02.redyellow"))
+    .file(closest("eskie.screen_overlay.speed_lines.horizontal.02.orange"))
     .screenSpace()
     .screenSpaceScale({ fitX: true, fitY: true })
     .mirrorX()
@@ -100,7 +100,7 @@ seq.effect()
     .zIndex(5);
 
 seq.effect()
-    .file(closest("eskie.aura.token.generic.01.redorange"))
+    .file(closest("eskie.aura.token.generic.01.red"))
     .atLocation(token)
     .scaleToObject(2.1)
     .zIndex(0.1)
@@ -111,7 +111,7 @@ seq.effect()
 
 // Dragon Eyes
 seq.effect()
-    .file(closest("eskie.fire.03.redorange"))
+    .file(closest("eskie.fire.03.orange"))
     .atLocation(token, { offset: { x: -0.3, y: -0.15 }, gridUnits: true })
     .scaleToObject(0.5)
     .playbackRate(1.2)
@@ -119,7 +119,7 @@ seq.effect()
     .zIndex(1);
 
 seq.effect()
-    .file(closest("eskie.fire.03.redorange"))
+    .file(closest("eskie.fire.03.orange"))
     .atLocation(token, { offset: { x: 0.3, y: -0.2 }, gridUnits: true })
     .scaleToObject(0.5)
     .playbackRate(1.2)
@@ -136,7 +136,7 @@ function createDeathEffect(targetToken, delay = 2250) {
 
     dSeq.effect()
         .delay(delay - 1000)
-        .file(closest("eskie.particle.03.orange"))
+        .file(closest("eskie.particle.04.orange"))
         .atLocation(targetToken, { randomOffset: 0.5, gridUnits: true })
         .scaleToObject(2)
         .randomRotation()
@@ -155,7 +155,7 @@ function createDeathEffect(targetToken, delay = 2250) {
 
     dSeq.effect()
         .delay(delay)
-        .file(closest("eskie.slice.01.white.rainbow"))
+        .file(closest("eskie.slice.01.color.rainbow"))
         .atLocation(targetToken)
         .scaleToObject(4)
         .rotate(-45)
@@ -163,7 +163,7 @@ function createDeathEffect(targetToken, delay = 2250) {
 
     dSeq.effect()
         .delay(delay)
-        .file(closest("eskie.particle.03.orange"))
+        .file(closest("eskie.particle.04.orange"))
         .atLocation(targetToken)
         .scaleToObject(2)
         .randomRotation()
@@ -224,7 +224,7 @@ function createDeathEffect(targetToken, delay = 2250) {
     // Burn mask top
     dSeq.effect()
         .delay(delay + 250)
-        .file(closest("eskie.burn.token_mask.orange.fast"))
+        .file(closest("eskie.burn.token_mask.orange.no_base.fast.01"))
         .name(`${tName}Top`)
         .scaleToObject(1.1)
         .atLocation({ x: cx + gs * 0.25, y: cy - gs * 0.25 })
@@ -246,7 +246,7 @@ function createDeathEffect(targetToken, delay = 2250) {
     // Burn mask bottom
     dSeq.effect()
         .delay(delay + 250)
-        .file(closest("eskie.burn.token_mask.orange.fast"))
+        .file(closest("eskie.burn.token_mask.orange.no_base.fast.01"))
         .name(`${tName}Bottom`)
         .scaleToObject(1.1)
         .atLocation(targetToken)
@@ -319,7 +319,7 @@ seq.canvasPan()
 seq.wait(1000);
 
 seq.sound()
-    .file("psfx.casting.fire-side.001")
+    .file(closest("psfx.casting.fire-side.001"))
     .volume(0.5);
 
 seq.wait(1000);

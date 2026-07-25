@@ -2,7 +2,6 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { closest } from '../../../lib/filemanager.js';
 import { template } from '../../../lib/templates.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 

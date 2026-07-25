@@ -295,7 +295,7 @@ partyTargets.forEach(target => {
 // Flash bloom impact blue wave on arrival
 sequence = sequence.effect()
     .name(label)
-    .file(closest("jb2a.impact.005.blue"))
+    .file(closest("jb2a.impact.004.blue"))
     .atLocation(token)
     .scaleToObject(maxDistance)
     .belowTokens();

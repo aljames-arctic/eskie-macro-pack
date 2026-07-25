@@ -103,7 +103,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
         })
 
         .effect()
-        .file(closest("eskie.damage.electricity.01.blue"))
+        .file(closest("eskie.damage.electricity.01.purple"))
         .atLocation(token, { offset: { x: 0, y: 0 }, gridUnits: true })
         .attachTo(token)
         .scaleToObject(token.document.texture.scaleX * 1.4)
@@ -215,7 +215,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                         .zIndex(3)
 
                         .effect()
-                        .file(closest("eskie.attack.ranged.arrow.01.physical.medium.purple"))
+                        .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.purpleblack"))
                         .atLocation(initialPoints[u])
                         .stretchTo(position)
                         .filter("ColorMatrix", { hue: 70 })
@@ -241,10 +241,10 @@ async function createStarwardSword(token, config = {}, options = {}) {
                                     .opacity(0.35)
 
                                     .effect()
-                                    .file(closest("jb2a.impact.009.purple"))
+                                    .file(closest("jb2a.impact.009.orange"))
                                     .atLocation(target, { randomOffset: 1, gridUnits: true })
                                     .randomRotation()
-                                    .filter("ColorMatrix", { saturate: -0.4 })
+                                    .filter("ColorMatrix", { hue: 250, saturate: -0.4 })
                                     .scaleToObject(1)
                                     .zIndex(0)
 
@@ -322,7 +322,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                         .zIndex(3)
 
                         .effect()
-                        .file(closest("eskie.attack.ranged.arrow.01.physical.medium.purple"))
+                        .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.purpleblack"))
                         .atLocation(initialPoints[u])
                         .stretchTo(initialPoints[(u + 1)])
                         .filter("ColorMatrix", { hue: 70 })
@@ -343,11 +343,11 @@ async function createStarwardSword(token, config = {}, options = {}) {
                                     .opacity(0.35)
 
                                     .effect()
-                                    .file(closest("jb2a.impact.009.purple"))
+                                    .file(closest("jb2a.impact.009.orange"))
                                     .atLocation(target, { randomOffset: 1, gridUnits: true })
                                     .randomRotation()
                                     .scaleToObject(1)
-                                    .filter("ColorMatrix", { saturate: -0.4 })
+                                    .filter("ColorMatrix", { hue: 250, saturate: -0.4 })
                                     .zIndex(0)
 
                                     .play()
@@ -361,7 +361,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
                 .effect()
                 .name(`location`)
-                .file(closest("eskie.attack.ranged.arrow.01.physical.medium.purple"))
+                .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.purpleblack"))
                 .atLocation(points[e])
                 .stretchTo(points[0])
                 .filter("ColorMatrix", { hue: 70 })
@@ -449,7 +449,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                 .wait(400)
 
                 .effect()
-                .file(closest("eskie.lightning.lightning_bolt.purple"))
+                .file(closest("eskie.lightning.lightning_bolt.blue"))
                 .atLocation(position, { offset: { x: size / 2, y: -0.5 }, gridUnits: true })
                 .stretchTo(position, { offset: { x: size / 2 * -1, y: 0.5 }, gridUnits: true })
                 .filter("ColorMatrix", { hue: 60 })
@@ -472,7 +472,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
             mainSequence.addSequence(new Sequence()
 
                 .effect()
-                .file(closest("eskie.attack.ranged.arrow.01.physical.medium.purple"))
+                .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.purpleblack"))
                 .atLocation(points[e])
                 .stretchTo(points[e + 1])
                 .fadeOut(1000)
@@ -480,7 +480,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                 .zIndex(4)
 
                 .effect()
-                .file(closest("eskie.attack.ranged.arrow.01.physical.medium.purple"))
+                .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.purpleblack"))
                 .atLocation(points[9 - e])
                 .stretchTo(points[9 - e - 1])
                 .fadeOut(1000)
@@ -506,11 +506,11 @@ async function createStarwardSword(token, config = {}, options = {}) {
                             .opacity(0.35)
 
                             .effect()
-                            .file(closest("jb2a.impact.009.purple"))
+                            .file(closest("jb2a.impact.009.orange"))
                             .atLocation(target, { randomOffset: 1, gridUnits: true })
                             .randomRotation()
                             .scaleToObject(1)
-                            .filter("ColorMatrix", { saturate: -0.4 })
+                            .filter("ColorMatrix", { hue: 250, saturate: -0.4 })
                             .playIf(() => {
                                 return Math.random() < 0.5;
                             })

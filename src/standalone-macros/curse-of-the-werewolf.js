@@ -67,7 +67,7 @@ sequence.effect()
 
 // Pale moonlight glow rays filtering through the darkness
 sequence.effect()
-    .file(closest("jb2a.moonbeam.01.intro"))
+    .file(closest("jb2a.moonbeam.01.intro.blue"))
     .attachTo(token)
     .scaleToObject(1.6, { considerTokenScale: true })
     .duration(4500)
@@ -81,7 +81,7 @@ sequence.effect()
 // --- PHASE 2: HOWLING FOG ---
 // Low dark rolling mist & howling fog creeping across the ground as the curse takes root
 sequence.effect()
-    .file(closest("jb2a.fog.01.dark_grey"))
+    .file(closest("jb2a.fog.01.grey"))
     .attachTo(token)
     .scaleToObject(2.5, { considerTokenScale: true })
     .duration(6000)

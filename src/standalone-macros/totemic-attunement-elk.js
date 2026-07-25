@@ -49,8 +49,8 @@ seq.effect()
     .file(closest(`eskie.nature.flower.particle.01.${color}`))
     .attachTo(token)
     .scaleToObject(1.5)
-    .fadeIn(500)
-    .fadeOut(500)
+    .fadeIn(1000)
+    .fadeOut(250)
     .persist()
     .zIndex(1);
 

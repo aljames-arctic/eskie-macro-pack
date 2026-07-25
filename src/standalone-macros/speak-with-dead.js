@@ -22,7 +22,7 @@ if (isPlaying) {
 
     // Main sequence creation
     let sequence = new Sequence()
-        .sound().name(label).volume(sound.volume).file(sound.file).playIf(sound.enabled)
+        .sound().name(label).volume(sound.volume).file(closest(sound.file)).playIf(sound.enabled)
         .addSequence(_addMagicCircleEffects(token, label))
         .wait(500)
         .addSequence(_addCornerFlameEffects(token, label, 0.5, 0.5, 2)) // Bottom Right Flame
@@ -39,12 +39,23 @@ if (isPlaying) {
 // Helper Functions
 // ==========================================
 
+const closest = (path) => {
+    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
+        return eskie.util.file.closest(path);
+    }
+    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
+    if (typeof apiClosest === "function") {
+        return apiClosest(path);
+    }
+    return path;
+};
+
 function _addMagicCircleEffects(token, id) {
     let seq = new Sequence()
         .effect()
         .name(id)
         .atLocation(token)
-        .file("jb2a.magic_signs.circle.02.necromancy.loop.blue")
+        .file(closest("jb2a.magic_signs.circle.02.necromancy.loop.blue"))
         .scaleToObject(1.25)
         .scaleIn(0, 600, { ease: "easeOutCubic" })
         .filter("ColorMatrix", { hue: -65 })
@@ -57,7 +68,7 @@ function _addMagicCircleEffects(token, id) {
         .effect()
         .name(id)
         .atLocation(token)
-        .file("jb2a.magic_signs.circle.02.necromancy.loop.green")
+        .file(closest("jb2a.magic_signs.circle.02.necromancy.loop.green"))
         .scaleToObject(1.25)
         .scaleIn(0, 600, { ease: "easeOutCubic" })
         .belowTokens(true)
@@ -88,7 +99,7 @@ function _addTokenVisualEffects(token, label) {
         .effect()
         .name(label)
         .delay(100)
-        .file("jb2a.particles.outward.blue.01.03")
+        .file(closest("jb2a.particles.outward.blue.01.03"))
         .atLocation(token)
         .scaleToObject(1.1)
         .filter("ColorMatrix", { saturate: -1, brightness: 2 })
@@ -102,7 +113,7 @@ function _addTokenVisualEffects(token, label) {
         .effect()
         .name(label)
         .delay(100)
-        .file("jb2a.detect_magic.circle.blue")
+        .file(closest("jb2a.detect_magic.circle.blue"))
         .atLocation(token)
         .scaleToObject(1.25)
         .filter("ColorMatrix", { hue: -65 })
@@ -116,7 +127,7 @@ function _addTokenVisualEffects(token, label) {
 
         .effect()
         .name(label)
-        .file("jb2a.token_border.circle.static.blue.012")
+        .file(closest("jb2a.token_border.circle.static.blue.012"))
         .attachTo(token, { bindAlpha: false, bindRotation: false })
         .scaleToObject(1.85, { considerTokenScale: true })
         .fadeIn(4000)
@@ -144,7 +155,7 @@ function _addTokenVisualEffects(token, label) {
         .effect()
         .name(label)
         .delay(2000)
-        .file("jb2a.spirit_guardians.blue.spirits")
+        .file(closest("jb2a.spirit_guardians.blue.spirits"))
         .attachTo(token, { offset: { y: 0 }, gridUnits: true, bindAlpha: false, bindRotation: false })
         .scaleToObject(1.35, { considerTokenScale: true })
         .persist()
@@ -156,7 +167,7 @@ function _addTokenVisualEffects(token, label) {
         .effect()
         .name(label)
         .delay(3000)
-        .file("jb2a.magic_signs.rune.necromancy.complete.blue")
+        .file(closest("jb2a.magic_signs.rune.necromancy.complete.blue"))
         .attachTo(token, { offset: { y: -0.77 * token.document.width }, gridUnits: true, bindAlpha: false, bindRotation: false })
         .scaleToObject(0.4, { considerTokenScale: true })
         .persist()
@@ -168,7 +179,7 @@ function _addTokenVisualEffects(token, label) {
         .effect()
         .name(label)
         .delay(3000)
-        .file("jb2a.magic_signs.rune.necromancy.complete.blue")
+        .file(closest("jb2a.magic_signs.rune.necromancy.complete.blue"))
         .attachTo(token, { offset: { y: -0.55 * token.document.width }, gridUnits: true, bindAlpha: false, bindRotation: false })
         .scaleToObject(0.4, { considerTokenScale: true })
         .persist()
@@ -201,7 +212,7 @@ function _addCornerFlameEffects(token, id, xOffset, yOffset, smokeZIndex) {
         .effect()
         .name(id)
         .atLocation(token, { offset: { x: xOffset, y: yOffset }, gridUnits: true })
-        .file("jb2a.impact.008.blue")
+        .file(closest("jb2a.impact.008.blue"))
         .filter("ColorMatrix", { hue: -65 })
         .scaleToObject(1)
         .zIndex(1)
@@ -209,7 +220,7 @@ function _addCornerFlameEffects(token, id, xOffset, yOffset, smokeZIndex) {
         .effect()
         .name(id)
         .atLocation(token, { offset: { x: xOffset, y: yOffset }, gridUnits: true })
-        .file("jb2a.flames.01.blue")
+        .file(closest("jb2a.flames.01.blue"))
         .belowTokens()
         .filter("ColorMatrix", { hue: -65 })
         .scaleToObject(0.5)
@@ -221,7 +232,7 @@ function _addCornerFlameEffects(token, id, xOffset, yOffset, smokeZIndex) {
         .name(id)
         .delay(250)
         .atLocation(token, { offset: { x: xOffset, y: yOffset - 0.35 }, gridUnits: true })
-        .file("eskie.smoke.05.black")
+        .file(closest("eskie.smoke.05.black"))
         .scaleToObject(0.8)
         .opacity(0.4)
         .tint("#6ff087")

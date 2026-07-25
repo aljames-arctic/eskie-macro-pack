@@ -25,8 +25,10 @@ const tokenId = token.id ?? token.document?.id ?? "";
 const label = `${id}-${tokenId}`;
 
 const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
-if (activeEffects.length > 0) {
+const activeIdEffects = Sequencer.EffectManager.getEffects({ name: id, object: token }) ?? [];
+if (activeEffects.length > 0 || activeIdEffects.length > 0) {
     Sequencer.EffectManager.endEffects({ name: label, object: token });
+    Sequencer.EffectManager.endEffects({ name: id, object: token });
     return;
 }
 
@@ -61,6 +63,7 @@ laughEffect.effect()
     .loopProperty("spriteContainer", "position.y", { from: 0, to: -0.01, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
     .loopProperty("sprite", "width", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
     .loopProperty("sprite", "height", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
+    .mirrorY(token.document?.mirrorX)
     .persist()
     .waitUntilFinished(-200);
 

@@ -73,6 +73,7 @@ const KNOWN_STANDALONE_MACROS = [
     'levitation.js',
     'lightning-bolt.js',
     'magic-missile.js',
+    'maxtac.js',
     'meteor-strike.js',
     'mirror-image.js',
     'misty-step.js',

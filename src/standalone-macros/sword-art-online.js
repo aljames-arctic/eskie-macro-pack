@@ -12,14 +12,14 @@ if (isPlaying) {
     new Sequence().animation().on(token).opacity(1).show(true).play();
     Sequencer.EffectManager.endEffects({ name: label });
 } else {
-    const tintColor = '#00FFFF';
-    const duration = 1000;
+    const tintColor = '#00BFFF';
+    const duration = 600;
     const shatterColor = 'blue';
     const deleteToken = false;
     const center = true;
     const rotation = 0;
 
-    const tokenOverlay = `eskie.wounds.token_mask.shatter.${center ? 'center' : 'side'}.01.${shatterColor}.no_base`;
+    const tokenOverlay = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
     const revealOverlay = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
     
     let revealOverlayPath = revealOverlay;

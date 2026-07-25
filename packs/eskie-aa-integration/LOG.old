@@ -1,3 +1,5 @@
-2026/07/17-09:10:45.321 b63c Recovering log #823
-2026/07/17-09:10:45.324 b63c Delete type=0 #823
-2026/07/17-09:10:45.324 b63c Delete type=3 #472
+2026/07/17-10:53:26.079 abe8 Recovering log #824
+2026/07/17-10:53:26.079 abe8 Level-0 table #826: started
+2026/07/17-10:53:26.087 abe8 Level-0 table #826: 1041 bytes OK
+2026/07/17-10:53:26.090 abe8 Delete type=0 #824
+2026/07/17-10:53:26.090 abe8 Delete type=3 #813

@@ -1,5 +1,5 @@
-2026/07/17-10:53:26.079 abe8 Recovering log #824
-2026/07/17-10:53:26.079 abe8 Level-0 table #826: started
-2026/07/17-10:53:26.087 abe8 Level-0 table #826: 1041 bytes OK
-2026/07/17-10:53:26.090 abe8 Delete type=0 #824
-2026/07/17-10:53:26.090 abe8 Delete type=3 #813
+2026/07/24-20:42:47.527 e54c Recovering log #827
+2026/07/24-20:42:47.527 e54c Recovering log #846
+2026/07/24-20:42:47.530 e54c Delete type=0 #827
+2026/07/24-20:42:47.530 e54c Delete type=0 #846
+2026/07/24-20:42:47.530 e54c Delete type=3 #825

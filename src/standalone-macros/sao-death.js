@@ -28,7 +28,7 @@ const sequence = new Sequence();
 
 // Red error warning rings popping on dying avatar
 sequence.effect()
-    .file(closest("jb2a.extras.tmfx.border.circle.inpulse.01.fast"))
+    .file(closest("jaamod.spells_effects.antilife_shell"))
     .atLocation(token)
     .scaleToObject(2.5)
     .tint("#ff0000")
@@ -54,7 +54,7 @@ sequence.animation()
 
 // Explosive glass shards burst into geometric poly fragments
 sequence.effect()
-    .file(closest("jb2a.explosion.shrapnel.grenade.02.black"))
+    .file(closest("eskie.particle.05.blue"))
     .atLocation(token)
     .size(tokenWidth * 3, { gridUnits: true })
     .filter("ColorMatrix", { hue: 180, brightness: 1.5 })
@@ -62,14 +62,14 @@ sequence.effect()
     .zIndex(5);
 
 sequence.effect()
-    .file(closest("jb2a.impact.004.blue"))
+    .file(closest("jb2a.markers.circle_of_stars.blue"))
     .atLocation(token)
     .scaleToObject(2.5)
     .playbackRate(1.5)
     .zIndex(6);
 
 sequence.effect()
-    .file(closest("eskie.particle.04.white"))
+    .file(closest("eskie.particle.05.blue"))
     .atLocation(token)
     .size(tokenWidth * 4, { gridUnits: true })
     .duration(2000)

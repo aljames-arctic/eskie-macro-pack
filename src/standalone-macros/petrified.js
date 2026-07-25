@@ -1,0 +1,96 @@
+// Standalone Macro: Petrified
+// Original Author: EskieMoh#2969
+// Modular Conversion: bakanabaka
+
+if (!game.modules.get("sequencer")?.active) {
+    return ui.notifications.error("The 'Petrified' macro requires the 'Sequencer' module to be installed and active!");
+}
+
+const token = canvas.tokens.controlled[0];
+if (!token) return ui.notifications.warn("Please select a token!");
+
+const closest = (path) => {
+    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
+        return eskie.util.file.closest(path);
+    }
+    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
+    if (typeof apiClosest === "function") {
+        return apiClosest(path);
+    }
+    return path;
+};
+
+const id = "Petrified";
+const tokenId = token.id ?? token.document?.id ?? "";
+const label = `${id}-${tokenId}`;
+const rotation = token.document?.rotation ?? token.rotation ?? 0;
+
+// Toggle / re-entrant persistent effect handling
+const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
+const activeById = Sequencer.EffectManager.getEffects({ name: id, object: token }) ?? [];
+
+if (activeEffects.length > 0 || activeById.length > 0) {
+    const stopSequence = new Sequence();
+
+    // Crack ground impact and stone dust shatter animation when breaking petrification
+    stopSequence.effect()
+        .file(closest("jb2a.impact.earth.01.browngreen"))
+        .atLocation(token)
+        .filter("ColorMatrix", { saturate: -1 })
+        .scaleToObject(2)
+        .randomRotation();
+
+    stopSequence.animation()
+        .on(token)
+        .opacity(1)
+        .thenDo(() => {
+            Sequencer.EffectManager.endEffects({ name: label, object: token });
+            Sequencer.EffectManager.endEffects({ name: id, object: token });
+        });
+
+    await stopSequence.play();
+    return;
+}
+
+const sequence = new Sequence();
+
+// Crack ground impact and stone dust animation as token turns to stone
+sequence.effect()
+    .file(closest("jb2a.impact.earth.01.browngreen"))
+    .atLocation(token)
+    .filter("ColorMatrix", { saturate: -1 })
+    .scaleToObject(2)
+    .randomRotation();
+
+// Gray saturation shift copy-sprite overlay
+sequence.effect()
+    .name(label)
+    .copySprite(token)
+    .spriteRotation(-rotation)
+    .atLocation(token)
+    .scaleToObject(1, { considerTokenScale: true })
+    .mask(token)
+    .opacity(0.4)
+    .filter("ColorMatrix", { contrast: 1, saturate: -1 })
+    .filter("Glow", { color: 0x000000, distance: 3, outerStrength: 4 })
+    .attachTo(token)
+    .fadeIn(3000)
+    .duration(5000)
+    .zIndex(1)
+    .persist();
+
+// Stone gray petrification statue texture overlay
+sequence.effect()
+    .file(closest("https://i.imgur.com/4P2tITB.png"))
+    .name(label)
+    .atLocation(token)
+    .mask(token)
+    .opacity(1)
+    .filter("Glow", { color: 0x000000, distance: 3, outerStrength: 4 })
+    .zIndex(0)
+    .fadeIn(3000)
+    .duration(5000)
+    .attachTo(token)
+    .persist();
+
+await sequence.play();

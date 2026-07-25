@@ -65,7 +65,13 @@ if (typeof scope !== "undefined" && scope?.template) {
 
 if (!position) return;
 
-const impactColors = ["yellow.0", "orange.0", "red.0", "blue.0", "purple.0"];
+const impactColors = [
+    "jb2a.impact.001.yellow",
+    "jb2a.impact.002.yellow",
+    "jb2a.impact.005.orange",
+    "jb2a.impact.010.orange",
+    "jb2a.impact.004.blue"
+];
 
 const seq = new Sequence();
 
@@ -95,10 +101,7 @@ seq.effect()
 seq.effect()
     .name(effectName)
     .repeats(10, 50, 50)
-    .file(closest("jb2a.impact.{{color}}"))
-    .setMustache({
-        color: () => impactColors[Math.floor(Math.random() * impactColors.length)] ?? "yellow.0"
-    })
+    .file(() => closest(impactColors[Math.floor(Math.random() * impactColors.length)]))
     .atLocation(position, { randomOffset: 1.0 })
     .size(0.8, { gridUnits: true })
     .randomRotation()
@@ -108,10 +111,7 @@ seq.effect()
 seq.effect()
     .name(effectName)
     .repeats(6, 50, 50)
-    .file(closest("jb2a.impact.{{color}}"))
-    .setMustache({
-        color: () => impactColors[Math.floor(Math.random() * impactColors.length)] ?? "orange.0"
-    })
+    .file(() => closest(impactColors[Math.floor(Math.random() * impactColors.length)]))
     .atLocation(position, { randomOffset: 1.0 })
     .size(0.8, { gridUnits: true })
     .randomRotation()
@@ -121,10 +121,7 @@ seq.effect()
 seq.effect()
     .name(effectName)
     .repeats(6, 50, 50)
-    .file(closest("jb2a.impact.{{color}}"))
-    .setMustache({
-        color: () => impactColors[Math.floor(Math.random() * impactColors.length)] ?? "red.0"
-    })
+    .file(() => closest(impactColors[Math.floor(Math.random() * impactColors.length)]))
     .atLocation(position, { randomOffset: 1.0 })
     .size(0.8, { gridUnits: true })
     .randomRotation()

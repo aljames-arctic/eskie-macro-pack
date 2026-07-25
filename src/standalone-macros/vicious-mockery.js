@@ -103,22 +103,19 @@ sequence.effect()
     .fadeIn(200, { ease: "easeOutCirc", delay: 500 })
     .fadeOut(300, { ease: "linear" });
 
+const musicNotes = ["bass_clef", "beamed_quavers", "crotchet", "flat", "quaver", "treble_clef"];
+const getMusicNote = () => closest(`jb2a.music_notations.${musicNotes[Math.floor(Math.random() * musicNotes.length)]}.purple`);
+
 // Bardic musical notations bursting around caster token
 sequence.effect()
     .name(label)
-    .file(closest("jb2a.music_notations.{{music}}.purple"))
+    .file(() => getMusicNote())
     .scaleIn(0, 500, { ease: "easeOutQuint" })
     .delay(500)
     .atLocation(token, { offset: { y: -0.2 }, gridUnits: true, randomOffset: 1.5 })
     .scaleToObject(0.5)
     .zIndex(1)
     .playbackRate(1.5)
-    .setMustache({
-        "music": () => {
-            const musics = ["bass_clef", "beamed_quavers", "crotchet", "flat", "quaver", "treble_clef"];
-            return musics[Math.floor(Math.random() * musics.length)];
-        }
-    })
     .repeats(5, 200, 200)
     .fadeOut(500);
 
@@ -134,17 +131,11 @@ for (const target of targets) {
     sequence.effect()
         .name(targetLabel)
         .delay(500)
-        .file(closest("jb2a.music_notations.{{music}}.purple"))
+        .file(() => getMusicNote())
         .atLocation(token)
         .stretchTo(target, { attachTo: true })
         .scaleToObject(0.6)
         .playbackRate(1.5)
-        .setMustache({
-            "music": () => {
-                const musics = ["bass_clef", "beamed_quavers", "crotchet", "flat", "quaver", "treble_clef"];
-                return musics[Math.floor(Math.random() * musics.length)];
-            }
-        })
         .repeats(3, 150, 150)
         .fadeOut(300)
         .zIndex(2);
@@ -236,7 +227,7 @@ for (const target of targets) {
     sequence.effect()
         .name(targetLabel)
         .delay(600)
-        .file(closest("jb2a.toll_the_dead.purple.skull"))
+        .file(closest("jb2a.toll_the_dead.purple.complete"))
         .atLocation(target)
         .scaleToObject(1.2)
         .fadeIn(150)

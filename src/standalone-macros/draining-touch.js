@@ -109,7 +109,7 @@ for (const target of targets) {
     // Life-draining touch: necrotic dark green tendrils siphoning vigor from target to caster
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.energy_strands.range.multiple.green.01"))
+        .file(closest("jb2a.energy_strands.overlay.green.01"))
         .atLocation(target)
         .stretchTo(token, { attachTo: true })
         .tint(tintColor)
@@ -125,7 +125,7 @@ for (const target of targets) {
     // Secondary necrotic dark green siphon tendril web for deep life force extraction
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.energy_strands.range.multiple.green.01"))
+        .file(closest("jb2a.energy_strands.overlay.green.01"))
         .atLocation(target)
         .stretchTo(token, { attachTo: true })
         .tint("#1e561e")

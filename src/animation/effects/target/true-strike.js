@@ -57,7 +57,7 @@ async function createTrueStrikeCast(token, config = {}) {
 
         .effect()
         .name(`TrueStrike - Glint - ${id} - ${token.uuid}`) // Persistent glint effect
-        .file(closest("jb2a.glint.blue.few.0"))
+        .file(closest("jb2a.glint.blue.few"))
         .atLocation(token)
         .scaleToObject(1.75)
         .attachTo(token)
@@ -227,7 +227,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .delay(0)
 
         .effect()
-        .file(closest("jb2a.glint.blue.many.0"))
+        .file(closest("jb2a.glint.blue.many"))
         .atLocation(target)
         .randomRotation()
         .scaleToObject(0.75)

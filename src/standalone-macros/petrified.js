@@ -81,7 +81,7 @@ sequence.effect()
 
 // Stone gray petrification statue texture overlay
 sequence.effect()
-    .file(closest("https://i.imgur.com/4P2tITB.png"))
+    .file("https://i.imgur.com/4P2tITB.png")
     .name(label)
     .atLocation(token)
     .mask(token)

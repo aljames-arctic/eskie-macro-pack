@@ -62,10 +62,12 @@ async function getPosition(templateDoc, config = {}) {
 }
 
 const radius = 5 / (canvas.grid?.distance ?? 5);
+const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
+const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
 const cfg = {
     radius: 1,
     max: 500,
-    icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm',
+    icon: portalPath,
     label: 'Grease'
 };
 

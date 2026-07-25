@@ -136,10 +136,12 @@ async function createSpikeGrowth(token, config = {}, options = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id, size, template } = mConfig;
 
+    const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
+    const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
     const cfg = { 
         radius: 20,
         max: 150,
-        icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm', 
+        icon: portalPath, 
         label: 'Spike Growth'
     };
     let [position, _] = await template.getPosition(template, cfg);

@@ -33,7 +33,7 @@ async function create(token, config = {}) {
         .persist()
 
         .effect()
-        .file(closest("https://i.imgur.com/4P2tITB.png"))
+        .file("https://i.imgur.com/4P2tITB.png")
         .name(id)
         .atLocation(token)
         .mask(token)

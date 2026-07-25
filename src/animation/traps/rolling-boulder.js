@@ -62,7 +62,7 @@ async function create(tile, targets, config = {}) {
         // Impact smoke wave at start location
         .effect()
         .delay(boulderSpeed / 6)
-        .file(closest('jb2a.impact.white.0'))
+        .file(closest('jb2a.impact.white.01'))
         .atLocation(startLoc)
         .size(boulderSize * 1.15, { gridUnits: true })
         .belowTokens()
@@ -85,7 +85,7 @@ async function create(tile, targets, config = {}) {
         // Impact flash at target/crash point
         .effect()
         .delay(250)
-        .file(closest('jb2a.impact.white.0'))
+        .file(closest('jb2a.impact.white.01'))
         .atLocation(endLoc)
         .size(boulderSize * 1.15, { gridUnits: true })
         .belowTokens()

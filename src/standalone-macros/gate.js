@@ -120,9 +120,12 @@ const portalSize = 20 / gridDistance;
 const width = portalSize ?? 4;
 const height = portalSize ?? 4;
 
+const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
+const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
+
 const position = await Sequencer.Crosshair.show({
     size: portalSize,
-    icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm',
+    icon: portalPath,
     label: 'Gate'
 });
 if (!position || position.cancelled) return;

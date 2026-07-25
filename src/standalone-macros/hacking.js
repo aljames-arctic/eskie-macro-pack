@@ -20,9 +20,12 @@ function _randomUiImage() {
     return UI_IMAGES[Math.floor(Math.random() * UI_IMAGES.length)];
 }
 
-if (Tagger.hasTags(token, HACK_TAG)) {
+const isHacking = (typeof Tagger !== "undefined" && Tagger.hasTags(token, HACK_TAG)) ||
+                  Sequencer.EffectManager.getEffects({ name: EFFECT_NAME, object: token }).length > 0;
+
+if (isHacking) {
     // Toggle off: remove tag, end effects, restore token opacity
-    await Tagger.removeTags(token, HACK_TAG);
+    if (typeof Tagger !== "undefined") await Tagger.removeTags(token, HACK_TAG);
     await Sequencer.EffectManager.endEffects({ name: EFFECT_NAME, object: token });
 
     new Sequence()
@@ -106,7 +109,7 @@ if (Tagger.hasTags(token, HACK_TAG)) {
 
     // Loop: randomly spawn holographic UI panels around the token while hacking is active
     seq.thenDo(async () => {
-        while (Tagger.hasTags(token, HACK_TAG)) {
+        while (Sequencer.EffectManager.getEffects({ name: EFFECT_NAME, object: token }).length > 0) {
             const ui1 = _randomUiImage();
             const ui2 = _randomUiImage();
 

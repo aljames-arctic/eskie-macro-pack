@@ -52,9 +52,12 @@ const UNICODE_CHARS = [
     '☲', '☳', '☴', '☵', '☶', '☷', '⣹', '⣺', '⣻', '⣼', '⣽', '⣾', '⣿',
 ];
 
-if (Tagger.hasTags(token, CALL_TAG)) {
+const isCalling = (typeof Tagger !== "undefined" && Tagger.hasTags(token, CALL_TAG)) ||
+                  Sequencer.EffectManager.getEffects({ name: EFFECT_NAME, object: token }).length > 0;
+
+if (isCalling) {
     // Toggle off: remove tag, end effects, restore token opacity
-    await Tagger.removeTags(token, CALL_TAG);
+    if (typeof Tagger !== "undefined") await Tagger.removeTags(token, CALL_TAG);
     await Sequencer.EffectManager.endEffects({ name: EFFECT_NAME, object: token });
     await Sequencer.EffectManager.endEffects({ name: EFFECT_NAME_TEXT, object: token });
 
@@ -139,7 +142,7 @@ if (Tagger.hasTags(token, CALL_TAG)) {
         let i = 1;
         let e = 1;
 
-        while (Tagger.hasTags(token, CALL_TAG)) {
+        while (Sequencer.EffectManager.getEffects({ name: EFFECT_NAME, object: token }).length > 0) {
             // Reset column position every 12 characters (3 rows of 12)
             if (i === 12 || i === 24) e = 1;
 

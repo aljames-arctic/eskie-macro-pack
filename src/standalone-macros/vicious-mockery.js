@@ -127,30 +127,6 @@ for (const target of targets) {
     const targetWidth = target.document?.width ?? 1;
     const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
 
-    // Bardic insult skull note beam projectile connecting caster token to target token
-    sequence.effect()
-        .name(targetLabel)
-        .delay(500)
-        .file(() => getMusicNote())
-        .atLocation(token)
-        .stretchTo(target, { attachTo: true })
-        .scaleToObject(0.6)
-        .playbackRate(1.5)
-        .repeats(3, 150, 150)
-        .fadeOut(300)
-        .zIndex(2);
-
-    // Psychic energy beam beam connecting caster token to target
-    sequence.effect()
-        .name(targetLabel)
-        .delay(550)
-        .file(closest("jb2a.energy_beam.normal.purple"))
-        .atLocation(token)
-        .stretchTo(target, { attachTo: true })
-        .duration(800)
-        .fadeIn(150)
-        .fadeOut(250)
-        .zIndex(1.5);
 
     const textStyle = {
         fill: "#ffffff",
@@ -223,18 +199,6 @@ for (const target of targets) {
         .scaleToObject(1.25)
         .zIndex(1);
 
-    // Psychic shock spectral skull impact overlay
-    sequence.effect()
-        .name(targetLabel)
-        .delay(600)
-        .file(closest("jb2a.toll_the_dead.purple.complete"))
-        .atLocation(target)
-        .scaleToObject(1.2)
-        .fadeIn(150)
-        .fadeOut(400)
-        .duration(1000)
-        .filter("ColorMatrix", { hue: 20, brightness: 1.3 })
-        .zIndex(2.5);
 
     // Psychic distortion target token shake & purple tint
     sequence.effect()
@@ -251,24 +215,6 @@ for (const target of targets) {
         .opacity(0.2)
         .tint(0x6820ee);
 
-    // Floating clown/laughing skull emoji indicators above target
-    sequence.effect()
-        .name(targetLabel)
-        .delay(750)
-        .atLocation(target, { offset: { x: 0, y: -0.8 * targetWidth }, gridUnits: true })
-        .text("🤡 💀 😂", {
-            fill: "#ffea00",
-            fontFamily: "Segoe UI Emoji, Apple Color Emoji, sans-serif",
-            fontSize: 32 * targetWidth,
-            stroke: "#000000",
-            strokeThickness: 3
-        })
-        .duration(1800)
-        .fadeIn(200)
-        .fadeOut(600)
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, duration: 1500, gridUnits: true, ease: "easeOutCubic" })
-        .scaleIn(0, 400, { ease: "easeOutBack" })
-        .zIndex(3);
 
     // Confused / mockery emote #1
     sequence.effect()

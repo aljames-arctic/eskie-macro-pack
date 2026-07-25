@@ -89,7 +89,7 @@ seq.effect()
 
 seq.effect()
     .delay(250)
-    .file(closest("jb2a.teleportation.01.purple"))
+    .file(closest("jb2a.teleport.01.white"))
     .atLocation(token)
     .rotateTowards(target)
     .scaleToObject(4)

@@ -28,6 +28,27 @@ if (isPlaying) {
 const target = game.user.targets.first();
 if (!target) return ui.notifications.warn("Please target a token!");
 
+const targetDeath = true;
+const teleport = true;
+const cameraFocus = {
+    enable: true,
+    scale: 0.3
+};
+const text = {
+    id: 'IaijutsuStrike Text',
+    duration: 2500,
+    delay: 200,
+    style: {
+        "fill": "#da1b1bff",
+        "fontFamily": "Helvetica",
+        "fontSize": 106,
+        "strokeThickness": 0,
+        fontWeight: "bold",
+    },
+    kerning: 1.7,
+    verticalOffset: 0.75,
+};
+
 const closest = (path) => {
     if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
         return eskie.util.file.closest(path);

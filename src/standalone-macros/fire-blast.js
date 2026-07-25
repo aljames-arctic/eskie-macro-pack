@@ -314,7 +314,7 @@ for (const target of targets) {
     // Impact: Ground Scorch Mark
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.impact.ground_crack.orange.01"))
+        .file(closest("jb2a.impact.ground_crack.01.orange"))
         .atLocation(target)
         .belowTokens()
         .scaleToObject(0.8, { considerTokenScale: true })

@@ -57,10 +57,12 @@ async function getPosition(templateDoc, config = {}) {
         }
         return [primary, secondary];
     } else {
+        const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
+        const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
         const cfg = {
             radius: config.radius ?? 20,
             max: config.max ?? 60,
-            icon: config.icon ?? 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm',
+            icon: config.icon ?? portalPath,
             label: config.label ?? 'Faerie Fire'
         };
         const position = await Sequencer.Crosshair.show(cfg);
@@ -84,10 +86,12 @@ async function runFaerieFire(casterToken, config = {}) {
     }
 
     // Determine target location for cloud blast
+    const portalEntryCloud = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
+    const portalPathCloud = typeof portalEntryCloud === "string" ? portalEntryCloud : (portalEntryCloud?.file ?? portalEntryCloud?.files?.[0]);
     const cfg = {
         radius: 20,
         max: 60,
-        icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm',
+        icon: portalPathCloud,
         label: id
     };
     const [position, _] = await getPosition(mergedConfig.template, cfg);

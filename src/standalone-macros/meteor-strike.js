@@ -82,7 +82,7 @@ for (let i = 0; i < positions.length; i++) {
     // 1. Falling flaming meteorite descending from the sky
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.fireball.fireball.orange"))
+        .file(closest("jb2a.fireball.beam.orange"))
         .atLocation({ x: pos.x + 350, y: pos.y - 850 })
         .stretchTo(pos)
         .scale(fireScale * 1.1)

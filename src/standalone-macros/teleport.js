@@ -128,9 +128,12 @@ let destination = null;
 if (choices.mode === "recall" && savedAnchor?.x && savedAnchor?.y) {
     destination = { x: savedAnchor.x, y: savedAnchor.y };
 } else {
+    const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
+    const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
+
     const crosshairConfig = {
         size: token.document?.width ?? 1,
-        icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm',
+        icon: portalPath,
         label: 'Teleportation Circle Destination',
         tag: label,
         rememberControlled: true

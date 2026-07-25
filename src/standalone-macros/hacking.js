@@ -41,7 +41,7 @@ if (isHacking) {
 
     // Left eye red glow (adjust offset to match token's eye position)
     seq.effect()
-        .file('jb2a.twinkling_stars.points04.orange')
+        .file(closest('jb2a.twinkling_stars.points04.orange'))
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: -0.2, y: -0.16 }, gridUnits: true, local: true })
         .size({ width: 0.4, height: 0.1 }, { gridUnits: true })
@@ -56,7 +56,7 @@ if (isHacking) {
 
     // Right eye red glow (adjust offset to match token's eye position)
     seq.effect()
-        .file('jb2a.twinkling_stars.points04.orange')
+        .file(closest('jb2a.twinkling_stars.points04.orange'))
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: 0.12, y: -0.225 }, gridUnits: true, local: true })
         .size({ width: 0.4, height: 0.1 }, { gridUnits: true })

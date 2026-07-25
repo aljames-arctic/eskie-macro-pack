@@ -100,10 +100,13 @@ async function create(token, config = {}) {
     mConfig.id = `${token.id} - ${mConfig.id}`;
     const { id, destination, destinationList, template } = mConfig;
 
+    const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
+    const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
+
     const cfg = {
         radius: 10,
         max: 60,
-        icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm',
+        icon: portalPath,
         label: 'Gate'
     };
     let [position, _] = await template.getPosition(template, cfg);

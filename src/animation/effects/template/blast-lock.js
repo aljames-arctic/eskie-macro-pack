@@ -139,7 +139,7 @@ async function create(token, config = {}) {
         // Padlock Shards
         .effect()
         .delay(100)
-        .file(closest("jb2a.explosion.side_fracture.flask.02.0"))
+        .file(closest("jb2a.explosion.side_fracture.flask.02"))
         .atLocation(position, { offset: { x: 0, y: -0 }, gridUnits: true })
         .scale(0.25)
         .rotateTowards(token)

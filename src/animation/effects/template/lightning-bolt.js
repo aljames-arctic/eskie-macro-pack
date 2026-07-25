@@ -9,9 +9,9 @@ import { settingsOverride } from '../../../lib/settings.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
-    id: 'lightningBolt',
-    deleteTemplate: true,
-    tintMap: true,
+    id: 'Lightning Bolt',
+    template: true,
+    tintMap: false,
     sound: {
         enabled: true,
         volume: 0.5
@@ -23,10 +23,13 @@ async function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     const { id, template, tintMap, sound } = mConfig;
 
+    const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
+    const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
+
     const cfg = { 
         radius: 1,
         max: 500,
-        icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm', 
+        icon: portalPath, 
         label: id
     };
     let [primary, secondary] = await template.getPosition(template, cfg);

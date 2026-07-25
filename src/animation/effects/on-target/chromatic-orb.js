@@ -88,7 +88,7 @@ async function create(token, target, config = {}) {
             .waitUntilFinished(-100)
 
         .effect()
-            .file(`eskie.damage.${damageType}.01.${color}`)
+            .file(closest(`eskie.damage.${damageType}.01.${color}`))
             .atLocation("position")
             .size(1, {gridUnits:true});
     

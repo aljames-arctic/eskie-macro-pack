@@ -29,7 +29,7 @@ function targetSequence(target, config = {}) {
         .opacity(0.35)
 
     .effect()
-        .file(`eskie.buff.one_shot.simple.${color}`)
+        .file(closest(`eskie.buff.one_shot.simple.${color}`))
         .attachTo(target, {offset:{y:-0.05}, gridUnits:true})
         .scaleToObject(1.2)
         .mirrorY()

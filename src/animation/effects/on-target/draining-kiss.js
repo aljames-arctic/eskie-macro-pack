@@ -105,7 +105,7 @@ function create(token, target, config = {}) {
 
         seq = seq.effect()
             .name(label)
-            .file(closest("jb2a.ground_cracks.purple.02"))
+            .file(closest("jb2a.impact.ground_crack.02.purple"))
             .atLocation(target)
             .scaleToObject(0.9)
             .delay(500)

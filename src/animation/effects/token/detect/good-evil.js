@@ -8,7 +8,7 @@ const defaultDetectionConfig = {
     fiend: 'jb2a.condition.curse.01.024.red',
     undead : 'jb2a.condition.curse.01.021.purple',
     consecrated : 'jb2a.magic_signs.rune.02.complete.04.yellow',
-    descecrated : 'jb2a.magic_signs.rune.02.complete.04.grey',
+    desecrated : 'jb2a.magic_signs.rune.02.complete.04.grey',
 };
 
 const defaultValidator = async function (target, tags) {

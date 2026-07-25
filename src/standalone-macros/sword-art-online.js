@@ -21,11 +21,22 @@ if (isPlaying) {
 
     const tokenOverlay = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
     const revealOverlay = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
+
+    const closest = (path) => {
+        if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
+            return eskie.util.file.closest(path);
+        }
+        const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
+        if (typeof apiClosest === "function") {
+            return apiClosest(path);
+        }
+        return path;
+    };
     
     let revealOverlayPath = revealOverlay;
     try { 
-        const entry = Sequencer.Database.getEntry(revealOverlay);
-        revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file ?? entry?.files?.[0] ?? revealOverlay);
+        const entry = Sequencer.Database.getEntry(closest(revealOverlay));
+        revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file ?? entry?.files?.[0] ?? closest(revealOverlay));
     } catch (e) {}
 
     let sequence = new Sequence()

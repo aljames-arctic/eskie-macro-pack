@@ -87,7 +87,7 @@ async function create(location, config = {}) {
 async function play(config = {}, crosshairOptions = undefined) {
     let crosshairConfig = {
         size:0.5,
-        icon: closest('eskie.crosshair', 'circle', 'fantasy_01') ?? 'icons/svg/circle.svg',
+        icon: closest('eskie.crosshair.circle.fantasy_01') ?? 'icons/svg/circle.svg',
         label: 'slap',
         tag: 'Spray',
         drawIcon: false,

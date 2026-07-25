@@ -147,7 +147,7 @@ sequence
     .effect()
         .name(label)
         .delay(100)
-        .file(closest("jb2a.impact.ground_crack.dark_red.02"))
+        .file(closest("jb2a.impact.ground_crack.02.dark_red"))
         .atLocation(targetLocation)
         .size(2.2, { gridUnits: true })
         .belowTokens()

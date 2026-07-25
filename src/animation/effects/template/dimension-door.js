@@ -37,7 +37,7 @@ async function create(token, config = {}) {
             .zIndex(0)
 
         .effect()
-            .file(closest("jb2a.portals.vertical.ring.purple"))
+            .file(closest("jb2a.portals.vertical.vortex.purple"))
             .atLocation(token)
             .rotateTowards(position)
             .belowTokens()
@@ -50,7 +50,7 @@ async function create(token, config = {}) {
             .waitUntilFinished(-2000)
 
         .effect()
-            .file(closest("jb2a.portals.vertical.ring.purple"))
+            .file(closest("jb2a.portals.vertical.vortex.purple"))
             .atLocation(position)
             .rotateTowards(token)
             .rotate(90)

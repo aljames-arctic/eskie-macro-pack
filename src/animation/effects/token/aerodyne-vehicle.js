@@ -65,7 +65,7 @@ async function create(token, config = {}) {
 
         // Thrusters, adjust thruster offset to match the token image
         .effect()
-        .file(closest('jb2a.dancing_light.blueteal'))
+        .file(closest('jb2a.dancing_lights.01.blueteal'))
         .scaleToObject(0.25)
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: 1.2, y: 1.2 }, gridUnits: true, local: true })
@@ -79,7 +79,7 @@ async function create(token, config = {}) {
         .zIndex(0)
 
         .effect()
-        .file(closest('jb2a.dancing_light.blueteal'))
+        .file(closest('jb2a.dancing_lights.01.blueteal'))
         .scaleToObject(0.25)
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: -1.2, y: 1.2 }, gridUnits: true, local: true })
@@ -93,7 +93,7 @@ async function create(token, config = {}) {
         .zIndex(0)
 
         .effect()
-        .file(closest('jb2a.dancing_light.blueteal'))
+        .file(closest('jb2a.dancing_lights.01.blueteal'))
         .scaleToObject(0.25)
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: 1.2, y: -1.2 }, gridUnits: true, local: true })
@@ -107,7 +107,7 @@ async function create(token, config = {}) {
         .zIndex(0)
 
         .effect()
-        .file(closest('jb2a.dancing_light.blueteal'))
+        .file(closest('jb2a.dancing_lights.01.blueteal'))
         .scaleToObject(0.25)
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: -1.2, y: -1.2 }, gridUnits: true, local: true })

@@ -109,7 +109,7 @@ const thrusterOffsets = [
 
 for (const offset of thrusterOffsets) {
     seq.effect()
-        .file(closest("jb2a.dancing_light.blueteal"))
+        .file(closest("jb2a.dancing_lights.01.blueteal"))
         .scaleToObject(0.25)
         .name(effectName)
         .atLocation(token, { offset, gridUnits: true, local: true })

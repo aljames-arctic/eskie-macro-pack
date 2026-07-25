@@ -35,8 +35,8 @@ if ((activeEffects?.length ?? 0) > 0 || (activeIdEffects?.length ?? 0) > 0) {
 }
 
 const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
-const resolvedExclaim = closest("eskie.emote.exclaim.01");
-const exclaimImg = (resolvedExclaim && resolvedExclaim !== "eskie.emote.exclaim.01") ? resolvedExclaim : "https://i.imgur.com/8Yr9fMC.png";
+const resolvedExclaim = closest("eskie.emote.surprised.01");
+const exclaimImg = (resolvedExclaim && resolvedExclaim !== "eskie.emote.surprised.01") ? resolvedExclaim : "https://i.imgur.com/8Yr9fMC.png";
 
 const sequence = new Sequence();
 

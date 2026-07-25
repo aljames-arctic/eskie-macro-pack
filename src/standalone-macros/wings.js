@@ -96,7 +96,7 @@ const WING_CONFIGS = {
         wingSize: 1.15,
         speedMulti: 0.9,
         swayMulti: 1.2,
-        introParticle: "jb2a.stars.interactive.01.yellow",
+        introParticle: "jb2a.twinkling_stars.points04.yellow",
         introHue: 45,
         tint: "#ffe875"
     },

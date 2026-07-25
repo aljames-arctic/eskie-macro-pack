@@ -76,7 +76,7 @@ function _addTokenVisualEffects(token, label) {
         .effect()
         .name(label)
         .delay(1000)
-        .file("eskie.attack.ranged.arrow.01.physical.medium.green")
+        .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.purpleblack"))
         .atLocation(token, { offset: { y: -0.75 * token.document.width }, gridUnits: true })
         .scaleToObject(2)
         .rotate(-90)

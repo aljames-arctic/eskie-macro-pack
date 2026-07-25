@@ -93,7 +93,7 @@ sequence.effect()
 // 5. Persistent blue glint aura on caster
 sequence.effect()
     .name(casterLabel)
-    .file(closest("jb2a.glint.blue.few.0"))
+    .file(closest("jb2a.fireflies.few.02.yellow"))
     .atLocation(token)
     .scaleToObject(1.75)
     .attachTo(token)
@@ -298,7 +298,7 @@ for (const target of targets) {
     // Gold energy impact flash on target
     sequence.effect()
         .name(targetLabel)
-        .file(closest("jb2a.impact.yellow.2"))
+        .file(closest("jb2a.impact.002.yellow"))
         .atLocation(target)
         .scaleToObject(3)
         .delay(0)
@@ -308,7 +308,7 @@ for (const target of targets) {
     // Persistent ground fractures on target
     sequence.effect()
         .name(targetLabel)
-        .file(closest("jb2a.ground_cracks.orange.02"))
+        .file(closest("jb2a.impact.ground_crack.02.orange"))
         .atLocation(target)
         .filter("ColorMatrix", { hue: 20, saturate: 1 })
         .scaleToObject(0.7)
@@ -334,7 +334,7 @@ for (const target of targets) {
     // Analytical verification glints on targeted creature
     sequence.effect()
         .name(targetLabel)
-        .file(closest("jb2a.glint.blue.many.0"))
+        .file(closest("jb2a.fireflies.many.02.yellow"))
         .atLocation(target)
         .randomRotation()
         .scaleToObject(0.75)

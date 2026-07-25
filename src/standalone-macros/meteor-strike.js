@@ -82,7 +82,7 @@ for (let i = 0; i < positions.length; i++) {
     // 1. Falling flaming meteorite descending from the sky
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.fireball.meteor.orange"))
+        .file(closest("jb2a.fireball.fireball.orange"))
         .atLocation({ x: pos.x + 350, y: pos.y - 850 })
         .stretchTo(pos)
         .scale(fireScale * 1.1)
@@ -111,7 +111,7 @@ for (let i = 0; i < positions.length; i++) {
 
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.ground_cracks.orange.01"))
+        .file(closest("jb2a.impact.ground_crack.01.orange"))
         .atLocation(pos)
         .belowTokens()
         .scale(fireScale * 2.2)
@@ -138,7 +138,7 @@ for (let i = 0; i < positions.length; i++) {
     // 5. Lingering magma burn fires at impact crater
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.fire_place.loop.orange"))
+        .file(closest("jb2a.fireplace.01.orange"))
         .atLocation(pos)
         .belowTokens()
         .scale(fireScale * 0.95)

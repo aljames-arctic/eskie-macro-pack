@@ -116,7 +116,7 @@ function addStormCloudToSequence(sequence, centerPosition, config = {}) {
     // Outer dark storm cloud swirl
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.fog_of_war.circle.grey"))
+        .file(closest("jb2a.fog.01.grey"))
         .atLocation(centerPosition)
         .size(cloudSize, { gridUnits: true })
         .opacity(0.65)

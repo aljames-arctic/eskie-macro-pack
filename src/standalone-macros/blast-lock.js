@@ -82,6 +82,11 @@ seq.effect()
     .elevation(safeElevation)
     .zIndex(11);
 
+// Sound effect
+seq.sound()
+    .file(closest("psfx.cantrips.thunderclap.v1"))
+    .volume(0.5);
+
 // Caster muzzle flash
 seq.effect()
     .delay(225)

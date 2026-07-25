@@ -31,14 +31,17 @@ const KNOWN_STANDALONE_MACROS = [
     'finger-of-death.js',
     'fire-blast.js',
     'fire-shield.js',
+    'firecracker.js',
     'flurry-of-blows.js',
     'fly.js',
+    'gate.js',
     'grease.js',
     'guiding-bolt.js',
     'hacking.js',
     'healing-word.js',
     'hex.js',
     'hide.js',
+    'hit-the-dirt.js',
     'levitation.js',
     'lightning-bolt.js',
     'magic-missile.js',
@@ -63,7 +66,9 @@ const KNOWN_STANDALONE_MACROS = [
     'suggestion.js',
     'sword-art-online.js',
     'tashas-caustic-brew.js',
-    'true-strike.js'
+    'true-strike.js',
+    'vicious-mockery.js',
+    'vortex-warp.js'
 ];
 
 /**

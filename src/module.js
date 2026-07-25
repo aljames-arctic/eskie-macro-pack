@@ -3,6 +3,7 @@ import { autoanimations } from './integration/autoanimations.js';
 import { socketlibapi, socket } from './integration/socketlib.js';
 import { loadWorldScripts } from './world-scripts/loader.js';
 import { MODULE_ID } from './lib/constants.js';
+import { crosshair } from './lib/crosshairs.js';
 import { standaloneMacros } from './lib/standalone-macros.js';
 import { template } from './lib/templates.js';
 
@@ -39,6 +40,7 @@ Hooks.once('init', async () => {
         const moduleRecord = game.modules.get(MODULE_ID);
         if (moduleRecord) {
             moduleRecord.api = {
+                crosshair,
                 socket,
                 standaloneMacros,
                 template,

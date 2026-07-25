@@ -314,7 +314,7 @@ for (const target of targets) {
     // Impact: Ground Scorch Mark
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.impact.ground_crack.01.orange"))
+        .file(closest("jb2a.impact.ground_crack.orange.01"))
         .atLocation(target)
         .belowTokens()
         .scaleToObject(0.8, { considerTokenScale: true })
@@ -326,7 +326,7 @@ for (const target of targets) {
     // Impact: Ember Sparks Impact
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.particles.outward.orange.01.02"))
+        .file(closest("jb2a.particles.outward.orange.01.03"))
         .atLocation(target)
         .scaleToObject(1.2, { considerTokenScale: true })
         .fadeIn(100)

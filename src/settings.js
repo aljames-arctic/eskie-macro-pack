@@ -2,11 +2,14 @@ import { MODULE_ID } from "./lib/constants.js";
 import { autorecUpdateFormApplication } from "./integration/autoanimations/updateMenu.js";
 import { WorldScriptsFormApplication } from "./world-scripts/worldScriptsMenu.js";
 import { RecommendedModulesFormApplication } from "./recommended-modules/recommendedModulesMenu.js";
+import { updateMacroCompendiums } from "./lib/standalone-macros.js";
 import { log } from './lib/logger.js';
 
 /* Initialize Module Settings */
 Hooks.once('init', function() {
     log.info('Initializing Eskie Macro Pack settings');
+
+    const isDevBuild = game.modules.get(MODULE_ID)?.version === "#{VERSION}#";
 
     // Recommended Modules Guide Menu
     game.settings.registerMenu(MODULE_ID, 'recommendedModules', {
@@ -16,6 +19,28 @@ Hooks.once('init', function() {
         type: RecommendedModulesFormApplication,
         restricted: false
     });
+
+    // Dev-only standalone macro compendium sync menu (enabled when version is #{VERSION}#)
+    if (isDevBuild) {
+        game.settings.registerMenu(MODULE_ID, 'generateCompendiums', {
+            name: 'EMP.settings.generateCompendiums.name',
+            label: 'EMP.settings.generateCompendiums.label',
+            hint: 'EMP.settings.generateCompendiums.hint',
+            icon: 'fa-solid fa-arrows-rotate',
+            type: class extends FormApplication {
+                constructor(...args) {
+                    super(...args);
+                    updateMacroCompendiums().then(() => {
+                        ui.notifications.info("EMP: Standalone macros synced to compendium!");
+                    }).catch((err) => {
+                        ui.notifications.error(`EMP: Failed to sync compendiums: ${err.message}`);
+                    });
+                }
+                render() { return this; }
+            },
+            restricted: true
+        });
+    }
 
     // World Scripts Configuration Menu
     game.settings.registerMenu(MODULE_ID, 'worldScripts', {

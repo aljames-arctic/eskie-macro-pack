@@ -144,7 +144,7 @@ for (const target of targets) {
     sequence.effect()
         .name(targetLabel)
         .delay(550)
-        .file(closest("jb2a.ray_of_enfeeblement.purple"))
+        .file(closest("jb2a.energy_beam.normal.purple"))
         .atLocation(token)
         .stretchTo(target, { attachTo: true })
         .duration(800)

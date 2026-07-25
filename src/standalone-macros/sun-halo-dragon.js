@@ -60,6 +60,22 @@ seq.effect()
     .duration(3500);
 
 seq.effect()
+    .copySprite(token)
+    .spriteRotation(-tokenRotation)
+    .scaleToObject(1, { considerTokenScale: true })
+    .atLocation(token)
+    .animateProperty("spriteContainer", "position.x", { from: 0, to: xdelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint", delay: 2150 })
+    .animateProperty("spriteContainer", "position.y", { from: 0, to: ydelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint", delay: 2150 })
+    .duration(2650)
+    .fadeIn(100, { delay: 2650 })
+    .fadeOut(250)
+    .filter("Blur", { blurX: 15, blurY: 0 });
+
+seq.sound()
+    .file("psfx.2nd-level-spells.misty-step.v1.intro.fire")
+    .volume(0.5);
+
+seq.effect()
     .file(closest("eskie.screen_overlay.speed_lines.horizontal.02.redyellow"))
     .screenSpace()
     .screenSpaceScale({ fitX: true, fitY: true })
@@ -90,7 +106,202 @@ seq.effect()
     .zIndex(0.1)
     .belowTokens()
     .animateProperty("spriteContainer", "position.x", { from: 0, to: xdelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint", delay: 2150 })
-    .animateProperty("spriteContainer", "position.y", { from: 0, to: ydelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint", delay: 2150 });
+    .animateProperty("spriteContainer", "position.y", { from: 0, to: ydelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint", delay: 2150 })
+    .animateProperty("sprite", "rotation", { from: 0, to: 90, duration: 50, ease: "easeOutQuint", delay: 2050 });
+
+// Dragon Eyes
+seq.effect()
+    .file(closest("eskie.fire.03.redorange"))
+    .atLocation(token, { offset: { x: -0.3, y: -0.15 }, gridUnits: true })
+    .scaleToObject(0.5)
+    .playbackRate(1.2)
+    .mirrorX()
+    .zIndex(1);
+
+seq.effect()
+    .file(closest("eskie.fire.03.redorange"))
+    .atLocation(token, { offset: { x: 0.3, y: -0.2 }, gridUnits: true })
+    .scaleToObject(0.5)
+    .playbackRate(1.2)
+    .zIndex(1);
+
+function createDeathEffect(targetToken, delay = 2250) {
+    const gs = canvas.grid.size ?? 100;
+    const cx = targetToken.center.x;
+    const cy = targetToken.center.y;
+    const tRot = targetToken.document?.rotation ?? targetToken.rotation ?? 0;
+    const tName = targetToken.document?.name ?? targetToken.name ?? "Target";
+
+    const dSeq = new Sequence();
+
+    dSeq.effect()
+        .delay(delay - 1000)
+        .file(closest("eskie.particle.03.orange"))
+        .atLocation(targetToken, { randomOffset: 0.5, gridUnits: true })
+        .scaleToObject(2)
+        .randomRotation()
+        .zIndex(3);
+
+    dSeq.effect()
+        .delay(delay - 1000)
+        .copySprite(targetToken)
+        .spriteRotation(-tRot)
+        .atLocation(targetToken)
+        .scaleToObject(1, { considerTokenScale: true })
+        .loopProperty("spriteContainer", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
+        .duration(250)
+        .opacity(0.5)
+        .zIndex(3);
+
+    dSeq.effect()
+        .delay(delay)
+        .file(closest("eskie.slice.01.white.rainbow"))
+        .atLocation(targetToken)
+        .scaleToObject(4)
+        .rotate(-45)
+        .zIndex(5);
+
+    dSeq.effect()
+        .delay(delay)
+        .file(closest("eskie.particle.03.orange"))
+        .atLocation(targetToken)
+        .scaleToObject(2)
+        .randomRotation()
+        .zIndex(4);
+
+    dSeq.wait(500);
+
+    dSeq.animation()
+        .on(targetToken)
+        .opacity(0);
+
+    // Top half mask copy
+    dSeq.effect()
+        .copySprite(targetToken)
+        .spriteRotation(-tRot)
+        .name(`${tName}Top`)
+        .scaleToObject(1, { considerTokenScale: true })
+        .atLocation(targetToken)
+        .shape("polygon", {
+            lineSize: 1,
+            lineColor: "#FF0000",
+            fillColor: "#FF0000",
+            points: [{ x: -1, y: -1 }, { x: 1, y: 1 }, { x: 1, y: -1 }],
+            fillAlpha: 1,
+            gridUnits: true,
+            isMask: true,
+            name: "test"
+        })
+        .moveTowards(
+            { x: cx + gs * 0.25, y: cy - gs * 0.25 },
+            { rotate: false, ease: "easeOutCubic", delay: delay }
+        )
+        .duration(3000)
+        .persist()
+        .fadeOut(1000);
+
+    // Bottom half mask copy
+    dSeq.effect()
+        .copySprite(targetToken)
+        .spriteRotation(-tRot)
+        .name(`${tName}Bottom`)
+        .scaleToObject(1, { considerTokenScale: true })
+        .atLocation(targetToken)
+        .shape("polygon", {
+            lineSize: 1,
+            lineColor: "#FF0000",
+            fillColor: "#FF0000",
+            points: [{ x: -1, y: -1 }, { x: 1, y: 1 }, { x: -1, y: 1 }],
+            fillAlpha: 1,
+            gridUnits: true,
+            isMask: true,
+            name: "test"
+        })
+        .duration(2500)
+        .persist()
+        .fadeOut(1000);
+
+    // Burn mask top
+    dSeq.effect()
+        .delay(delay + 250)
+        .file(closest("eskie.burn.token_mask.orange.fast"))
+        .name(`${tName}Top`)
+        .scaleToObject(1.1)
+        .atLocation({ x: cx + gs * 0.25, y: cy - gs * 0.25 })
+        .shape("polygon", {
+            lineSize: 1,
+            lineColor: "#FF0000",
+            fillColor: "#FF0000",
+            points: [{ x: -1, y: -1 }, { x: 1, y: 1 }, { x: 1, y: -1 }],
+            fillAlpha: 1,
+            gridUnits: true,
+            isMask: true,
+            name: "test"
+        })
+        .moveTowards(
+            { x: cx + gs * 0.25, y: cy - gs * 0.25 },
+            { rotate: false, ease: "easeOutCubic", delay: 2000 }
+        );
+
+    // Burn mask bottom
+    dSeq.effect()
+        .delay(delay + 250)
+        .file(closest("eskie.burn.token_mask.orange.fast"))
+        .name(`${tName}Bottom`)
+        .scaleToObject(1.1)
+        .atLocation(targetToken)
+        .shape("polygon", {
+            lineSize: 1,
+            lineColor: "#FF0000",
+            fillColor: "#FF0000",
+            points: [{ x: -1, y: -1 }, { x: 1, y: 1 }, { x: -1, y: 1 }],
+            fillAlpha: 1,
+            gridUnits: true,
+            isMask: true,
+            name: "test"
+        })
+        .zIndex(1);
+
+    // Embers top
+    dSeq.effect()
+        .delay(delay + 250)
+        .file(closest("eskie.burn.embers.orange"))
+        .name(`${tName}Top`)
+        .scaleToObject(1.5)
+        .atLocation({ x: cx + gs * 0.25, y: cy - gs * 0.25 })
+        .mirrorX()
+        .fadeIn(500)
+        .spriteOffset({ x: 0.3, y: -0.3 }, { gridUnits: true });
+
+    // Embers bottom
+    dSeq.effect()
+        .delay(delay + 250)
+        .file(closest("eskie.burn.embers.orange"))
+        .name(`${tName}Bottom`)
+        .scaleToObject(1.5)
+        .atLocation(targetToken)
+        .mirrorX()
+        .fadeIn(500)
+        .spriteOffset({ x: 0, y: 0 }, { gridUnits: true })
+        .spriteRotation(-45)
+        .zIndex(2);
+
+    return dSeq;
+}
+
+seq.thenDo(() => {
+    for (const tgt of targets) {
+        createDeathEffect(tgt).play();
+    }
+});
+
+seq.effect()
+    .delay(2100)
+    .file(closest("eskie.particle.04.orange"))
+    .atLocation(token)
+    .scaleToObject(5)
+    .animateProperty("spriteContainer", "position.x", { from: 0, to: -7.5, duration: 500, gridUnits: true, ease: "easeOutQuint" })
+    .belowTokens();
 
 seq.effect()
     .file(closest("eskie.velocity.01.white"))
@@ -104,6 +315,12 @@ seq.effect()
 seq.canvasPan()
     .delay(2000)
     .shake({ duration: 250, strength: 1.5, rotation: false, fadeOut: 250 });
+
+seq.wait(1000);
+
+seq.sound()
+    .file("psfx.casting.fire-side.001")
+    .volume(0.5);
 
 seq.wait(1000);
 
@@ -134,18 +351,5 @@ seq.animation()
     .on(token)
     .teleportTo(pos2)
     .opacity(1);
-
-// Demon slice decapitation death effect on targeted enemies
-for (const target of targets) {
-    const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
-    seq.effect()
-        .copySprite(target)
-        .spriteRotation(-targetRotation)
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .filter("ColorMatrix", { saturate: -1, brightness: 2 })
-        .duration(800)
-        .fadeOut(300);
-}
 
 await seq.play();

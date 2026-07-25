@@ -48,17 +48,22 @@ const KNOWN_STANDALONE_MACROS = [
     'rage.js',
     'rapid-strike.js',
     'revivify.js',
+    'sanctuary.js',
     'shapechange.js',
     'shocking-grasp.js',
     'silence.js',
+    'sky-rocket.js',
     'sleep.js',
     'sneak-attack.js',
     'speak-with-dead.js',
     'spike-growth.js',
     'strength-before-death.js',
     'stunning-fist.js',
+    'stunning-strike.js',
+    'suggestion.js',
     'sword-art-online.js',
-    'tashas-caustic-brew.js'
+    'tashas-caustic-brew.js',
+    'true-strike.js'
 ];
 
 /**

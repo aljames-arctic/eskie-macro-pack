@@ -65,12 +65,12 @@ async function create(token, targets = [], config = {}) {
             .filter("Blur", { blurX: 15, blurY: 0 });
 
         seq.sound()
-            .file("psfx.2nd-level-spells.misty-step.v1.intro.fire")
+            .file(closest("psfx.2nd-level-spells.misty-step.v1.intro.fire"))
             .volume(sound.volume)
             .playIf(sound.enabled);
 
         seq.effect()
-            .file(closest("eskie.screen_overlay.speed_lines.horizontal.02.redyellow"))
+            .file(closest("eskie.screen_overlay.speed_lines.horizontal.02.orange"))
             .screenSpace()
             .screenSpaceScale({fitX:true,fitY:true})
             .mirrorX()
@@ -97,7 +97,7 @@ async function create(token, targets = [], config = {}) {
 
         // Fire Aura
         .effect()
-            .file(closest("eskie.aura.token.generic.01.redorange"))
+            .file(closest("eskie.aura.token.generic.01.red"))
             .atLocation(token)
             .scaleToObject(2.1)
             .zIndex(0.1)
@@ -109,14 +109,14 @@ async function create(token, targets = [], config = {}) {
 
         // Dragon Eyes
         .effect()
-            .file(closest("eskie.fire.03.redorange"))
+            .file(closest("eskie.fire.03.orange"))
             .atLocation(token, {offset:{x:-0.3, y:-0.15}, gridUnits:true})
             .scaleToObject(0.5)
             .playbackRate(1.2)
             .mirrorX()
             .zIndex(1)
         .effect()
-            .file(closest("eskie.fire.03.redorange"))
+            .file(closest("eskie.fire.03.orange"))
             .atLocation(token, {offset:{x:0.3, y:-0.2}, gridUnits:true})
             .scaleToObject(0.5)
             .playbackRate(1.2)
@@ -181,7 +181,7 @@ async function create(token, targets = [], config = {}) {
 
         .wait(1000);
         seq.sound()
-            .file("psfx.casting.fire-side.001")
+            .file(closest("psfx.casting.fire-side.001"))
             .volume(sound.volume)
             .playIf(sound.enabled);
         seq.wait(1000);

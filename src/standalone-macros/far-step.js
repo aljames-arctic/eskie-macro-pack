@@ -57,7 +57,7 @@ if (!position || position.cancelled) return;
 
 const sequence = new Sequence();
 
-// 1. Departure Blue/Cyan explosion flash at source token
+// 1. Departure explosion flash at source token
 sequence.effect()
     .name(id)
     .file(closest("jb2a.explosion.07.bluewhite"))
@@ -66,65 +66,21 @@ sequence.effect()
     .fadeOut(1000)
     .scale({ x: tokenWidth / 4, y: tokenHeight / 4 });
 
-// Rapid sequential bonus action yellow/cyan portal departure rings
-sequence.effect()
-    .name(id)
-    .file(closest("jb2a.portals.vertical.vortex.yellow"))
-    .atLocation(token)
-    .scaleToObject(1.5)
-    .duration(800)
-    .fadeOut(300)
-    .belowTokens();
-
-sequence.effect()
-    .name(id)
-    .file(closest("jb2a.portals.vertical.vortex.cyan"))
-    .atLocation(token)
-    .scaleToObject(1.8)
-    .delay(100)
-    .duration(800)
-    .fadeOut(300)
-    .belowTokens();
-
 // Hide token during step motion
 sequence.animation()
     .on(token)
     .opacity(0);
 
-// 2. Rapid sequential yellow & cyan energy strand portal step streaks stretching from token to destination
+// 2. Energy strand stretching from token to destination
 sequence.effect()
     .name(id)
     .file(closest("jb2a.energy_strands.range.standard.blue.04"))
     .atLocation(token)
     .stretchTo(position)
-    .filter("ColorMatrix", { hue: 180, saturate: 1.5 })
-    .playbackRate(1.5)
-    .opacity(0.95);
+    .waitUntilFinished(-2000)
+    .playbackRate(1.25);
 
-sequence.effect()
-    .name(id)
-    .file(closest("jb2a.energy_strands.range.standard.blue.04"))
-    .atLocation(token)
-    .stretchTo(position)
-    .filter("ColorMatrix", { hue: 45, saturate: 2.0, brightness: 1.2 })
-    .delay(50)
-    .playbackRate(1.75)
-    .opacity(0.85)
-    .waitUntilFinished(-1800);
-
-// Speed motion trail ghost copy during transit
-sequence.effect()
-    .name(id)
-    .copySprite(token)
-    .spriteRotation(-(token.document?.rotation ?? 0))
-    .atLocation(token)
-    .stretchTo(position)
-    .filter("ColorMatrix", { hue: 40, saturate: 2 })
-    .filter("Blur", { blurX: 8, blurY: 2 })
-    .duration(400)
-    .fadeOut(200);
-
-// 3. Arrival explosion & yellow/cyan portal rings at destination
+// 3. Arrival explosion at destination
 sequence.effect()
     .name(id)
     .file(closest("jb2a.explosion.07.bluewhite"))
@@ -132,14 +88,6 @@ sequence.effect()
     .scale({ x: tokenWidth / 4, y: tokenHeight / 4 })
     .scaleIn(0, 500, { ease: "easeOutCubic" })
     .fadeOut(1000);
-
-sequence.effect()
-    .name(id)
-    .file(closest("jb2a.portals.vertical.vortex.yellow"))
-    .atLocation(position)
-    .scaleToObject(1.6)
-    .duration(700)
-    .fadeOut(250);
 
 // 4. Teleport token and snap to grid
 sequence.animation()
@@ -159,18 +107,6 @@ sequence.effect()
     .attachTo(token, { bindAlpha: false })
     .scaleToObject(2)
     .waitUntilFinished();
-
-// Lingering yellow/cyan speed momentum particle trail on token
-sequence.effect()
-    .name(`${id}-con`)
-    .file(closest("jb2a.particles.outward.cyan.01.03"))
-    .atLocation(token)
-    .attachTo(token, { bindAlpha: false })
-    .scaleToObject(1.5)
-    .duration(1200)
-    .fadeIn(200)
-    .fadeOut(400)
-    .belowTokens();
 
 // 6. Restore token visibility
 sequence.animation()

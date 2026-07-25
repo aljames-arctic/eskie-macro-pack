@@ -67,16 +67,16 @@ seq.effect()
     .randomRotation();
 
 if (flaps !== 0) {
-    seq.effect()
+    let wing1 = seq.effect()
         .name(label)
         .file(closest("eskie.wings.bird.01"))
         .attachTo(token, { offset: { y: -0.5 - 0.1 * sway }, gridUnits: true, bindAlpha: false })
         .scaleToObject(3 * wingSize)
         .animateProperty("spriteContainer", "position.y", { from: 0.5 + 0.1 * sway, to: 0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
         .loopProperty("spriteContainer", "position.y", { values: [0.075 * sway, 0.1 * sway, 0.025 * sway, 0, 0.025 * sway, 0.05 * sway], duration: 1000, gridUnits: true, ease: "linear", pingPong: true })
-        .playbackRate(2)
-        .loopOptions({ loops: flaps, loopDelay: 1000, endOnLastLoop: true })
-        .fadeIn(500, { ease: "easeOutCubic", delay: 350 })
+        .playbackRate(2);
+    if (flaps > 0) wing1.loopOptions({ loops: flaps, loopDelay: 1000, endOnLastLoop: true });
+    wing1.fadeIn(500, { ease: "easeOutCubic", delay: 350 })
         .fadeOut(500, { ease: "easeOutCubic" })
         .tint("#ff0000")
         .filter("ColorMatrix", { brightness: 5, saturate: -1 })
@@ -84,16 +84,16 @@ if (flaps !== 0) {
         .zIndex(0)
         .persist();
 
-    seq.effect()
+    let wing2 = seq.effect()
         .name(label)
         .file(closest("eskie.wings.bird.01"))
         .attachTo(token, { offset: { y: -0.5 - 0.1 * sway }, gridUnits: true, bindAlpha: false })
         .scaleToObject(3 * wingSize)
         .animateProperty("spriteContainer", "position.y", { from: 0.5 + 0.1 * sway, to: 0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
         .loopProperty("spriteContainer", "position.y", { values: [0.075 * sway, 0.1 * sway, 0.025 * sway, 0, 0.025 * sway, 0.05 * sway], duration: 1000, gridUnits: true, ease: "linear", pingPong: true })
-        .playbackRate(2)
-        .loopOptions({ loops: flaps, loopDelay: 1000, endOnLastLoop: true })
-        .fadeIn(500, { ease: "easeOutCubic", delay: 350 })
+        .playbackRate(2);
+    if (flaps > 0) wing2.loopOptions({ loops: flaps, loopDelay: 1000, endOnLastLoop: true });
+    wing2.fadeIn(500, { ease: "easeOutCubic", delay: 350 })
         .fadeOut(500, { ease: "easeOutCubic" })
         .tint("#ff0000")
         .filter("ColorMatrix", { brightness: 3, saturate: 1, hue: 20 })

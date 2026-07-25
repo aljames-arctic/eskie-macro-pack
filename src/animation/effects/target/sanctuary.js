@@ -12,7 +12,7 @@ async function create(token, target, config = {}) {
     let seq = new Sequence()
         .effect()
             .atLocation(token)
-            .file(closest(`jb2a.markers.light.complete.blue`))
+            .file(closest(`jb2a.markers.light.complete.yellow`))
             .scaleToObject(2)
             .scaleIn(0, 600, {ease: "easeOutCubic"})
             .belowTokens()
@@ -25,7 +25,7 @@ async function create(token, target, config = {}) {
 
         .effect()
             .atLocation(token)
-            .file(closest(`jb2a.magic_signs.circle.02.abjuration.loop.blue`))
+            .file(closest(`jb2a.magic_signs.circle.02.conjuration.loop.blue`))
             .scaleToObject(1.25)
             .rotateIn(180, 600, {ease: "easeOutCubic"})
             .scaleIn(0, 600, {ease: "easeOutCubic"})
@@ -37,7 +37,7 @@ async function create(token, target, config = {}) {
 
         .effect()
             .atLocation(token)
-            .file(closest(`jb2a.magic_signs.circle.02.abjuration.loop.blue`))
+            .file(closest(`jb2a.magic_signs.circle.02.conjuration.loop.blue`))
             .scaleToObject(1.25)
             .rotateIn(180, 600, {ease: "easeOutCubic"})
             .scaleIn(0, 600, {ease: "easeOutCubic"})
@@ -71,7 +71,7 @@ async function create(token, target, config = {}) {
             .delay(1200)
 
         .effect()
-            .file(closest("jb2a.butterflies.single.blue"))
+            .file(closest("jb2a.fireflies.few.02.yellow"))
             .name(`${target.name} Sanctuary`)
             .scaleToObject(2 * target.document.texture.scaleX)
             .opacity(1)
@@ -123,7 +123,7 @@ async function create(token, target, config = {}) {
 
         .effect()
             .name(`${target.name} Sanctuary`)
-            .file(closest("jb2a.bless.200px.intro.blue"))
+            .file(closest("jb2a.bless.200px.intro.yellow"))
             .atLocation(target)
             .scaleToObject(1.5 * target.document.texture.scaleX)
             .fadeIn(2000)

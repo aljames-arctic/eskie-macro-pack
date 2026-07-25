@@ -61,7 +61,7 @@ const sequence = new Sequence();
 // Caster abjuration activation signs on casting token
 sequence.effect()
     .atLocation(token)
-    .file(closest("jb2a.markers.light.complete.blue"))
+    .file(closest("jb2a.markers.light.complete.yellow"))
     .scaleToObject(2)
     .scaleIn(0, 600, { ease: "easeOutCubic" })
     .belowTokens()
@@ -74,7 +74,7 @@ sequence.wait(250);
 
 sequence.effect()
     .atLocation(token)
-    .file(closest("jb2a.magic_signs.circle.02.abjuration.loop.blue"))
+    .file(closest("jb2a.magic_signs.circle.02.conjuration.loop.blue"))
     .scaleToObject(1.25)
     .rotateIn(180, 600, { ease: "easeOutCubic" })
     .scaleIn(0, 600, { ease: "easeOutCubic" })
@@ -86,7 +86,7 @@ sequence.effect()
 
 sequence.effect()
     .atLocation(token)
-    .file(closest("jb2a.magic_signs.circle.02.abjuration.loop.blue"))
+    .file(closest("jb2a.magic_signs.circle.02.conjuration.loop.blue"))
     .scaleToObject(1.25)
     .rotateIn(180, 600, { ease: "easeOutCubic" })
     .scaleIn(0, 600, { ease: "easeOutCubic" })
@@ -130,7 +130,7 @@ for (const target of targets) {
 
     // Floating butterflies divine spark motif (persistent)
     sequence.effect()
-        .file(closest("jb2a.butterflies.single.blue"))
+        .file(closest("jb2a.fireflies.few.02.yellow"))
         .name(label)
         .scaleToObject(2 * scaleX)
         .opacity(1)
@@ -186,7 +186,7 @@ for (const target of targets) {
     // Protective shield intro field
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.bless.200px.intro.blue"))
+        .file(closest("jb2a.bless.200px.intro.yellow"))
         .atLocation(target)
         .scaleToObject(1.5 * scaleX)
         .fadeIn(2000)

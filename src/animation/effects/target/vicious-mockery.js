@@ -110,7 +110,7 @@ async function createViciousMockeryImpact(target, word, config = {}) {
         .filter("ColorMatrix", { hue: 50 })
 
         .effect()
-        .file(closest("jb2a.particles.outward.orange.02.02"))
+        .file(closest("jb2a.particles.outward.orange.02.03"))
         .atLocation(target, { offset: { x: -0.25 * target.document.width, y: -0.3 * target.document.width }, randomOffset: 0.1, gridUnits: true })
         .scale(0.25 * target.document.width)
         .duration(800)

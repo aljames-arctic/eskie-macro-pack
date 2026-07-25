@@ -12,6 +12,16 @@ const targeted = Array.from(game.user.targets);
 let red = controlled[0];
 let blue = targeted[0] ?? controlled[1];
 
+const isPlaying = Sequencer.EffectManager.getEffects({ name: "gob" }).length > 0 ||
+                  Sequencer.EffectManager.getEffects({ name: "Trail" }).length > 0;
+if (isPlaying) {
+    Sequencer.EffectManager.endEffects({ name: "gob" });
+    Sequencer.EffectManager.endEffects({ name: "Trail" });
+    if (red) new Sequence().animation().on(red).opacity(1).play();
+    if (blue) new Sequence().animation().on(blue).opacity(1).play();
+    return ui.notifications.info("Stopped Attack Attack duel.");
+}
+
 if (!red || !blue || red.id === blue.id) {
     return ui.notifications.warn("Please select 1 token and target 1 opponent token to play the Attack Attack duel show!");
 }

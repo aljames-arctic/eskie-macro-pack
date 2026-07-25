@@ -47,7 +47,7 @@ const crosshairConfig = {
 const position = await Sequencer.Crosshair.show(crosshairConfig);
 if (!position || position.cancelled || !position.x) return;
 
-const portalFile = closest("jb2a.portals.horizontal.vortex.cyan");
+const portalFile = closest("jb2a.portals.horizontal.vortex.purple");
 
 let sequence = new Sequence();
 

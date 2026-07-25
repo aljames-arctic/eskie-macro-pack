@@ -139,7 +139,7 @@ async function playShapechange(token, targetForm, effectLabel, shimmerLabel) {
     sequence
         .effect()
         .delay(600)
-        .file(closest("jb2a.energy_strands.in.green.01.0"))
+        .file(closest("jb2a.energy_strands.in.green.01"))
         .attachTo(token)
         .duration(3200)
         .fadeIn(400)

@@ -89,7 +89,7 @@ seq.effect()
 
 seq.effect()
     .name(effectName)
-    .file(closest("jb2a.bolt.lightning.yellow"))
+    .file(closest("jb2a.bolt.fire.yellow"))
     .atLocation(token)
     .stretchTo(position)
     .playbackRate(3.0)

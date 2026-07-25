@@ -27,23 +27,6 @@ const DEFAULT_CONFIG = {
     wolfForm: "https://files.d20.io/images/390116931/NRBle2scKhQmU-q0EHskPw/original.png",
 };
 
-const tokenId = token.id ?? token.document?.id ?? "";
-const label = `shapechange - ${tokenId}`;
-const persistentShimmerLabel = `shapechange-shimmer - ${tokenId}`;
-
-// Toggle / re-entrant persistent effect handling:
-// Check if Shapechange active effect is currently running on token
-const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token });
-const activeShimmer = Sequencer.EffectManager.getEffects({ name: persistentShimmerLabel, object: token });
-
-if ((activeEffects?.length ?? 0) > 0 || (activeShimmer?.length ?? 0) > 0) {
-    // End active persistent effects and trigger revert
-    Sequencer.EffectManager.endEffects({ name: label, object: token });
-    Sequencer.EffectManager.endEffects({ name: persistentShimmerLabel, object: token });
-    await playRevert(token);
-    return;
-}
-
 // Fetch or record human base form in flags
 let shapechangeData = token.document?.getFlag("eskie-macros", "shapechange");
 const currentTexture = token.document?.texture?.src ?? "";
@@ -53,6 +36,12 @@ if (!shapechangeData) {
 } else if (!shapechangeData.baseForm) {
     shapechangeData.baseForm = currentTexture;
     await token.document?.setFlag("eskie-macros", "shapechange", shapechangeData);
+}
+
+// Toggle re-entrant handling: if token is shifted, revert back to human form
+if (shapechangeData.baseForm && currentTexture !== shapechangeData.baseForm) {
+    await playRevert(token);
+    return;
 }
 
 // Dialog prompt for player choice of form
@@ -78,19 +67,19 @@ const choice = await Dialog.wait({
 if (!choice) return;
 
 const targetForm = choice === "hybrid" ? DEFAULT_CONFIG.hybridForm : DEFAULT_CONFIG.wolfForm;
-await playShapechange(token, targetForm, label, persistentShimmerLabel);
+await playShapechange(token, targetForm);
 
 /**
  * Executes the forward Shapechange transformation sequence with primal energy cocoon,
- * token ghosts, wild shape morph flash, smoke puff, claw impacts, and persistent shimmer.
+ * token ghosts, wild shape morph flash, and claw impacts.
  */
-async function playShapechange(token, targetForm, effectLabel, shimmerLabel) {
+async function playShapechange(token, targetForm) {
     const sequence = new Sequence();
     const tokenWidth = token.document?.width ?? 1;
     const scaleX = token.document?.texture?.scaleX ?? 1;
     const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
 
-    // 1. PRIMAL SHIFTING ENERGY COCOON AURA — Dark outflow vortex beneath token
+    // 1. Dark outflow vortex beneath token — builds atmosphere
     sequence
         .effect()
         .file(closest("jb2a.extras.tmfx.outflow.circle.01"))
@@ -120,7 +109,7 @@ async function playShapechange(token, targetForm, effectLabel, shimmerLabel) {
         })
         .belowTokens();
 
-    // 2. PRIMAL ENERGY SWIRL — Swirling dark vortex ring forming cocoon base
+    // 2. Swirling dark vortex ring
     sequence
         .effect()
         .delay(400)
@@ -135,20 +124,7 @@ async function playShapechange(token, targetForm, effectLabel, shimmerLabel) {
         .filter("ColorMatrix", { saturate: 0, brightness: 0 })
         .belowTokens();
 
-    // 3. PRIMAL ENERGY STRANDS COCOON — Green/wild natural strands wrapping surrounding aura
-    sequence
-        .effect()
-        .delay(600)
-        .file(closest("jb2a.energy_strands.in.green.01"))
-        .attachTo(token)
-        .duration(3200)
-        .fadeIn(400)
-        .fadeOut(600)
-        .scaleToObject(1.65, { considerTokenScale: true })
-        .opacity(0.85)
-        .belowTokens();
-
-    // 4. WARPING TOKEN GHOST — Current token sprite stretches and squashes
+    // 3. Ghost of current token sprite — stretches and squashes as it warps
     sequence
         .effect()
         .copySprite(token)
@@ -181,7 +157,7 @@ async function playShapechange(token, targetForm, effectLabel, shimmerLabel) {
         .opacity(0.65)
         .repeats(3, 800, 800);
 
-    // 5. FIRST TARGET FORM GHOST — Very faint, brightened emergence
+    // 4. First target form ghost — very faint, brightened
     sequence
         .effect()
         .file(closest(targetForm))
@@ -213,7 +189,7 @@ async function playShapechange(token, targetForm, effectLabel, shimmerLabel) {
         .opacity(0.25)
         .filter("ColorMatrix", { brightness: 0.75 });
 
-    // 6. SECOND TARGET FORM GHOST — Semiapparent intermediate shape
+    // 5. Second target form ghost — intermediate shape
     sequence
         .effect()
         .file(closest(targetForm))
@@ -246,7 +222,7 @@ async function playShapechange(token, targetForm, effectLabel, shimmerLabel) {
         .opacity(0.5)
         .filter("ColorMatrix", { brightness: 0.5 });
 
-    // 7. THIRD TARGET FORM GHOST — Nearly solid wild manifest
+    // 6. Third target form ghost — nearly solid wild manifest
     sequence
         .effect()
         .file(closest(targetForm))
@@ -279,7 +255,7 @@ async function playShapechange(token, targetForm, effectLabel, shimmerLabel) {
         .opacity(0.75)
         .filter("ColorMatrix", { brightness: 0.25 });
 
-    // 8. GLOWING RED EYES FLASH — Peak primal instinct flash
+    // 7. Glowing red eyes flash at peak of transformation
     sequence
         .effect()
         .delay(3000)
@@ -288,9 +264,9 @@ async function playShapechange(token, targetForm, effectLabel, shimmerLabel) {
         .attachTo(token)
         .scaleToObject(1.15, { considerTokenScale: true })
         .fadeOut(500)
-        .zIndex(2);
+        .zIndex(1);
 
-    // 9. FINAL BLURRED GHOST OF TARGET FORM BEFORE SWAP
+    // 8. Final blurred ghost of target form before swap
     sequence
         .effect()
         .file(closest(targetForm))
@@ -324,7 +300,7 @@ async function playShapechange(token, targetForm, effectLabel, shimmerLabel) {
         .opacity(0.75)
         .filter("ColorMatrix", { brightness: 0.2 });
 
-    // 10. CURRENT TOKEN CLIMAX BLUR & DARKEN
+    // 9. Current token sprite climax blur & darken
     sequence
         .effect()
         .copySprite(token)
@@ -362,38 +338,12 @@ async function playShapechange(token, targetForm, effectLabel, shimmerLabel) {
         .zIndex(0)
         .waitUntilFinished(-500);
 
-    // 11. WILD SHAPE MORPH FLASH — Intense energy flash at instant of image transformation
-    sequence
-        .effect()
-        .delay(3800)
-        .file(closest("jb2a.impact.004.dark_red"))
-        .atLocation(token)
-        .scaleToObject(2.5, { considerTokenScale: true })
-        .fadeIn(100)
-        .fadeOut(400)
-        .filter("ColorMatrix", { saturate: 1, brightness: 0.5 })
-        .zIndex(4);
-
-    // 12. SMOKE PUFF — Billowing shapechange smoke puff cloud masking the physical morph
-    sequence
-        .effect()
-        .delay(3850)
-        .file(closest("jb2a.smoke.puff.side.01.white"))
-        .atLocation(token)
-        .scaleToObject(2.2, { considerTokenScale: true })
-        .fadeIn(150)
-        .fadeOut(800)
-        .randomRotation()
-        .opacity(0.85)
-        .filter("ColorMatrix", { saturate: -1, brightness: -0.2 })
-        .zIndex(3);
-
-    // 13. TOKEN IMAGE SWAP — Change token image to selected shape
+    // 10. Token image swap — change texture to selected form
     sequence.thenDo(function () {
         token.document?.update({ "texture.src": targetForm });
     });
 
-    // 14. CLAW SLASH IMPACT — Underneath token post-swap
+    // 11. Claw slash impact — below token
     sequence
         .effect()
         .file(closest("jb2a.claws.200px.dark_red"))
@@ -404,7 +354,7 @@ async function playShapechange(token, targetForm, effectLabel, shimmerLabel) {
         .belowTokens()
         .zIndex(1);
 
-    // 15. DARK IMPACT BURST BENEATH TOKEN
+    // 12. Dark impact burst beneath token
     sequence
         .effect()
         .file(closest("jb2a.impact.004.dark_red"))
@@ -415,40 +365,13 @@ async function playShapechange(token, targetForm, effectLabel, shimmerLabel) {
         .filter("ColorMatrix", { brightness: 0 })
         .opacity(0.85);
 
-    // 16. PERSISTENT POLYMORPH SHIMMER EFFECTS — Endless magic shimmer aura while in wild shape
-    sequence
-        .effect()
-        .name(effectLabel)
-        .file(closest("jb2a.shimmer.01.purple"))
-        .attachTo(token)
-        .scaleToObject(1.3, { considerTokenScale: true })
-        .opacity(0.6)
-        .fadeIn(1000)
-        .fadeOut(1000)
-        .filter("ColorMatrix", { hue: 120, saturate: 0.5 })
-        .persist()
-        .belowTokens(false);
-
-    sequence
-        .effect()
-        .name(shimmerLabel)
-        .file(closest("jb2a.particles.outward.white.01.03"))
-        .attachTo(token)
-        .scaleToObject(1.4, { considerTokenScale: true })
-        .opacity(0.45)
-        .fadeIn(800)
-        .fadeOut(800)
-        .filter("ColorMatrix", { saturate: -1, brightness: 0.5 })
-        .persist()
-        .belowTokens(true);
-
     await sequence.play();
 }
 
 /**
  * Executes the revert sequence restoring the token to its base human form,
  * complete with unravelling cocoon vortex, energy dissolution particle burst,
- * smoke puff, and flash.
+ * and texture restoration.
  */
 async function playRevert(token) {
     const shapechangeData = token.document?.getFlag("eskie-macros", "shapechange");
@@ -462,10 +385,10 @@ async function playRevert(token) {
         .effect()
         .file(closest("jb2a.extras.tmfx.outflow.circle.01"))
         .attachTo(token)
-        .duration(5000)
+        .duration(6000)
         .fadeIn(500)
         .scaleIn(0, 750, { ease: "easeOutSine" })
-        .scaleOut(0, 3500, { ease: "easeOutSine" })
+        .scaleOut(0, 4000, { ease: "easeOutSine" })
         .fadeOut(500)
         .scaleToObject(1.75, { considerTokenScale: true })
         .randomRotation()
@@ -477,8 +400,8 @@ async function playRevert(token) {
         .effect()
         .file(closest(currentForm))
         .attachTo(token)
-        .duration(4200)
-        .fadeOut(3500, { ease: "easeInSine" })
+        .duration(5000)
+        .fadeOut(4000, { ease: "easeInSine" })
         .scaleToObject(1, { considerTokenScale: true })
         .loopProperty("spriteContainer", "position.x", {
             from: -0.005,
@@ -486,7 +409,7 @@ async function playRevert(token) {
             duration: 500,
             pingPong: true,
             gridUnits: true,
-            delay: 800,
+            delay: 1000,
         });
 
     sequence.wait(500);
@@ -527,31 +450,6 @@ async function playRevert(token) {
         .opacity(1)
         .repeats(14, 250, 250)
         .zIndex(0.3);
-
-    // Smoke puff on reversion
-    sequence
-        .effect()
-        .delay(1200)
-        .file(closest("jb2a.smoke.puff.side.01.white"))
-        .atLocation(token)
-        .scaleToObject(2.0, { considerTokenScale: true })
-        .fadeIn(150)
-        .fadeOut(600)
-        .randomRotation()
-        .opacity(0.8)
-        .zIndex(2);
-
-    // Wild shape morph flash during revert
-    sequence
-        .effect()
-        .delay(1200)
-        .file(closest("jb2a.impact.004.dark_red"))
-        .atLocation(token)
-        .scaleToObject(2.2, { considerTokenScale: true })
-        .fadeIn(100)
-        .fadeOut(400)
-        .filter("ColorMatrix", { saturate: 0, brightness: 0.6 })
-        .zIndex(3);
 
     // Swap token texture back to human base form
     sequence.thenDo(function () {

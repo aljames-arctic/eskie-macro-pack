@@ -75,23 +75,12 @@ async function runFaerieFire(casterToken, config = {}) {
     const color = mergedConfig.color ?? 'green';
     const targets = game.user.targets.size > 0 ? Array.from(game.user.targets) : [];
 
-    // Toggle Check: Check if active persistent effect exists on targets or caster
-    let isPlaying = false;
-    const targetsToCheck = targets.length > 0 ? targets : [casterToken];
-    for (const t of targetsToCheck) {
-        const activeFx = Sequencer.EffectManager.getEffects({ name: `${id} - ${t.name}`, object: t });
-        if (activeFx.length > 0) {
-            isPlaying = true;
-            break;
-        }
-    }
-
-    if (isPlaying) {
-        for (const t of targetsToCheck) {
-            Sequencer.EffectManager.endEffects({ name: `${id} - ${t.name}`, object: t });
-        }
+    // Toggle Check: Check if active persistent effect exists anywhere on canvas or target
+    const globalFaerieFx = Sequencer.EffectManager.getEffects({ name: `*${id}*` });
+    if (globalFaerieFx.length > 0) {
+        Sequencer.EffectManager.endEffects({ name: `*${id}*` });
         Sequencer.EffectManager.endEffects({ name: id });
-        return;
+        return ui.notifications.info("Cleared Faerie Fire aura glow.");
     }
 
     // Determine target location for cloud blast

@@ -25,9 +25,14 @@ const tokenId = token.id ?? token.document?.id ?? "";
 const label = `${id}-${tokenId}`;
 
 // Toggle existing active Dread Lord transformation
-const activeEffects = Sequencer.EffectManager.getEffects({ name: id, object: token }) ?? [];
+const activeEffects = Sequencer.EffectManager.getEffects({ name: id, object: token }).concat(
+    Sequencer.EffectManager.getEffects({ name: id })
+);
 if (activeEffects.length > 0) {
     Sequencer.EffectManager.endEffects({ name: id, object: token });
+    Sequencer.EffectManager.endEffects({ name: id });
+    Sequencer.EffectManager.endEffects({ name: label, object: token });
+    Sequencer.EffectManager.endEffects({ name: label });
     return ui.notifications.info(`Ended Dread Lord avatar transformation for ${token.name}.`);
 }
 

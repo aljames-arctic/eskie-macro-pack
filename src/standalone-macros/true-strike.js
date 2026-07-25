@@ -12,14 +12,21 @@ if (!token) return ui.notifications.warn("Please select a token!");
 
 // 2. Target Token Validation
 const targets = Array.from(game.user.targets);
+const id = "true-strike";
+const activeTrueStrike = Sequencer.EffectManager.getEffects({ name: "*TrueStrike*" }).concat(
+    Sequencer.EffectManager.getEffects({ name: "*true-strike*" })
+);
+if (activeTrueStrike.length > 0) {
+    Sequencer.EffectManager.endEffects({ name: "*TrueStrike*" });
+    Sequencer.EffectManager.endEffects({ name: "*true-strike*" });
+    Sequencer.EffectManager.endEffects({ name: id });
+    return ui.notifications.info("Ended True Strike aim lock.");
+}
+
 if (targets.length === 0) {
     return ui.notifications.warn("Please target at least one token!");
 }
 
-/**
- * Safely resolves Free vs Patreon asset paths if the eskie module is active.
- * Falls back to direct string path if running as a standalone copy-paste macro.
- */
 const closest = (path) => {
     if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
         return eskie.util.file.closest(path);
@@ -31,46 +38,7 @@ const closest = (path) => {
     return path;
 };
 
-const id = "true-strike";
 const allTokens = [token, ...targets];
-
-// 3. Toggle / Re-entrant Persistent Effect Handling
-const isEffectActive = (t) => {
-    const tokenId = t.id ?? t.document?.id ?? "";
-    const label = `${id}-${tokenId}`;
-    const glintName = `TrueStrike - Glint - trueStrike - ${t.uuid ?? ""}`;
-    const borderName = `TrueStrike - Border - trueStrike - ${t.uuid ?? ""}`;
-    return Sequencer.EffectManager.getEffects({ name: label, object: t }).length > 0 ||
-           Sequencer.EffectManager.getEffects({ name: id, object: t }).length > 0 ||
-           Sequencer.EffectManager.getEffects({ name: label }).length > 0 ||
-           Sequencer.EffectManager.getEffects({ name: glintName }).length > 0 ||
-           Sequencer.EffectManager.getEffects({ name: borderName }).length > 0;
-};
-
-const stopEffect = (t) => {
-    const tokenId = t.id ?? t.document?.id ?? "";
-    const label = `${id}-${tokenId}`;
-    const glintName = `TrueStrike - Glint - trueStrike - ${t.uuid ?? ""}`;
-    const borderName = `TrueStrike - Border - trueStrike - ${t.uuid ?? ""}`;
-    Sequencer.EffectManager.endEffects({ name: label, object: t });
-    Sequencer.EffectManager.endEffects({ name: id, object: t });
-    Sequencer.EffectManager.endEffects({ name: label });
-    Sequencer.EffectManager.endEffects({ name: id });
-    Sequencer.EffectManager.endEffects({ name: glintName });
-    Sequencer.EffectManager.endEffects({ name: borderName });
-    if (typeof Tagger !== "undefined" && Tagger.hasTags(t, "TrueStrike")) {
-        Tagger.removeTags(t, "TrueStrike");
-    }
-};
-
-const anyActive = allTokens.some(t => isEffectActive(t)) ||
-                  Sequencer.EffectManager.getEffects({ name: id }).length > 0;
-
-if (anyActive) {
-    allTokens.forEach(t => stopEffect(t));
-    Sequencer.EffectManager.endEffects({ name: id });
-    return;
-}
 
 if (typeof Tagger !== "undefined") {
     Tagger.addTags(token, "TrueStrike");

@@ -44,11 +44,14 @@ const stopEffect = (target) => {
     Sequencer.EffectManager.endEffects({ name: id, object: target });
 };
 
-const anyActive = targets.some(target => isEffectActive(target)) || isEffectActive(token);
+const globalBlessEffects = Sequencer.EffectManager.getEffects({ name: `${id}*` });
+const anyActive = targets.some(target => isEffectActive(target)) || isEffectActive(token) || globalBlessEffects.length > 0;
 
 if (anyActive) {
     targets.forEach(target => stopEffect(target));
     stopEffect(token);
+    Sequencer.EffectManager.endEffects({ name: `${id}*` });
+    return ui.notifications.info("Ended Bless.");
 } else {
     const sequence = new Sequence();
 

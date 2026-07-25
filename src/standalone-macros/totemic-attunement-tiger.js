@@ -10,25 +10,22 @@ if (!game.modules.get("sequencer")?.active) {
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select your Barbarian token!");
 
-const target = game.user.targets.first();
-if (!target) return ui.notifications.warn("Please target an enemy to tiger pounce!");
-
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
-    if (typeof apiClosest === "function") {
-        return apiClosest(path);
-    }
-    return path;
-};
-
 const id = "Tiger Totemic Attunement";
 const color = "red";
 const count = 2; // dual claw pounce strikes
 const tokenId = token.id ?? token.document?.id ?? "";
 const label = `${id} - ${tokenId}`;
+
+const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
+if (activeEffects.length > 0) {
+    Sequencer.EffectManager.endEffects({ name: label, object: token });
+    Sequencer.EffectManager.endEffects({ name: label });
+    await new Sequence().animation().on(token).opacity(1).play();
+    return ui.notifications.info("Ended Tiger Totemic Attunement.");
+}
+
+const target = game.user.targets.first();
+if (!target) return ui.notifications.warn("Please target an enemy to tiger pounce!");
 
 const tokenWidth = token.document?.width ?? 1;
 const dx = target.center.x - token.center.x;
@@ -66,8 +63,9 @@ seq.effect()
     .atLocation(token)
     .scaleToObject(2.1)
     .startTime(550)
-    .duration(1450)
     .moveTowards(location, { relativeToCenter: true, ease: "easeOutQuint", rotate: false, delay: 240, snapToGrid: true })
+    .attachTo(token)
+    .persist()
     .zIndex(1);
 
 seq.effect()

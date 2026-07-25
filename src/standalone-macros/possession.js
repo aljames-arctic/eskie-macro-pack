@@ -9,9 +9,6 @@ if (!game.modules.get("sequencer")?.active) {
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select the possessing ghost/spirit token!");
 
-const target = game.user.targets.first();
-if (!target) return ui.notifications.warn("Please target the token to possess!");
-
 const closest = (path) => {
     if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
         return eskie.util.file.closest(path);
@@ -23,16 +20,19 @@ const closest = (path) => {
     return path;
 };
 
+const tokenId = token.id ?? token.document?.id ?? "";
+const activePossessions = Sequencer.EffectManager.getEffects({ name: "eskie.effect.possession.main*" });
+if (activePossessions.length > 0) {
+    await Sequencer.EffectManager.endEffects({ name: "eskie.effect.possession.main*" });
+    await new Sequence().animation().on(token).opacity(1).show(true).play();
+    return ui.notifications.info(`Ended ghost possession.`);
+}
+
+const target = game.user.targets.first();
+if (!target) return ui.notifications.warn("Please target the token to possess!");
+
 const targetUuid = target.document?.uuid ?? target.uuid ?? target.id;
 const effectName = `eskie.effect.possession.main - ${targetUuid}`;
-
-// Toggle/Stop handling if target is currently possessed
-const existingEffects = Sequencer.EffectManager.getEffects({ name: effectName, object: target }) ?? [];
-if (existingEffects.length > 0) {
-    await Sequencer.EffectManager.endEffects({ name: effectName, object: target });
-    new Sequence().animation().on(token).show(true).play();
-    return ui.notifications.info(`Ended possession of ${target.name}.`);
-}
 
 const tintColor = "#6ff087"; // Teal ghostly energy tint
 const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;

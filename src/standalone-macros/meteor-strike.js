@@ -100,7 +100,7 @@ for (let i = 0; i < positions.length; i++) {
     // 3. Ground crater shockwave & radial blast wave
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.shockwave.01.orange"))
+        .file(closest("jb2a.impact.009.orange"))
         .atLocation(pos)
         .size(fireScale * 7, { gridUnits: true })
         .belowTokens()
@@ -111,7 +111,7 @@ for (let i = 0; i < positions.length; i++) {
 
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.impact.ground_crack.01.orange"))
+        .file(closest("jb2a.impact.ground_crack.orange.01"))
         .atLocation(pos)
         .belowTokens()
         .scale(fireScale * 2.2)
@@ -138,7 +138,7 @@ for (let i = 0; i < positions.length; i++) {
     // 5. Lingering magma burn fires at impact crater
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.fireplace.01.orange"))
+        .file(closest("eskie.burn.embers.orange"))
         .atLocation(pos)
         .belowTokens()
         .scale(fireScale * 0.95)

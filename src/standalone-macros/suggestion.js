@@ -163,7 +163,7 @@ for (const target of targets) {
     // Subtle silver hypnosis spiral ring rotating below target token
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.extras.tmfx.runes.circle.simple.illusion"))
+        .file(closest("jb2a.template_circle.symbol.normal.runes.blue"))
         .attachTo(target)
         .scaleToObject(1.15)
         .filter("ColorMatrix", { saturate: -1, brightness: 1.2 })
@@ -177,9 +177,10 @@ for (const target of targets) {
     // Golden suggestion mind-whisper cloud particles over target token
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.particles.outward.yellow.01.03"))
+        .file(closest("jb2a.particles.outward.white.01.03"))
         .attachTo(target)
         .scaleToObject(1.5)
+        .filter("ColorMatrix", { hue: 45 })
         .opacity(0.65)
         .fadeIn(1000)
         .fadeOut(1000)

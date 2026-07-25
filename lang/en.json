@@ -20,6 +20,11 @@
                 "label": "View Recommended Modules",
                 "hint": "View companion modules that provide assets, audio, and functionality for Eskie Macro Pack."
             },
+            "generateCompendiums": {
+                "name": "Generate Macro Compendiums (Dev Only)",
+                "label": "Generate Compendiums",
+                "hint": "Synchronizes all standalone macro files from src/standalone-macros/ into the module compendium."
+            },
             "logVerbosity": {
                 "name": "Log Verbosity Level",
                 "hint": "Controls the level of detail printed to the browser console.",

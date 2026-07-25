@@ -1,5 +1,5 @@
 import { closest } from '../../../lib/filemanager.js';
-import { templates } from '../../../lib/templates.js';
+import { template } from '../../../lib/templates.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
 //Last Updated: 4/30/2024
@@ -19,7 +19,7 @@ async function create(token, config, options) {
         icon: 'icons/magic/control/silhouette-fall-slip-prone.webp',
         label: 'Hit The Dirt!'
     };
-    let [position, _] = await templates.getPosition(template, cfg);
+    let [position, _] = await template.getPosition(template, cfg);
     if (!position) { return; }
 
     let seq = new Sequence()

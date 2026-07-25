@@ -1,7 +1,7 @@
 // Original Author: Unknown (from discord)
 // Modular Conversion: bakanabaka
 
-import { templates } from '../../../lib/templates.js';
+import { template } from '../../../lib/templates.js';
 import { teleportIn } from "./teleport/teleportIn.js";
 import { teleportOut } from "./teleport/teleportOut.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
@@ -19,7 +19,7 @@ async function create(token, config = {}) {
         icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm', 
         label: 'Teleportation Destination',
     };
-    [config.position, _] = await templates.getPosition(template, cfg);
+    [config.position, _] = await template.getPosition(template, cfg);
     if (!config.position) { return; }
 
     let [tOut, tIn] = await Promise.all([

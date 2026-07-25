@@ -197,7 +197,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .zIndex(1)
 
         .effect()
-        .file(closest("jb2a.impact.yellow.2"))
+        .file(closest("jb2a.impact.002.yellow"))
         .atLocation(target)
         .scaleToObject(3)
         .delay(0)
@@ -205,7 +205,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
         .waitUntilFinished(-2000)
 
         .effect()
-        .file(closest("jb2a.ground_cracks.orange.02"))
+        .file(closest("jb2a.impact.ground_crack.orange.02"))
         .atLocation(target)
         .filter("ColorMatrix", { hue: 20, saturate: 1 })
         .scaleToObject(0.7)

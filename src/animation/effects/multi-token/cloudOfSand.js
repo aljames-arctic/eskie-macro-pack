@@ -5,7 +5,7 @@ import { closest } from "../../../lib/filemanager.js";
 
 const DEFAULT_CONFIG = {
     persist: false,
-    color: "yellow",
+    color: "white",
 };
 
 /**
@@ -135,8 +135,8 @@ async function create(position, config = {}) {
     sequence.addSequence(_createCloudEffect(position, `jb2a.sleep.cloud.01.${color}`, { size: 12, opacity: 1, rotate: 0, zIndex: 1, rotationDuration: 1500 }, config.persist));
     sequence.addSequence(_createCloudEffect(position, `jb2a.sleep.cloud.01.${color}`, { size: 10, opacity: 0.65, rotate: 90, zIndex: 2, rotationDuration: 1400 }, config.persist));
     sequence.addSequence(_createCloudEffect(position, `jb2a.sleep.cloud.01.${color}`, { size: 6, opacity: 0.4, rotate: 180, zIndex: 3, rotationDuration: 1300 }, config.persist));
-    sequence.addSequence(_createCloudEffect(position, `jb2a.sleep.cloud.02.${color}`, { size: 2, opacity: 0.25, rotate: 180, zIndex: 4, rotationDuration: 1200 }, config.persist));
-    sequence.addSequence(_createCloudEffect(position, `jb2a.sleep.cloud.02.${color}`, { size: 1, opacity: 0.15, rotate: 180, zIndex: 5, rotationDuration: 1100 }, config.persist));
+    sequence.addSequence(_createCloudEffect(position, `jb2a.sleep.cloud.01.${color}`, { size: 2, opacity: 0.25, rotate: 180, zIndex: 4, rotationDuration: 1200 }, config.persist));
+    sequence.addSequence(_createCloudEffect(position, `jb2a.sleep.cloud.01.${color}`, { size: 1, opacity: 0.15, rotate: 180, zIndex: 5, rotationDuration: 1100 }, config.persist));
 
     return sequence;
 }

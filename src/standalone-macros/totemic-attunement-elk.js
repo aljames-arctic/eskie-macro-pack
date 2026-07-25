@@ -1,0 +1,107 @@
+// Standalone Macro: Totemic Attunement - Elk
+// Last Updated: 1/27/2025
+// Author: .eskie
+// Conversion: bakanabaka
+
+if (!game.modules.get("sequencer")?.active) {
+    return ui.notifications.error("The 'Elk Totemic Attunement' macro requires the 'Sequencer' module to be installed and active!");
+}
+
+const token = canvas.tokens.controlled[0];
+if (!token) return ui.notifications.warn("Please select your Barbarian token!");
+
+const target = game.user.targets.first();
+
+const closest = (path) => {
+    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
+        return eskie.util.file.closest(path);
+    }
+    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
+    if (typeof apiClosest === "function") {
+        return apiClosest(path);
+    }
+    return path;
+};
+
+const color = "red";
+const tokenId = token.id ?? token.document?.id ?? "";
+const label = `Elk Totemic Attunement - ${tokenId}`;
+
+const seq = new Sequence();
+
+// Elk charge flower particle trailing surge around attacker
+seq.effect()
+    .file(closest("eskie.smoke.03.tan"))
+    .attachTo(token, { bindAlpha: false, bindRotation: false })
+    .scaleToObject(2)
+    .opacity(0.6)
+    .belowTokens();
+
+seq.effect()
+    .name(label)
+    .file(closest(`eskie.nature.flower.particle.01.${color}`))
+    .attachTo(token)
+    .scaleToObject(1.5)
+    .fadeIn(500)
+    .fadeOut(500)
+    .duration(3000)
+    .zIndex(1);
+
+// Optional Prone / Trample knock-down animation if targeting an enemy
+if (target) {
+    const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
+
+    seq.animation()
+        .delay(100)
+        .on(target)
+        .opacity(0);
+
+    seq.effect()
+        .copySprite(target)
+        .spriteRotation(-targetRotation)
+        .attachTo(target, { bindAlpha: false, bindRotation: false, local: false })
+        .scaleToObject(0.9, { considerTokenScale: true })
+        .zIndex(0.1)
+        .belowTokens()
+        .filter("ColorMatrix", { brightness: 0 })
+        .filter("Blur", { blurX: 5, blurY: 10 })
+        .opacity(0.65)
+        .duration(1200);
+
+    seq.effect()
+        .delay(100)
+        .file(closest(`eskie.damage.bludgeoning.01.${color}`))
+        .attachTo(target, { bindAlpha: false, bindRotation: false })
+        .scaleToObject(1.5)
+        .opacity(1)
+        .zIndex(1)
+        .belowTokens()
+        .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", gridUnits: true })
+        .filter("ColorMatrix", { saturate: 1 });
+
+    seq.effect()
+        .copySprite(target)
+        .spriteRotation(-targetRotation)
+        .attachTo(target, { bindAlpha: false, bindRotation: false, local: false })
+        .scaleToObject(1, { considerTokenScale: true })
+        .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", delay: 100, gridUnits: true })
+        .animateProperty("spriteContainer", "position.y", { from: 0, to: 0.5, duration: 250, ease: "easeOutCubic", delay: 600, gridUnits: true })
+        .animateProperty("sprite", "rotation", { from: 0, to: 90, duration: 250, ease: "easeOutCubic", delay: 100 })
+        .duration(1200)
+        .waitUntilFinished(-500);
+
+    seq.effect()
+        .file(closest("eskie.smoke.03.tan"))
+        .attachTo(target, { bindAlpha: false, bindRotation: false })
+        .scaleToObject(2)
+        .opacity(0.8)
+        .belowTokens();
+
+    seq.animation()
+        .delay(300)
+        .on(target)
+        .opacity(1)
+        .rotate(targetRotation + 90);
+}
+
+await seq.play();

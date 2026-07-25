@@ -53,6 +53,24 @@ async function createLeap(token, config = {}) {
         .belowTokens()
 
         .effect()
+        .file(closest("eskie.smoke.03.white"))
+        .atLocation(token)
+        .scaleToObject(1.5)
+        .belowTokens()
+
+        .effect()
+        .file(closest("jb2a.impact.009.orange"))
+        .atLocation(token)
+        .scaleToObject(1.5)
+        .belowTokens()
+
+        .effect()
+        .file(closest("jb2a.explosion.01.orange"))
+        .atLocation(position)
+        .scaleToObject(1.5)
+        .belowTokens()
+
+        .effect()
         .file(closest("jb2a.wind_stream.white"))
         .anchor({ x: 0.5, y: 1 })
         .atLocation(token)

@@ -29,23 +29,15 @@ if (excludeSelf) {
     targets = targets.filter(t => t.id !== token.id);
 }
 
-// Check if effect is already active on the caster or any targets (toggle/stop check)
 const casterEffects = Sequencer.EffectManager.getEffects({ name: id, object: token });
 const canvasEffects = Sequencer.EffectManager.getEffects({ name: id });
-const isTargetActive = targets.some(target => {
-    const targetName = target?.name ?? "Target";
-    return Sequencer.EffectManager.getEffects({ name: `${targetName} ${id}`, object: target }).length > 0;
-});
+const wildcardEffects = Sequencer.EffectManager.getEffects({ name: `*${id}*` });
 
-if (casterEffects.length > 0 || canvasEffects.length > 0 || isTargetActive) {
+if (casterEffects.length > 0 || canvasEffects.length > 0 || wildcardEffects.length > 0) {
     Sequencer.EffectManager.endEffects({ name: id, object: token });
     Sequencer.EffectManager.endEffects({ name: id });
-    targets.forEach(target => {
-        const targetName = target?.name ?? "Target";
-        Sequencer.EffectManager.endEffects({ name: `${targetName} ${id}`, object: target });
-        new Sequence().animation().on(target).opacity(1).play();
-    });
-    return;
+    Sequencer.EffectManager.endEffects({ name: `*${id}*` });
+    return ui.notifications.info("Ended Arms of Hadar.");
 }
 
 const sequence = new Sequence();

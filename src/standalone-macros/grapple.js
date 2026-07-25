@@ -9,20 +9,6 @@ if (!game.modules.get("sequencer")?.active) {
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select your grappling token!");
 
-const target = game.user.targets.first();
-if (!target) return ui.notifications.warn("Please target an enemy to grapple!");
-
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
-    if (typeof apiClosest === "function") {
-        return apiClosest(path);
-    }
-    return path;
-};
-
 const id = "Grapple Latch";
 const tokenId = token.id ?? token.document?.id ?? "";
 const label = `${id} - ${tokenId}`;
@@ -31,8 +17,12 @@ const label = `${id} - ${tokenId}`;
 const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
 if (activeEffects.length > 0) {
     Sequencer.EffectManager.endEffects({ name: label, object: token });
-    return ui.notifications.info(`Released grapple on ${target.name}.`);
+    Sequencer.EffectManager.endEffects({ name: label });
+    return ui.notifications.info(`Released grapple tether.`);
 }
+
+const target = game.user.targets.first();
+if (!target) return ui.notifications.warn("Please target an enemy to grapple!");
 
 const sequence = new Sequence();
 

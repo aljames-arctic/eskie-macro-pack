@@ -22,15 +22,8 @@ const label = "Cloud of Sand";
 // Toggle handling: if persistent cloud effects are already present at selected location / canvas
 const activeEffects = Sequencer.EffectManager.getEffects({ name: label });
 if ((activeEffects?.length ?? 0) > 0) {
-    const confirmStop = await Dialog.confirm({
-        title: "Cloud of Sand Active",
-        content: "<p>An active Cloud of Sand effect was found. End all active Cloud of Sand effects?</p>",
-        defaultYes: true
-    });
-    if (confirmStop) {
-        Sequencer.EffectManager.endEffects({ name: label });
-        return;
-    }
+    Sequencer.EffectManager.endEffects({ name: label });
+    return ui.notifications.info("Cleared active Cloud of Sand.");
 }
 
 const color = "yellow";

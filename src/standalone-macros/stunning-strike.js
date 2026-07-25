@@ -11,20 +11,19 @@ const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select a token!");
 
 // 2. Target Token Validation
+const id = "stunningStrike";
+const activeStuns = Sequencer.EffectManager.getEffects({ name: `*StunningStrike*` });
+if (activeStuns.length > 0) {
+    Sequencer.EffectManager.endEffects({ name: `*StunningStrike*` });
+    Sequencer.EffectManager.endEffects({ name: id });
+    return ui.notifications.info("Cleared Stunning Strike state.");
+}
+
 const target = game.user.targets.first();
 if (!target) return ui.notifications.warn("Please select a target!");
 
-const DEFAULT_CONFIG = {
-    id: "stunningStrike",
-};
-
-const id = DEFAULT_CONFIG.id ?? "stunningStrike";
 const label = `StunningStrike - DizzyStars - ${id} - ${target.uuid}`;
 
-/**
- * Safely resolves Free vs Patreon asset paths if the eskie module is active.
- * Falls back to direct database key if running as a standalone copy-paste macro.
- */
 const closest = (path) => {
     if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
         return eskie.util.file.closest(path);
@@ -35,16 +34,6 @@ const closest = (path) => {
     }
     return path;
 };
-
-// 3. Toggle / Re-entrant Persistent Effect Handling
-const isPlaying = Sequencer.EffectManager.getEffects({ name: label }).length > 0 ||
-                  Sequencer.EffectManager.getEffects({ name: label, object: target }).length > 0;
-
-if (isPlaying) {
-    Sequencer.EffectManager.endEffects({ name: label });
-    Sequencer.EffectManager.endEffects({ name: label, object: target });
-    return;
-}
 
 const tokenCenter = token.center ?? { x: token.x ?? 0, y: token.y ?? 0 };
 const targetCenter = target.center ?? { x: target.x ?? 0, y: target.y ?? 0 };

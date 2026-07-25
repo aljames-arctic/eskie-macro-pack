@@ -36,26 +36,11 @@ const label = DEFAULT_CONFIG.label ?? "Tasha's Caustic Brew";
 const targets = game.user.targets.size > 0 ? Array.from(game.user.targets) : [];
 
 // Toggle / re-entrant persistent effect handling:
-// Check if an effect with this label or target persistent name is already active.
-let isPlaying = Sequencer.EffectManager.getEffects({ name: label }).length > 0;
-if (!isPlaying && targets.length > 0) {
-    for (const t of targets) {
-        const targetName = t.document?.name ?? t.name ?? "Target";
-        if (Sequencer.EffectManager.getEffects({ name: `${targetName}CausticBrew`, object: t }).length > 0) {
-            isPlaying = true;
-            break;
-        }
-    }
-}
-
-if (isPlaying) {
+const causticFx = Sequencer.EffectManager.getEffects({ name: "*Caustic*" });
+if (causticFx.length > 0) {
     Sequencer.EffectManager.endEffects({ name: label });
-    const allTokens = targets.length > 0 ? targets : canvas.tokens.placeables;
-    for (const t of allTokens) {
-        const targetName = t.document?.name ?? t.name ?? "Target";
-        Sequencer.EffectManager.endEffects({ name: `${targetName}CausticBrew`, object: t });
-    }
-    return;
+    Sequencer.EffectManager.endEffects({ name: "*Caustic*" });
+    return ui.notifications.info("Cleared Tasha's Caustic Brew.");
 }
 
 /**

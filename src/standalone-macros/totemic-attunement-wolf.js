@@ -10,24 +10,21 @@ if (!game.modules.get("sequencer")?.active) {
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select your Barbarian token!");
 
-const target = game.user.targets.first();
-if (!target) return ui.notifications.warn("Please target an enemy for wolf pack bite strike!");
-
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
-    if (typeof apiClosest === "function") {
-        return apiClosest(path);
-    }
-    return path;
-};
-
 const id = "Wolf Totemic Attunement";
 const color = "red";
 const tokenId = token.id ?? token.document?.id ?? "";
 const label = `${id} - ${tokenId}`;
+
+const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
+if (activeEffects.length > 0) {
+    Sequencer.EffectManager.endEffects({ name: label, object: token });
+    Sequencer.EffectManager.endEffects({ name: label });
+    await new Sequence().animation().on(token).opacity(1).play();
+    return ui.notifications.info("Ended Wolf Totemic Attunement.");
+}
+
+const target = game.user.targets.first();
+if (!target) return ui.notifications.warn("Please target an enemy for wolf pack bite strike!");
 const tokenWidth = token.document?.width ?? 1;
 const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
 const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
@@ -101,7 +98,8 @@ seq.effect()
     .atLocation(token)
     .scaleToObject(2.1)
     .startTime(500)
-    .duration(2000)
+    .attachTo(token)
+    .persist()
     .animateProperty("spriteContainer", "position.x", { from: 0, to: mid.x, duration: 250, ease: "easeOutExpo", delay: 200 })
     .animateProperty("spriteContainer", "position.y", { from: 0, to: mid.y, duration: 250, ease: "easeOutExpo", delay: 200 })
     .animateProperty("spriteContainer", "position.x", { from: 0, to: -mid.x + back.x, duration: 250, ease: "easeOutExpo", delay: 1000 })

@@ -1,18 +1,13 @@
 import { log } from './logger.js';
-import { dependency } from './dependency.js';
 
 /**
  * Gets position coordinates from a template document or crosshair.
- * Enforces that Bakana's Better Crosshairs (BBC) is installed and active.
  *
  * @param {Document|object} template The Foundry MeasuredTemplate or Region document
  * @param {object} [config={}] Configuration options
  * @returns {Promise<Array>} Coordinates array [primary, secondary]
  */
 async function getPosition(template, config = {}) {
-    dependency.required([
-        { id: 'bakana-better-crosshairs', ref: "Bakana's Better Crosshairs" }
-    ]);
 
     let position;
     if (template) {

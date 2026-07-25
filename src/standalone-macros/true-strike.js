@@ -17,6 +17,9 @@ const activeTrueStrike = Sequencer.EffectManager.getEffects({ name: "*TrueStrike
     Sequencer.EffectManager.getEffects({ name: "*true-strike*" })
 );
 if (activeTrueStrike.length > 0) {
+    if (typeof Tagger !== "undefined") {
+        Tagger.removeTags(token, "TrueStrike");
+    }
     Sequencer.EffectManager.endEffects({ name: "*TrueStrike*" });
     Sequencer.EffectManager.endEffects({ name: "*true-strike*" });
     Sequencer.EffectManager.endEffects({ name: id });
@@ -308,7 +311,7 @@ for (const target of targets) {
     // Persistent ground fractures on target
     sequence.effect()
         .name(targetLabel)
-        .file(closest("jb2a.impact.ground_crack.02.orange"))
+        .file(closest("jb2a.impact.ground_crack.orange.02"))
         .atLocation(target)
         .filter("ColorMatrix", { hue: 20, saturate: 1 })
         .scaleToObject(0.7)

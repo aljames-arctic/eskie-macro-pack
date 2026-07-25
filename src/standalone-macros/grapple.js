@@ -9,6 +9,17 @@ if (!game.modules.get("sequencer")?.active) {
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select your grappling token!");
 
+const closest = (path) => {
+    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
+        return eskie.util.file.closest(path);
+    }
+    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
+    if (typeof apiClosest === "function") {
+        return apiClosest(path);
+    }
+    return path;
+};
+
 const id = "Grapple Latch";
 const tokenId = token.id ?? token.document?.id ?? "";
 const label = `${id} - ${tokenId}`;

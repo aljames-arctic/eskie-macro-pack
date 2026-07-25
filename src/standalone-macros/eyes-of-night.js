@@ -86,7 +86,7 @@ const tokenLabel = `${id}-${token.id ?? token.document?.id ?? ""}`;
 // Caster healing/twilight bluepurple energy burst
 sequence.wait(250)
     .effect()
-    .file(closest("jb2a.healing_generic.03.burst.bluepurple"))
+    .file(closest("jb2a.healing_generic.burst.bluepurple"))
     .attachTo(token)
     .scaleToObject(2.2, { considerTokenScale: true })
     .fadeIn(500)
@@ -183,7 +183,7 @@ for (let u = 0; u < targetOrder.length; u++) {
 
         // Connecting vision aura beam from token/ally to next ally
         chainSeq.effect()
-            .file(closest("jb2a.energy_beam.normal.yellow.03"))
+            .file(closest("jb2a.energy_beam.normal.yellow"))
             .atLocation(targetOrder[u], { offset: { x: targetOffsetX[u], y: targetOffsetY[u] }, gridUnits: true })
             .stretchTo(nextTarget, { offset: { x: targetOffsetX[u + 1], y: targetOffsetY[u + 1] }, gridUnits: true, onlyX: true })
             .scale(0.1)
@@ -234,7 +234,7 @@ for (let u = 0; u < targetOrder.length; u++) {
         // One-shot healing bluepurple burst on ally
         chainSeq.effect()
             .delay(10 + 100 * u)
-            .file(closest("jb2a.healing_generic.03.burst.bluepurple"))
+            .file(closest("jb2a.healing_generic.burst.bluepurple"))
             .attachTo(nextTarget)
             .scaleToObject(2.2, { considerTokenScale: true })
             .fadeIn(500)

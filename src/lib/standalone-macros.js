@@ -5,9 +5,14 @@ import { log } from './logger.js';
  * Used as a base list and fallback if directory browsing is unavailable.
  */
 const KNOWN_STANDALONE_MACROS = [
+    'arms-of-hadar.js',
     'bless.js',
     'call.js',
+    'color-spray.js',
+    'disintegrate.js',
+    'divine-smite.js',
     'faerie-fire.js',
+    'fire-shield.js',
     'hacking.js',
     'healing-word.js',
     'mirror-image.js',

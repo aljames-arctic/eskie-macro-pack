@@ -5,11 +5,13 @@ import { log } from './logger.js';
  * Used as a base list and fallback if directory browsing is unavailable.
  */
 const KNOWN_STANDALONE_MACROS = [
+    'aerodyne-vehicle.js',
     'angry.js',
     'animate-dead.js',
     'armor-of-agathys.js',
     'arms-of-hadar.js',
     'banishment.js',
+    'beam.js',
     'benign-transportation.js',
     'bless.js',
     'blurred-vision.js',
@@ -77,6 +79,7 @@ const KNOWN_STANDALONE_MACROS = [
     'rage.js',
     'rapid-strike.js',
     'revivify.js',
+    'roman-candle.js',
     'sanctuary.js',
     'shapechange.js',
     'shocking-grasp.js',

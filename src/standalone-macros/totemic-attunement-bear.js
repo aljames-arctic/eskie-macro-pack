@@ -29,6 +29,16 @@ const color = "red";
 const tokenId = token.id ?? token.document?.id ?? "";
 const label = `${id} - ${tokenId}`;
 
+const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
+if (activeEffects.length > 0) {
+    Sequencer.EffectManager.endEffects({ name: label, object: token });
+    Sequencer.EffectManager.endEffects({ name: label });
+    for (const target of affectTargets) {
+        Sequencer.EffectManager.endEffects({ name: `${label}-${target.id}`, object: target });
+    }
+    return ui.notifications.info("Ended Bear Totemic Attunement.");
+}
+
 const seq = new Sequence();
 
 seq.effect()
@@ -65,11 +75,12 @@ for (const target of affectTargets) {
         .zIndex(2);
 
     seq.effect()
+        .name(`${label}-${target.id}`)
         .file(closest(`eskie.buff.loop.simple.${color}`))
         .attachTo(target, { offset: { y: -0.05 }, gridUnits: true })
         .scaleToObject(1.2)
         .mirrorY()
-        .duration(2000)
+        .persist()
         .fadeOut(500)
         .filter("ColorMatrix", { brightness: 0, saturate: 1 })
         .zIndex(2);

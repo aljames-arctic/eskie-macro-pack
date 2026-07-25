@@ -32,6 +32,7 @@ if (activeEffects.length > 0) {
         await Tagger.removeTags(token, "Flying");
     }
     await Sequencer.EffectManager.endEffects({ name: effectName, object: token });
+    await Sequencer.EffectManager.endEffects({ name: effectName });
     await new Sequence()
         .animation()
         .on(token)

@@ -10,14 +10,24 @@ if (!game.modules.get("sequencer")?.active) {
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select a token!");
 
+const isPlaying = Sequencer.EffectManager.getEffects({ name: "*IaijutsuStrike*" }).length > 0 ||
+                  Sequencer.EffectManager.getEffects({ name: "cinema-bars" }).length > 0;
+
+if (isPlaying) {
+    Sequencer.EffectManager.endEffects({ name: "*IaijutsuStrike*" });
+    Sequencer.EffectManager.endEffects({ name: "IaijutsuStrike" });
+    Sequencer.EffectManager.endEffects({ name: "IaijutsuStrike Text" });
+    Sequencer.EffectManager.endEffects({ name: "cinema-bars" });
+    Sequencer.EffectManager.endEffects({ name: "*Top*" });
+    Sequencer.EffectManager.endEffects({ name: "*Bottom*" });
+    new Sequence().animation().on(token).opacity(1).play();
+    return ui.notifications.info("Ended Iaijutsu Strike slice.");
+}
+
 // 2. Target Token Validation
 const target = game.user.targets.first();
 if (!target) return ui.notifications.warn("Please target a token!");
 
-/**
- * Safely resolves Free vs Patreon asset paths if the eskie module is active.
- * Falls back to direct database key if running as a standalone copy-paste macro.
- */
 const closest = (path) => {
     if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
         return eskie.util.file.closest(path);
@@ -28,55 +38,6 @@ const closest = (path) => {
     }
     return path;
 };
-
-const DEFAULT_CONFIG = {
-    targetDeath: true,
-    teleport: true,
-    cameraFocus: {
-        enable: true,
-        scale: 0.3
-    },
-    text: {
-        id: 'IaijutsuStrike Text',
-        duration: 2500,
-        delay: 200,
-        style: {
-            fill: "#da1b1bff",
-            fontFamily: "Helvetica",
-            fontSize: 106,
-            strokeThickness: 0,
-            fontWeight: "bold",
-        },
-        kerning: 1.7,
-        verticalOffset: 0.75,
-    }
-};
-
-const config = DEFAULT_CONFIG;
-const { targetDeath, teleport, cameraFocus, text } = config;
-
-// 3. Toggle / Re-entrant Persistent Effect Handling
-const targetName = target.name ?? "Target";
-const isPlaying = Sequencer.EffectManager.getEffects({ name: "IaijutsuStrike" }).length > 0 ||
-                  Sequencer.EffectManager.getEffects({ name: "IaijutsuStrike Text" }).length > 0 ||
-                  Sequencer.EffectManager.getEffects({ name: "cinema-bars" }).length > 0 ||
-                  Sequencer.EffectManager.getEffects({ name: `IaijutsuStrike ${targetName} Top` }).length > 0 ||
-                  Sequencer.EffectManager.getEffects({ name: `IaijutsuStrike ${targetName} Bottom` }).length > 0;
-
-if (isPlaying) {
-    Sequencer.EffectManager.endEffects({ name: "IaijutsuStrike" });
-    Sequencer.EffectManager.endEffects({ name: "IaijutsuStrike Text" });
-    Sequencer.EffectManager.endEffects({ name: "cinema-bars" });
-    Sequencer.EffectManager.endEffects({ name: `IaijutsuStrike ${targetName} Top` });
-    Sequencer.EffectManager.endEffects({ name: `IaijutsuStrike ${targetName} Bottom` });
-    new Sequence()
-        .animation()
-        .on(target)
-        .opacity(1)
-        .show(true)
-        .play();
-    return;
-}
 
 function createCinemaBars(dim = true) {
     const barId = 'cinema-bars';

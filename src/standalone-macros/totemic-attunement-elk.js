@@ -27,6 +27,13 @@ const color = "red";
 const tokenId = token.id ?? token.document?.id ?? "";
 const label = `Elk Totemic Attunement - ${tokenId}`;
 
+const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
+if (activeEffects.length > 0) {
+    Sequencer.EffectManager.endEffects({ name: label, object: token });
+    Sequencer.EffectManager.endEffects({ name: label });
+    return ui.notifications.info("Ended Elk Totemic Attunement.");
+}
+
 const seq = new Sequence();
 
 // Elk charge flower particle trailing surge around attacker
@@ -44,7 +51,7 @@ seq.effect()
     .scaleToObject(1.5)
     .fadeIn(500)
     .fadeOut(500)
-    .duration(3000)
+    .persist()
     .zIndex(1);
 
 // Optional Prone / Trample knock-down animation if targeting an enemy

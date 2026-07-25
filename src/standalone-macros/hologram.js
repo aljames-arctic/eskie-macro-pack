@@ -53,7 +53,7 @@ const seq = new Sequence()
     // Futuristic cyber scanline and scan grid projector overlay masked over the hologram
     .effect()
     .name(EFFECT_NAME)
-    .file(closest("https://i.imgur.com/DBMEF5B.png"))
+    .file("https://i.imgur.com/DBMEF5B.png")
     .atLocation(token)
     .attachTo(token, { bindRotation: false, bindVisibility: false })
     .scaleToObject()

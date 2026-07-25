@@ -75,7 +75,7 @@ async function create(tile, targets, config = {}) {
 
         // Impact shockwave
         .effect()
-        .file(closest('jb2a.impact.white.0'))
+        .file(closest('jb2a.impact.white.01'))
         .atLocation(tile)
         .scaleIn(0, 500, { ease: 'easeOutCubic' })
         .belowTokens()

@@ -31,9 +31,12 @@ const closest = (path) => {
 const tokenWidth = token.document?.width ?? token.width ?? 1;
 const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
 
+const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
+const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
+
 const crosshairConfig = {
     size: tokenWidth,
-    icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm',
+    icon: portalPath,
     label: "Step of the Wind (Jump)",
     tag: label,
     drawIcon: true,

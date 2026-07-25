@@ -47,7 +47,7 @@ async function createCast(source, config = {}) {
     }
     let sequence = new Sequence()
         .effect()
-        .file(closest('jb2a.markers.bubble.02.complete.green.0'))
+        .file(closest('jb2a.markers.bubble.02.complete.green'))
         .atLocation(source)
         .scale(0.1)
         .rotateTowards(position)

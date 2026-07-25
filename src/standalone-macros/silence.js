@@ -26,9 +26,12 @@ const isPlaying = Sequencer.EffectManager.getEffects({ name: effectName }).lengt
 if (isPlaying) {
     Sequencer.EffectManager.endEffects({ name: effectName });
 } else {
+    const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
+    const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
+
     const position = await Sequencer.Crosshair.show({
         size: size,
-        icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm',
+        icon: portalPath,
         label: 'Silence'
     });
     if (!position || position.cancelled) return;

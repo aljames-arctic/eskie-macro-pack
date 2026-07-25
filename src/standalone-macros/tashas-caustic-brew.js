@@ -96,7 +96,7 @@ const sequence = new Sequence();
 // Cast Sequence with acid green streaming spray line & markers
 sequence.effect()
     .name(label)
-    .file(closest('jb2a.markers.bubble.02.complete.green.0'))
+    .file(closest('jb2a.markers.bubble.02.complete.green'))
     .atLocation(token)
     .scale(0.1)
     .rotateTowards(position)

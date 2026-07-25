@@ -59,7 +59,7 @@ async function create(source, target, config = {}) {
         .waitUntilFinished(-500);
 
     sequence.effect()
-        .file(closest('jb2a.lightning_orb.01.loop.bluepurple.0'))
+        .file(closest('jb2a.lightning_orb.01.loop.bluepurple'))
         .filter('ColorMatrix', { hue: 90, contrast: 1.5 })
         .tint('#e6a900')
         .attachTo(source)

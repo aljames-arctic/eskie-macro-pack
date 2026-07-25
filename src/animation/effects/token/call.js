@@ -45,7 +45,7 @@ async function create(token, config = {}) {
 
     // Phone icon badge attached to the top-right corner of the token
     seq.effect()
-        .file(closest('https://i.imgur.com/Vif3lSd.png'))
+        .file('https://i.imgur.com/Vif3lSd.png')
         .name(EFFECT_NAME)
         .atLocation(token)
         .scaleIn({ x: 0.75, y: 0 }, 50)

@@ -69,7 +69,7 @@ async function createAnimateDead(undeadToken, config = {}) {
         //Build Up
         .effect()
         .delay(2250)
-        .file(closest("jb2a.cast_generic.ice.01.blue.0"))
+        .file(closest("jb2a.cast_generic.ice.01.blue"))
         .atLocation(undeadToken)
         .size(1.5, { gridUnits: true })
         .opacity(0.8)
@@ -100,7 +100,7 @@ async function createAnimateDead(undeadToken, config = {}) {
         .zIndex(2)
 
         .effect()
-        .file(closest("jb2a.impact.dark.01.red.0"))
+        .file(closest("jb2a.impact.dark.01.red"))
         .atLocation(undeadToken)
         .size(2.5, { gridUnits: true })
         .filter("ColorMatrix", { hue: 90 })

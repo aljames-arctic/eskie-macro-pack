@@ -54,7 +54,7 @@ async function create(token, config = {}) {
 
     // Main hacker terminal/laptop icon attached to the lower-left of the token
     seq.effect()
-        .file(closest('https://i.imgur.com/xLJ9SPY.png'))
+        .file('https://i.imgur.com/xLJ9SPY.png')
         .name(EFFECT_NAME)
         .atLocation(token)
         .scaleIn({ x: 0.75, y: 0 }, 50)
@@ -67,7 +67,7 @@ async function create(token, config = {}) {
 
     // Scrolling code lines on the terminal screen (vertical scroll)
     seq.effect()
-        .file(closest('https://i.imgur.com/oOqrAsc.png'))
+        .file('https://i.imgur.com/oOqrAsc.png')
         .name(EFFECT_NAME)
         .atLocation(token)
         .attachTo(token, { align: 'center', edge: 'outer', bindVisibility: false, offset: { x: -0.39, y: 0.24 }, gridUnits: true, bindRotation: false })
@@ -79,7 +79,7 @@ async function create(token, config = {}) {
 
     // Rotated scrolling code lines (horizontal strip scrolled 90°)
     seq.effect()
-        .file(closest('https://i.imgur.com/oOqrAsc.png'))
+        .file('https://i.imgur.com/oOqrAsc.png')
         .name(EFFECT_NAME)
         .atLocation(token)
         .attachTo(token, { align: 'center', edge: 'outer', bindVisibility: false, offset: { x: -0.54, y: 0.385 }, gridUnits: true, bindRotation: false })

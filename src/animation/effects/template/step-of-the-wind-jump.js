@@ -17,10 +17,12 @@ async function create(token, config = {}) {
     let upTime = jumpTime*0.5;
     let downTime = jumpTime*0.4;
 
+    const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
+    const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
     const cfg = { 
         radius: 1,
         max: 500,
-        icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm', 
+        icon: portalPath, 
         label: 'Step of the Wind'
     };
     let [position, _] = await template.getPosition(template, cfg);

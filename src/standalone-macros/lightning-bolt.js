@@ -95,10 +95,12 @@ async function getTargetOrPoint(templateDoc, config = {}) {
         secondary = target.center ?? { x: target.x, y: target.y };
         primary = tokenCenter;
     } else {
+        const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
+        const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
         const crosshairCfg = {
             radius: 1,
             max: 500,
-            icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm',
+            icon: portalPath,
             label: label
         };
         const point = await Sequencer.Crosshair.show(crosshairCfg);

@@ -96,7 +96,7 @@ sequence.effect()
 // 5. Persistent blue glint aura on caster
 sequence.effect()
     .name(casterLabel)
-    .file(closest("jb2a.glint.blue.few.0"))
+    .file(closest("jb2a.glint.blue.few"))
     .atLocation(token)
     .scaleToObject(1.75)
     .attachTo(token)
@@ -337,7 +337,7 @@ for (const target of targets) {
     // Analytical verification glints on targeted creature
     sequence.effect()
         .name(targetLabel)
-        .file(closest("jb2a.glint.blue.many.0"))
+        .file(closest("jb2a.glint.blue.many"))
         .atLocation(target)
         .randomRotation()
         .scaleToObject(0.75)

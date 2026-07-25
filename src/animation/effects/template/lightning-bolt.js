@@ -4,7 +4,7 @@
  */
 
 import { closest } from '../../../lib/filemanager.js';
-import { templates } from '../../../lib/templates.js';
+import { template } from '../../../lib/templates.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
@@ -29,7 +29,7 @@ async function create(token, config = {}) {
         icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm', 
         label: id
     };
-    let [primary, secondary] = await templates.getPosition(template, cfg);
+    let [primary, secondary] = await template.getPosition(template, cfg);
     if (primary.cancelled) { return; }
     if (!secondary) {
         secondary = primary;

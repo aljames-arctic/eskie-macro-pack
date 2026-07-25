@@ -43,8 +43,7 @@ Hooks.once('init', async () => {
                 crosshair,
                 socket,
                 standaloneMacros,
-                template,
-                templates: template
+                template
             };
         }
     }

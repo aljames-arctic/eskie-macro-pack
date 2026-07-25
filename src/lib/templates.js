@@ -47,8 +47,6 @@ async function getPosition(template, config = {}) {
     }
 }
 
-export const templates = {
+export const template = {
     getPosition
 };
-
-export const template = templates;

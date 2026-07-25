@@ -5,7 +5,7 @@
 ** */
 
 import { closest } from '../../../lib/filemanager.js';
-import { templates } from '../../../lib/templates.js';
+import { template } from '../../../lib/templates.js';
 import { socket } from '../../../integration/socketlib.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
@@ -64,7 +64,7 @@ async function create(token, config = {}) {
     const safeElevation = (token.document.elevation || 0) + 10;
 
     // 1. Select location with Crosshair
-    let [position, _] = await templates.getPosition(template, crosshair);
+    let [position, _] = await template.getPosition(template, crosshair);
     if (!position || position.cancelled ) { return null; }
 
     // 2. Door Detection Logic

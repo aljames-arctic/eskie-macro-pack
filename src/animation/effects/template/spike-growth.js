@@ -4,7 +4,7 @@
 ** */
 
 import { closest } from "../../../lib/filemanager.js";
-import { templates } from '../../../lib/templates.js';
+import { template } from '../../../lib/templates.js';
 import { autoanimations, CONCENTRATING } from "../../../integration/autoanimations.js";
 
 const DEFAULT_CONFIG = {
@@ -142,7 +142,7 @@ async function createSpikeGrowth(token, config = {}, options = {}) {
         icon: 'modules/jb2a_patreon/Library/Generic/Portals/Portal_Bright_Purple_V_400x250.webm', 
         label: 'Spike Growth'
     };
-    let [position, _] = await templates.getPosition(template, cfg);
+    let [position, _] = await template.getPosition(template, cfg);
     if (!position) { return; }
 
     const initialSequence = await createInitialSpikeGrowth(position, config);

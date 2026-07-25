@@ -154,7 +154,7 @@ for (const target of targets) {
     // Dynamic orange outward particles on impact
     sequence.effect()
         .name(targetLabel)
-        .file(closest("jb2a.particles.outward.orange.02.02"))
+        .file(closest("jb2a.particles.outward.orange.02.03"))
         .atLocation(target, { offset: { x: -0.25 * targetWidth, y: -0.3 * targetWidth }, randomOffset: 0.1, gridUnits: true })
         .scale(0.25 * targetWidth)
         .duration(800)

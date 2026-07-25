@@ -162,7 +162,7 @@ mainSequence
     })
 
     .effect()
-    .file(closest("eskie.damage.electricity.01.blue"))
+    .file(closest("eskie.damage.electricity.01.purple"))
     .atLocation(token, { offset: { x: 0, y: 0 }, gridUnits: true })
     .attachTo(token)
     .scaleToObject(tokenScaleX * 1.4)
@@ -272,7 +272,7 @@ for (let e = 0; e < 10; e++) {
                     .zIndex(3)
 
                     .effect()
-                    .file(closest("eskie.attack.ranged.arrow.01.physical.medium.purple"))
+                    .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.purpleblack"))
                     .atLocation(initialPoints[u])
                     .stretchTo(position)
                     .filter("ColorMatrix", { hue: 70 })
@@ -297,10 +297,10 @@ for (let e = 0; e < 10; e++) {
                                 .opacity(0.35)
 
                                 .effect()
-                                .file(closest("jb2a.impact.009.purple"))
+                                .file(closest("jb2a.impact.009.orange"))
                                 .atLocation(target, { randomOffset: 1, gridUnits: true })
                                 .randomRotation()
-                                .filter("ColorMatrix", { saturate: -0.4 })
+                                .filter("ColorMatrix", { hue: 250, saturate: -0.4 })
                                 .scaleToObject(1)
                                 .zIndex(0)
 
@@ -376,7 +376,7 @@ for (let e = 0; e < 10; e++) {
                     .zIndex(3)
 
                     .effect()
-                    .file(closest("eskie.attack.ranged.arrow.01.physical.medium.purple"))
+                    .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.purpleblack"))
                     .atLocation(initialPoints[u])
                     .stretchTo(initialPoints[(u + 1)])
                     .filter("ColorMatrix", { hue: 70 })
@@ -397,11 +397,11 @@ for (let e = 0; e < 10; e++) {
                                 .opacity(0.35)
 
                                 .effect()
-                                .file(closest("jb2a.impact.009.purple"))
+                                .file(closest("jb2a.impact.009.orange"))
                                 .atLocation(target, { randomOffset: 1, gridUnits: true })
                                 .randomRotation()
                                 .scaleToObject(1)
-                                .filter("ColorMatrix", { saturate: -0.4 })
+                                .filter("ColorMatrix", { hue: 250, saturate: -0.4 })
                                 .zIndex(0)
 
                                 .play();
@@ -414,7 +414,7 @@ for (let e = 0; e < 10; e++) {
         mainSequence.addSequence(new Sequence()
             .effect()
             .name(`location`)
-            .file(closest("eskie.attack.ranged.arrow.01.physical.medium.purple"))
+            .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.purpleblack"))
             .atLocation(points[e])
             .stretchTo(points[0])
             .filter("ColorMatrix", { hue: 70 })
@@ -436,11 +436,11 @@ for (let e = 0; e < 10; e++) {
                         .opacity(0.35)
 
                         .effect()
-                        .file(closest("jb2a.impact.009.purple"))
+                        .file(closest("jb2a.impact.009.orange"))
                         .atLocation(target, { gridUnits: true })
                         .randomRotation()
                         .scaleToObject(2)
-                        .filter("ColorMatrix", { saturate: -0.4 })
+                        .filter("ColorMatrix", { hue: 250, saturate: -0.4 })
                         .zIndex(0)
                         .delay(700)
                         .waitUntilFinished(-500)
@@ -500,7 +500,7 @@ for (let e = 0; e < 10; e++) {
             .wait(400)
 
             .effect()
-            .file(closest("eskie.lightning.lightning_bolt.purple"))
+            .file(closest("eskie.lightning.lightning_bolt.blue"))
             .atLocation(position, { offset: { x: size / 2, y: -0.5 }, gridUnits: true })
             .stretchTo(position, { offset: { x: (size / 2) * -1, y: 0.5 }, gridUnits: true })
             .filter("ColorMatrix", { hue: 60 })
@@ -519,7 +519,7 @@ for (let e = 0; e < 10; e++) {
     } else {
         mainSequence.addSequence(new Sequence()
             .effect()
-            .file(closest("eskie.attack.ranged.arrow.01.physical.medium.purple"))
+            .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.purpleblack"))
             .atLocation(points[e])
             .stretchTo(points[e + 1])
             .fadeOut(1000)
@@ -527,7 +527,7 @@ for (let e = 0; e < 10; e++) {
             .zIndex(4)
 
             .effect()
-            .file(closest("eskie.attack.ranged.arrow.01.physical.medium.purple"))
+            .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.purpleblack"))
             .atLocation(points[9 - e])
             .stretchTo(points[9 - e - 1])
             .fadeOut(1000)
@@ -553,11 +553,11 @@ for (let e = 0; e < 10; e++) {
                         .opacity(0.35)
 
                         .effect()
-                        .file(closest("jb2a.impact.009.purple"))
+                        .file(closest("jb2a.impact.009.orange"))
                         .atLocation(target, { randomOffset: 1, gridUnits: true })
                         .randomRotation()
                         .scaleToObject(1)
-                        .filter("ColorMatrix", { saturate: -0.4 })
+                        .filter("ColorMatrix", { hue: 250, saturate: -0.4 })
                         .playIf(() => {
                             return Math.random() < 0.5;
                         })

@@ -36,6 +36,18 @@ if (activeEffects.length > 0) {
 
 const target = game.user.targets.first();
 if (!target) return ui.notifications.warn("Please target an enemy for wolf pack bite strike!");
+
+const closest = (path) => {
+    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
+        return eskie.util.file.closest(path);
+    }
+    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
+    if (typeof apiClosest === "function") {
+        return apiClosest(path);
+    }
+    return path;
+};
+
 const tokenWidth = token.document?.width ?? 1;
 const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
 const targetRotation = target.document?.rotation ?? target.rotation ?? 0;

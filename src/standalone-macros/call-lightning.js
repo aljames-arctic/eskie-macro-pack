@@ -99,7 +99,7 @@ function addLightningStrikeToSequence(sequence, position, config = {}) {
     // Ground crack impact below tokens
     sequence.effect()
         .delay(250)
-        .file(closest("jb2a.impact.ground_crack.blue.01"))
+        .file(closest("jb2a.impact.ground_crack.01.blue"))
         .atLocation(position)
         .belowTokens()
         .randomRotation()

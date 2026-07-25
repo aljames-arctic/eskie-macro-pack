@@ -59,6 +59,9 @@ When a user asks to convert an effect from the `src/animation/` directory into a
    - The second time the macro is called, the effect should be stopped using the logic from the `stop()` function (e.g. `Sequencer.EffectManager.endEffects({ name: label, object: token })`).
    - Use `Sequencer.EffectManager.getEffects({ name: label, object: token }).length > 0` to check if the effect is currently playing.
 11. **Output the Macro**: Write the resulting JavaScript code into `src/standalone-macros/` following the naming convention of the existing files. For effects with multiple variants, the filename should include the variant name (e.g. `rage-electric.js`, `rage-super-saiyan.js`, etc.).
+12. **CRITICAL: Strict `src/*` Asset Source Parity Rule**:
+    - Every literal sequence key string (`jb2a.*`, `eskie.*`, `psfx.*`, `blfx.*`) used in a standalone macro script MUST be checked against the corresponding modular original file in `src/animation/`.
+    - If a standalone macro includes an asset path that did NOT exist in its `src/*` modular original script, verify whether it is a valid runtime sequence or delete/replace it with the canonical `src/*` original asset. Never invent custom preset particle options without confirming their presence in the `src/*` codebase or JB2A.
 
 ## Concrete Example: Before & After
 

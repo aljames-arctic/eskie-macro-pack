@@ -5,6 +5,8 @@ import { log } from './logger.js';
  * Used as a base list and fallback if directory browsing is unavailable.
  */
 const KNOWN_STANDALONE_MACROS = [
+    'animate-dead.js',
+    'armor-of-agathys.js',
     'arms-of-hadar.js',
     'banishment.js',
     'benign-transportation.js',
@@ -14,6 +16,7 @@ const KNOWN_STANDALONE_MACROS = [
     'charmed.js',
     'chromatic-orb.js',
     'color-spray.js',
+    'control-undead.js',
     'dimension-door.js',
     'disintegrate.js',
     'divine-smite.js',
@@ -44,9 +47,11 @@ const KNOWN_STANDALONE_MACROS = [
     'shocking-grasp.js',
     'silence.js',
     'sleep.js',
+    'sneak-attack.js',
     'speak-with-dead.js',
     'spike-growth.js',
     'strength-before-death.js',
+    'stunning-fist.js',
     'sword-art-online.js',
     'tashas-caustic-brew.js'
 ];

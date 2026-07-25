@@ -58,7 +58,7 @@ if (activeFly.length > 0 || activeLanding.length > 0 || hasTag) {
 
     for (const offset of thrusterOffsets) {
         departureSeq.effect()
-            .file(closest("jb2a.dancing_lights.01.red"))
+            .file(closest("jb2a.dancing_light.red"))
             .scaleToObject(0.25)
             .attachTo(target, { offset, gridUnits: true, local: true, bindAlpha: false })
             .filter("ColorMatrix", { saturate: 1 })
@@ -237,7 +237,7 @@ const thrusterPositions = [
 
 for (const offset of thrusterPositions) {
     seq.effect()
-        .file(closest("jb2a.dancing_lights.01.red"))
+        .file(closest("jb2a.dancing_light.red"))
         .scaleToObject(0.25)
         .name(effectNameFly)
         .attachTo(target, { offset, gridUnits: true, local: true, bindAlpha: false })

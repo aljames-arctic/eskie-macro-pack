@@ -6,12 +6,14 @@ import { log } from './logger.js';
  */
 const KNOWN_STANDALONE_MACROS = [
     'arms-of-hadar.js',
+    'banishment.js',
     'bless.js',
     'call.js',
     'color-spray.js',
     'dimension-door.js',
     'disintegrate.js',
     'divine-smite.js',
+    'enlarge-reduce.js',
     'faerie-fire.js',
     'fire-shield.js',
     'fly.js',
@@ -25,10 +27,13 @@ const KNOWN_STANDALONE_MACROS = [
     'misty-step.js',
     'rage.js',
     'revivify.js',
+    'shocking-grasp.js',
     'silence.js',
+    'sleep.js',
     'speak-with-dead.js',
     'spike-growth.js',
-    'sword-art-online.js'
+    'sword-art-online.js',
+    'tashas-caustic-brew.js'
 ];
 
 /**

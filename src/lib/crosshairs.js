@@ -21,46 +21,95 @@ function getBbcApi() {
 }
 
 /**
+ * Normalizes polymorphic caller arguments into a valid canvas template placeable and configuration object.
+ * Validates that tokens or tiles are not passed as the target placeable to prevent BBC from hiding them.
+ *
+ * @param {object|null} targetOrPlaceable Potential template/region placeable or token object
+ * @param {object} [config={}] Configuration options
+ * @returns {{placeable: object|null, config: object}} Normalized placeable and options
+ */
+function normalizeCrosshairInvocation(targetOrPlaceable, config = {}) {
+    const docName = targetOrPlaceable?.documentName ?? targetOrPlaceable?.document?.documentName;
+    const isTokenOrTile = docName === 'Token' || docName === 'Tile';
+
+    if (isTokenOrTile) {
+        log.debug(`normalizeCrosshairInvocation | Passed object is a ${docName} ("${targetOrPlaceable?.name ?? targetOrPlaceable?.document?.name}"), normalizing to token config.`);
+        return {
+            placeable: null,
+            config: foundry.utils.mergeObject({ token: targetOrPlaceable }, config, { inplace: false })
+        };
+    }
+
+    const isTemplateOrRegion = docName === 'MeasuredTemplate' || docName === 'Region';
+    if (!isTemplateOrRegion && targetOrPlaceable !== null && targetOrPlaceable !== undefined) {
+        log.warn('normalizeCrosshairInvocation | First parameter is neither a template placeable nor a Token/Tile.', targetOrPlaceable);
+    }
+
+    return {
+        placeable: targetOrPlaceable ?? null,
+        config: config ?? {}
+    };
+}
+
+/**
  * Delegates a specific shape crosshair play invocation to BBC.
  *
  * @param {string} shape The shape name ('cone', 'circle', 'ray', 'square')
- * @param {Token} token The casting Token instance
- * @param {object} [config={}] Shape configuration options
+ * @param {object|null} targetOrPlaceable The canvas MeasuredTemplate/Region placeable or source Token
+ * @param {object} [rawConfig={}] Shape configuration options
  * @returns {Promise<unknown>} The BBC play sequence result
  */
-async function playShape(shape, token, config = {}) {
+async function playShape(shape, targetOrPlaceable, rawConfig = {}) {
     const api = getBbcApi();
-    log.debug(`Delegating crosshair "${shape}" play to BBC API for token:`, token?.name);
+    const { placeable, config } = normalizeCrosshairInvocation(targetOrPlaceable, rawConfig);
+    log.debug(`Delegating crosshair "${shape}" play to BBC API for target:`, placeable?.id ?? config.token?.name);
     const shapeBuilder = api.crosshair?.[shape] ?? api.crosshair?.circle;
     if (typeof shapeBuilder?.play === 'function') {
-        return shapeBuilder.play(token, config);
+        return shapeBuilder.play(placeable, config);
     }
-    return api.crosshair.play(shape, token, config);
+    return api.crosshair.play(shape, placeable, config);
 }
 
 export const crosshair = {
     cone: {
-        play: (token, config = {}) => playShape('cone', token, config),
-        create: (token, config = {}) => getBbcApi().crosshair?.cone?.create?.(token, config),
+        play: (targetOrPlaceable, config = {}) => playShape('cone', targetOrPlaceable, config),
+        create: (targetOrPlaceable, config = {}) => {
+            const { placeable, config: normConfig } = normalizeCrosshairInvocation(targetOrPlaceable, config);
+            return getBbcApi().crosshair?.cone?.create?.(placeable, normConfig);
+        },
         stop: (token, config = {}) => getBbcApi().crosshair?.cone?.stop?.(token, config)
     },
     circle: {
-        play: (token, config = {}) => playShape('circle', token, config),
-        create: (token, config = {}) => getBbcApi().crosshair?.circle?.create?.(token, config),
+        play: (targetOrPlaceable, config = {}) => playShape('circle', targetOrPlaceable, config),
+        create: (targetOrPlaceable, config = {}) => {
+            const { placeable, config: normConfig } = normalizeCrosshairInvocation(targetOrPlaceable, config);
+            return getBbcApi().crosshair?.circle?.create?.(placeable, normConfig);
+        },
         stop: (token, config = {}) => getBbcApi().crosshair?.circle?.stop?.(token, config)
     },
     ray: {
-        play: (token, config = {}) => playShape('ray', token, config),
-        create: (token, config = {}) => getBbcApi().crosshair?.ray?.create?.(token, config),
+        play: (targetOrPlaceable, config = {}) => playShape('ray', targetOrPlaceable, config),
+        create: (targetOrPlaceable, config = {}) => {
+            const { placeable, config: normConfig } = normalizeCrosshairInvocation(targetOrPlaceable, config);
+            return getBbcApi().crosshair?.ray?.create?.(placeable, normConfig);
+        },
         stop: (token, config = {}) => getBbcApi().crosshair?.ray?.stop?.(token, config)
     },
     square: {
-        play: (token, config = {}) => playShape('square', token, config),
-        create: (token, config = {}) => getBbcApi().crosshair?.square?.create?.(token, config),
+        play: (targetOrPlaceable, config = {}) => playShape('square', targetOrPlaceable, config),
+        create: (targetOrPlaceable, config = {}) => {
+            const { placeable, config: normConfig } = normalizeCrosshairInvocation(targetOrPlaceable, config);
+            return getBbcApi().crosshair?.square?.create?.(placeable, normConfig);
+        },
         stop: (token, config = {}) => getBbcApi().crosshair?.square?.stop?.(token, config)
     },
-    play: (typeOrToken, tokenOrConfig, config) => {
+    play: (typeOrPlaceable, placeableOrConfig, config) => {
         const api = getBbcApi();
-        return api.crosshair.play(typeOrToken, tokenOrConfig, config);
+        if (typeof typeOrPlaceable === 'string') {
+            const { placeable, config: normConfig } = normalizeCrosshairInvocation(placeableOrConfig, config);
+            return api.crosshair.play(typeOrPlaceable, placeable, normConfig);
+        }
+        const { placeable, config: normConfig } = normalizeCrosshairInvocation(typeOrPlaceable, placeableOrConfig);
+        return api.crosshair.play(placeable, normConfig);
     }
 };

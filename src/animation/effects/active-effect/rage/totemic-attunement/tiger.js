@@ -82,7 +82,7 @@ function create(token, target, config = {}) {
                 
     .effect()
         .delay(100)
-        .file(closest("eskie.velocity.01"))
+        .file(closest("eskie.velocity.01.white"))
         .atLocation(token)
         .rotateTowards(target)
         .scaleToObject(4)

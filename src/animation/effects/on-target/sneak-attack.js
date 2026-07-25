@@ -43,7 +43,7 @@ async function createMelee(token, target, config = {}) {
 
         .effect()
         .delay(150)
-        .file(closest(`jb2a.impact.007.${color.impact}`))
+        .file(closest(`jb2a.impact.008.${color.impact}`))
         .size(1.25 * token.document.width, { gridUnits: true })
         .atLocation(targetSquare)
         .randomRotation()
@@ -52,7 +52,7 @@ async function createMelee(token, target, config = {}) {
 
         .effect()
         .delay(150)
-        .file(closest(`jb2a.liquid.splash_side02.${color.damage}`))
+        .file(closest(`jb2a.liquid.splash_side.${color.damage}`))
         .atLocation(targetSquare)
         .size(1.5 * token.document.width, { gridUnits: true })
         .rotateTowards(token)
@@ -108,7 +108,7 @@ function createRanged(token, target, config = {}) {
 
         .effect()
         .delay(150)
-        .file(closest(`jb2a.impact.007.${color.impact}`))
+        .file(closest(`jb2a.impact.008.${color.impact}`))
         .size(1.25 * token.document.width, { gridUnits: true })
         .atLocation(target)
         .randomRotation()
@@ -117,7 +117,7 @@ function createRanged(token, target, config = {}) {
 
         .effect()
         .delay(150)
-        .file(closest(`jb2a.liquid.splash_side02.${color.damage}`))
+        .file(closest(`jb2a.liquid.splash_side.${color.damage}`))
         .atLocation(target)
         .size(1.5 * token.document.width, { gridUnits: true })
         .rotateTowards(token)

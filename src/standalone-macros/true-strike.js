@@ -132,7 +132,7 @@ sequence.effect()
 // 8. Glowing Foresight Eye Overlay hovering above caster
 sequence.effect()
     .name(casterLabel)
-    .file(closest("eskie.symbol.eye.01.cyan"))
+    .file(closest("eskie.symbol.eye.01.purple"))
     .atLocation(token)
     .attachTo(token, { offset: { y: -0.65 }, gridUnits: true })
     .scaleToObject(0.55)
@@ -155,7 +155,7 @@ for (const target of targets) {
     // 1. Divination analytical circle intro mark on target
     sequence.effect()
         .name(targetLabel)
-        .file(closest("jb2a.magic_signs.circle.02.divination.intro.blue"))
+        .file(closest("jb2a.magic_signs.circle.02.conjuration.intro.blue"))
         .atLocation(target)
         .attachTo(target)
         .scaleToObject(1.6 * targetScaleX)
@@ -168,7 +168,7 @@ for (const target of targets) {
     // 2. Persistent Divination loop analytical scanning mark below target
     sequence.effect()
         .name(targetLabel)
-        .file(closest("jb2a.magic_signs.circle.02.divination.loop.blue"))
+        .file(closest("jb2a.magic_signs.circle.02.conjuration.loop.blue"))
         .atLocation(target)
         .attachTo(target)
         .scaleToObject(1.5 * targetScaleX)

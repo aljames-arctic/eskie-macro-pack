@@ -108,7 +108,7 @@ const WING_CONFIGS = {
         wingSize: 1.25,
         speedMulti: 1.35,
         swayMulti: 1.1,
-        introParticle: "jb2a.impact.010.orange",
+        introParticle: "jb2a.impact.009.orange",
         introHue: 0,
         tint: "#ff2200"
     },

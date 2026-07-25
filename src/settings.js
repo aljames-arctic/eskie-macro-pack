@@ -83,6 +83,7 @@ Hooks.once('init', function() {
 // Ensure AA Autorec Update button is hidden if Automated Animations is disabled
 Hooks.on('renderSettingsConfig', function(app, html, data) {
     if (!game.modules.get("autoanimations")?.active) {
-        html.find(`[data-key="${MODULE_ID}.autorecUpdate"]`).closest('.form-group').remove();
+        const root = html instanceof jQuery ? html[0] : (html.querySelector ? html : html?.[0]);
+        root?.querySelector(`[data-key="${MODULE_ID}.autorecUpdate"]`)?.closest('.form-group')?.remove();
     }
 });

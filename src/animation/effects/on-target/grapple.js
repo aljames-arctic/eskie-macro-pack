@@ -15,7 +15,7 @@ function create(token, target, config = {}) {
     const sequenceOn = new Sequence()
         .effect()
             .name(label)
-            .file("modules/eskie-effects/assets/Objects/Biological/Hand/Spectral_Hand/Ranged/01/Objects_Biological_Hand_Spectral_Hand_Ranged_01_Generic_Latch_Blue_05ft.webm")
+            .file(closest("eskie.objects.biological.hand.spectral_hand.ranged.01.generic.latch.blue.05ft"))
             .attachTo(token)
             .stretchTo(target, {attachTo: true, offset: {x: 0.5}, gridUnits: true, local: true})
             .spriteOffset({x: -0.1}, { gridUnits: true })

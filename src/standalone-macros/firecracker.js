@@ -66,10 +66,10 @@ if (typeof scope !== "undefined" && scope?.template) {
 if (!position) return;
 
 const impactColors = [
-    "jb2a.impact.001.yellow",
     "jb2a.impact.002.yellow",
-    "jb2a.impact.005.orange",
-    "jb2a.impact.010.orange",
+    "jb2a.impact.003.yellow",
+    "jb2a.impact.009.orange",
+    "jb2a.impact.008.orange",
     "jb2a.impact.004.blue"
 ];
 

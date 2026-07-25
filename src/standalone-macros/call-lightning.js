@@ -116,7 +116,7 @@ function addStormCloudToSequence(sequence, centerPosition, config = {}) {
     // Outer dark storm cloud swirl
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.fog.01.grey"))
+        .file(closest("jb2a.smoke.puff.centered.grey"))
         .atLocation(centerPosition)
         .size(cloudSize, { gridUnits: true })
         .opacity(0.65)
@@ -142,7 +142,7 @@ function addStormCloudToSequence(sequence, centerPosition, config = {}) {
     // Evocation swirl magic ring overhead
     sequence.effect()
         .name(label)
-        .file(closest("jb2a.magic_signs.circle.02.evocation.loop.blue"))
+        .file(closest("jb2a.magic_signs.circle.02.conjuration.loop.blue"))
         .atLocation(centerPosition)
         .size(cloudSize * 0.5, { gridUnits: true })
         .opacity(0.35)

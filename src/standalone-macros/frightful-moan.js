@@ -217,7 +217,7 @@ for (const target of targets) {
     sequence.effect()
         .name(targetLabel)
         .delay(650)
-        .file(closest("jb2a.toll_the_dead.purple.complete"))
+        .file(closest("jb2a.toll_the_dead.red.skull_smoke"))
         .atLocation(target, { offset: { y: -0.2 * targetWidth }, gridUnits: true })
         .scaleToObject(1.1)
         .filter("ColorMatrix", { saturate: -1, brightness: 1.4 })

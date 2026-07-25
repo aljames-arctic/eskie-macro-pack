@@ -19,7 +19,7 @@ async function create(token, config = {}) {
 
     let seq = new Sequence();
     seq = seq.effect()
-        .file(closest("jb2a.energy_strands.in.red.01"))
+        .file(closest("jb2a.energy_strands.in.yellow.01.2"))
         .attachTo(token)
         .scaleToObject(9, { considerTokenScale: true })
         .filter("ColorMatrix", { brightness: 0 })
@@ -79,7 +79,7 @@ async function create(token, config = {}) {
         .waitUntilFinished(-500);
 
     seq = seq.effect()
-        .file(closest("jb2a.impact.ground_crack.dark_red.01"))
+        .file(closest("jb2a.impact.ground_crack.01.dark_red"))
         .atLocation(token)
         .belowTokens()
         .filter("ColorMatrix", { hue: -15, saturate: 1 })
@@ -106,7 +106,7 @@ async function create(token, config = {}) {
 
     seq = seq.effect()
         .name(id)
-        .file(closest("jb2a.energy_strands.complete.dark_red.01"))
+        .file(closest("jb2a.energy_strands.complete.purple.01"))
         .attachTo(token)
         .scaleToObject(2, { considerTokenScale: true })
         .opacity(1)
@@ -118,7 +118,7 @@ async function create(token, config = {}) {
 
     seq = seq.effect()
         .name(id)
-        .file(closest("jb2a.energy_strands.overlay.dark_red.01"))
+        .file(closest("jb2a.energy_strands.overlay.purple.01"))
         .attachTo(token)
         .scaleToObject(2, { considerTokenScale: true })
         .filter("ColorMatrix", { brightness: 0 })

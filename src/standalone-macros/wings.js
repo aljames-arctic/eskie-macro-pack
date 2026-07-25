@@ -84,7 +84,7 @@ const WING_CONFIGS = {
         wingSize: 1.1,
         speedMulti: 1.0,
         swayMulti: 1.0,
-        introParticle: "jb2a.sparkles.orange.01",
+        introParticle: "jb2a.twinkling_stars.points04.white",
         introHue: 180,
         tint: null
     },

@@ -58,7 +58,7 @@ async function create(token, config = {}) {
         .zIndex(0)
 
         .effect()
-        .file("jb2a.arms_of_hadar.dark_purple")
+        .file(closest("jb2a.arms_of_hadar.dark_purple"))
         .atLocation(token)
         .randomRotation()
         .scaleIn(0, 1500, { ease: "easeOutCirc" })

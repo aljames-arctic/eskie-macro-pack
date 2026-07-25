@@ -9,15 +9,20 @@ const KNOWN_STANDALONE_MACROS = [
     'bless.js',
     'call.js',
     'color-spray.js',
+    'dimension-door.js',
     'disintegrate.js',
     'divine-smite.js',
     'faerie-fire.js',
     'fire-shield.js',
+    'grease.js',
     'hacking.js',
     'healing-word.js',
+    'lightning-bolt.js',
     'mirror-image.js',
+    'rage.js',
     'silence.js',
     'speak-with-dead.js',
+    'spike-growth.js',
     'sword-art-online.js'
 ];
 

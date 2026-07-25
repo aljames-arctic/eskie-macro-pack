@@ -144,7 +144,7 @@ if (isPlaying) {
                 })
 
                 .effect()
-                .file(tokenOverlay)
+                .file(closest(tokenOverlay))
                 .attachTo(token, {bindAlpha: false, bindVisibility: false, bindRotation: false})
                 .mask(tokenShapeMask)
                 .rotate(-rotation)

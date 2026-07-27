@@ -3,6 +3,7 @@
 
 if git diff --quiet HEAD -- 'packs/**/*.ldb' && git diff --cached --quiet -- 'packs/**/*.ldb'; then
     echo "ℹ️  No .ldb compendium changes detected. Cleaning up LevelDB runtime churn in packs/..."
+    git restore --staged packs/ 2>/dev/null || git reset HEAD -- packs/ 2>/dev/null || true
     git checkout -- packs/ 2>/dev/null || true
     git clean -fd packs/ 2>/dev/null || true
 fi

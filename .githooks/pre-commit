@@ -1,0 +1,8 @@
+#!/bin/sh
+# Pre-commit hook: Auto-discard LevelDB runtime churn if no .ldb data files changed
+
+if git diff --quiet HEAD -- 'packs/**/*.ldb' && git diff --cached --quiet -- 'packs/**/*.ldb'; then
+    echo "ℹ️  No .ldb compendium changes detected. Cleaning up LevelDB runtime churn in packs/..."
+    git checkout -- packs/ 2>/dev/null || true
+    git clean -fd packs/ 2>/dev/null || true
+fi

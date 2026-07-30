@@ -90,12 +90,12 @@ async function configure(token, tile, config = {}) {
     return { rotation, travelTime, label, delta: {x: dx, y: dy} };
 }
 
-async function setup(playPath, config = {}) {
+async function setup(animation, config = {}) {
     dependency.required([{ id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers" }]);
 
     if (!game.user.isGM) return ui.notifications.error(game.i18n.localize('EMP.traps.setup.onlyGm'));
 
-    const pathParts = playPath.split('.');
+    const pathParts = animation.split('.');
     const trapKey = pathParts[pathParts.length - 1];
     const tileCount = config.tileCount ?? 2;
 
@@ -195,35 +195,37 @@ async function setup(playPath, config = {}) {
         }
     }
 
-    const code = `const playPath = tile.getFlag('${MODULE_ID}', 'trap.playPath');
-const originTileIds = tile.getFlag('${MODULE_ID}', 'trap.trapOriginTileIds') || tile.getFlag('${MODULE_ID}', 'trap.trapTileIds') || [];
-if (playPath && typeof token !== 'undefined') {
-    const trap = foundry.utils.getProperty(globalThis, playPath);
-    if (trap && typeof trap.play === 'function') {
-        originTileIds.forEach(id => {
-            const originTile = canvas.tiles.get(id);
-            if (originTile) trap.play(originTile, [token]);
-        });
-    }
-}`;
+    const code = `
+if (!token) return;
+
+// Get the specific Eskie Trap Animation Function
+const animation = tile.getFlag('${MODULE_ID}', 'trap.animation');
+if (!animation) return;
+const trap = foundry.utils.getProperty(globalThis, animation);
+if (!trap || typeof trap.play !== 'function') return;
+
+// Play the trap animation for the token(s)
+const originIds = tile.getFlag('${MODULE_ID}', 'trap.originIds') ?? [];
+originIds.forEach(id => {
+    const originTile = canvas.tiles.get(id);
+    if (originTile) trap.play(originTile, [token.object ?? token]);
+});
+`;
 
     // Update trigger tiles
     for (const triggerTile of triggerTiles) {
         const updateData = {
-            [`flags.${MODULE_ID}.trap.playPath`]: playPath,
-            [`flags.${MODULE_ID}.trap.trapKey`]: trapKey,
-            [`flags.${MODULE_ID}.trap.trapOriginTileIds`]: originTiles.map(t => t.id),
-            // Maintain backward compatibility for older runcode scripts
-            [`flags.${MODULE_ID}.trap.trapTileIds`]: originTiles.map(t => t.id),
+            [`flags.${MODULE_ID}.trap.animation`]: animation,
+            [`flags.${MODULE_ID}.trap.originIds`]: originTiles.map(t => t.id),
             [`flags.${MODULE_ID}.trap.isTriggerTile`]: true,
             'flags.monks-active-tiles.active': true,
-            'flags.monks-active-tiles.trigger': config.trigger || ['enter'],
+            'flags.monks-active-tiles.trigger': config.trigger ?? ['enter'],
             'flags.monks-active-tiles.actions': [{
                 id: foundry.utils.randomID(),
                 action: 'runcode',
                 data: { code },
             }],
-            'flags.monks-active-tiles.controlled': config.controlled || 'gm',
+            'flags.monks-active-tiles.controlled': config.controlled ?? 'gm',
         };
         await socket.tile.edit(triggerTile.id, updateData);
     }

@@ -37,7 +37,7 @@ async function create(tile, targets, config = {}) {
             .file(closest('jb2a.breath_weapons02.burst.cone.fire.orange.02'))
             .atLocation(tile)
             .size(size, { gridUnits: true })
-            .rotateTowards(targetLoc)
+            .stretchTo(targetLoc)
             .zIndex(1);
     }
 

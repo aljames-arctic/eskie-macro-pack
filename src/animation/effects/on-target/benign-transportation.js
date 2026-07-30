@@ -33,6 +33,8 @@ async function create(token, targets, config = {}) {
     const { id, animations, sound, teleport } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
 
     if (!Array.isArray(targets)) targets = [targets];
+    targets = targets.filter(target => target.id != token.id);
+
     const A = targets[0];
     const B = (targets.length > 1) ? targets[1] : token;
 

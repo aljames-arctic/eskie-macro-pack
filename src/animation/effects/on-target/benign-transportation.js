@@ -34,7 +34,8 @@ async function create(token, targets, config = {}) {
 
     if (!Array.isArray(targets)) targets = [targets];
     targets = targets.filter(target => target.id != token.id);
-
+    if (targets.length === 0) return;
+    
     const A = targets[0];
     const B = (targets.length > 1) ? targets[1] : token;
 

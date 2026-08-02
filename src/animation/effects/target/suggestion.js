@@ -4,6 +4,7 @@
 ** */
 
 import { closest } from "../../../lib/filemanager.js";
+import { log } from "../../../lib/logger.js";
 
 const DEFAULT_CONFIG = {
     id: 'suggestion',
@@ -123,7 +124,7 @@ async function createSuggestion(token, target, config = {}) {
  */
 async function playSuggestion(token, target, config = {}) {
     if (!target) {
-        console.warn("Suggestion: No target provided.");
+        log.warn("Suggestion: No target provided.");
         return;
     }
     const sequence = await createSuggestion(token, target, config);

@@ -1,4 +1,5 @@
 import { MODULE_ID } from "../../lib/constants.js"
+import { log } from "../../lib/logger.js";
 import { socketlib } from "../socketlib.js"
 
 const tileTrackers = new Map();
@@ -21,7 +22,7 @@ async function waitForTileReplication(tileId) {
     const timeoutId = setTimeout(() => {
         const tracker = tileTrackers.get(trackerId);
         if (tracker) {
-            console.warn(`Eskie Macros | waitForTileReplication | Timeout waiting for tile ${tileId} to replicate to all players.`);
+            log.warn(`waitForTileReplication | Timeout waiting for tile ${tileId} to replicate to all players.`);
             tracker.resolve();
         }
     }, 10000);

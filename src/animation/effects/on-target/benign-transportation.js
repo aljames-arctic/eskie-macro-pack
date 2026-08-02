@@ -38,6 +38,10 @@ async function create(token, targets, config = {}) {
     
     const A = targets[0];
     const B = (targets.length > 1) ? targets[1] : token;
+    const ADest = A.center;
+    const BDest = B.center;
+    console.debug(`benignTransportation | A: ${A.name} (${A.id}) at (${ADest.x},${ADest.y}) -> (${BDest.x},${BDest.y})`);
+    console.debug(`benignTransportation | B: ${B.name} (${B.id}) at (${BDest.x},${BDest.y}) -> (${ADest.x},${ADest.y})`);
 
     const seq = new Sequence();
         if (sound.enabled) {
@@ -66,11 +70,11 @@ async function create(token, targets, config = {}) {
         if (teleport) {
             seq.animation()
                 .on(A)
-                .teleportTo(B.center)
+                .teleportTo(BDest)
                 .snapToGrid()
             .animation()
                 .on(B)
-                .teleportTo(A.center)
+                .teleportTo(ADest)
                 .snapToGrid()
         }
 

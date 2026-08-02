@@ -3,9 +3,9 @@
 **/*LOCK
 **/*LOG
 **/*LOG.old
-!packs/**/*.ldb
-!packs/**/*.log
-!packs/**/CURRENT
 **/*.ldb
 **/*.log
 **/CURRENT
+!packs/**/*.ldb
+!packs/**/*.log
+!packs/**/CURRENT

@@ -4,6 +4,7 @@
 ** */
 
 import { closest } from "../../../lib/filemanager.js";
+import { log } from "../../../lib/logger.js";
 
 const DEFAULT_CONFIG = {
     id: 'trueStrike',
@@ -252,12 +253,12 @@ async function playTrueStrikeAttack(token, target, config = {}) {
     const { id } = mConfig;
 
     if (!target) {
-        console.warn("True Strike Attack: No target provided.");
+        log.warn("True Strike Attack: No target provided.");
         return;
     }
 
     if (!Tagger.hasTags(token, "TrueStrike")) {
-        console.warn("True Strike Attack: Attacking token does not have 'TrueStrike' tag.");
+        log.warn("True Strike Attack: Attacking token does not have 'TrueStrike' tag.");
         return;
     }
 

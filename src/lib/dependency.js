@@ -1,3 +1,5 @@
+import { log } from './logger.js';
+
 /**
  * Checks if the versions are in ascending order.
  * @param {string} min The minimum version.
@@ -83,7 +85,7 @@ function isActivated(dependency, warnMessage) {
         const depRef = dependency?.id + ((dependency?.ref) ? ` (${dependency?.ref})` : '');
         warnMessage += `Warning: ${depRef} is not activated and between expected versions:`;
         warnMessage += _versionMessageAppend(dependency, _getEntity(dependency)?.version);
-        console.warn(warnMessage);
+        log.warn(warnMessage);
     }
     return valid;
 }
@@ -96,7 +98,7 @@ function isInstalled(dependency, warnMessage) {
         const depRef = dependency?.id + ((dependency?.ref) ? ` (${dependency?.ref})` : '');
         warnMessage += `Warning: ${depRef} is not installed and between expected versions:`;
         warnMessage += _versionMessageAppend(dependency, _getEntity(dependency)?.version);
-        console.warn(warnMessage);
+        log.warn(warnMessage);
     }
     return valid;
 }
@@ -124,7 +126,7 @@ function hasSomeRecommended(dependencyList) {
         warnMsg += `\nModule: ${dependency?.id}`;
         if (dependency?.ref) warnMsg += ` (${dependency?.ref})`;
     }
-    console.warn(warnMsg);
+    log.warn(warnMsg);
     return false;
 }
 

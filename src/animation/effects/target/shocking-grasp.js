@@ -4,6 +4,7 @@
 ** */
 
 import { closest } from "../../../lib/filemanager.js";
+import { log } from "../../../lib/logger.js";
 
 const DEFAULT_CONFIG = {
     id: 'shockingGrasp',
@@ -102,7 +103,7 @@ async function createShockingGrasp(token, target, config = {}) {
  */
 async function playShockingGrasp(token, target, config = {}) {
     if (!target) {
-        console.warn("Shocking Grasp: No target provided.");
+        log.warn("Shocking Grasp: No target provided.");
         return;
     }
     const sequence = await createShockingGrasp(token, target, config);

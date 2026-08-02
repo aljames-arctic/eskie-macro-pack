@@ -40,8 +40,8 @@ async function create(token, targets, config = {}) {
     const B = (targets.length > 1) ? targets[1] : token;
     const ADest = A.center;
     const BDest = B.center;
-    console.debug(`benignTransportation | A: ${A.name} (${A.id}) at (${ADest.x},${ADest.y}) -> (${BDest.x},${BDest.y})`);
-    console.debug(`benignTransportation | B: ${B.name} (${B.id}) at (${BDest.x},${BDest.y}) -> (${ADest.x},${ADest.y})`);
+    log.debug(`benignTransportation | A: ${A.name} (${A.id}) at (${ADest.x},${ADest.y}) -> (${BDest.x},${BDest.y})`);
+    log.debug(`benignTransportation | B: ${B.name} (${B.id}) at (${BDest.x},${BDest.y}) -> (${ADest.x},${ADest.y})`);
 
     const seq = new Sequence();
         if (sound.enabled) {

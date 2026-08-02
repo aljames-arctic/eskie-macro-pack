@@ -46,7 +46,7 @@ function bestFit(modulePrefix, ...categories) {
         msg += `\n\tRequested: ${originalPath}`;
         msg += `\n\tResolved as: ${currentPath}`;
         msg += `\n\tAvailable options at divergence: ${divergenceOptions}`;
-        console.warn(msg);
+        log.warn(msg);
     }
     return currentPath;
 }

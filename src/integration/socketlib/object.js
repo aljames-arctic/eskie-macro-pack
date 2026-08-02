@@ -1,5 +1,6 @@
 import { token } from './token.js';
 import { tile } from './tile.js';
+import { log } from '../../lib/logger.js';
 
 /**
  * Generalized edit function that dynamically updates either a Token or a Tile
@@ -17,7 +18,7 @@ async function edit(id, updates = {}) {
         return tile.edit(id, updates);
     }
     
-    console.warn(`socket.object.edit | Object ${id} not found on this client's canvas!`);
+    log.warn(`socket.object.edit | Object ${id} not found on this client's canvas!`);
 }
 
 export const object = {

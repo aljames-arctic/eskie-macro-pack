@@ -94,6 +94,7 @@ import { stepOfTheWindMove } from "./active-effect/step-of-the-wind.js";
 import { strengthBeforeDeath } from "./active-effect/strength-before-death.js";
 import { stunningFist } from "./on-target/stunning-fist.js";
 import { stunningStrike } from "./target/stunning-strike.js";
+import { stormingDashStrikes } from "./token/storming-dash-strikes.js";
 import { suggestion } from "./target/suggestion.js";
 import { surprised } from "./token/surprised.js";
 import { tashasCausticBrew } from "./template/tashas-caustic-brew.js";
@@ -200,6 +201,7 @@ export const effect = {
     strengthBeforeDeath,
     stunningFist,
     stunningStrike,
+    stormingDashStrikes,
     suggestion,
     surprised,
     tashasCausticBrew,

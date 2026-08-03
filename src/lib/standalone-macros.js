@@ -103,6 +103,7 @@ const KNOWN_STANDALONE_MACROS = [
     'spike-growth.js',
     'starward-sword.js',
     'step-of-the-wind-jump.js',
+    'storming-dash-strikes.js',
     'strength-before-death.js',
     'stunning-fist.js',
     'stunning-strike.js',

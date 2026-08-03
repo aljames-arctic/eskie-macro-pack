@@ -27,20 +27,56 @@ const DEFAULT_CONFIG = {
     animationId: undefined
 }
 
+/* In Foundry v14 they changed the anchor points of tiles which really messes with the math for the masks
+ * This function returns the correct offset for the tile based on the Foundry version and the object type (Token or Tile)
+ */
+function getRevealOffset(object) {
+    const updatedTiles = foundry.utils.isNewerVersion(game.version, "14");
+    const widthAdjustment = (getDocumentName(object) === 'Token') ? canvas.grid.size : 1;
+    const scaleXY = object.document.texture.scaleX;
+    const legacyOffset = {
+        x: object.x - (widthAdjustment * object.document.width * (scaleXY - 1) / 2),
+        y: object.y - (widthAdjustment * object.document.height * (scaleXY - 1) / 2)
+    };
+    return updatedTiles ? object.center : legacyOffset;
+}
+function getShapeOffset(object) {
+    const updatedTiles = foundry.utils.isNewerVersion(game.version, "14");
+    const legacyOffset = {
+        x: object.x,
+        y: object.y
+    };
+    return updatedTiles ? object.center : legacyOffset;
+}
+function getTileOffset(object, type) {
+    switch (type) {
+        case 'reveal':
+            return getRevealOffset(object);
+        case 'shape':
+            return getShapeOffset(object);
+        default:
+            throw new Error(`Invalid offset type: ${type}`);
+    }
+}
+// Looks janky but the purpose is to eventually allow for either removal... or pushing to adapter object
+const compat = { getTileOffset };
+
 /* Works for tokens and tiles */
 async function createMaskTiles(object, config = {}) {
     const widthAdjustment = (getDocumentName(object) === 'Token') ? canvas.grid.size : 1;
 
     const { revealOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const revealOverlayPath = absolutePath(revealOverlay);
+    const updatedTiles = foundry.utils.isNewerVersion(game.version, "14");
     const scaleXY = object.document.texture.scaleX;
-
+    
+    const revealOffset = compat.getTileOffset(object, 'reveal');
     const revealMaskUpdatesBase = {
         "texture.src": revealOverlayPath,
         "alpha": 0,
         "hidden": true,
-        "x": object.x - (widthAdjustment * object.document.width * (scaleXY - 1) / 2),
-        "y": object.y - (widthAdjustment * object.document.height * (scaleXY - 1) / 2),
+        "x": revealOffset.x,
+        "y": revealOffset.y,
         "video": {
             autoplay: false,
             loop: false,
@@ -51,12 +87,13 @@ async function createMaskTiles(object, config = {}) {
         "rotation": rotation,
     };
 
+    const shapeOffset = compat.getTileOffset(object, 'shape');
     const objectShapeMaskUpdates = {
         "texture": object.document.texture,
         "alpha": 1,
         "hidden": true,
-        "x": object.x,
-        "y": object.y,
+        "x": shapeOffset.x,
+        "y": shapeOffset.y,
         "rotation": object.document.rotation,
         "width": widthAdjustment * object.document.width,
         "height": widthAdjustment * object.document.height,

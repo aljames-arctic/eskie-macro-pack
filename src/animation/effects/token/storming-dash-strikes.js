@@ -299,5 +299,3 @@ export const stormingDashStrikes = {
     stop,
     default_config: DEFAULT_CONFIG,
 };
-
-autoanimations.register("Storming Dash Strikes", "template", "eskie.effect.stormingDashStrikes", DEFAULT_CONFIG, "0.1.0", "Storming Dash Strikes");

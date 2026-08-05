@@ -11,12 +11,13 @@ async function getPosition(template, config = {}) {
 
     let position;
     if (template) {
-        let primary, secondary;
+        let primary, secondary, center;
 
         // Foundry V14 Region structures
         if (template.documentName === 'Region' || template.shapes) {
             const shape = template.shapes?.[0];
             primary = { x: shape?.x ?? 0, y: shape?.y ?? 0 };
+            center = { x: shape?.center?.x ?? 0, y: shape?.center?.y ?? 0 };
 
             // Calculate the furthest point based on shape rotation and radius
             const distance = shape?.radius ?? shape?.distance ?? 0;
@@ -37,13 +38,15 @@ async function getPosition(template, config = {}) {
             const farpoint = template.object?.ray?.B;
             secondary = { x: farpoint?.x ?? template.x, y: farpoint?.y ?? template.y };
             primary = { x: template.x, y: template.y };
+            const height = Math.sqrt(template.distance * template.distance - template.width * template.width);
+            center = { x: template.x + (template.width / 2) * (canvas.grid.size / canvas.grid.distance), y: template.y + (height / 2) * (canvas.grid.size / canvas.grid.distance) };
         }
 
-        return [primary, secondary];
+        return [primary, secondary, center];
     } else {
         position = await Sequencer.Crosshair.show();
         if (position?.cancelled) { return []; }
-        return [position, undefined];
+        return [position, undefined, position];
     }
 }
 

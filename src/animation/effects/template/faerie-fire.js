@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { template } from '../../../lib/templates.js'
+import { template as templatelib } from '../../../lib/templates.js'
 import { autoanimations } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
@@ -48,13 +48,13 @@ async function createCloud(token, config = {}) {
         icon: portalPath,
         label: 'Faerie Fire'
     };
-    let [position, _] = await template.getPosition(template, cfg);
-    if (!position) { return; }
+    let [primary, secondary, center] = await templatelib.getPosition(template, cfg);
+    if (!center) { return; }
 
     const sequence = new Sequence();
     sequence.effect()
         .file(closest(`jb2a.fairies.loop.01.greenyellow`))
-        .atLocation(position)
+        .atLocation(center)
         .scale(0.05)
         .playbackRate(1)
         .duration(1500)
@@ -68,7 +68,7 @@ async function createCloud(token, config = {}) {
 
     sequence.effect()
         .file(closest(`jb2a.particles.outward.white.01.03`))
-        .atLocation(position)
+        .atLocation(center)
         .scale(0.025)
         .playbackRate(1)
         .duration(1500)
@@ -81,7 +81,7 @@ async function createCloud(token, config = {}) {
 
     sequence.effect()
         .file(closest(`jb2a.sacred_flame.target.${color}`))
-        .atLocation(position)
+        .atLocation(center)
         .scale(0.05)
         .playbackRate(1)
         .duration(1500)
@@ -93,7 +93,7 @@ async function createCloud(token, config = {}) {
 
     sequence.effect()
         .file(closest(`jb2a.impact.010.${color}`))
-        .atLocation(position, { offset: { y: -0.25 }, gridUnits: true })
+        .atLocation(center, { offset: { y: -0.25 }, gridUnits: true })
         .scale(0.45)
         .randomRotation()
         .zIndex(1);
@@ -102,7 +102,7 @@ async function createCloud(token, config = {}) {
         .file(closest("jb2a.particles.outward.white.01.03"))
         .scaleIn(0, 500, { ease: "easeOutQuint" })
         .fadeOut(1000)
-        .atLocation(position, { offset: { y: -0.25 }, gridUnits: true })
+        .atLocation(center, { offset: { y: -0.25 }, gridUnits: true })
         .randomRotation()
         .duration(2500)
         .size(3, { gridUnits: true })
@@ -111,7 +111,7 @@ async function createCloud(token, config = {}) {
 
     sequence.effect()
         .file(closest(`jb2a.fireflies.{{Pfew}}.02.${color}`))
-        .atLocation({ x: position.x, y: position.y }, { randomOffset: 3.5 })
+        .atLocation({ x: center.x, y: center.y }, { randomOffset: 3.5 })
         .scaleToObject(1.8)
         .randomRotation()
         .duration(750)
@@ -127,7 +127,7 @@ async function createCloud(token, config = {}) {
 
     sequence.effect()
         .file(closest(`eskie.pulse.energy.01.yellow.yellow`))
-        .atLocation(position, { offset: { y: -0.25 }, gridUnits: true })
+        .atLocation(center, { offset: { y: -0.25 }, gridUnits: true })
         .size(5, { gridUnits: true })
         .filter("ColorMatrix", { saturate: -1, brightness: 2, hue: hue })
         .fadeOut(250)
@@ -137,7 +137,7 @@ async function createCloud(token, config = {}) {
     sequence.effect()
         .delay(50)
         .file(closest(`eskie.pulse.energy.01.yellow.yellow`))
-        .atLocation(position, { offset: { y: -0.25 }, gridUnits: true })
+        .atLocation(center, { offset: { y: -0.25 }, gridUnits: true })
         .size(5, { gridUnits: true })
         .filter("ColorMatrix", { hue: hue })
         .zIndex(0.5);

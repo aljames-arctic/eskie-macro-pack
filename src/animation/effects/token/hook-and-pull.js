@@ -6,11 +6,11 @@ import { closest } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
-    missed: false,
+    isHit: false,
     timingAdjust: -50,
     effect: {
-        hook: 'eskie.objects.meat_hook.ranged.01.physical.normal.iron',
-        latch: 'eskie.objects.meat_hook.ranged.01.physical.latch.iron'
+        miss: 'eskie.objects.meat_hook.ranged.01.physical.normal.iron',
+        hit: 'eskie.objects.meat_hook.ranged.01.physical.latch.iron'
     }
 };
 
@@ -24,7 +24,7 @@ const DEFAULT_CONFIG = {
 async function create(token, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { hitTargets, timingAdjust, effect } = mConfig;
-    const missed = mConfig.missed || !hitTargets?.includes(target.document.id);
+    const isHit = mConfig.isHit ?? hitTargets?.includes(target.document.id);
 
     // Determine pull location (best adjacent square to the token along the line to the target)
     const location = utils.grid.getBestAdjacentLocation(token, target);
@@ -32,51 +32,43 @@ async function create(token, target, config = {}) {
     // Determine travel distance
     const offsetX = (location.x - target.center.x) / canvas.grid.size;
     const offsetY = (location.y - target.center.y) / canvas.grid.size;
+    const grappleEffect = isHit ? effect.hit : effect.miss;
 
     const sequence = new Sequence();
 
     // Effect if missed
     sequence.effect()
-        .file(closest(effect.hook))
+        .file(closest(grappleEffect))
         .attachTo(token)
         .stretchTo(target)
         .zIndex(1)
         .waitUntilFinished(-750)
-        .playIf(missed);
-
-    // Effect if hit
-    sequence.effect()
-        .file(closest(effect.latch))
-        .attachTo(token)
-        .stretchTo(target)
-        .zIndex(1)
-        .waitUntilFinished(-750)
-        .playIf(!missed);
 
     // Turn token invisible  
     sequence.animation()
         .delay(100)
         .on(target)
         .opacity(0)
-        .playIf(!missed);
+        .playIf(isHit);
 
     // Create effect copy of target and pull it toward location  
     sequence.effect()
         .copySprite(target)
-        .spriteRotation(-target.document.rotation)
+        // When animating spriteContainer, we do not need to correct for rotation
+        //.spriteRotation(-target.document.rotation)
         .zIndex(0)
         .animateProperty('spriteContainer', 'position.x', { from: 0, to: offsetX, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })
         .animateProperty('spriteContainer', 'position.y', { from: 0, to: offsetY, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })
         .duration(700 + timingAdjust)
         .waitUntilFinished(-100)
-        .playIf(!missed);
+        .playIf(isHit);
 
     // Teleport target to pull location and make it visible again
     sequence.animation()
         .on(target)
         .teleportTo(location, { relativeToCenter: true })
         .opacity(1)
-        .playIf(!missed);
+        .playIf(isHit);
 
     return sequence;
 }

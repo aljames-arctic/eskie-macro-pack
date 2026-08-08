@@ -106,6 +106,8 @@ function createAutorecEntry(key, trigger, animation, config, version = "0.0.0", 
 // Convert object to stringified JSON and escape quotes
 // For instance: { key: "value" } -> "{ "key": \"value\"}"
 function JSONformatObject(obj, depth = 1) {
+    if (obj === null) return 'null';
+    if (obj === undefined) return 'undefined';
     var type = typeof obj;
     /* Special case for eskie.effect and eskie.mask functions */
     if(type === 'string' && (obj.startsWith("eskie.effect.") || obj.startsWith("eskie.mask."))) return obj;

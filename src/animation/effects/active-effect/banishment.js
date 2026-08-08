@@ -407,4 +407,4 @@ export const banishment = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("banishment", "effect", "eskie.effect.banishment", DEFAULT_CONFIG, '2.0.0', "Banishment");
+autoanimations.register("banishment", "effect", "eskie.effect.banishment", DEFAULT_CONFIG, '2.0.1', "Banishment");

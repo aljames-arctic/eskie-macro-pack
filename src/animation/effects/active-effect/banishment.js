@@ -9,16 +9,113 @@ import { autoanimations } from "../../../integration/autoanimations.js";
 
 const DEFAULT_CONFIG = {
     id: 'banish',
-    color: 'yellow',
     sound: {
         enabled: true,
         volume: 0.5,
+    },
+    portal: {
+        file: undefined,
+        color: 'yellow',
+        scale: 2,
+        offset: { x: 0, y: -75 }
     }
 };
 
+function modifyPortal(portal, target) {
+    if (portal?.file) return;
+    
+    let color = portal.color;
+    if (game.system.id === "dnd5e") {
+        const creatureType = target.actor?.system.details?.type?.value;
+
+        // Colors -- Red, White, Purple, Blue, Green, Yellow, Orange
+        if (creatureType) {
+            switch (creatureType.toLowerCase()) {
+                // Red
+                case "fiend":
+                case "ooze":
+                    color = "red";
+                    break;
+                // White
+                case "construct":
+                    color = "white";
+                    break;
+                // Purple
+                case "aberration":
+                case "undead":
+                case "humanoid":
+                    color = "purple";
+                    break;                
+                // Blue
+                case "dragon":     
+                case "monstrosity":
+                    color = "blue";
+                    break;
+                // Green
+                case "beast":
+                case "elemental":
+                case "plant":
+                    color = "green";
+                    break;
+                // Yellow
+                case "celestial":
+                case "giant":
+                    color = "yellow";
+                    break;
+                // Orange
+                case "fey":
+                    color = "orange";
+                    break;
+            }
+        }
+
+        if (creatureType) {
+            switch (creatureType.toLowerCase()) {
+                // Oval Portal
+                case "dragon":
+                case "fiend":
+                case "monstrosity":
+                    portal.file = closest(`eskie.environment.portal.generic.01.center.one_shot.full.${color}`);
+                    return;
+                // MTG Warp
+                case "aberration":
+                    portal.scale = 3;
+                    portal.offset.y = -150;
+                    portal.file = closest(`eskie.environment.portal.warp.01.center.one_shot.full.${color}`);
+                    return;
+                // Door Front
+                case "beast":
+                case "elemental":
+                case "plant":
+                case "celestial":
+                case "giant":
+                case "humanoid":
+                case "undead":
+                    portal.file = closest(`eskie.environment.portal.doorway.01.center.one_shot.full.${color}`);
+                    return;
+                // Vertical MTG Warp
+                case "construct":
+                    portal.file = closest(`eskie.environment.portal.warp.01.side.loop.full.${color}`);
+                // Vertical Tear
+                case "fey":
+                    portal.file = closest(`eskie.environment.portal.tear.01.center.one_shot.full.${color}`);
+                    return;
+                // Small Oval
+                case "ooze":
+                    portal.file = closest(`eskie.environment.portal.generic.01.side.one_shot.full.${color}`);
+                    return;
+            }
+        }
+    }
+
+    // Pure default
+    return closest(`jb2a.portals.vertical.vortex.${color}`);
+}
+
 async function createBanish(target, config = {}) {
     config = settingsOverride(config);
-    const { color, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { sound, portal } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    modifyPortal(portal, target);
 
     const RUNE_DATA = {
         animDuration: 300,
@@ -40,14 +137,14 @@ async function createBanish(target, config = {}) {
             .volume(sound.volume)
     }
     sequence.effect()
-        .file(closest(`jb2a.magic_signs.circle.02.conjuration.intro.${color}`))
+        .file(closest(`jb2a.magic_signs.circle.02.conjuration.intro.${portal.color}`))
         .atLocation(target)
         .scaleToObject(2)
         .belowTokens();
 
     sequence.wait(3000);
     sequence.effect()
-        .file(closest(`jb2a.magic_signs.circle.02.conjuration.loop.${color}`))
+        .file(closest(`jb2a.magic_signs.circle.02.conjuration.loop.${portal.color}`))
         .atLocation(target)
         .scaleToObject(2)
         .belowTokens()
@@ -65,7 +162,7 @@ async function createBanish(target, config = {}) {
                 .delay(runeDelay + 750)
         }
         sequence.effect()
-            .file(closest(`jb2a.magic_signs.rune.conjuration.complete.${color}`))
+            .file(closest(`jb2a.magic_signs.rune.conjuration.complete.${portal.color}`))
             .atLocation(target, { offset: rune.offset })
             .scaleToObject(0.5)
             .delay(runeDelay)
@@ -89,16 +186,16 @@ async function createBanish(target, config = {}) {
 
     sequence.wait(1500);
     sequence.effect()
-        .file(closest(`jb2a.explosion.01.${color}`))
+        .file(closest(`jb2a.explosion.01.${portal.color}`))
         .atLocation(target, { offset: { x: 5, y: -75 } })
         .delay(500)
         .scaleToObject(1.5)
         .zIndex(1);
 
     sequence.effect()
-        .file(closest(`jb2a.portals.vertical.vortex.${color}`))
-        .atLocation(target, { offset: { x: 0, y: -75 } })
-        .scaleToObject(2)
+        .file(closest(portal.file))
+        .atLocation(target, { offset: portal.offset })
+        .scaleToObject(portal?.scale)
         .duration(6000)
         .scaleIn({ x: 0, y: 0.8 }, 500)
         .scaleOut({ x: 0, y: 0.4 }, 500, { ease: "easeInBack" })
@@ -127,7 +224,7 @@ async function createBanish(target, config = {}) {
         .fadeOut(750);
 
     sequence.effect()
-        .file(closest(`jb2a.energy_beam.normal.${color}`))
+        .file(closest(`jb2a.energy_beam.normal.${portal.color}`))
         .atLocation(target, { offset: { x: 0, y: 50 } })
         .rotate(90)
         .size({ width: 400, height: 350 })
@@ -193,14 +290,14 @@ async function createBanish(target, config = {}) {
         .waitUntilFinished(-150);
 
     sequence.effect()
-        .file(closest(`jb2a.explosion.02.${color}`))
+        .file(closest(`jb2a.explosion.02.${portal.color}`))
         .atLocation(target, { offset: { x: 0, y: -85 } })
         .scaleToObject(0.5)
         .filter("ColorMatrix", { hue: 15 })
         .zIndex(0.9);
 
     sequence.effect()
-        .file(closest(`jb2a.detect_magic.cone.${color}`))
+        .file(closest(`jb2a.detect_magic.cone.${portal.color}`))
         .rotateTowards(target)
         .atLocation(target, { offset: { x: 0, y: -110 } })
         .scaleToObject(1)
@@ -208,7 +305,7 @@ async function createBanish(target, config = {}) {
         .zIndex(1);
 
     sequence.effect()
-        .file(closest(`jb2a.template_circle.out_pulse.02.loop.${color}`))
+        .file(closest(`jb2a.template_circle.out_pulse.02.loop.${portal.color}`))
         .atLocation(target, { offset: { x: 0, y: -75 } })
         .scaleToObject(1.75)
         .delay(1000)
@@ -216,7 +313,7 @@ async function createBanish(target, config = {}) {
         .waitUntilFinished(-1500);
 
     sequence.effect()
-        .file(closest(`jb2a.fireflies.many.02.${color}`))
+        .file(closest(`jb2a.fireflies.many.02.${portal.color}`))
         .atLocation(target, { offset: { x: 0, y: -75 } })
         .scaleToObject(0.75)
         .duration(2000)
@@ -234,7 +331,8 @@ async function playBanish(target, config = {}) {
 
 async function createReturn(target, config = {}) {
     config = settingsOverride(config);
-    const { color, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { color, sound, portal } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    modifyPortal(portal, target);
 
     const sequence = new Sequence();
     if (sound.enabled) {
@@ -243,15 +341,15 @@ async function createReturn(target, config = {}) {
             .volume(sound.volume)
     }
     sequence.effect()
-        .file(closest(`jb2a.explosion.01.${color}`))
+        .file(closest(`jb2a.explosion.01.${portal.color}`))
         .atLocation(target, { offset: { x: 5, y: -75 } })
         .scaleToObject(1.5)
         .delay(1500)
         .zIndex(1);
     sequence.effect()
-        .file(closest(`jb2a.portals.vertical.vortex.${color}`))
-        .atLocation(target, { offset: { x: 0, y: -75 } })
-        .scaleToObject(2)
+        .file(closest(portal.file))
+        .atLocation(target, { offset: portal.offset })
+        .scaleToObject(portal.scale)
         .duration(6000)
         .scaleIn({ x: 0, y: 0.8 }, 500)
         .scaleOut({ x: 0, y: 0.4 }, 500, { ease: "easeInBack" })
@@ -309,4 +407,4 @@ export const banishment = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("banishment", "effect", "eskie.effect.banishment", DEFAULT_CONFIG, '0.1.0', "Banishment");
+autoanimations.register("banishment", "effect", "eskie.effect.banishment", DEFAULT_CONFIG, '2.0.0', "Banishment");

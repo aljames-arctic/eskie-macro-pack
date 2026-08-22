@@ -715,5 +715,32 @@ input:checked + .eskie-slider:before {
     color: #ffffff !important;
 }
 
+/* ============================================================================
+   AUTOREC DESTINATION CHOOSER DIALOG STYLES
+   ============================================================================ */
+
+.eskie-autorec-destination-app .window-content {
+    background: #1a1a1e url("../../../ui/denim.png") repeat !important;
+    color: #f0f0f0;
+    padding: 16px;
+    font-family: "Signika", sans-serif;
+}
+
+.eskie-animations-muted {
+    opacity: 0.6;
+}
+
+.eskie-autorec-destination-form .eskie-script-card {
+    cursor: pointer;
+}
+
+.eskie-autorec-destination-form input[type="radio"] {
+    accent-color: #a78bfa;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    margin: 0;
+}
+
 
 

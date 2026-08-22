@@ -1,5 +1,7 @@
 import { MODULE_ID } from "./lib/constants.js";
 import { autorecUpdateFormApplication } from "./integration/autoanimations/updateMenu.js";
+import { AutorecDestinationDialog } from "./integration/autorec/destinationDialog.js";
+import { blfx } from "./integration/blfx.js";
 import { WorldScriptsFormApplication } from "./world-scripts/worldScriptsMenu.js";
 import { RecommendedModulesFormApplication } from "./recommended-modules/recommendedModulesMenu.js";
 import { updateMacroCompendiums } from "./lib/standalone-macros.js";
@@ -18,6 +20,16 @@ Hooks.once('init', function() {
         icon: 'fa-solid fa-puzzle-piece',
         type: RecommendedModulesFormApplication,
         restricted: false
+    });
+
+    // Auto-Recognition Destination Chooser Menu
+    game.settings.registerMenu(MODULE_ID, 'autorecDestinationMenu', {
+        name: 'EMP.settings.autorecDestinationMenu.name',
+        label: 'EMP.settings.autorecDestinationMenu.label',
+        hint: 'EMP.settings.autorecDestinationMenu.hint',
+        icon: 'fa-solid fa-wand-magic-sparkles',
+        type: AutorecDestinationDialog,
+        restricted: true
     });
 
     // Dev-only standalone macro compendium sync menu (enabled when version is #{VERSION}#)
@@ -51,16 +63,52 @@ Hooks.once('init', function() {
         restricted: true
     });
 
-    // Register AA Autorec Update Menu only if Automated Animations is active
-    if (game.modules.get("autoanimations")?.active) {
-        game.settings.registerMenu(MODULE_ID, 'autorecUpdate', {
-            name: 'EMP.settings.autorecUpdate.name',
-            label: 'EMP.settings.autorecUpdate.label',
-            icon: 'fa-solid fa-wrench',
-            type: autorecUpdateFormApplication,
-            restricted: true
-        });
-    }
+    // Register AA Autorec Update Menu
+    game.settings.registerMenu(MODULE_ID, 'autorecUpdate', {
+        name: 'EMP.settings.autorecUpdate.name',
+        label: 'EMP.settings.autorecUpdate.label',
+        hint: 'EMP.settings.autorecUpdate.hint',
+        icon: 'fa-solid fa-wrench',
+        type: autorecUpdateFormApplication,
+        restricted: true
+    });
+
+    // Register BLFX Sync Menu
+    game.settings.registerMenu(MODULE_ID, 'blfxSync', {
+        name: 'EMP.settings.blfxSync.name',
+        label: 'EMP.settings.blfxSync.label',
+        hint: 'EMP.settings.blfxSync.hint',
+        icon: 'fa-solid fa-dragon',
+        type: class extends FormApplication {
+            constructor(...args) {
+                super(...args);
+                blfx.submit(true).then(() => {
+                    ui.notifications.info("EMP: Synced custom auto-recognition to Boss Loot FX!");
+                }).catch((err) => {
+                    ui.notifications.error(`EMP: Failed to sync to Boss Loot FX: ${err.message}`);
+                });
+            }
+            render() { return this; }
+        },
+        restricted: true
+    });
+
+    // Destination target configuration: 'ask', 'autoanimations', 'blfx', 'none'
+    game.settings.register(MODULE_ID, 'autorecTarget', {
+        name: 'EMP.settings.autorecTarget.name',
+        hint: 'EMP.settings.autorecTarget.hint',
+        scope: 'world',
+        config: true,
+        type: String,
+        choices: {
+            'ask': 'EMP.settings.autorecTarget.choices.ask',
+            'autoanimations': 'EMP.settings.autorecTarget.choices.autoanimations',
+            'blfx': 'EMP.settings.autorecTarget.choices.blfx',
+            'none': 'EMP.settings.autorecTarget.choices.none'
+        },
+        default: 'ask',
+        onChange: (value) => log.info(`EMP | Autorec target setting updated to "${value}"`)
+    });
 
     game.settings.register(MODULE_ID, 'enableSounds', {
         name: 'EMP.settings.enableSounds.name',
@@ -87,6 +135,13 @@ Hooks.once('init', function() {
         default: '0.0.0',
     });
 
+    game.settings.register(MODULE_ID, 'blfxAutorecVersion', {
+        scope: 'world',
+        config: false,
+        type: String,
+        default: '0.0.0',
+    });
+
     // Log Verbosity Level Setting
     game.settings.register(MODULE_ID, 'logVerbosity', {
         name: 'EMP.settings.logVerbosity.name',
@@ -105,10 +160,25 @@ Hooks.once('init', function() {
     });
 });
 
-// Ensure AA Autorec Update button is hidden if Automated Animations is disabled
+// Dynamic visibility of AA and BLFX buttons in settings config
 Hooks.on('renderSettingsConfig', function(app, html, data) {
-    if (!game.modules.get("autoanimations")?.active) {
-        const root = html instanceof jQuery ? html[0] : (html.querySelector ? html : html?.[0]);
-        root?.querySelector(`[data-key="${MODULE_ID}.autorecUpdate"]`)?.closest('.form-group')?.remove();
+    const root = html instanceof jQuery ? html[0] : (html.querySelector ? html : html?.[0]);
+    if (!root) return;
+
+    const isAaActive = Boolean(game.modules?.get("autoanimations")?.active);
+    const isBlfxActive = Boolean(
+        game.modules?.get('boss-loot-assets-premium')?.active ||
+        game.modules?.get('boss-loot-assets-free')?.active ||
+        game.modules?.get('blfx')?.active ||
+        Hooks.events?.['blfx.register.CustomAutoRec']
+    );
+
+    const target = game.settings?.get(MODULE_ID, 'autorecTarget') ?? 'ask';
+
+    if (!isAaActive || target === 'blfx' || target === 'none') {
+        root.querySelector(`[data-key="${MODULE_ID}.autorecUpdate"]`)?.closest('.form-group')?.remove();
+    }
+    if (!isBlfxActive || target === 'autoanimations' || target === 'none') {
+        root.querySelector(`[data-key="${MODULE_ID}.blfxSync"]`)?.closest('.form-group')?.remove();
     }
 });

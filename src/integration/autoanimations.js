@@ -2,6 +2,7 @@ import { MODULE_ID } from "../lib/constants.js";
 import { dependency } from "../lib/dependency.js";
 import { defaultMenuSettings } from "./autoanimations/defaultMenuSettings.js";
 import { autorecUpdateFormApplication, generateAutorecUpdate } from "./autoanimations/updateMenu.js";
+import { blfx } from "./blfx.js";
 import { log } from '../lib/logger.js';
 import { localize, format } from "../lib/utils.js";
 
@@ -140,11 +141,13 @@ function JSONformatObject(obj, depth = 1) {
  * @param {string} version - The version of the animation entry.
  * @returns {void}
  */
-async function register(key, trigger, animation, config, version = "0.0.0", fallback = key) {
-    trigger = standardizeTrigger(trigger);
-    const entry = createAutorecEntry(key, trigger, animation, config, version, fallback);
-    if (!entry) return;
-    EMP_AA_Menu[trigger].push(entry);
+async function register(key, trigger, animation, config, version = "0.0.0", fallback = key, options = {}) {
+    const stdTrigger = standardizeTrigger(trigger);
+    const entry = createAutorecEntry(key, stdTrigger, animation, config, version, fallback);
+    if (entry) {
+        EMP_AA_Menu[stdTrigger].push(entry);
+    }
+    blfx.register(key, trigger, animation, config, version, fallback, options);
 }
 
 /**

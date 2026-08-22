@@ -1,5 +1,7 @@
 import { animation } from './animation/index.js';
+import { autorec } from './integration/autorec.js';
 import { autoanimations } from './integration/autoanimations.js';
+import { blfx } from './integration/blfx.js';
 import { socketlibapi, socket } from './integration/socketlib.js';
 import { loadWorldScripts } from './world-scripts/loader.js';
 import { MODULE_ID } from './lib/constants.js';
@@ -14,7 +16,7 @@ import { log } from './lib/logger.js';
 const status = {
     aaReady: false,
     ready: false,
-}
+};
 
 Hooks.once('init', async () => {
     function setupModule() {
@@ -40,6 +42,9 @@ Hooks.once('init', async () => {
         const moduleRecord = game.modules.get(MODULE_ID);
         if (moduleRecord) {
             moduleRecord.api = {
+                autorec,
+                autoanimations,
+                blfx,
                 crosshair,
                 socket,
                 standaloneMacros,
@@ -54,8 +59,10 @@ Hooks.once('init', async () => {
 
 Hooks.once('ready', async () => {
     status.ready = true;
-    if (status.ready && status.aaReady)
-        await autoanimations.submit();
+    const isAaActive = Boolean(game.modules?.get('autoanimations')?.active);
+    if (!isAaActive || status.aaReady) {
+        await autorec.submit();
+    }
 
     // Load enabled world scripts for the player
     loadWorldScripts();
@@ -63,8 +70,9 @@ Hooks.once('ready', async () => {
 
 Hooks.once('aa.ready', async () => {
     status.aaReady = true;
-    if (status.ready && status.aaReady)
-        await autoanimations.submit();
+    if (status.ready) {
+        await autorec.submit();
+    }
 });
 
 Hooks.once('socketlib.ready', async () => { await socketlibapi.register(); });

@@ -1,0 +1,85 @@
+<form class="eskie-world-scripts-container eskie-autorec-destination-form">
+    <div class="eskie-world-scripts-header">
+        <div class="eskie-header-icon">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+        <div class="eskie-header-text">
+            <h2>{{localize "EMP.autorecManager.promptTitle"}}</h2>
+            <p class="notes">{{localize "EMP.autorecManager.promptHint"}}</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="eskie-world-scripts-list">
+        <!-- Option: Automated Animations -->
+        <label class="eskie-script-card {{#if (eq currentTarget 'autoanimations')}}active{{/if}} {{#unless isAaInstalled}}eskie-animations-muted{{/unless}}">
+            <div class="eskie-card-icon-wrapper">
+                <i class="fa-solid fa-film"></i>
+            </div>
+            <div class="eskie-card-details">
+                <div class="eskie-card-title-row">
+                    <h3 class="eskie-card-title">{{localize "EMP.autorecManager.targets.autoanimations.name"}}</h3>
+                    <span class="eskie-status-badge {{#if isAaActive}}active{{else if isAaInstalled}}disabled{{else}}missing{{/if}}">
+                        {{#if isAaActive}}{{localize "EMP.recommendedModules.status.active"}}{{else if isAaInstalled}}{{localize "EMP.recommendedModules.status.disabled"}}{{else}}{{localize "EMP.recommendedModules.status.missing"}}{{/if}}
+                    </span>
+                </div>
+                <p class="eskie-card-description">{{localize "EMP.autorecManager.targets.autoanimations.description"}}</p>
+            </div>
+            <div class="eskie-card-toggle-wrapper">
+                <input type="radio" name="autorecTarget" value="autoanimations" {{#if (eq currentTarget 'autoanimations')}}checked{{/if}}>
+            </div>
+        </label>
+
+        <!-- Option: Boss Loot FX -->
+        <label class="eskie-script-card {{#if (eq currentTarget 'blfx')}}active{{/if}} {{#unless isBlfxInstalled}}eskie-animations-muted{{/unless}}">
+            <div class="eskie-card-icon-wrapper">
+                <i class="fa-solid fa-dragon"></i>
+            </div>
+            <div class="eskie-card-details">
+                <div class="eskie-card-title-row">
+                    <h3 class="eskie-card-title">{{localize "EMP.autorecManager.targets.blfx.name"}}</h3>
+                    <span class="eskie-status-badge {{#if isBlfxActive}}active{{else if isBlfxInstalled}}disabled{{else}}missing{{/if}}">
+                        {{#if isBlfxActive}}{{localize "EMP.recommendedModules.status.active"}}{{else if isBlfxInstalled}}{{localize "EMP.recommendedModules.status.disabled"}}{{else}}{{localize "EMP.recommendedModules.status.missing"}}{{/if}}
+                    </span>
+                </div>
+                <p class="eskie-card-description">{{localize "EMP.autorecManager.targets.blfx.description"}}</p>
+            </div>
+            <div class="eskie-card-toggle-wrapper">
+                <input type="radio" name="autorecTarget" value="blfx" {{#if (eq currentTarget 'blfx')}}checked{{/if}}>
+            </div>
+        </label>
+
+        <!-- Option: None / Disabled -->
+        <label class="eskie-script-card {{#if (eq currentTarget 'none')}}active{{/if}}">
+            <div class="eskie-card-icon-wrapper">
+                <i class="fa-solid fa-ban"></i>
+            </div>
+            <div class="eskie-card-details">
+                <div class="eskie-card-title-row">
+                    <h3 class="eskie-card-title">{{localize "EMP.autorecManager.targets.none.name"}}</h3>
+                </div>
+                <p class="eskie-card-description">{{localize "EMP.autorecManager.targets.none.description"}}</p>
+            </div>
+            <div class="eskie-card-toggle-wrapper">
+                <input type="radio" name="autorecTarget" value="none" {{#if (eq currentTarget 'none')}}checked{{/if}}>
+            </div>
+        </label>
+    </div>
+
+    <div class="eskie-aa-chip toggleable" style="margin-top: 5px;">
+        <label style="display: flex; align-items: center; gap: 8px; width: 100%; cursor: pointer;">
+            <input type="checkbox" name="rememberChoice" checked>
+            <span class="eskie-chip-label">{{localize "EMP.autorecManager.rememberChoice"}}</span>
+        </label>
+    </div>
+
+    <footer class="eskie-world-scripts-footer eskie-aa-button-row">
+        <button type="button" name="cancel" class="eskie-btn-secondary">
+            <i class="fa-solid fa-clock"></i> {{localize "EMP.autorecManager.decideLater"}}
+        </button>
+        <button type="submit" name="submit" class="eskie-btn-primary">
+            <i class="fa-solid fa-check"></i> {{localize "EMP.autorecManager.applyChoice"}}
+        </button>
+    </footer>
+</form>

@@ -9,6 +9,48 @@
                 "name": "Atualizar Auto-Reconhecimento do Automated Animations",
                 "label": "Atualizar AutoRec do AA",
                 "hint": "Força uma atualização do Auto-Reconhecimento do Automated Animations."
+            },
+            "autorecDestinationMenu": {
+                "name": "Alvo de Integração de Auto-Reconhecimento",
+                "label": "Configurar Alvo do AutoRec",
+                "hint": "Escolha para qual gerenciador de animação o Eskie Macro Pack deve registrar seus efeitos automatizados."
+            },
+            "autorecTarget": {
+                "name": "Destino do Auto-Reconhecimento",
+                "hint": "Selecione onde o EMP registra suas animações automáticas de magias e ataques. Apenas um gerenciador fica ativo por vez.",
+                "choices": {
+                    "ask": "Perguntar ao Carregar (Não configurado)",
+                    "autoanimations": "Automated Animations (AA)",
+                    "blfx": "Boss Loot FX (BLFX)",
+                    "none": "Desativado (Não registrar)"
+                }
+            },
+            "blfxSync": {
+                "name": "Sincronizar AutoRec do Boss Loot FX",
+                "label": "Sincronizar com Boss Loot FX",
+                "hint": "Força a sincronização dos efeitos customizados do Eskie Macro Pack para o Custom Auto-Rec do Boss Loot FX."
+            }
+        },
+        "autorecManager": {
+            "menuTitle": "Eskie Macro Pack — Alvo de Auto-Reconhecimento",
+            "promptTitle": "Escolher Integração de Auto-Reconhecimento",
+            "promptHint": "O Eskie Macro Pack suporta animações automáticas de magias, ataques e modelos. Selecione qual sistema de automação deve receber e armazenar as predefinições de efeitos do EMP.",
+            "rememberChoice": "Lembrar minha escolha (salvar como configuração padrão do mundo)",
+            "applyChoice": "Aplicar e Sincronizar",
+            "decideLater": "Decidir Depois",
+            "targets": {
+                "autoanimations": {
+                    "name": "Automated Animations (AA)",
+                    "description": "Registra efeitos nos menus de AutoRec e compêndios de macro do Automated Animations."
+                },
+                "blfx": {
+                    "name": "Boss Loot FX (BLFX)",
+                    "description": "Registra efeitos diretamente no Custom Auto-Recognition do Boss Loot FX."
+                },
+                "none": {
+                    "name": "Desativado",
+                    "description": "Não registrar efeitos automaticamente em nenhum gerenciador de animação."
+                }
             }
         },
         "traps": {

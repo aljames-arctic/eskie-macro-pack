@@ -130,6 +130,65 @@ export function buildBlfxPayload() {
 }
 
 /**
+ * Safely merges EMP BLFX entries into the existing BLFX custom auto-recognition tree.
+ * Preserves user-created custom animations while adding new EMP effects and updating existing EMP effects.
+ * @param {object} existingData Existing BLFX customAutoRecognition settings data
+ * @param {object} empRegistry EMP's internal BLFX registry
+ * @returns {object} Merged payload ready for the blfx.register.CustomAutoRec hook
+ */
+export function mergeBlfxCustomAutoRec(existingData, empRegistry) {
+    let baseCustomTree = {};
+    if (existingData?.flags?.['boss-loot-assets-premium']?.customAutoRecognition) {
+        baseCustomTree = foundry.utils.duplicate(existingData.flags['boss-loot-assets-premium'].customAutoRecognition);
+    } else if (existingData && typeof existingData === 'object' && !existingData.flags) {
+        baseCustomTree = foundry.utils.duplicate(existingData);
+    }
+
+    const mergedTree = foundry.utils.duplicate(baseCustomTree);
+
+    for (const [systemId, items] of Object.entries(empRegistry)) {
+        if (!mergedTree[systemId]) {
+            mergedTree[systemId] = {};
+        }
+
+        for (const [itemSlug, activities] of Object.entries(items)) {
+            if (!mergedTree[systemId][itemSlug]) {
+                mergedTree[systemId][itemSlug] = {};
+            }
+
+            for (const [activitySlug, triggers] of Object.entries(activities)) {
+                if (!mergedTree[systemId][itemSlug][activitySlug]) {
+                    mergedTree[systemId][itemSlug][activitySlug] = {};
+                }
+
+                for (const [triggerMode, newEntry] of Object.entries(triggers)) {
+                    const existingEntry = mergedTree[systemId][itemSlug][activitySlug][triggerMode];
+
+                    if (!existingEntry) {
+                        // Effect does not exist: ADD it
+                        mergedTree[systemId][itemSlug][activitySlug][triggerMode] = newEntry;
+                    } else if (existingEntry.note?.includes?.("Eskie Macro Pack")) {
+                        // Existing entry was registered by EMP: UPDATE to latest version
+                        mergedTree[systemId][itemSlug][activitySlug][triggerMode] = newEntry;
+                    } else {
+                        // Existing entry is custom user created: PRESERVE user custom animation
+                        log.debug(`EMP | Preserving user custom BLFX entry for ${itemSlug}/${activitySlug}/${triggerMode}`);
+                    }
+                }
+            }
+        }
+    }
+
+    return {
+        flags: {
+            "boss-loot-assets-premium": {
+                customAutoRecognition: mergedTree
+            }
+        }
+    };
+}
+
+/**
  * Submits registered animations to Boss Loot FX via the blfx.register.CustomAutoRec Hook.
  * Performs a non-destructive merge with any existing custom autorec data in world settings.
  * @param {boolean} [force=false] Force update regardless of version check
@@ -168,8 +227,7 @@ export async function submit(force = false) {
         log.debug("EMP | Could not read existing blfxCustomAutoRecognition setting:", err);
     }
 
-    const empPayload = buildBlfxPayload();
-    const mergedResources = foundry.utils.mergeObject(existingSettings, empPayload, { inplace: false, overwrite: true });
+    const mergedResources = mergeBlfxCustomAutoRec(existingSettings, EMP_BLFX_Registry);
 
     Hooks.call('blfx.register.CustomAutoRec', mergedResources, MODULE_ID, moduleVersion);
 

@@ -1,6 +1,7 @@
 import { MODULE_ID } from "../lib/constants.js";
 import { log } from '../lib/logger.js';
 import { localize } from "../lib/utils.js";
+import { BlfxAutorecUpdateFormApplication, generateBlfxAutorecUpdate } from "./blfx/updateMenu.js";
 
 /**
  * Internal registry storing Boss Loot FX auto-recognition entries grouped by system -> item -> activity -> trigger.
@@ -236,26 +237,14 @@ export async function submit(force = false) {
         return;
     }
 
-    log.info(`EMP | Registering effects into Boss Loot FX Custom Auto-Rec (version: ${effectiveVersion})...`);
+    log.debug(`EMP | Checking Boss Loot FX Custom Auto-Rec (version: ${effectiveVersion})...`);
 
-    let existingSettings = {};
-    try {
-        if (game.settings?.settings?.has('boss-loot-assets-premium.blfxCustomAutoRecognition')) {
-            existingSettings = game.settings.get('boss-loot-assets-premium', 'blfxCustomAutoRecognition') ?? {};
-        }
-    } catch (err) {
-        log.debug("EMP | Could not read existing blfxCustomAutoRecognition setting:", err);
+    const { missingEntries, updatedEntries, customEntries } = await generateBlfxAutorecUpdate(EMP_BLFX_Registry);
+    if (missingEntries.length || updatedEntries.length || customEntries.length) {
+        new BlfxAutorecUpdateFormApplication(EMP_BLFX_Registry).render(true);
+    } else {
+        log.info(localize("EMP.blfxUpdateMenu.nothing", "All Eskie Macro Pack animations are up to date in Boss Loot FX!"));
     }
-
-    const mergedResources = mergeBlfxCustomAutoRec(existingSettings, EMP_BLFX_Registry);
-
-    Hooks.call('blfx.register.CustomAutoRec', mergedResources, MODULE_ID, effectiveVersion);
-
-    if (game.settings) {
-        await game.settings.set(MODULE_ID, "blfxAutorecVersion", effectiveVersion);
-    }
-
-    log.info("EMP | Successfully synced custom auto-recognition to Boss Loot FX!");
 }
 
 export const blfx = {

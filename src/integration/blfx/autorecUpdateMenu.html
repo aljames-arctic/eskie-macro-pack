@@ -1,0 +1,93 @@
+<form class="eskie-recommended-modules-container emp-animations-autorec-update">
+    <header class="eskie-world-scripts-header">
+        <div class="eskie-header-icon">
+            <i class="fa-solid fa-dragon"></i>
+        </div>
+        <div class="eskie-header-text">
+            <h2>{{localize "EMP.blfxUpdateMenu.menuTitle"}}</h2>
+            <p class="notes">{{localize "EMP.blfxUpdateMenu.menuHint"}}</p>
+        </div>
+    </header>
+
+    <hr />
+
+    <div class="eskie-aa-update-scroll-area">
+        {{#if hasChanges}}
+            {{#if missingEntries.length}}
+            <div class="eskie-aa-update-card added">
+                <div class="eskie-aa-card-header">
+                    <i class="fa-solid fa-circle-plus"></i>
+                    <h3>{{localize "EMP.blfxUpdateMenu.added"}}</h3>
+                </div>
+                <div class="eskie-aa-chip-grid">
+                    {{#each missingEntries}}
+                    <label class="eskie-aa-chip toggleable">
+                        <input type="checkbox" name="missing_{{key}}" checked />
+                        <span class="eskie-chip-label">{{label}}</span>
+                        <span class="eskie-chip-menu">{{menu}}</span>
+                    </label>
+                    {{/each}}
+                </div>
+            </div>
+            {{/if}}
+
+            {{#if updatedEntries.length}}
+            <div class="eskie-aa-update-card updated">
+                <div class="eskie-aa-card-header">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    <h3>{{localize "EMP.blfxUpdateMenu.updated"}}</h3>
+                </div>
+                <div class="eskie-aa-chip-grid">
+                    {{#each updatedEntries}}
+                    <div class="eskie-aa-chip">
+                        <span class="eskie-chip-label">{{label}}</span>
+                        <span class="eskie-chip-menu">{{menu}}</span>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+            {{/if}}
+
+            {{#if customEntries.length}}
+            <div class="eskie-aa-update-card conflict">
+                <div class="eskie-aa-card-header">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <h3>{{localize "EMP.blfxUpdateMenu.custom"}}</h3>
+                </div>
+                <p class="eskie-aa-card-hint">{{localize "EMP.blfxUpdateMenu.customHint"}}</p>
+                <div class="eskie-aa-chip-grid">
+                    {{#each customEntries}}
+                    <div class="eskie-aa-chip">
+                        <span class="eskie-chip-label">{{label}}</span>
+                        <span class="eskie-chip-menu">{{menu}}</span>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+            {{/if}}
+
+            <div class="eskie-aa-warning-box">
+                <i class="fa-solid fa-shield-halved"></i>
+                <p>{{localize "EMP.blfxUpdateMenu.warning"}}</p>
+            </div>
+        {{else}}
+            <div class="eskie-aa-empty-state">
+                <i class="fa-solid fa-circle-check"></i>
+                <p>{{localize "EMP.blfxUpdateMenu.nothing"}}</p>
+            </div>
+        {{/if}}
+    </div>
+
+    <footer class="eskie-world-scripts-footer emp-animations-autorec-update-footer">
+        <div class="eskie-aa-button-row">
+            {{#if hasChanges}}
+            <button type="submit" name="update" value="1" class="eskie-btn-primary">
+                <i class="fa-solid fa-floppy-disk"></i> {{localize "EMP.blfxUpdateMenu.acceptButton"}}
+            </button>
+            {{/if}}
+            <button type="button" name="cancel" value="1" class="eskie-btn-secondary">
+                <i class="fa-solid fa-xmark"></i> {{localize "EMP.blfxUpdateMenu.cancelButton"}}
+            </button>
+        </div>
+    </footer>
+</form>

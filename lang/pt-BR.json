@@ -31,6 +31,18 @@
                 "hint": "Força a sincronização dos efeitos customizados do Eskie Macro Pack para o Custom Auto-Rec do Boss Loot FX."
             }
         },
+        "blfxUpdateMenu": {
+            "menuTitle": "Integração Boss Loot FX",
+            "menuHint": "Revise e sincronize as predefinições do Custom Auto-Recognition do Eskie Macro Pack no Boss Loot FX.",
+            "added": "Novas Predefinições de Animação para Adicionar",
+            "custom": "Predefinições em Conflito Ignoradas",
+            "customHint": "Estas predefinições já existem no Boss Loot FX a partir de outra fonte ou edição customizada e não serão sobrescritas.",
+            "updated": "Predefinições de Animação para Atualizar",
+            "warning": "Isso atualizará as predefinições de animação do Eskie Macro Pack no Boss Loot FX. Predefinições customizadas de outras fontes permanecerão intocadas.",
+            "nothing": "Todas as animações do Eskie Macro Pack estão atualizadas no Boss Loot FX!",
+            "acceptButton": "Aplicar Atualizações",
+            "cancelButton": "Cancelar"
+        },
         "autorecManager": {
             "menuTitle": "Eskie Macro Pack — Alvo de Auto-Reconhecimento",
             "promptTitle": "Escolher Integração de Auto-Reconhecimento",

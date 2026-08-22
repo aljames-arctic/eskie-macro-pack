@@ -1,5 +1,6 @@
 import { MODULE_ID } from "./lib/constants.js";
 import { autorecUpdateFormApplication } from "./integration/autoanimations/updateMenu.js";
+import { BlfxAutorecUpdateFormApplication } from "./integration/blfx/updateMenu.js";
 import { AutorecDestinationDialog } from "./integration/autorec/destinationDialog.js";
 import { blfx } from "./integration/blfx.js";
 import { WorldScriptsFormApplication } from "./world-scripts/worldScriptsMenu.js";
@@ -79,17 +80,7 @@ Hooks.once('init', function() {
         label: 'EMP.settings.blfxSync.label',
         hint: 'EMP.settings.blfxSync.hint',
         icon: 'fa-solid fa-dragon',
-        type: class extends FormApplication {
-            constructor(...args) {
-                super(...args);
-                blfx.submit(true).then(() => {
-                    ui.notifications.info("EMP: Synced custom auto-recognition to Boss Loot FX!");
-                }).catch((err) => {
-                    ui.notifications.error(`EMP: Failed to sync to Boss Loot FX: ${err.message}`);
-                });
-            }
-            render() { return this; }
-        },
+        type: BlfxAutorecUpdateFormApplication,
         restricted: true
     });
 

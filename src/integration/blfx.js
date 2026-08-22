@@ -193,6 +193,21 @@ export function mergeBlfxCustomAutoRec(existingData, empRegistry) {
 }
 
 /**
+ * Generates a monotonically increasing version string formatted as YY.MM.DD.HH.MM.SS for development builds.
+ * @returns {string} Timestamp-based version string
+ */
+function getDevelopmentVersion() {
+    const now = new Date();
+    const yy = String(now.getFullYear()).slice(-2);
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const hh = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+    return `${yy}.${mm}.${dd}.${hh}.${min}.${ss}`;
+}
+
+/**
  * Submits registered animations to Boss Loot FX via the blfx.register.CustomAutoRec Hook.
  * Performs a non-destructive merge with any existing custom autorec data in world settings.
  * @param {boolean} [force=false] Force update regardless of version check
@@ -201,10 +216,11 @@ export function mergeBlfxCustomAutoRec(existingData, empRegistry) {
 export async function submit(force = false) {
     if (!game.user?.isGM) return;
 
-    const developmentVersion = "#{VERSION}#";
-    const moduleVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
+    const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
+    const isDevelopment = rawVersion === "#{VERSION}#";
+    const effectiveVersion = isDevelopment ? getDevelopmentVersion() : rawVersion;
     const lastUpdate = game.settings?.get(MODULE_ID, "blfxAutorecVersion") ?? "0.0.0";
-    const shouldUpdate = force || moduleVersion === developmentVersion || foundry.utils.isNewerVersion(moduleVersion, lastUpdate);
+    const shouldUpdate = force || isDevelopment || foundry.utils.isNewerVersion(effectiveVersion, lastUpdate);
 
     if (!shouldUpdate) return;
 
@@ -220,7 +236,7 @@ export async function submit(force = false) {
         return;
     }
 
-    log.info("EMP | Registering effects into Boss Loot FX Custom Auto-Rec...");
+    log.info(`EMP | Registering effects into Boss Loot FX Custom Auto-Rec (version: ${effectiveVersion})...`);
 
     let existingSettings = {};
     try {
@@ -233,10 +249,10 @@ export async function submit(force = false) {
 
     const mergedResources = mergeBlfxCustomAutoRec(existingSettings, EMP_BLFX_Registry);
 
-    Hooks.call('blfx.register.CustomAutoRec', mergedResources, MODULE_ID, moduleVersion);
+    Hooks.call('blfx.register.CustomAutoRec', mergedResources, MODULE_ID, effectiveVersion);
 
-    if (moduleVersion !== developmentVersion && game.settings) {
-        await game.settings.set(MODULE_ID, "blfxAutorecVersion", moduleVersion);
+    if (game.settings) {
+        await game.settings.set(MODULE_ID, "blfxAutorecVersion", effectiveVersion);
     }
 
     log.info("EMP | Successfully synced custom auto-recognition to Boss Loot FX!");

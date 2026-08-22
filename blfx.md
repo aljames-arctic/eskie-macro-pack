@@ -13,26 +13,27 @@ Hooks.call('blfx.register.CustomAutoRec', resources, moduleName, version);
 - `version` *(String)*: The current version of your module (e.g., `'1.0.0'`).
 
 ## 2. The Expected Data Structure
-The `resources` object must match the exact nested flag structure used by BLFX internally. 
+The `resources` object must contain a boolean flag indicating it is a BLFX import, and a top-level `customAutoRecognition` object containing the actual data.
 
 ```json
 {
   "flags": {
     "boss-loot-assets-premium": {
-      "customAutoRecognition": {
-        "dnd5e": {
-          "item-name-slug": {
-            "activity-name-slug": {
-              "triggerMode": {
-                "animationName": "Name to display in UI",
-                "itemName": "Item Name",
-                "activityName": "Activity Name",
-                "triggerName": "triggerMode",
-                "note": "Optional notes",
-                "animationData": {
-                  "command": "// Your javascript macro code here"
-                }
-              }
+      "customAutoRecognition": true
+    }
+  },
+  "customAutoRecognition": {
+    "dnd5e": {
+      "item-name-slug": {
+        "activity-name-slug": {
+          "triggerMode": {
+            "animationName": "Name to display in UI",
+            "itemName": "Item Name",
+            "activityName": "Activity Name",
+            "triggerName": "triggerMode",
+            "note": "Optional notes",
+            "animationData": {
+              "command": "// Your javascript macro code here"
             }
           }
         }

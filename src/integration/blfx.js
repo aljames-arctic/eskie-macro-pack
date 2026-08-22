@@ -123,9 +123,10 @@ export function buildBlfxPayload() {
     return {
         flags: {
             "boss-loot-assets-premium": {
-                customAutoRecognition: foundry.utils.duplicate(EMP_BLFX_Registry)
+                customAutoRecognition: true
             }
-        }
+        },
+        customAutoRecognition: foundry.utils.duplicate(EMP_BLFX_Registry)
     };
 }
 
@@ -138,7 +139,9 @@ export function buildBlfxPayload() {
  */
 export function mergeBlfxCustomAutoRec(existingData, empRegistry) {
     let baseCustomTree = {};
-    if (existingData?.flags?.['boss-loot-assets-premium']?.customAutoRecognition) {
+    if (existingData?.customAutoRecognition && typeof existingData.customAutoRecognition === 'object') {
+        baseCustomTree = foundry.utils.duplicate(existingData.customAutoRecognition);
+    } else if (existingData?.flags?.['boss-loot-assets-premium']?.customAutoRecognition && typeof existingData.flags['boss-loot-assets-premium'].customAutoRecognition === 'object') {
         baseCustomTree = foundry.utils.duplicate(existingData.flags['boss-loot-assets-premium'].customAutoRecognition);
     } else if (existingData && typeof existingData === 'object' && !existingData.flags) {
         baseCustomTree = foundry.utils.duplicate(existingData);
@@ -182,9 +185,10 @@ export function mergeBlfxCustomAutoRec(existingData, empRegistry) {
     return {
         flags: {
             "boss-loot-assets-premium": {
-                customAutoRecognition: mergedTree
+                customAutoRecognition: true
             }
-        }
+        },
+        customAutoRecognition: mergedTree
     };
 }
 

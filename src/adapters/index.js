@@ -42,7 +42,7 @@ import { log } from '../lib/logger.js';
  */
 export class Adapter {
     constructor() {
-        this.foundry = new BaseFoundryAdapter();
+        this.foundry = new BaseFoundryAdapter(this);
         this.system = new GenericSystemAdapter(this.foundry);
         this.modules = new Map();
         this._initialized = false;
@@ -65,7 +65,7 @@ export class Adapter {
      * @returns {Promise<void>}
      */
     async init() {
-        this.foundry = initializeFoundryAdapter();
+        this.foundry = initializeFoundryAdapter(this);
         this.system = await initializeSystemAdapter(game?.system?.id, this.foundry);
         this.modules = initializeModuleAdapters();
         this._initialized = true;

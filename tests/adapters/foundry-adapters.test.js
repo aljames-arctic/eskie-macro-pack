@@ -325,6 +325,30 @@ test('getTokenOwners and placeable attachment contracts on BaseFoundryAdapter', 
 
     const detachRes = await v12.detachPlaceableElements([{ id: 'tile-1' }], token);
     assert.deepEqual(detachRes, { detached: true, count: 1 });
+
+    // Verify BaseFoundryAdapter reads from parent adapter and navigates to massEdit / tokenAttacher
+    const mockParentAdapter = {
+        massEdit: {
+            link: async (elements, target) => ({ mockLinked: true, targetId: target.id }),
+            removeLinks: async (elements, target) => ({ mockUnlinked: true, targetId: target.id })
+        },
+        tokenAttacher: {
+            attachElementsToToken: async (elements, target) => ({ mockAttached: true, targetId: target.id }),
+            detachElementsFromToken: async (elements, target) => ({ mockDetached: true, targetId: target.id })
+        }
+    };
+    const adapterWithParent = new BaseFoundryAdapter(mockParentAdapter);
+    assert.equal(adapterWithParent.adapter, mockParentAdapter);
+    assert.equal(adapterWithParent.massEdit, mockParentAdapter.massEdit);
+    assert.equal(adapterWithParent.tokenAttacher, mockParentAdapter.tokenAttacher);
+
+    const tileObj = { document: { documentName: 'Tile' }, id: 'tile-target' };
+    game.modules.set('multi-token-edit', { id: 'multi-token-edit', active: true });
+    const tileAttach = await adapterWithParent.attachPlaceableElements([{ id: 'child-1' }], tileObj);
+    assert.deepEqual(tileAttach, { mockLinked: true, targetId: 'tile-target' });
+
+    const tileDetach = await adapterWithParent.detachPlaceableElements([{ id: 'child-1' }], tileObj);
+    assert.deepEqual(tileDetach, { mockUnlinked: true, targetId: 'tile-target' });
 });
 
 

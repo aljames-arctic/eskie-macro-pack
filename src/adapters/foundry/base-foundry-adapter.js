@@ -21,6 +21,38 @@ export const USER_PERMISSION_TIERS = Object.freeze({
  */
 export class BaseFoundryAdapter {
     /**
+     * @param {object|null} [adapter=null] Unified Adapter singleton reference
+     */
+    constructor(adapter = null) {
+        this._adapter = adapter;
+    }
+
+    /**
+     * Reference to parent unified adapter singleton.
+     */
+    get adapter() {
+        return this._adapter ?? (typeof globalThis !== 'undefined' ? globalThis.adapter : null);
+    }
+
+    set adapter(inst) {
+        this._adapter = inst;
+    }
+
+    /**
+     * Access the Mass Edit module adapter via parent adapter navigation, falling back to singleton.
+     */
+    get massEdit() {
+        return this.adapter?.massEdit ?? (this.adapter?.getModule ? this.adapter.getModule('multi-token-edit') : null) ?? massEditAdapter;
+    }
+
+    /**
+     * Access the Token Attacher module adapter via parent adapter navigation, falling back to singleton.
+     */
+    get tokenAttacher() {
+        return this.adapter?.tokenAttacher ?? (this.adapter?.getModule ? this.adapter.getModule('token-attacher') : null) ?? tokenAttacherAdapter;
+    }
+
+    /**
      * The major generation version of Foundry VTT (e.g. 12, 13, 14).
      * @returns {number}
      */
@@ -742,14 +774,14 @@ export class BaseFoundryAdapter {
             dependency.required([
                 { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
             ]);
-            return massEditAdapter.link(elements, target);
+            return this.massEdit?.link(elements, target);
         }
 
         // Default Token behavior
         if (dependency.isActivated({ id: 'token-attacher', ref: "Token Attacher" })) {
-            return tokenAttacherAdapter.attachElementsToToken(elements, target, true);
+            return this.tokenAttacher?.attachElementsToToken(elements, target, true);
         } else if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
-            return massEditAdapter.link(elements, target);
+            return this.massEdit?.link(elements, target);
         }
 
         dependency.someRequired([
@@ -771,14 +803,14 @@ export class BaseFoundryAdapter {
             dependency.required([
                 { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
             ]);
-            return massEditAdapter.removeLinks(elements, target);
+            return this.massEdit?.removeLinks(elements, target);
         }
 
         // Default Token behavior
         if (dependency.isActivated({ id: 'token-attacher', ref: "Token Attacher" })) {
-            return tokenAttacherAdapter.detachElementsFromToken(elements, target, true);
+            return this.tokenAttacher?.detachElementsFromToken(elements, target, true);
         } else if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
-            return massEditAdapter.removeLinks(elements, target);
+            return this.massEdit?.removeLinks(elements, target);
         }
 
         dependency.someRequired([

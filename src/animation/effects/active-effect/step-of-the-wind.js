@@ -2,8 +2,8 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js'
-import { socket } from '../../../integration/socketlib.js';
-import { autoanimations } from '../../../integration/autoanimations.js';
+import { socket } from '../../../adapters/modules/socketlib/socketlib.js';
+import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
 import { matt } from '../../utils/matt-tiles.js';
 
 export const DEFAULT_CONFIG = {

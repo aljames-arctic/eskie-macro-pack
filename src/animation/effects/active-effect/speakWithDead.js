@@ -1,6 +1,6 @@
 // Original Author: EskieMoh#2969
 // Updater: @bakanabaka
-import { autoanimations } from "../../../integration/autoanimations.js";
+import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
 import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
 

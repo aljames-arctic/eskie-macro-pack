@@ -1,11 +1,11 @@
 import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { BlfxAutorecUpdateApp, BlfxAutorecUpdateFormApplication } from '../../src/integration/blfx/updateMenu.js';
-import { AutorecUpdateApp, autorecUpdateFormApplication } from '../../src/integration/autoanimations/updateMenu.js';
+import { BlfxAutorecUpdateApp, BlfxAutorecUpdateFormApplication } from '../../src/adapters/modules/blfx/updateMenu.js';
+import { AutorecUpdateApp, autorecUpdateFormApplication } from '../../src/adapters/modules/autoanimations/updateMenu.js';
 import { WorldScriptsApp, WorldScriptsFormApplication } from '../../src/world-scripts/worldScriptsMenu.js';
 import { RecommendedModulesApp, RecommendedModulesFormApplication } from '../../src/recommended-modules/recommendedModulesMenu.js';
-import { AutorecDestinationDialog } from '../../src/integration/autorec/destinationDialog.js';
+import { AutorecDestinationDialog } from '../../src/adapters/modules/autorec/destinationDialog.js';
 
 test('BlfxAutorecUpdateApp inherits from ApplicationV2 with HandlebarsApplicationMixin', async () => {
     assert.equal(BlfxAutorecUpdateApp, BlfxAutorecUpdateFormApplication);

@@ -1,8 +1,8 @@
 import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { blfx, EMP_BLFX_Registry, buildBlfxPayload, mergeBlfxCustomAutoRec } from '../../src/integration/blfx.js';
-import { generateBlfxAutorecUpdate, readExistingBlfxData, BlfxAutorecUpdateApp } from '../../src/integration/blfx/updateMenu.js';
+import { blfx, EMP_BLFX_Registry, buildBlfxPayload, mergeBlfxCustomAutoRec } from '../../src/adapters/modules/blfx/blfx.js';
+import { generateBlfxAutorecUpdate, readExistingBlfxData, BlfxAutorecUpdateApp } from '../../src/adapters/modules/blfx/updateMenu.js';
 
 test('blfx.register creates robustly keyed entries in EMP_BLFX_Registry', () => {
     blfx.register('fireball', 'template', 'eskie.effect.fireball', { speed: 1 }, '1.0.0', 'Fireball', {

@@ -1,13 +1,15 @@
-import { MODULE_ID } from "../../lib/constants.js";
-import { log } from '../../lib/logger.js';
-import { autoanimations } from "../autoanimations.js";
-import { blfx } from "../blfx.js";
-import { adapter } from "../../adapters/index.js";
+import { MODULE_ID } from "../../../lib/constants.js";
+import { log } from '../../../lib/logger.js';
+import { autoanimations } from "../autoanimations/autoanimations.js";
+import { blfx } from "../blfx/blfx.js";
+import { BaseFoundryAdapter } from "../../foundry/index.js";
+
+const foundryPlatform = new BaseFoundryAdapter();
 
 /**
  * Modern ApplicationV2 Dialog prompting the GM to select which auto-recognition system Eskie Macro Pack should integrate with.
  */
-export class AutorecDestinationDialog extends adapter.foundry.HandlebarsApplicationMixin(adapter.foundry.ApplicationV2) {
+export class AutorecDestinationDialog extends foundryPlatform.HandlebarsApplicationMixin(foundryPlatform.ApplicationV2) {
     constructor(options = {}) {
         super(options);
         this.onSelectedCallback = options.onSelectedCallback ?? null;
@@ -33,7 +35,7 @@ export class AutorecDestinationDialog extends adapter.foundry.HandlebarsApplicat
     static get PARTS() {
         return {
             form: {
-                template: `modules/${MODULE_ID}/src/integration/autorec/destinationDialog.html`
+                template: `modules/${MODULE_ID}/src/adapters/modules/autorec/destinationDialog.html`
             }
         };
     }
@@ -103,6 +105,7 @@ export class AutorecDestinationDialog extends adapter.foundry.HandlebarsApplicat
             await game.settings.set(MODULE_ID, 'autorecTarget', target);
         }
 
+        const appInstance = this;
         if (appInstance?.onSelectedCallback) {
             await appInstance.onSelectedCallback(target);
         } else {

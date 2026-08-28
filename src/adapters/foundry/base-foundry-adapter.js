@@ -65,21 +65,21 @@ export class BaseFoundryAdapter {
      * The active ApplicationV2 constructor (introduced in v12 under foundry.applications.api).
      */
     get ApplicationV2() {
-        return foundry.applications?.api?.ApplicationV2;
+        return typeof foundry !== 'undefined' ? (foundry.applications?.api?.ApplicationV2 ?? class {}) : class {};
     }
 
     /**
      * The active HandlebarsApplicationMixin wrapper (introduced in v12 under foundry.applications.api).
      */
     get HandlebarsApplicationMixin() {
-        return foundry.applications?.api?.HandlebarsApplicationMixin;
+        return typeof foundry !== 'undefined' ? (foundry.applications?.api?.HandlebarsApplicationMixin ?? (Base => Base)) : (Base => class extends Base {});
     }
 
     /**
      * The active DialogV2 constructor (introduced in v12 under foundry.applications.api).
      */
     get DialogV2() {
-        return foundry.applications?.api?.DialogV2;
+        return typeof foundry !== 'undefined' ? foundry.applications?.api?.DialogV2 : undefined;
     }
 
     /**

@@ -3,7 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
-import { autoanimations, CONCENTRATING } from '../../../integration/autoanimations.js';
+import { autoanimations, CONCENTRATING } from '../../../adapters/modules/autoanimations/autoanimations.js';
 
 const DEFAULT_CONFIG = {
     id: 'entangle',

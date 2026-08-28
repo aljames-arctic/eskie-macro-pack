@@ -1,1 +1,1 @@
-export { MidiQolModuleAdapter, midiQolAdapter } from "../../../adapters/module/midi-qol-module-adapter.js";
+export { MidiQolModuleAdapter, midiQolAdapter } from "../../../adapters/modules/midi-qol/midi-qol-module-adapter.js";

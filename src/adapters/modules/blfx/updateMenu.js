@@ -1,7 +1,9 @@
-import { MODULE_ID } from "../../lib/constants.js";
-import { EMP_BLFX_Registry } from "../blfx.js";
-import { log } from '../../lib/logger.js';
-import { adapter } from '../../adapters/index.js';
+import { MODULE_ID } from "../../../lib/constants.js";
+import { EMP_BLFX_Registry } from "./blfx.js";
+import { log } from '../../../lib/logger.js';
+import { BaseFoundryAdapter } from '../../foundry/index.js';
+
+const foundryPlatform = new BaseFoundryAdapter();
 
 /**
  * Known Boss Loot FX module IDs and setting keys across premium, free, and core packages.
@@ -168,7 +170,7 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
 /**
  * Interactive ApplicationV2 for reviewing and synchronizing Boss Loot FX custom auto-recognition presets.
  */
-export class BlfxAutorecUpdateApp extends adapter.foundry.HandlebarsApplicationMixin(adapter.foundry.ApplicationV2) {
+export class BlfxAutorecUpdateApp extends foundryPlatform.HandlebarsApplicationMixin(foundryPlatform.ApplicationV2) {
     constructor(registry = EMP_BLFX_Registry, options = {}) {
         super(options);
         this.registry = registry;
@@ -194,7 +196,7 @@ export class BlfxAutorecUpdateApp extends adapter.foundry.HandlebarsApplicationM
     static get PARTS() {
         return {
             form: {
-                template: `modules/${MODULE_ID}/src/integration/blfx/autorecUpdateMenu.html`
+                template: `modules/${MODULE_ID}/src/adapters/modules/blfx/autorecUpdateMenu.html`
             }
         };
     }

@@ -4,8 +4,8 @@
 import { time } from "../../../lib/time.js";
 import { matt } from '../../utils/matt-tiles.js';
 import { closest } from '../../../lib/filemanager.js';
-import { socket } from '../../../integration/socketlib.js';
-import { autoanimations } from '../../../integration/autoanimations.js';
+import { socket } from '../../../adapters/modules/socketlib/socketlib.js';
+import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
 import { MODULE_ID } from "../../../lib/constants.js";
 
 function hslToHex(h, s, l) {

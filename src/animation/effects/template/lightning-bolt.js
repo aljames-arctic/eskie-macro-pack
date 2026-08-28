@@ -6,7 +6,7 @@
 import { closest } from '../../../lib/filemanager.js';
 import { template } from '../../../lib/templates.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { autoanimations } from '../../../integration/autoanimations.js';
+import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
 import { adapter } from '../../../adapters/index.js';
 
 const DEFAULT_CONFIG = {

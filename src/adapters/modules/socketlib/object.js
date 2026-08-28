@@ -1,6 +1,6 @@
 import { token } from './token.js';
 import { tile } from './tile.js';
-import { log } from '../../lib/logger.js';
+import { log } from '../../../lib/logger.js';
 
 /**
  * Generalized edit function that dynamically updates either a Token or a Tile

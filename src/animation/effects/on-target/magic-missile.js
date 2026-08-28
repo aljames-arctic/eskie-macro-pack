@@ -2,8 +2,8 @@
 //Modular Conversion: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
-import { autoanimations } from "../../../integration/autoanimations.js";
-import { system } from "../../../integration/system.js";
+import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { adapter } from "../../../adapters/index.js";
 
 const DEFAULT_CONFIG = {
     id: "magicMissile",
@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
 async function create(token, target, config = {}) {
     const { id, missileCount, info } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     let mCount = missileCount;
-    const spellLevel = system.getSpellLevel({aaHandler: info});
+    const spellLevel = adapter.getSpellLevel({aaHandler: info});
     if (spellLevel) mCount = spellLevel + 2;
 
     const seq = new Sequence();

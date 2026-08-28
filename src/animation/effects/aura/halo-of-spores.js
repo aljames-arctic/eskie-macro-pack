@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autoanimations, CONCENTRATING } from '../../../integration/autoanimations.js';
+import { autoanimations, CONCENTRATING } from '../../../adapters/modules/autoanimations/autoanimations.js';
 
 const DEFAULT_CONFIG = {
     id: 'HaloOfSpores',

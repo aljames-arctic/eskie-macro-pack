@@ -1,11 +1,38 @@
 import { initializeFoundryAdapter, BaseFoundryAdapter, FoundryCurrentAdapter, USER_PERMISSION_TIERS } from './foundry/index.js';
 import { initializeSystemAdapter, BaseSystemAdapter, Dnd5eSystemAdapter, Pf2eSystemAdapter, GenericSystemAdapter, parseAndNormalizeAbility, BASE_ABILITY_MAP } from './system/index.js';
-import { initializeModuleAdapters, BaseModuleAdapter, MidiQolModuleAdapter, midiQolAdapter } from './module/index.js';
+import {
+    initializeModuleAdapters,
+    hasActiveModuleAdapters,
+    MODULE_ADAPTERS,
+    BaseModuleAdapter,
+    MidiQolModuleAdapter,
+    midiQolAdapter,
+    AutoanimationsModuleAdapter,
+    autoanimationsAdapter,
+    autoanimations,
+    EMP_AA_Menu,
+    BlfxModuleAdapter,
+    blfxAdapter,
+    blfx,
+    EMP_BLFX_Registry,
+    buildBlfxPayload,
+    mergeBlfxCustomAutoRec,
+    SocketlibModuleAdapter,
+    socketlibAdapter,
+    socketlibapi,
+    socket,
+    socketlib,
+    AutorecManager,
+    autorecManager,
+    autorec,
+    promptDestinationDialog,
+    CONCENTRATING
+} from './modules/index.js';
 import { log } from '../lib/logger.js';
 
 /**
  * Unified Adapter Singleton for Eskie Macro Pack.
- * Centralizes and abstracts Foundry platform generations (V12, V13, V14+), Game Systems, and Modules.
+ * Centralizes and abstracts Foundry platform generations (V12, V13, V14+), Game Systems, and Third-Party Modules.
  */
 export class Adapter {
     constructor() {
@@ -38,6 +65,51 @@ export class Adapter {
         this._initialized = true;
         const systemLabel = this.system.isSupported ? this.system.systemId : `${this.system.systemId} (unsupported)`;
         log.info(`Unified Adapter initialized [Foundry: v${this.foundry.generation}, System: ${systemLabel}, Modules: ${this.modules.size}]`);
+    }
+
+    /* -------------------------------------------- */
+    /*  Module Adapter Layer Accessors              */
+    /* -------------------------------------------- */
+
+    /**
+     * Retrieve a specific instantiated module adapter by module ID.
+     * @param {string} moduleId Unique module identifier
+     * @returns {BaseModuleAdapter|undefined}
+     */
+    getModule(moduleId) {
+        return this.modules.get(moduleId);
+    }
+
+    /**
+     * Check whether an active module adapter exists for a given module ID.
+     * @param {string} moduleId Unique module identifier
+     * @returns {boolean}
+     */
+    hasModule(moduleId) {
+        return this.modules.has(moduleId);
+    }
+
+    get autoanimations() {
+        return this.modules.get('autoanimations') ?? autoanimationsAdapter;
+    }
+
+    get blfx() {
+        return this.modules.get('blfx')
+            ?? this.modules.get('boss-loot-assets-premium')
+            ?? this.modules.get('boss-loot-assets-free')
+            ?? blfxAdapter;
+    }
+
+    get socketlib() {
+        return this.modules.get('socketlib') ?? socketlibAdapter;
+    }
+
+    get midiQol() {
+        return this.modules.get('midi-qol') ?? midiQolAdapter;
+    }
+
+    get autorec() {
+        return autorecManager;
     }
 
     /* -------------------------------------------- */
@@ -217,7 +289,30 @@ export {
     GenericSystemAdapter,
     parseAndNormalizeAbility,
     BASE_ABILITY_MAP,
+    MODULE_ADAPTERS,
+    initializeModuleAdapters,
+    hasActiveModuleAdapters,
     BaseModuleAdapter,
     MidiQolModuleAdapter,
-    midiQolAdapter
+    midiQolAdapter,
+    AutoanimationsModuleAdapter,
+    autoanimationsAdapter,
+    autoanimations,
+    EMP_AA_Menu,
+    CONCENTRATING,
+    AutorecManager,
+    autorecManager,
+    autorec,
+    promptDestinationDialog,
+    BlfxModuleAdapter,
+    blfxAdapter,
+    blfx,
+    EMP_BLFX_Registry,
+    buildBlfxPayload,
+    mergeBlfxCustomAutoRec,
+    SocketlibModuleAdapter,
+    socketlibAdapter,
+    socketlibapi,
+    socket,
+    socketlib
 };

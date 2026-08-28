@@ -1,17 +1,37 @@
 import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { initializeModuleAdapters, hasActiveModuleAdapters, MidiQolModuleAdapter } from '../../src/adapters/module/index.js';
+import {
+    initializeModuleAdapters,
+    hasActiveModuleAdapters,
+    BaseModuleAdapter,
+    MidiQolModuleAdapter,
+    AutoanimationsModuleAdapter,
+    autoanimationsAdapter,
+    BlfxModuleAdapter,
+    blfxAdapter,
+    SocketlibModuleAdapter,
+    socketlibAdapter,
+    AutorecManager,
+    autorecManager
+} from '../../src/adapters/modules/index.js';
+import { adapter } from '../../src/adapters/index.js';
 
 test('initializeModuleAdapters and hasActiveModuleAdapters detect active modules', () => {
     game.modules = new Map([
-        ['midi-qol', { id: 'midi-qol', active: true }]
+        ['midi-qol', { id: 'midi-qol', active: true }],
+        ['autoanimations', { id: 'autoanimations', active: true }],
+        ['blfx', { id: 'blfx', active: true }],
+        ['socketlib', { id: 'socketlib', active: true }]
     ]);
 
     assert.equal(hasActiveModuleAdapters(), true);
     const activeMap = initializeModuleAdapters();
-    assert.equal(activeMap.size, 1);
+    assert.equal(activeMap.size, 4);
     assert.ok(activeMap.get('midi-qol') instanceof MidiQolModuleAdapter);
+    assert.ok(activeMap.get('autoanimations') instanceof AutoanimationsModuleAdapter);
+    assert.ok(activeMap.get('blfx') instanceof BlfxModuleAdapter);
+    assert.ok(activeMap.get('socketlib') instanceof SocketlibModuleAdapter);
 });
 
 test('MidiQolModuleAdapter parses flags and HTML saves display with DOMParser', () => {
@@ -74,4 +94,86 @@ test('MidiQolModuleAdapter parses flags and HTML saves display with DOMParser', 
     assert.equal(htmlRolls.rolls[1].tokenId, 'target-token-2');
     assert.equal(htmlRolls.rolls[1].outcome, 'failure');
     assert.equal(htmlRolls.rolls[1].rawAbility, 'dexterity');
+});
+
+test('AutoanimationsModuleAdapter standardizes triggers and generates compliant autorec entries', () => {
+    const aa = new AutoanimationsModuleAdapter();
+    assert.equal(aa.standardizeTrigger('token'), 'ontoken');
+    assert.equal(aa.standardizeTrigger('template'), 'templatefx');
+    assert.equal(aa.standardizeTrigger('melee-target'), 'melee');
+    assert.equal(aa.standardizeTrigger('ranged-target'), 'range');
+    assert.equal(aa.standardizeTrigger('effect'), 'aefx');
+    assert.equal(aa.standardizeTrigger('aura'), 'aura');
+
+    const entry = aa.createAutorecEntry('magicMissile', 'range', 'eskie.effect.magicMissile', { speed: 2 }, '1.0.0', 'Magic Missile');
+    assert.ok(entry);
+    assert.equal(entry.label, 'Magic Missile');
+    assert.equal(entry.metaData.name, 'Eskie Macro Pack');
+    assert.equal(entry.metaData.version, '1.0.0');
+    assert.ok(entry.macro.args.includes('eskie.effect.magicMissile'));
+});
+
+test('BlfxModuleAdapter standardizes triggers and generates compliant macro commands', () => {
+    const blfx = new BlfxModuleAdapter();
+    assert.equal(blfx.standardizeTrigger('melee-target'), 'afterAttack');
+    assert.equal(blfx.standardizeTrigger('template'), 'afterItemUse');
+    assert.equal(blfx.standardizeTrigger('template', 'templatePlaced'), 'templatePlaced');
+
+    const commandTargeted = blfx.buildMacroCommand('eskie.effect.sneakAttack', 'melee-target', { damage: '2d6' });
+    assert.ok(commandTargeted.includes('Eskie Macro Pack Autorec (Targeted)'));
+    assert.ok(commandTargeted.includes('eskie.effect.sneakAttack'));
+
+    const commandSelf = blfx.buildMacroCommand('eskie.effect.shield', 'token', {});
+    assert.ok(commandSelf.includes('Eskie Macro Pack Autorec'));
+    assert.ok(commandSelf.includes('eskie.effect.shield'));
+});
+
+test('SocketlibModuleAdapter registers RPC handlers cleanly', async () => {
+    const registeredSockets = new Map();
+    globalThis.socketlib = {
+        registerModule: (modId) => ({
+            register: (name, fn) => registeredSockets.set(name, fn)
+        })
+    };
+
+    const sockAdapter = new SocketlibModuleAdapter();
+    await sockAdapter.register();
+
+    assert.ok(registeredSockets.has('createTile'));
+    assert.ok(registeredSockets.has('destroyTiles'));
+    assert.ok(registeredSockets.has('editDoor'));
+    assert.ok(registeredSockets.has('editToken'));
+    assert.ok(registeredSockets.has('playTokenMaskLocal'));
+});
+
+test('AutorecManager coordinates registration across AA and BLFX adapters', () => {
+    const customAA = new AutoanimationsModuleAdapter();
+    const customBLFX = new BlfxModuleAdapter();
+    const manager = new AutorecManager(customAA, customBLFX);
+
+    manager.register('fireball', 'template', 'eskie.effect.fireball', { radius: 20 }, '1.0.0', 'Fireball');
+
+    assert.equal(customAA.menu.templatefx.length, 1);
+    assert.equal(customAA.menu.templatefx[0].label, 'Fireball');
+    assert.ok(customBLFX.registry.dnd5e.fireball.default.afterItemUse);
+    assert.equal(customBLFX.registry.dnd5e.fireball.default.afterItemUse.itemName, 'Fireball');
+});
+
+test('Unified Adapter delegates to module adapters through accessors', async () => {
+    game.modules = new Map([
+        ['autoanimations', { id: 'autoanimations', active: true }],
+        ['blfx', { id: 'blfx', active: true }],
+        ['socketlib', { id: 'socketlib', active: true }],
+        ['midi-qol', { id: 'midi-qol', active: true }]
+    ]);
+
+    await adapter.init();
+
+    assert.ok(adapter.autoanimations instanceof AutoanimationsModuleAdapter);
+    assert.ok(adapter.blfx instanceof BlfxModuleAdapter);
+    assert.ok(adapter.socketlib instanceof SocketlibModuleAdapter);
+    assert.ok(adapter.midiQol instanceof MidiQolModuleAdapter);
+    assert.ok(adapter.autorec instanceof AutorecManager);
+    assert.equal(adapter.hasModule('autoanimations'), true);
+    assert.equal(adapter.hasModule('non-existent'), false);
 });

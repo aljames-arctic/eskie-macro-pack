@@ -1,6 +1,6 @@
 import { adapter } from "../../../adapters/index.js";
 import { blur } from "../../scene-overlays/status-blur.js";
-import { autoanimations } from "../../../integration/autoanimations.js";
+import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
 import { log } from '../../../lib/logger.js';
 
 /* **

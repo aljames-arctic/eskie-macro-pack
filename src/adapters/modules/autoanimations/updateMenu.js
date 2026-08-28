@@ -1,7 +1,9 @@
-import { MODULE_ID } from "../../lib/constants.js";
-import { EMP_AA_Menu } from "../autoanimations.js";
-import { log } from '../../lib/logger.js';
-import { adapter } from '../../adapters/index.js';
+import { MODULE_ID } from "../../../lib/constants.js";
+import { EMP_AA_Menu } from "./autoanimations.js";
+import { log } from '../../../lib/logger.js';
+import { BaseFoundryAdapter } from '../../foundry/index.js';
+
+const foundryPlatform = new BaseFoundryAdapter();
 
 export async function generateAutorecUpdate(autorec, excludedIds = new Set()) {
     log.group("Autorecognition Menu Check", 'debug');
@@ -96,7 +98,7 @@ export async function generateAutorecUpdate(autorec, excludedIds = new Set()) {
 /**
  * Interactive ApplicationV2 for reviewing and synchronizing Automated Animations custom auto-recognition presets.
  */
-export class AutorecUpdateApp extends adapter.foundry.HandlebarsApplicationMixin(adapter.foundry.ApplicationV2) {
+export class AutorecUpdateApp extends foundryPlatform.HandlebarsApplicationMixin(foundryPlatform.ApplicationV2) {
     constructor(autorec = EMP_AA_Menu, options = {}) {
         super(options);
         this.autorec = autorec ?? EMP_AA_Menu;
@@ -122,7 +124,7 @@ export class AutorecUpdateApp extends adapter.foundry.HandlebarsApplicationMixin
     static get PARTS() {
         return {
             form: {
-                template: `modules/${MODULE_ID}/src/integration/autoanimations/autorecUpdateMenu.html`
+                template: `modules/${MODULE_ID}/src/adapters/modules/autoanimations/autorecUpdateMenu.html`
             }
         };
     }

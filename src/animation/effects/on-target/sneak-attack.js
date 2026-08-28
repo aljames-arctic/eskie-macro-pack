@@ -1,6 +1,6 @@
 import { adapter } from '../../../adapters/index.js';
 import { closest } from '../../../lib/filemanager.js';
-import { autoanimations } from '../../../integration/autoanimations.js';
+import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
 
 const DEFAULT_CONFIG_MELEE = {
     id: "sneakAttackMelee",

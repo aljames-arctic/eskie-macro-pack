@@ -1,8 +1,8 @@
 import { MODULE_ID } from "./lib/constants.js";
-import { autorecUpdateFormApplication } from "./integration/autoanimations/updateMenu.js";
-import { BlfxAutorecUpdateFormApplication } from "./integration/blfx/updateMenu.js";
-import { AutorecDestinationDialog } from "./integration/autorec/destinationDialog.js";
-import { blfx } from "./integration/blfx.js";
+import { autorecUpdateFormApplication } from "./adapters/modules/autoanimations/updateMenu.js";
+import { BlfxAutorecUpdateFormApplication } from "./adapters/modules/blfx/updateMenu.js";
+import { AutorecDestinationDialog } from "./adapters/modules/autorec/destinationDialog.js";
+import { blfx } from "./adapters/modules/blfx/blfx.js";
 import { WorldScriptsFormApplication } from "./world-scripts/worldScriptsMenu.js";
 import { RecommendedModulesFormApplication } from "./recommended-modules/recommendedModulesMenu.js";
 import { updateMacroCompendiums } from "./lib/standalone-macros.js";

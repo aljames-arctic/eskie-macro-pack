@@ -1,5 +1,5 @@
-import { autoanimations } from '../../../integration/autoanimations.js';
-import { socket } from '../../../integration/socketlib.js';
+import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { socket } from '../../../adapters/modules/socketlib/socketlib.js';
 import { closest } from '../../../lib/filemanager.js'
 import { matt } from '../../utils/matt-tiles.js';
 

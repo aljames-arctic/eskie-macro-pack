@@ -1,6 +1,6 @@
 import { closest } from '../../../lib/filemanager.js';
 import { template } from '../../../lib/templates.js';
-import { autoanimations } from '../../../integration/autoanimations.js';
+import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
 
 //Last Updated: 4/30/2024
 //Author: EskieMoh#2969

@@ -1,5 +1,5 @@
 import { closest } from "../../../lib/filemanager.js";
-import { autoanimations } from "../../../integration/autoanimations.js";
+import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
 
 /* **
    Originally Published: 4/14/2023

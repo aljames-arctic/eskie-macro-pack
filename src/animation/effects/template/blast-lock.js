@@ -6,9 +6,9 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { template } from '../../../lib/templates.js';
-import { socket } from '../../../integration/socketlib.js';
+import { socket } from '../../../adapters/modules/socketlib/socketlib.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { autoanimations } from '../../../integration/autoanimations.js';
+import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
 
 
 const DEFAULT_CONFIG = {

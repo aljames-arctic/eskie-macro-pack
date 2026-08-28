@@ -1,9 +1,9 @@
-import { MODULE_ID } from "../../lib/constants.js";
-import { log } from '../../lib/logger.js';
-import { socket, socketlib } from "../socketlib.js";
-import { tokenMaskEffect, tokenMaskTracker, playLocal, stopLocal } from "../../animation/mask/token-mask.js";
+import { MODULE_ID } from "../../../lib/constants.js";
+import { log } from '../../../lib/logger.js';
+import { socket, socketlib } from "./socketlib.js";
+import { tokenMaskEffect, tokenMaskTracker, playLocal, stopLocal } from "../../../animation/mask/token-mask.js";
 import { tile } from "./tile.js";
-import { adapter } from "../../adapters/index.js";
+import { adapter } from "../../index.js";
 
 /**
  * Socketlib handler to execute local sequence rendering on a client.

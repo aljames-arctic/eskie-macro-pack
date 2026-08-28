@@ -5,7 +5,7 @@ import { closest, absolutePath } from '../../../lib/filemanager.js';
 import { template } from '../../../lib/templates.js';
 import { teleportIn } from "./teleport/teleportIn.js";
 import { teleportOut } from "./teleport/teleportOut.js";
-import { autoanimations } from "../../../integration/autoanimations.js";
+import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
 
 const DEFAULT_CONFIG = {
     id: 'Teleportation',

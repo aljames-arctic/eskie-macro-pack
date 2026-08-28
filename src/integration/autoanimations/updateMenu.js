@@ -184,6 +184,15 @@ export class AutorecUpdateApp extends adapter.foundry.HandlebarsApplicationMixin
             if (globalThis.AutomatedAnimations?.AutorecManager?.overwriteMenus) {
                 await globalThis.AutomatedAnimations.AutorecManager.overwriteMenus(JSON.stringify(newSettings), { submitAll: true });
             }
+
+            const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
+            const isDevelopment = rawVersion === "#{VERSION}#";
+            const effectiveVersion = isDevelopment ? `${rawVersion}.${Date.now()}` : rawVersion;
+
+            if (game.settings?.settings?.has?.(`${MODULE_ID}.autorecVersion`)) {
+                await game.settings.set(MODULE_ID, "autorecVersion", effectiveVersion);
+            }
+
             log.info("Animations have been updated in Automated Animations.");
             log.groupEnd();
         }

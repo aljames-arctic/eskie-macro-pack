@@ -4,6 +4,38 @@ import { log } from '../../lib/logger.js';
 import { adapter } from '../../adapters/index.js';
 
 /**
+ * Known Boss Loot FX module IDs and setting keys across premium, free, and core packages.
+ */
+const BLFX_MODULES = ['boss-loot-assets-premium', 'boss-loot-assets-free', 'blfx', 'blfx-assets-pack01'];
+const BLFX_SETTING_KEYS = ['blfxCustomAutoRecognition', 'customAutoRecognition'];
+
+/**
+ * Safely retrieves existing Custom Auto-Recognition data from any registered BLFX module settings.
+ * @returns {object} Existing BLFX customAutoRecognition object
+ */
+export function readExistingBlfxData() {
+    for (const mod of BLFX_MODULES) {
+        for (const key of BLFX_SETTING_KEYS) {
+            const settingKey = `${mod}.${key}`;
+            try {
+                if (game.settings?.settings?.has?.(settingKey)) {
+                    let val = game.settings.get(mod, key);
+                    if (typeof val === 'string') {
+                        try { val = JSON.parse(val); } catch {}
+                    }
+                    if (val && typeof val === 'object') {
+                        return val;
+                    }
+                }
+            } catch (err) {
+                log.debug(`EMP | Could not read ${settingKey}:`, err);
+            }
+        }
+    }
+    return {};
+}
+
+/**
  * Extracts a semver version string from an EMP note field, e.g. "Eskie Macro Pack (1.0.0)".
  * @param {string} note The note text
  * @returns {string} The version string or "0.0.0"
@@ -22,23 +54,7 @@ function extractVersionFromNote(note) {
 export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry, excludedKeys = new Set()) {
     log.group("Boss Loot FX Autorec Check", 'debug');
 
-    let existingData = {};
-    for (const mod of ['boss-loot-assets-premium', 'boss-loot-assets-free', 'blfx']) {
-        try {
-            if (game.settings?.settings?.has?.(`${mod}.blfxCustomAutoRecognition`)) {
-                let val = game.settings.get(mod, 'blfxCustomAutoRecognition');
-                if (typeof val === 'string') {
-                    try { val = JSON.parse(val); } catch {}
-                }
-                if (val && typeof val === 'object') {
-                    existingData = val;
-                    break;
-                }
-            }
-        } catch (err) {
-            log.debug(`EMP | Could not read existing ${mod}.blfxCustomAutoRecognition setting:`, err);
-        }
-    }
+    const existingData = readExistingBlfxData();
 
     let existingTree = {};
     if (existingData?.customAutoRecognition && typeof existingData.customAutoRecognition === 'object' && !Array.isArray(existingData.customAutoRecognition)) {
@@ -238,13 +254,32 @@ export class BlfxAutorecUpdateApp extends adapter.foundry.HandlebarsApplicationM
                 return;
             }
 
-            const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
-            const isDevelopment = rawVersion === "#{VERSION}#";
-            const effectiveVersion = isDevelopment ? BlfxAutorecUpdateApp._getDevelopmentVersion() : rawVersion;
+            // 1. Directly write the merged customAutoRecognition payload to all active BLFX settings
+            for (const mod of BLFX_MODULES) {
+                for (const key of BLFX_SETTING_KEYS) {
+                    const settingKey = `${mod}.${key}`;
+                    try {
+                        if (game.settings?.settings?.has?.(settingKey)) {
+                            await game.settings.set(mod, key, newPayload);
+                            log.info(`EMP | Directly saved custom auto-recognition payload to ${settingKey}`);
+                        }
+                    } catch (err) {
+                        log.debug(`EMP | Could not directly write to ${settingKey}:`, err);
+                    }
+                }
+            }
 
+            // 2. Compute an effective version string that satisfies BLFX's isNewerVersion guard
+            const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
+            const effectiveVersion = rawVersion === "#{VERSION}#" 
+                ? BlfxAutorecUpdateApp._getDevelopmentVersion() 
+                : `${rawVersion}.${Date.now()}`;
+
+            // 3. Dispatch the official BLFX registration Hook
             Hooks.call('blfx.register.CustomAutoRec', newPayload, MODULE_ID, effectiveVersion);
 
-            if (game.settings) {
+            // 4. Update EMP's internal tracking version
+            if (game.settings?.settings?.has?.(`${MODULE_ID}.blfxAutorecVersion`)) {
                 await game.settings.set(MODULE_ID, "blfxAutorecVersion", effectiveVersion);
             }
 

@@ -2,7 +2,7 @@ import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { blfx, EMP_BLFX_Registry, buildBlfxPayload, mergeBlfxCustomAutoRec } from '../../src/integration/blfx.js';
-import { generateBlfxAutorecUpdate } from '../../src/integration/blfx/updateMenu.js';
+import { generateBlfxAutorecUpdate, readExistingBlfxData, BlfxAutorecUpdateApp } from '../../src/integration/blfx/updateMenu.js';
 
 test('blfx.register creates robustly keyed entries in EMP_BLFX_Registry', () => {
     blfx.register('fireball', 'template', 'eskie.effect.fireball', { speed: 1 }, '1.0.0', 'Fireball', {
@@ -69,7 +69,7 @@ test('mergeBlfxCustomAutoRec non-destructively handles stringified JSON, empty o
     assert.equal(merged.customAutoRecognition.dnd5e.fireball.cast.afterItemUse.note, 'Eskie Macro Pack (1.0.0)');
 });
 
-test('generateBlfxAutorecUpdate handles corrupted or empty settings gracefully without crashing', async () => {
+test('generateBlfxAutorecUpdate and readExistingBlfxData handle settings seamlessly', async () => {
     const testRegistry = {
         dnd5e: {
             sample: {
@@ -83,6 +83,9 @@ test('generateBlfxAutorecUpdate handles corrupted or empty settings gracefully w
             }
         }
     };
+
+    const initialRead = readExistingBlfxData();
+    assert.ok(typeof initialRead === 'object');
 
     const result = await generateBlfxAutorecUpdate(testRegistry);
     assert.ok(result);

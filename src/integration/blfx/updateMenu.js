@@ -23,21 +23,33 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
     log.group("Boss Loot FX Autorec Check", 'debug');
 
     let existingData = {};
-    try {
-        if (game.settings?.settings?.has('boss-loot-assets-premium.blfxCustomAutoRecognition')) {
-            existingData = game.settings.get('boss-loot-assets-premium', 'blfxCustomAutoRecognition') ?? {};
+    for (const mod of ['boss-loot-assets-premium', 'boss-loot-assets-free', 'blfx']) {
+        try {
+            if (game.settings?.settings?.has?.(`${mod}.blfxCustomAutoRecognition`)) {
+                let val = game.settings.get(mod, 'blfxCustomAutoRecognition');
+                if (typeof val === 'string') {
+                    try { val = JSON.parse(val); } catch {}
+                }
+                if (val && typeof val === 'object') {
+                    existingData = val;
+                    break;
+                }
+            }
+        } catch (err) {
+            log.debug(`EMP | Could not read existing ${mod}.blfxCustomAutoRecognition setting:`, err);
         }
-    } catch (err) {
-        log.debug("EMP | Could not read existing blfxCustomAutoRecognition setting:", err);
     }
 
     let existingTree = {};
-    if (existingData?.customAutoRecognition && typeof existingData.customAutoRecognition === 'object') {
+    if (existingData?.customAutoRecognition && typeof existingData.customAutoRecognition === 'object' && !Array.isArray(existingData.customAutoRecognition)) {
         existingTree = foundry.utils.duplicate(existingData.customAutoRecognition);
     } else if (existingData?.flags?.['boss-loot-assets-premium']?.customAutoRecognition && typeof existingData.flags['boss-loot-assets-premium'].customAutoRecognition === 'object') {
         existingTree = foundry.utils.duplicate(existingData.flags['boss-loot-assets-premium'].customAutoRecognition);
-    } else if (existingData && typeof existingData === 'object' && !existingData.flags) {
+    } else if (existingData && typeof existingData === 'object' && !Array.isArray(existingData) && !existingData.flags) {
         existingTree = foundry.utils.duplicate(existingData);
+    }
+    if (typeof existingTree !== 'object' || existingTree === null || Array.isArray(existingTree)) {
+        existingTree = {};
     }
 
     const missingEntries = [];
@@ -46,10 +58,15 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
     const sameEntries = [];
 
     // 1st Pass: Compare incoming EMP entries against existing BLFX settings
-    for (const [systemId, items] of Object.entries(empRegistry)) {
+    for (const [systemId, items] of Object.entries(empRegistry ?? {})) {
+        if (!items || typeof items !== 'object') continue;
         for (const [itemSlug, activities] of Object.entries(items)) {
+            if (!activities || typeof activities !== 'object') continue;
             for (const [activitySlug, triggers] of Object.entries(activities)) {
+                if (!triggers || typeof triggers !== 'object') continue;
                 for (const [triggerMode, newEntry] of Object.entries(triggers)) {
+                    if (!newEntry || typeof newEntry !== 'object') continue;
+
                     const entryKey = `${systemId}___${itemSlug}___${activitySlug}___${triggerMode}`;
                     const formatted = {
                         key: entryKey,
@@ -64,9 +81,9 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
 
                     const existingEntry = existingTree?.[systemId]?.[itemSlug]?.[activitySlug]?.[triggerMode];
 
-                    if (!existingEntry) {
+                    if (!existingEntry || typeof existingEntry !== 'object') {
                         missingEntries.push(formatted);
-                    } else if (existingEntry.note?.includes?.("Eskie Macro Pack")) {
+                    } else if (typeof existingEntry.note === 'string' && existingEntry.note.includes("Eskie Macro Pack")) {
                         const newVersion = extractVersionFromNote(newEntry.note);
                         const oldVersion = extractVersionFromNote(existingEntry.note);
                         if (foundry.utils.isNewerVersion(newVersion, oldVersion)) {
@@ -94,23 +111,29 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
     // Add selected missing entries
     for (const item of missingEntries) {
         if (excludedKeys.has(item.key)) continue;
-        if (!mergedTree[item.systemId]) mergedTree[item.systemId] = {};
-        if (!mergedTree[item.systemId][item.itemSlug]) mergedTree[item.systemId][item.itemSlug] = {};
-        if (!mergedTree[item.systemId][item.itemSlug][item.activitySlug]) mergedTree[item.systemId][item.itemSlug][item.activitySlug] = {};
+        if (!mergedTree[item.systemId] || typeof mergedTree[item.systemId] !== 'object') mergedTree[item.systemId] = {};
+        if (!mergedTree[item.systemId][item.itemSlug] || typeof mergedTree[item.systemId][item.itemSlug] !== 'object') mergedTree[item.systemId][item.itemSlug] = {};
+        if (!mergedTree[item.systemId][item.itemSlug][item.activitySlug] || typeof mergedTree[item.systemId][item.itemSlug][item.activitySlug] !== 'object') mergedTree[item.systemId][item.itemSlug][item.activitySlug] = {};
         mergedTree[item.systemId][item.itemSlug][item.activitySlug][item.triggerMode] = item.entry;
     }
 
     // Apply updated entries
     for (const item of updatedEntries) {
-        if (!mergedTree[item.systemId]) mergedTree[item.systemId] = {};
-        if (!mergedTree[item.systemId][item.itemSlug]) mergedTree[item.systemId][item.itemSlug] = {};
-        if (!mergedTree[item.systemId][item.itemSlug][item.activitySlug]) mergedTree[item.systemId][item.itemSlug][item.activitySlug] = {};
+        if (!mergedTree[item.systemId] || typeof mergedTree[item.systemId] !== 'object') mergedTree[item.systemId] = {};
+        if (!mergedTree[item.systemId][item.itemSlug] || typeof mergedTree[item.systemId][item.itemSlug] !== 'object') mergedTree[item.systemId][item.itemSlug] = {};
+        if (!mergedTree[item.systemId][item.itemSlug][item.activitySlug] || typeof mergedTree[item.systemId][item.itemSlug][item.activitySlug] !== 'object') mergedTree[item.systemId][item.itemSlug][item.activitySlug] = {};
         mergedTree[item.systemId][item.itemSlug][item.activitySlug][item.triggerMode] = item.entry;
     }
 
     const newPayload = {
         flags: {
             "boss-loot-assets-premium": {
+                customAutoRecognition: true
+            },
+            "boss-loot-assets-free": {
+                customAutoRecognition: true
+            },
+            "blfx": {
                 customAutoRecognition: true
             }
         },
@@ -119,9 +142,9 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
 
     return {
         newPayload,
-        missingEntries: missingEntries.sort((a, b) => a.label.localeCompare(b.label)),
-        updatedEntries: updatedEntries.sort((a, b) => a.label.localeCompare(b.label)),
-        customEntries: customEntries.sort((a, b) => a.label.localeCompare(b.label)),
+        missingEntries: missingEntries.sort((a, b) => (a.label || "").localeCompare(b.label || "")),
+        updatedEntries: updatedEntries.sort((a, b) => (a.label || "").localeCompare(b.label || "")),
+        customEntries: customEntries.sort((a, b) => (a.label || "").localeCompare(b.label || "")),
         sameEntries
     };
 }
@@ -206,7 +229,9 @@ export class BlfxAutorecUpdateApp extends adapter.foundry.HandlebarsApplicationM
                 }
             }
 
-            const { newPayload } = await this.settings(excludedKeys);
+            const appInstance = (this instanceof BlfxAutorecUpdateApp) ? this : (form?.app ?? null);
+            const { newPayload } = appInstance?.settings ? await appInstance.settings(excludedKeys) : await generateBlfxAutorecUpdate(EMP_BLFX_Registry, excludedKeys);
+
             if (!newPayload?.customAutoRecognition || Object.keys(newPayload.customAutoRecognition).length === 0) {
                 log.debug("EMP | Nothing to update in Boss Loot FX!");
                 log.groupEnd();
@@ -215,7 +240,7 @@ export class BlfxAutorecUpdateApp extends adapter.foundry.HandlebarsApplicationM
 
             const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
             const isDevelopment = rawVersion === "#{VERSION}#";
-            const effectiveVersion = isDevelopment ? this._getDevelopmentVersion() : rawVersion;
+            const effectiveVersion = isDevelopment ? BlfxAutorecUpdateApp._getDevelopmentVersion() : rawVersion;
 
             Hooks.call('blfx.register.CustomAutoRec', newPayload, MODULE_ID, effectiveVersion);
 

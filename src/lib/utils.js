@@ -5,7 +5,7 @@
  * @returns {string} The localized string or fallback
  */
 export function localize(key, fallback = key) {
-    return game.i18n?.has(key) ? game.i18n.localize(key) : fallback;
+    return game.i18n?.has?.(key) ? (game.i18n.localize?.(key) ?? fallback) : fallback;
 }
 
 /**
@@ -16,5 +16,5 @@ export function localize(key, fallback = key) {
  * @returns {string} The formatted string or fallback
  */
 export function format(key, data = {}, fallback = key) {
-    return game.i18n?.has(key) ? game.i18n.format(key, data) : fallback;
+    return game.i18n?.has?.(key) ? (game.i18n.format?.(key, data) ?? fallback) : fallback;
 }

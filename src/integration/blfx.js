@@ -50,8 +50,9 @@ function buildBlfxMacroCommand(animation, trigger, config) {
 
     if (isTargeted) {
         return `// Eskie Macro Pack Autorec (Targeted)
-const token = (typeof workflow !== 'undefined' && workflow?.token) || canvas.tokens?.controlled?.[0] || (typeof speaker !== 'undefined' ? ChatMessage.getSpeakerActor(speaker)?.getActiveTokens?.()?.[0] : null);
-const target = (typeof workflow !== 'undefined' && workflow?.targets?.first?.()) || (typeof targets !== 'undefined' && targets[0]) || Array.from(game.user?.targets ?? [])[0];
+const speakerActor = typeof speaker !== 'undefined' && speaker ? (globalThis.ChatMessage?.getSpeakerActor?.(speaker) ?? globalThis.ChatMessage?.implementation?.getSpeakerActor?.(speaker)) : null;
+const token = (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || speakerActor?.getActiveTokens?.()?.[0] || null;
+const target = (typeof workflow !== 'undefined' && (workflow?.targets?.first?.() ?? (workflow?.targets instanceof Set ? Array.from(workflow.targets)[0] : workflow?.targets?.[0]))) || (typeof targets !== 'undefined' && (targets instanceof Set ? Array.from(targets)[0] : targets?.[0])) || Array.from(game.user?.targets ?? [])[0] || null;
 const config = ${serializedConfig};
 const effect = foundry.utils.getProperty(globalThis, '${animation}');
 if (effect?.play) {
@@ -64,7 +65,8 @@ if (effect?.play) {
     }
 
     return `// Eskie Macro Pack Autorec
-const token = (typeof workflow !== 'undefined' && workflow?.token) || canvas.tokens?.controlled?.[0] || (typeof speaker !== 'undefined' ? ChatMessage.getSpeakerActor(speaker)?.getActiveTokens?.()?.[0] : null);
+const speakerActor = typeof speaker !== 'undefined' && speaker ? (globalThis.ChatMessage?.getSpeakerActor?.(speaker) ?? globalThis.ChatMessage?.implementation?.getSpeakerActor?.(speaker)) : null;
+const token = (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || speakerActor?.getActiveTokens?.()?.[0] || null;
 const config = ${serializedConfig};
 const effect = foundry.utils.getProperty(globalThis, '${animation}');
 if (effect?.play && token) {
@@ -84,11 +86,15 @@ if (effect?.play && token) {
  */
 export function register(key, trigger, animation, config, version = "0.0.0", fallback = key, options = {}) {
     const systemId = options.systemId ?? game?.system?.id ?? 'dnd5e';
-    const localizedLabel = (key.includes(":") || key.includes(" ")) ? key : localize(`EMP.effects.${key}`, fallback);
-    const itemName = options.itemName ?? localizedLabel;
-    const itemSlug = options.itemSlug ?? (foundry.utils?.slugify ? foundry.utils.slugify(itemName) : itemName.toLowerCase().replace(/[^a-z0-9]/g, '-'));
+    const localizedLabel = (typeof key === 'string' && (key.includes(":") || key.includes(" "))) ? key : localize(`EMP.effects.${key}`, fallback);
+    const itemName = options.itemName ?? localizedLabel ?? String(key ?? 'default');
+    const slugName = typeof itemName === 'string' ? itemName : String(itemName);
+    const rawItemSlug = options.itemSlug ?? (foundry.utils?.slugify ? foundry.utils.slugify(slugName) : slugName.toLowerCase().replace(/[^a-z0-9]/g, '-'));
+    const itemSlug = rawItemSlug ? rawItemSlug : 'default-item';
     const activityName = options.activityName ?? "Default";
-    const activitySlug = options.activitySlug ?? (activityName ? (foundry.utils?.slugify ? foundry.utils.slugify(activityName) : activityName.toLowerCase().replace(/[^a-z0-9]/g, '-')) : "default");
+    const slugAct = typeof activityName === 'string' ? activityName : String(activityName);
+    const rawActivitySlug = options.activitySlug ?? (activityName ? (foundry.utils?.slugify ? foundry.utils.slugify(slugAct) : slugAct.toLowerCase().replace(/[^a-z0-9]/g, '-')) : "default");
+    const activitySlug = rawActivitySlug ? rawActivitySlug : 'default';
     const triggerMode = standardizeBlfxTrigger(trigger, options.blfxTrigger);
     const command = options.command ?? buildBlfxMacroCommand(animation, trigger, config);
 
@@ -125,6 +131,12 @@ export function buildBlfxPayload() {
         flags: {
             "boss-loot-assets-premium": {
                 customAutoRecognition: true
+            },
+            "boss-loot-assets-free": {
+                customAutoRecognition: true
+            },
+            "blfx": {
+                customAutoRecognition: true
             }
         },
         customAutoRecognition: foundry.utils.duplicate(EMP_BLFX_Registry)
@@ -140,38 +152,48 @@ export function buildBlfxPayload() {
  */
 export function mergeBlfxCustomAutoRec(existingData, empRegistry) {
     let baseCustomTree = {};
-    if (existingData?.customAutoRecognition && typeof existingData.customAutoRecognition === 'object') {
+    if (typeof existingData === 'string') {
+        try { existingData = JSON.parse(existingData); } catch {}
+    }
+    if (existingData?.customAutoRecognition && typeof existingData.customAutoRecognition === 'object' && !Array.isArray(existingData.customAutoRecognition)) {
         baseCustomTree = foundry.utils.duplicate(existingData.customAutoRecognition);
     } else if (existingData?.flags?.['boss-loot-assets-premium']?.customAutoRecognition && typeof existingData.flags['boss-loot-assets-premium'].customAutoRecognition === 'object') {
         baseCustomTree = foundry.utils.duplicate(existingData.flags['boss-loot-assets-premium'].customAutoRecognition);
-    } else if (existingData && typeof existingData === 'object' && !existingData.flags) {
+    } else if (existingData && typeof existingData === 'object' && !Array.isArray(existingData) && !existingData.flags) {
         baseCustomTree = foundry.utils.duplicate(existingData);
+    }
+    if (typeof baseCustomTree !== 'object' || baseCustomTree === null || Array.isArray(baseCustomTree)) {
+        baseCustomTree = {};
     }
 
     const mergedTree = foundry.utils.duplicate(baseCustomTree);
 
-    for (const [systemId, items] of Object.entries(empRegistry)) {
-        if (!mergedTree[systemId]) {
+    for (const [systemId, items] of Object.entries(empRegistry ?? {})) {
+        if (!items || typeof items !== 'object') continue;
+        if (!mergedTree[systemId] || typeof mergedTree[systemId] !== 'object') {
             mergedTree[systemId] = {};
         }
 
         for (const [itemSlug, activities] of Object.entries(items)) {
-            if (!mergedTree[systemId][itemSlug]) {
+            if (!activities || typeof activities !== 'object') continue;
+            if (!mergedTree[systemId][itemSlug] || typeof mergedTree[systemId][itemSlug] !== 'object') {
                 mergedTree[systemId][itemSlug] = {};
             }
 
             for (const [activitySlug, triggers] of Object.entries(activities)) {
-                if (!mergedTree[systemId][itemSlug][activitySlug]) {
+                if (!triggers || typeof triggers !== 'object') continue;
+                if (!mergedTree[systemId][itemSlug][activitySlug] || typeof mergedTree[systemId][itemSlug][activitySlug] !== 'object') {
                     mergedTree[systemId][itemSlug][activitySlug] = {};
                 }
 
                 for (const [triggerMode, newEntry] of Object.entries(triggers)) {
+                    if (!newEntry || typeof newEntry !== 'object') continue;
                     const existingEntry = mergedTree[systemId][itemSlug][activitySlug][triggerMode];
 
-                    if (!existingEntry) {
+                    if (!existingEntry || typeof existingEntry !== 'object') {
                         // Effect does not exist: ADD it
                         mergedTree[systemId][itemSlug][activitySlug][triggerMode] = newEntry;
-                    } else if (existingEntry.note?.includes?.("Eskie Macro Pack")) {
+                    } else if (typeof existingEntry.note === 'string' && existingEntry.note.includes("Eskie Macro Pack")) {
                         // Existing entry was registered by EMP: UPDATE to latest version
                         mergedTree[systemId][itemSlug][activitySlug][triggerMode] = newEntry;
                     } else {
@@ -186,6 +208,12 @@ export function mergeBlfxCustomAutoRec(existingData, empRegistry) {
     return {
         flags: {
             "boss-loot-assets-premium": {
+                customAutoRecognition: true
+            },
+            "boss-loot-assets-free": {
+                customAutoRecognition: true
+            },
+            "blfx": {
                 customAutoRecognition: true
             }
         },
@@ -220,7 +248,16 @@ export async function submit(force = false) {
     const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
     const isDevelopment = rawVersion === "#{VERSION}#";
     const effectiveVersion = isDevelopment ? getDevelopmentVersion() : rawVersion;
-    const lastUpdate = game.settings?.get(MODULE_ID, "blfxAutorecVersion") ?? "0.0.0";
+
+    let lastUpdate = "0.0.0";
+    try {
+        if (game.settings?.settings?.has?.(`${MODULE_ID}.blfxAutorecVersion`)) {
+            lastUpdate = game.settings.get(MODULE_ID, "blfxAutorecVersion") ?? "0.0.0";
+        }
+    } catch {
+        lastUpdate = "0.0.0";
+    }
+
     const shouldUpdate = force || isDevelopment || foundry.utils.isNewerVersion(effectiveVersion, lastUpdate);
 
     if (!shouldUpdate) return;
@@ -250,6 +287,7 @@ export async function submit(force = false) {
 export const blfx = {
     register,
     buildBlfxPayload,
+    mergeBlfxCustomAutoRec,
     submit,
     registry: EMP_BLFX_Registry
 };

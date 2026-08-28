@@ -173,7 +173,8 @@ export class AutorecUpdateApp extends adapter.foundry.HandlebarsApplicationMixin
                 }
             }
 
-            const { newSettings } = await this.settings(excludedIds);
+            const appInstance = (this instanceof AutorecUpdateApp) ? this : (form?.app ?? null);
+            const { newSettings } = appInstance?.settings ? await appInstance.settings(excludedIds) : await generateAutorecUpdate(EMP_AA_Menu, excludedIds);
             if (!newSettings || Object.keys(newSettings).length === 0) {
                 log.debug("Nothing to update!");
                 log.groupEnd();

@@ -83,28 +83,28 @@ async function createStarwardSword(token, config = {}, options = {}) {
     //Opening
     const mainSequence = new Sequence();
     const bg = adapter.getSceneBackground(canvas?.scene);
+    if (darkMap && bg?.src) {
+        mainSequence
+            .effect()
+            .file(bg.src)
+            .name("Starward Sword")
+            .filter("ColorMatrix", { brightness: 0.3 })
+            .atLocation({ x: (canvas.dimensions.width) / 2, y: (canvas.dimensions.height) / 2 })
+            .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
+            .persist()
+            .fadeIn(500)
+            .fadeOut(1000)
+            .belowTokens()
+            .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY });
+    }
+
+    if (cameraZoom) {
+        mainSequence.thenDo(function () {
+            canvas.animatePan({ duration: 250, x: token.center.x, y: token.center.y, scale: 1.620 });
+        });
+    }
+
     mainSequence
-        .effect()
-        .file(bg?.src)
-        .name("Starward Sword")
-        .filter("ColorMatrix", { brightness: 0.3 })
-        .atLocation({ x: (canvas.dimensions.width) / 2, y: (canvas.dimensions.height) / 2 })
-        .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
-        .persist()
-        .fadeIn(500)
-        .fadeOut(1000)
-        .belowTokens()
-        .spriteOffset({ x: -(bg?.offsetX ?? 0), y: -(bg?.offsetY ?? 0) })
-        .playIf(() => {
-            return Boolean(darkMap && bg?.src);
-        })
-
-        .thenDo(function () {
-            if (cameraZoom == true) {
-                canvas.animatePan({ duration: 250, x: token.center.x, y: token.center.y, scale: 1.620 })
-            }
-        })
-
         .effect()
         .file(closest("eskie.damage.electricity.01.purple"))
         .atLocation(token, { offset: { x: 0, y: 0 }, gridUnits: true })

@@ -1,7 +1,7 @@
 ---
 name: discord-effect-converter
 description: Instructions for converting legacy Discord animations into the modern modular format in src/animation/effects. Make sure to use this skill whenever you are asked to "update scripts in the new-submissions folder" or convert any Discord animation scripts.
-compatibility: Foundry VTT V11+
+compatibility: Foundry VTT V12+
 ---
 
 # Discord Animation to Modular Format Conversion
@@ -11,16 +11,16 @@ When asked to update scripts in the `new-submissions` folder or to convert Disco
 - For active effects, read `references/template_active_effect.js`. Save these to `src/animation/effects/active-effect/`.
 
 > [!NOTE]
-> If a legacy script utilizes a position or crosshair (`warpgate.crosshairs.show`) to place effects at, it is considered a **template-driven** effect. You MUST read `references/template_template.js` to understand its unique structure. These should be saved to `src/animation/effects/template/`.
+> If a legacy script utilizes a position or crosshair (`Sequencer.Crosshair.show`) to place effects at, it is considered a **template-driven** effect. You MUST read `references/template_template.js` to understand its unique structure. These should be saved to `src/animation/effects/template/`.
 
 ## Code Style
 
-*   **Apply Style Guide:** Ensure that all generated or updated code adheres strictly to the project's coding conventions. You MUST refer to the `style-guide` skill (located in `.agent/skills/style-guide/SKILL.md`) and apply its rules (e.g., 4-space indentation, semicolons, single quotes, 1TBS brace style, single-line if-statements) to the resulting module file.
+*   **Apply Style Guide:** Ensure that all generated or updated code adheres strictly to the project's coding conventions. You MUST refer to the `style-guide` skill (located in `.agent/skills/style-guide/SKILL.md`) and apply its rules (e.g., 4-space indentation, semicolons, single quotes, 1TBS brace style, single-line if-statements, nullish coalescing `??` for defaults, standard logger) to the resulting module file.
 
 ## General Transformations
 
 *   **Modular Structure:** Encapsulate the animation logic within an `export async function create(...)` function. This function MUST return a `Sequence` object.
-*   **Root Exports:** The final module MUST export an object containing `create`, `play`, and `stop` at its root level. The `create` method is absolutely mandatory because the Automated Animations system directly calls `animation.create(token, config)`!
+*   **Root Exports:** The final module MUST export an object containing `create`, `play`, and `stop` at its root level. The `create` method is absolutely mandatory because the Automated Animations and Boss Loot FX integrations directly call `animation.create(token, config)`!
 *   **Toggle Logic (Tagger):** Do NOT use `Tagger` to manage toggling features on/off inside the module's `create` function. The `create` function should solely generate the Sequence to turn the effect on. Use the `stop` function to end the effect.
 *   **Parameter Handling:**
     *   **Token & Active Effects:** Pass the casting token as `source`. 
@@ -28,7 +28,7 @@ When asked to update scripts in the `new-submissions` folder or to convert Disco
         *   If the animation affects multiple targets, pass them as an array `targetTokens`. Signature: `(source, targetTokens, config = {})`.
         *   Pass configurations as `config`.
     *   **Template Effects:** Template effects only receive two arguments: `(source, config = {})`. Target tokens MUST be extracted via `config.targets?.length ? config.targets : Array.from(game.user.targets)`.
-*   **Template Positioning:** If `config.template` exists, you MUST prioritize extracting the position from it (e.g., `config.template._object?.ray?.B`) instead of spawning a `Sequencer.Crosshair`. Refer to `template_template.js`.
+*   **Template Positioning:** If `config.template` exists, extract the position via `adapter.getTemplatePosition(config.template)` rather than manual deep traversal. Refer to `template_template.js`.
 *   **Multi-Target Timing:** When iterating over multiple targets with a delay (e.g., waiting 2 seconds before striking each), do NOT chain `.wait()` sequentially on the main sequence. You MUST create a new isolated Sequence for each target (`let targetSeq = new Sequence().wait(1000)`) and add it to the main sequence using `sequence.addSequence(targetSeq)`. This prevents cumulative, compounding delays.
 *   **File Relocation:** Move the newly converted file from its input folder (e.g., `new-submissions`) to `src/animation/effects/`.
 *   **Module Integration:** Update `src/animation/effects/_effects.js` to import and export the new modular animation.
@@ -66,11 +66,11 @@ Ensure the script uses the latest Foundry VTT API patterns:
 *   Change the `t` property in the crosshairs configuration from `'line'` to `'ray'` for valid measured template types.
 *   Replace deprecated `.from()` methods with `.copySprite()`.
 *   **`scaleToObject` Convention:** Every `.scaleToObject(...)` call MUST include `{ considerTokenScale: true }` as its options argument. When scaling an effect to match the token's natural size, always use `.scaleToObject(1, { considerTokenScale: true })`. Never pass `token.document.texture.scaleX` as the scale value — this is already accounted for by the `considerTokenScale` option. For effects intentionally larger or smaller than the token, use a numeric multiplier (e.g. `.scaleToObject(1.5, { considerTokenScale: true })`).
-*   Replace `warpgate.buttonDialog(buttonData)` with `eskie.util.dialog.buttonDialog(buttonData)` (or, inside a module file, import `{ dialog }` from `'../../../lib/dialog.js'` and call `dialog.buttonDialog(buttonData)` directly). The `buttonData` shape is identical — a `buttons` array with `label` and `value` fields, plus an optional `title`. When converting, **replace any numeric `value` fields with descriptive string identifiers** that reflect the semantic meaning of that choice. For example, `{ label: 'Hybrid Form', value: 1 }` should become `{ label: 'Hybrid Form', value: 'hybrid' }`, and `{ label: 'Wolf Form', value: 2 }` should become `{ label: 'Wolf Form', value: 'wolf' }`. Update all downstream comparisons to match the new string values (e.g. `if (result === 'hybrid')`). Since `DialogV2` always returns strings, this also eliminates any type-mismatch issues.
+*   Replace `warpgate.buttonDialog(buttonData)` with `adapter.buttonDialog(buttonData)` (or `eskie.util.dialog.buttonDialog(buttonData)`). The `buttonData` shape is identical — a `buttons` array with `label` and `value` fields, plus an optional `title`. When converting, **replace any numeric `value` fields with descriptive string identifiers** that reflect the semantic meaning of that choice (e.g., `{ label: 'Hybrid Form', value: 'hybrid' }`). Since `DialogV2` always returns strings, this also eliminates any type-mismatch issues.
 
 ## Bug Fixes
 
-*   Add a validation check to ensure `canvas.scene.background.src` exists before creating effects that rely on it, preventing errors on scenes without background images.
+*   Use `adapter.getSceneBackground(canvas.scene)` to safely resolve background textures across Foundry V12/V13 Scenes and V14+ Levels.
 
 ## Attribution
 

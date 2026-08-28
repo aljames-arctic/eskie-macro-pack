@@ -3,7 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { templates } from '../../../lib/templates.js';
-import { autoanimations } from '../../../integration/autoanimations.js';
+import { autorec } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: 'TemplateEffectName',
@@ -17,13 +17,7 @@ async function create(source, config = {}) {
     // Always prioritize the provided template position over Sequencer.Crosshair
     let position;
     if (mConfig.template) {
-        // For lines/cones/rays, use the far point. For circles, use { x: mConfig.template.x, y: mConfig.template.y }
-        let farpoint = mConfig.template._object?.ray?.B || mConfig.template.ray?.B;
-        if (farpoint) {
-            position = { x: farpoint.x, y: farpoint.y };
-        } else {
-            position = { x: mConfig.template.x, y: mConfig.template.y };
-        }
+        position = templates.getPosition(mConfig.template);
     } else {
         // Fallback if no template is provided
         position = await Sequencer.Crosshair.show();
@@ -85,4 +79,4 @@ export const templateName = {
 };
 
 // Register with "template" trigger
-autoanimations.register("Template Name", "template", "eskie.effect.templateName", DEFAULT_CONFIG, '0.1.0');
+autorec.register("Template Name", "template", "eskie.effect.templateName", DEFAULT_CONFIG, '1.0.0');

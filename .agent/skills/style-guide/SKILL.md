@@ -1,13 +1,26 @@
 ---
 name: style-guide
-description: Coding style guidelines and conventions for the eskie-macro-pack project. Make sure to use this skill whenever you write, edit, or refactor ANY code in this repository, to ensure consistency with the project's formatting and patterns.
+description: Coding style guidelines, architectural contracts, and conventions for the eskie-macro-pack project. Make sure to use this skill whenever you write, edit, or refactor ANY code in this repository, to ensure consistency with the project's formatting and patterns.
 ---
 
 # Eskie Macro Pack Style Guide
 
-When writing or modifying code in the `eskie-macro-pack` repository, adhere strictly to the following style guidelines.
+When writing or modifying code in the `eskie-macro-pack` repository, adhere strictly to the following architectural guidelines and coding conventions.
 
-## General Formatting
+## 1. Project Directory Layout & Architectural Layers
+
+*   **`src/adapters/`**: Centralized adapter layer decoupling the macro pack from platform versions, game systems, and third-party modules:
+    *   `foundry/`: Platform generation adapters (`BaseFoundryAdapter` for V12/V13 baseline, `FoundryCurrentAdapter` for modern V14+ centered tiles/levels/regions).
+    *   `system/`: Game system adapters (`Dnd5eSystemAdapter`, `Pf2eSystemAdapter`, `GenericSystemAdapter`).
+    *   `modules/`: Third-party module adapters (`autoanimations/`, `blfx/`, `midi-qol/`, `socketlib/`, `mass-edit/`, `token-attacher/`, `autorec/`).
+    *   `index.js`: Unified singleton `adapter` (`adapter.foundry`, `adapter.system`, `adapter.autoanimations`, `adapter.blfx`, `adapter.socketlib`, `adapter.midiQol`, `adapter.massEdit`, `adapter.tokenAttacher`, `adapter.autorec`).
+*   **`src/ui/`**: Centralized user interface layer. ALL `ApplicationV2` classes, Handlebars templates, settings menus, and interactive dialogs live here (`recommended-modules/`, `world-scripts/`, `autoanimations/`, `blfx/`, `autorec/`).
+*   **`src/world-scripts/`**: Runtime script loader and execution triggers (`loader.js`, `rollAnimation.js`). UI menus reside in `src/ui/world-scripts/`.
+*   **`src/animation/`**: Modular animation effects (`effects/`), masks (`mask/`), scene overlays (`scene-overlays/`), showcases (`showcase/`), traps (`traps/`), and animation helpers (`utils/`).
+*   **`src/standalone-macros/`**: Standalone, copy-paste-ready JavaScript macros for Foundry VTT.
+*   **`src/lib/`**: Core shared utilities (`constants.js`, `dependency.js`, `filemanager.js`, `logger.js`, `utils.js`, `settings.js`).
+
+## 2. General Formatting & Syntax
 
 *   **Indentation:** Use exactly 4 spaces for indentation. Never use tabs.
 *   **Semicolons:** Always terminate statements with a semicolon (`;`).
@@ -18,92 +31,64 @@ When writing or modifying code in the `eskie-macro-pack` repository, adhere stri
         // ...
     }
     ```
+*   **Single-Line If-Returns:** If an `if` statement immediately returns or executes a single action, write it as a concise single line:
+    ```javascript
+    if (!token) return ui.notifications.warn('No token selected');
+    ```
 
-## Naming Conventions
+## 3. Strict Nullish Coalescing vs. Logical OR Separation
+
+*   **Property & Value Fallbacks (`??`):** Always use nullish coalescing (`??`) when providing fallback default values (e.g., `const count = config.count ?? 0;` or `const name = item?.name ?? '';`). Never use logical OR (`||`) for value fallbacks, as `||` overrides valid falsy primitives (`0`, `false`, `''`).
+*   **Boolean Logic (`||`):** Strictly reserve logical OR (`||`) for evaluating boolean conditions (e.g., `if (isBroken || isMissing)`).
+
+## 4. Modern Idiomatic Typing & Defensive Coding Aversion
+
+*   **Avoid Redundant `globalThis` and Defensive Checks:** Do NOT clutter code with defensive checks like `typeof globalThis !== 'undefined'`, `typeof window !== 'undefined'`, or prefixing standard globals with `globalThis.` (unless required for disambiguating a local identifier of the same name).
+*   **Trust Foundry Globals & Optional Chaining:** Rely on standard Foundry globals (`game`, `foundry`, `canvas`, `ChatMessage`, `Token`, `Tile`, etc.) and modern JavaScript optional chaining (`?.`) instead of verbose `typeof`, `instanceof`, or `Array.isArray` guard chains.
+
+## 5. Modules, Exports, and Naming
 
 *   **Variables and Functions:** Use `camelCase`.
 *   **Constants:** Use `UPPER_SNAKE_CASE` (e.g., `MODULE_ID`).
-*   **Object Properties:** Use `camelCase`.
-
-## Modules and Structure
-
-*   **Module System:** Use ES6 module syntax (`import` and `export`).
-*   **Exports:** Prefer named exports over default exports.
-*   **Function Declarations in Exports:** Do **not** declare functions inline inside an exported variable. Declare the function separately first, then export it.
+*   **Exports:** Prefer named exports. Do not declare functions inline inside exported object literals; declare the function separately first, then export it:
     ```javascript
-    // Incorrect: function declared inside the export variable
-    export const actions = {
-        doSomething: function() {
-            // ...
-        },
-    };
-
-    // Correct: function declared outside, then referenced
     function doSomething() {
         // ...
     }
 
     export const actions = {
-        doSomething,
+        doSomething
     };
     ```
 
-## Control Structures
+## 6. Logging Level Hierarchy
 
-*   **If-Return Statements:** Keep an `if` statement concise if it immediately returns or executes a single action. *Note: Per user global rules, if adding or changing an if statement that immediately returns, write it as a single line.*
-    ```javascript
-    // Required pattern for immediate returns
-    if (condition) return true;
-    ```
+*   **Use Project Logger (`lib/logger.js`):** Import `log` from `lib/logger.js` (`import { log } from '../../lib/logger.js';`). The logger automatically manages prefixes (`'EMP | '`) and verbosity settings.
+*   **`log.error`**: Strictly use for unexpected exceptions or unrecoverable fatal failures.
+*   **`log.warn`**: Strictly use for expected but non-fatal issues (e.g., missing optional dependency, graceful degradation).
+*   **`log.info`**: Strictly reserve for high-level lifecycle or status updates (e.g., `"Initializing module"`, `"World Scripts Loaded"`). Never use `log.info` for internal data dumps.
+*   **`log.debug`**: Use for inspecting internal data structures, comparison trees, variable payloads, and execution tracing.
 
-## Logging
+## 7. Foundry Platform & D&D 5e Contracts
 
-*   **Prefixes:** Always prefix console logs, warnings, and errors with `'EMP | '`. This makes it easy to identify module logs in the console.
-    ```javascript
-    console.log('EMP | Eskie Macro Pack module ready');
-    console.warn('EMP | Filemanager closest path diverged');
-    ```
+*   **Modern Baseline (Zero Legacy Fallbacks):** All code targets modern Foundry VTT (v12+/v14+) and modern system schemas (D&D 5e v4+).
+*   **D&D 5e SpellData Contracts:**
+    *   Method: `item.system.method ?? 'prepared'`
+    *   Prepared: `Boolean(item.system.prepared)`
+    *   Never access or fallback to deprecated `item.system.preparation`.
+*   **Flag Scope:** Always import `MODULE_ID` from `lib/constants.js` and use it for flags (e.g., `doc.getFlag(MODULE_ID, ...)`). Never hardcode `'eskie-macro-pack'` as the scope key because the active module ID is `'eskie-macros'`.
+*   **Scene Backgrounds:** Route background texture and offset queries through `adapter.getSceneBackground(scene)` to support Foundry V14+ Levels seamlessly.
 
-## Foundry VTT Specifics
+## 8. Sequencer & Asset Standards
 
-*   **Hooks:** Use `Hooks.once` or `Hooks.on` for all Foundry VTT lifecycle events.
-*   **Settings and Localization:** Use `game.settings.register` and `game.i18n.localize` for module settings and text definitions.
-*   **Flag Scope:** Always import `MODULE_ID` from constants (e.g., `import { MODULE_ID } from '../../lib/constants.js';` or relative path) and use it when getting or setting document flags (e.g., `tile.document.getFlag(MODULE_ID, ...)`). Do NOT hardcode the module ID or folder name strings (such as `'eskie-macro-pack'`) because the active module scope key is `'eskie-macros'`.
+*   **Optional Asset Libraries:** Protect optional asset libraries (like `psfx`) inside an `if` check rather than `.playIf(...)`, preventing `closest()` from throwing if the pack is not installed.
+*   **`copySprite` Rotation Fix:** Every `.copySprite(token)` effect MUST include `.spriteRotation(-token.document.rotation)` immediately after to counteract token world rotation.
+*   **`scaleToObject` Convention:** Always use `.scaleToObject(scale, { considerTokenScale: true })`.
+*   **Zero Sequence Path Hallucinations:** Always verify database keys against standard JB2A / Sequencer naming conventions.
 
-## Sequencer Specifics
+## 9. Automated Linting
 
-*   **Optional Asset Libraries:** Optional asset libraries (like `psfx` or similar config parameters) that use `closest()` MUST be protected inside an `if` statement rather than using `.playIf(...)`. If `closest()` is called on an asset that doesn't exist, it throws an error immediately, breaking the script before the `playIf` check even occurs.
-    ```javascript
-    // Incorrect: closest() throws if asset is missing, before playIf evaluates
-    sequence.sound()
-        .file(closest(sound.file))
-        .playIf(sound.enabled);
-
-    // Correct: closest() is never evaluated if sound is disabled
-    if (sound.enabled) {
-        sequence.sound()
-            .file(closest(sound.file));
-    }
-    ```
-
-*   **copySprite Rotation Fix:** Every `.copySprite(token)` effect MUST include `.spriteRotation(-token.document.rotation)` immediately after to counteract the token's world rotation. Without this, the sprite renders in a rotated orientation that does not match the token's visual appearance.
-    ```javascript
-    // Incorrect: sprite may appear rotated if the token has a non-zero rotation
-    sequence.effect()
-        .copySprite(token)
-        .attachTo(token);
-
-    // Correct: always negate the token's rotation on copySprite effects
-    sequence.effect()
-        .copySprite(token)
-        .attachTo(token)
-        .spriteRotation(-token.document.rotation);
-    ```
-
-## Automated Linting
-
-*   **Linter Script:** Before finalizing your code changes, you MUST run the provided linter script on any JavaScript files you modified to automatically check for tabs and logging prefix violations.
+*   Before finalizing code changes, run the linter script on any modified JavaScript files:
     ```bash
     python .agent/skills/style-guide/scripts/lint.py <path/to/file.js>
     ```
-    If the linter reports any errors, fix them before completing the task.

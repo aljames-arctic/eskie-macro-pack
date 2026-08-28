@@ -14,7 +14,7 @@ When a user asks to convert an effect from the `src/animation/` directory into a
    > **CRITICAL**: If the user specifies an effect with multiple variants (such as the Rage effect), **STOP** and ask the user to clarify which version they want output before proceeding. Do not guess or output all variants.
 3. **Extract the Sequence**: Extract the core `new Sequence()` logic from the `create` or `play` functions of the effect.
 4. **Remove Module Dependencies & Use Standalone `closest()` Helper**:
-   - Remove top-level ES module `import` statements (like `import { closest }` or `import { autoanimations }`).
+   - Remove top-level ES module `import` statements (like `import { closest }` or `import { autorec }`).
    - Define a standalone `closest` helper snippet at the top of the macro so Patreon/Free JB2A asset paths resolve dynamically in live Foundry environments:
      ```javascript
      const closest = (path) => {
@@ -52,7 +52,7 @@ When a user asks to convert an effect from the `src/animation/` directory into a
    - In a module, `source`, `token`, or `target` are passed as arguments.
    - In a macro, define these at the top of the script using Foundry globals (e.g. `const token = canvas.tokens.controlled[0];` or `const target = game.user.targets.first();`).
    - Add safety checks to return early if the necessary tokens are not selected.
-   - **Note**: Remember the project rule: *If adding or changing an if statement that immediately returns, it should be a single line. For example: `if (!token) return ui.notifications.warn("No token");`*
+   - **Note**: Remember the project rule: *If adding or changing an if statement that immediately returns, write it as a single line. For example: `if (!token) return ui.notifications.warn("No token");`*
 10. **Implement Toggle Functionality (Play/Stop)**:
    - The first time the macro is called, the effect should be played.
    - If the original effect includes a `stop()` function, or if it persists an effect on a token using `.persist()`, the macro should function as a toggle.
@@ -68,12 +68,12 @@ When a user asks to convert an effect from the `src/animation/` directory into a
 ### Before: Module Effect (e.g., src/animation/effects/buff/example.js)
 ```javascript
 import { closest } from "../../../../lib/filemanager.js";
-import { autoanimations } from "../../../../integration/autoanimations.js";
+import { autorec } from "../../../../adapters/modules/autorec/autorec.js";
 
 const DEFAULT_CONFIG = { color: 'red' };
 
 function create(token, config = {}) {
-    const { color } = foundry.utils.mergeObject(DEFAULT_CONFIG, config);
+    const { color } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     let seq = new Sequence()
         .effect()
         .name(`exampleBuff - ${token.id}`)

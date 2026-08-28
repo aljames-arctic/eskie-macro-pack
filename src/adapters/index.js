@@ -132,6 +132,10 @@ export class Adapter {
         return this.foundry.getTemplatePosition(template, config);
     }
 
+    getSceneBackground(scene = globalThis.canvas?.scene, level = null) {
+        return this.foundry.getSceneBackground(scene, level);
+    }
+
     /* -------------------------------------------- */
     /*  System Layer Delegates                      */
     /* -------------------------------------------- */

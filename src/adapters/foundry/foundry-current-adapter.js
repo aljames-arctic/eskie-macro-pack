@@ -175,4 +175,55 @@ export class FoundryCurrentAdapter extends BaseFoundryAdapter {
 
         return super.getTemplatePosition(template, config);
     }
+
+    /* -------------------------------------------- */
+    /*  Scene & Level Background (V14+ Levels)      */
+    /* -------------------------------------------- */
+
+    /**
+     * Retrieve the background texture and offsets for a scene on Foundry V14+ (Level#background / Level#textures).
+     * Avoids accessing deprecated Scene#background.
+     *
+     * @param {Scene} [scene=canvas.scene] Target scene document
+     * @param {Level|null} [level=null] Target level document or placeable (defaults to active level)
+     * @returns {{ src: string|null, offsetX: number, offsetY: number }}
+     */
+    getSceneBackground(scene = globalThis.canvas?.scene, level = null) {
+        if (!scene) return { src: null, offsetX: 0, offsetY: 0 };
+
+        const activeLevel = level
+            ?? globalThis.canvas?.level
+            ?? scene.levels?.get?.(scene.activeLevel)
+            ?? scene.levels?.contents?.[0]
+            ?? (Array.isArray(scene.levels) ? scene.levels[0] : null)
+            ?? (scene.levels?.values ? Array.from(scene.levels.values())[0] : null)
+            ?? null;
+
+        if (activeLevel) {
+            const levelBg = activeLevel.background ?? activeLevel.textures?.background ?? activeLevel.texture ?? null;
+            if (levelBg) {
+                const src = levelBg.src ?? (typeof levelBg === 'string' ? levelBg : null);
+                const offsetX = levelBg.offsetX ?? activeLevel.offsetX ?? 0;
+                const offsetY = levelBg.offsetY ?? activeLevel.offsetY ?? 0;
+                return { src, offsetX, offsetY };
+            }
+        }
+
+        const envBg = scene.environment?.background ?? null;
+        if (envBg) {
+            return {
+                src: envBg.src ?? null,
+                offsetX: envBg.offsetX ?? 0,
+                offsetY: envBg.offsetY ?? 0
+            };
+        }
+
+        // Unmigrated legacy fallback if levels are not present
+        const rawBg = scene.background;
+        return {
+            src: rawBg?.src ?? null,
+            offsetX: rawBg?.offsetX ?? 0,
+            offsetY: rawBg?.offsetY ?? 0
+        };
+    }
 }

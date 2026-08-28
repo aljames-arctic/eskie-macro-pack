@@ -160,16 +160,17 @@ async function createLocal(object, tileIds, animationId, config = {}) {
     let seq = new Sequence();
 
     // Background mask
-    if (canvas.scene.background.src) {
+    const sceneBackground = adapter.getSceneBackground(canvas.scene);
+    if (sceneBackground.src) {
         seq = seq.effect()
             .name(label)
-            .file(canvas.scene.background.src)
+            .file(sceneBackground.src)
             .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
             .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
             .persist()
             .belowTokens()
             .mask(sceneRevealMask)
-            .spriteOffset({ x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY })
+            .spriteOffset({ x: -sceneBackground.offsetX, y: -sceneBackground.offsetY })
             .locally(true);
     }
 

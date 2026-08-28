@@ -2,6 +2,7 @@
 // Updater: @bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
+import { adapter } from "../../../adapters/index.js";
 
 const DEFAULT_CONFIG = {
     darkMap: true,
@@ -33,9 +34,10 @@ async function create(token, target, config = {}) {
         .filter("ColorMatrix", { saturate: 0, brightness: 0 })
         .zIndex(1);
 
-    if (darkMap && canvas.scene.background.src) {
+    const sceneBackground = adapter.getSceneBackground(canvas.scene);
+    if (darkMap && sceneBackground.src) {
         sequence.effect()
-            .file(canvas.scene.background.src)
+            .file(sceneBackground.src)
             .filter("ColorMatrix", { brightness: 0.3 })
             .atLocation({ x: (canvas.dimensions.width) / 2, y: (canvas.dimensions.height) / 2 })
             .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })

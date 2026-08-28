@@ -540,4 +540,24 @@ export class BaseFoundryAdapter {
 
         return [primary, secondary, center];
     }
+
+    /* -------------------------------------------- */
+    /*  Scene & Environment Background (V12 / V13)  */
+    /* -------------------------------------------- */
+
+    /**
+     * Retrieve the background texture and offsets for a scene on Foundry V12 / V13 (Scene#background).
+     * @param {Scene} [scene=canvas.scene] Target scene document
+     * @param {Level|null} [_level=null] Unused in V12/V13
+     * @returns {{ src: string|null, offsetX: number, offsetY: number }}
+     */
+    getSceneBackground(scene = globalThis.canvas?.scene, _level = null) {
+        if (!scene) return { src: null, offsetX: 0, offsetY: 0 };
+        const bg = scene.background;
+        return {
+            src: bg?.src ?? null,
+            offsetX: bg?.offsetX ?? 0,
+            offsetY: bg?.offsetY ?? 0
+        };
+    }
 }

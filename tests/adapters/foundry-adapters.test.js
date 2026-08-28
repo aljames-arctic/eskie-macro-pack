@@ -151,3 +151,62 @@ test('Permission tiers and ownership evaluation on BaseFoundryAdapter', () => {
     assert.equal(adapter.isUserInCharge(mockToken, playerUser), true);
     assert.equal(adapter.isUserInCharge(mockToken, gmUser), false); // player owns it and is active
 });
+
+test('getSceneBackground: V12/V13 Scene#background vs V14+ Level#background and Level#textures', () => {
+    // V12/V13 BaseFoundryAdapter
+    const v12 = new BaseFoundryAdapter();
+    const v12Scene = {
+        background: {
+            src: 'maps/dungeon-v12.webp',
+            offsetX: 50,
+            offsetY: 75
+        }
+    };
+    assert.deepEqual(v12.getSceneBackground(v12Scene), {
+        src: 'maps/dungeon-v12.webp',
+        offsetX: 50,
+        offsetY: 75
+    });
+    assert.deepEqual(v12.getSceneBackground(null), {
+        src: null,
+        offsetX: 0,
+        offsetY: 0
+    });
+
+    // V14+ FoundryCurrentAdapter with Levels
+    const v14 = new FoundryCurrentAdapter();
+    const v14SceneWithLevel = {
+        activeLevel: 'lvl-1',
+        levels: new Map([
+            ['lvl-1', {
+                background: {
+                    src: 'maps/dungeon-level-1.webp',
+                    offsetX: 10,
+                    offsetY: 20
+                }
+            }]
+        ])
+    };
+    assert.deepEqual(v14.getSceneBackground(v14SceneWithLevel), {
+        src: 'maps/dungeon-level-1.webp',
+        offsetX: 10,
+        offsetY: 20
+    });
+
+    // V14+ with environment fallback
+    const v14SceneWithEnv = {
+        environment: {
+            background: {
+                src: 'maps/space-env.webp',
+                offsetX: 0,
+                offsetY: 0
+            }
+        }
+    };
+    assert.deepEqual(v14.getSceneBackground(v14SceneWithEnv), {
+        src: 'maps/space-env.webp',
+        offsetX: 0,
+        offsetY: 0
+    });
+});
+

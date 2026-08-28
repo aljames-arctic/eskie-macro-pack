@@ -26,7 +26,13 @@ import {
     autorecManager,
     autorec,
     promptDestinationDialog,
-    CONCENTRATING
+    CONCENTRATING,
+    MassEditModuleAdapter,
+    massEditAdapter,
+    massEdit,
+    TokenAttacherModuleAdapter,
+    tokenAttacherAdapter,
+    tokenAttacher
 } from './modules/index.js';
 import { log } from '../lib/logger.js';
 
@@ -110,6 +116,16 @@ export class Adapter {
 
     get autorec() {
         return autorecManager;
+    }
+
+    get massEdit() {
+        return this.modules.get('multi-token-edit')
+            ?? this.modules.get('mass-edit')
+            ?? massEditAdapter;
+    }
+
+    get tokenAttacher() {
+        return this.modules.get('token-attacher') ?? tokenAttacherAdapter;
     }
 
     /* -------------------------------------------- */
@@ -314,5 +330,11 @@ export {
     socketlibAdapter,
     socketlibapi,
     socket,
-    socketlib
+    socketlib,
+    MassEditModuleAdapter,
+    massEditAdapter,
+    massEdit,
+    TokenAttacherModuleAdapter,
+    tokenAttacherAdapter,
+    tokenAttacher
 };

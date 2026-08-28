@@ -13,7 +13,11 @@ import {
     SocketlibModuleAdapter,
     socketlibAdapter,
     AutorecManager,
-    autorecManager
+    autorecManager,
+    MassEditModuleAdapter,
+    massEditAdapter,
+    TokenAttacherModuleAdapter,
+    tokenAttacherAdapter
 } from '../../src/adapters/modules/index.js';
 import { adapter } from '../../src/adapters/index.js';
 
@@ -159,12 +163,78 @@ test('AutorecManager coordinates registration across AA and BLFX adapters', () =
     assert.equal(customBLFX.registry.dnd5e.fireball.default.afterItemUse.itemName, 'Fireball');
 });
 
+test('MassEditModuleAdapter delegates link and removeLinks to MassEdit.linker', async () => {
+    const linked = [];
+    const unlinked = [];
+    globalThis.MassEdit = {
+        linker: {
+            link: async (elements) => {
+                linked.push(elements);
+                return { linked: true };
+            },
+            removeLinks: async (elements) => {
+                unlinked.push(elements);
+                return { unlinked: true };
+            }
+        }
+    };
+
+    const massEdit = new MassEditModuleAdapter();
+    const token = { id: 'tok-1', documentName: 'Token' };
+    const tile1 = { id: 'tile-1', documentName: 'Tile' };
+    const tile2 = { id: 'tile-2', documentName: 'Tile' };
+
+    await massEdit.link([tile1, tile2], token);
+    assert.equal(linked.length, 2);
+    assert.deepEqual(linked[0], [tile1, token]);
+    assert.deepEqual(linked[1], [tile2, token]);
+
+    await massEdit.removeLinks([tile1, tile2], token);
+    assert.equal(unlinked.length, 2);
+    assert.deepEqual(unlinked[0], [tile1, token]);
+    assert.deepEqual(unlinked[1], [tile2, token]);
+});
+
+test('TokenAttacherModuleAdapter delegates attach and detach to tokenAttacher global', async () => {
+    let attachCalled = null;
+    let detachCalled = null;
+
+    globalThis.tokenAttacher = {
+        attachElementsToToken: async (elements, target, suppress) => {
+            attachCalled = { elements, target, suppress };
+            return { attached: true };
+        },
+        detachElementsFromToken: async (elements, target, suppress) => {
+            detachCalled = { elements, target, suppress };
+            return { detached: true };
+        }
+    };
+
+    const tokenAttacher = new TokenAttacherModuleAdapter();
+    const token = { id: 'tok-1', documentName: 'Token' };
+    const elements = [{ id: 'tile-1' }, { id: 'tile-2' }];
+
+    await tokenAttacher.attach(elements, token, true);
+    assert.ok(attachCalled);
+    assert.equal(attachCalled.elements.length, 2);
+    assert.equal(attachCalled.target.id, 'tok-1');
+    assert.equal(attachCalled.suppress, true);
+
+    await tokenAttacher.detach(elements, token, false);
+    assert.ok(detachCalled);
+    assert.equal(detachCalled.elements.length, 2);
+    assert.equal(detachCalled.target.id, 'tok-1');
+    assert.equal(detachCalled.suppress, false);
+});
+
 test('Unified Adapter delegates to module adapters through accessors', async () => {
     game.modules = new Map([
         ['autoanimations', { id: 'autoanimations', active: true }],
         ['blfx', { id: 'blfx', active: true }],
         ['socketlib', { id: 'socketlib', active: true }],
-        ['midi-qol', { id: 'midi-qol', active: true }]
+        ['midi-qol', { id: 'midi-qol', active: true }],
+        ['multi-token-edit', { id: 'multi-token-edit', active: true }],
+        ['token-attacher', { id: 'token-attacher', active: true }]
     ]);
 
     await adapter.init();
@@ -174,6 +244,10 @@ test('Unified Adapter delegates to module adapters through accessors', async () 
     assert.ok(adapter.socketlib instanceof SocketlibModuleAdapter);
     assert.ok(adapter.midiQol instanceof MidiQolModuleAdapter);
     assert.ok(adapter.autorec instanceof AutorecManager);
+    assert.ok(adapter.massEdit instanceof MassEditModuleAdapter);
+    assert.ok(adapter.tokenAttacher instanceof TokenAttacherModuleAdapter);
     assert.equal(adapter.hasModule('autoanimations'), true);
+    assert.equal(adapter.hasModule('multi-token-edit'), true);
+    assert.equal(adapter.hasModule('token-attacher'), true);
     assert.equal(adapter.hasModule('non-existent'), false);
 });

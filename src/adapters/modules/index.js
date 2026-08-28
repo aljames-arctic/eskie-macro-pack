@@ -4,6 +4,8 @@ import { AutoanimationsModuleAdapter, autoanimationsAdapter, autoanimations, EMP
 import { BlfxModuleAdapter, blfxAdapter, blfx, EMP_BLFX_Registry, buildBlfxPayload, mergeBlfxCustomAutoRec, standardizeBlfxTrigger, buildBlfxMacroCommand } from './blfx/blfx-module-adapter.js';
 import { SocketlibModuleAdapter, socketlibAdapter, socketlibapi, socket, socketlib } from './socketlib/socketlib-module-adapter.js';
 import { AutorecManager, autorecManager, autorec, promptDestinationDialog, CONCENTRATING, register as autorecRegister, submit as autorecSubmit } from './autorec/autorec-module-adapter.js';
+import { MassEditModuleAdapter, massEditAdapter, massEdit } from './mass-edit/mass-edit-module-adapter.js';
+import { TokenAttacherModuleAdapter, tokenAttacherAdapter, tokenAttacher } from './token-attacher/token-attacher-module-adapter.js';
 import { MODULE_ADAPTERS } from './module-adapters.js';
 import { log } from '../../lib/logger.js';
 
@@ -65,5 +67,11 @@ export {
     promptDestinationDialog,
     CONCENTRATING,
     autorecRegister,
-    autorecSubmit
+    autorecSubmit,
+    MassEditModuleAdapter,
+    massEditAdapter,
+    massEdit,
+    TokenAttacherModuleAdapter,
+    tokenAttacherAdapter,
+    tokenAttacher
 };

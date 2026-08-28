@@ -1,4 +1,6 @@
 import { dependency } from '../../lib/dependency.js';
+import { massEditAdapter } from '../modules/mass-edit/index.js';
+import { tokenAttacherAdapter } from '../modules/token-attacher/index.js';
 
 /**
  * User permission tiers for ownership priority evaluation.
@@ -740,14 +742,14 @@ export class BaseFoundryAdapter {
             dependency.required([
                 { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
             ]);
-            return Promise.all(elements.map(element => MassEdit?.linker?.link?.([element, target])));
+            return massEditAdapter.link(elements, target);
         }
 
         // Default Token behavior
         if (dependency.isActivated({ id: 'token-attacher', ref: "Token Attacher" })) {
-            return tokenAttacher?.attachElementsToToken?.(elements, target, true);
+            return tokenAttacherAdapter.attachElementsToToken(elements, target, true);
         } else if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
-            return Promise.all(elements.map(element => MassEdit?.linker?.link?.([element, target])));
+            return massEditAdapter.link(elements, target);
         }
 
         dependency.someRequired([
@@ -769,14 +771,14 @@ export class BaseFoundryAdapter {
             dependency.required([
                 { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
             ]);
-            return Promise.all(elements.map(element => MassEdit?.linker?.removeLinks?.([element, target])));
+            return massEditAdapter.removeLinks(elements, target);
         }
 
         // Default Token behavior
         if (dependency.isActivated({ id: 'token-attacher', ref: "Token Attacher" })) {
-            return tokenAttacher?.detachElementsFromToken?.(elements, target, true);
+            return tokenAttacherAdapter.detachElementsFromToken(elements, target, true);
         } else if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
-            return Promise.all(elements.map(element => MassEdit?.linker?.removeLinks?.([element, target])));
+            return massEditAdapter.removeLinks(elements, target);
         }
 
         dependency.someRequired([

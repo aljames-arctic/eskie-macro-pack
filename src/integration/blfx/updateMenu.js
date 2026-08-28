@@ -230,11 +230,21 @@ export class BlfxAutorecUpdateApp extends adapter.foundry.HandlebarsApplicationM
     }
 
     static async _formHandler(event, form, formData) {
-        const submitter = event.submitter;
-        if (submitter && submitter.name === "update") {
-            log.group("Boss Loot FX Autorec Menu Update");
+        const isCancel = event.submitter && event.submitter.name === "cancel";
+        if (isCancel) return;
 
-            const excludedKeys = new Set();
+        log.group("Boss Loot FX Autorec Menu Update");
+
+        const excludedKeys = new Set();
+        const checkboxes = form?.querySelectorAll ? form.querySelectorAll('input[type="checkbox"][name^="missing_"]') : [];
+        if (checkboxes.length) {
+            for (const cb of checkboxes) {
+                if (!cb.checked) {
+                    const entryKey = cb.name.replace("missing_", "");
+                    excludedKeys.add(entryKey);
+                }
+            }
+        } else {
             const rawData = formData.object ?? formData;
             if (rawData) {
                 for (const [key, value] of Object.entries(rawData)) {
@@ -244,48 +254,48 @@ export class BlfxAutorecUpdateApp extends adapter.foundry.HandlebarsApplicationM
                     }
                 }
             }
+        }
 
-            const appInstance = (this instanceof BlfxAutorecUpdateApp) ? this : (form?.app ?? null);
-            const { newPayload } = appInstance?.settings ? await appInstance.settings(excludedKeys) : await generateBlfxAutorecUpdate(EMP_BLFX_Registry, excludedKeys);
+        const appInstance = (this instanceof BlfxAutorecUpdateApp) ? this : (form?.app ?? null);
+        const { newPayload } = appInstance?.settings ? await appInstance.settings(excludedKeys) : await generateBlfxAutorecUpdate(EMP_BLFX_Registry, excludedKeys);
 
-            if (!newPayload?.customAutoRecognition || Object.keys(newPayload.customAutoRecognition).length === 0) {
-                log.debug("EMP | Nothing to update in Boss Loot FX!");
-                log.groupEnd();
-                return;
-            }
+        if (!newPayload?.customAutoRecognition || Object.keys(newPayload.customAutoRecognition).length === 0) {
+            log.debug("EMP | Nothing to update in Boss Loot FX!");
+            log.groupEnd();
+            return;
+        }
 
-            // 1. Directly write the merged customAutoRecognition payload to all active BLFX settings
-            for (const mod of BLFX_MODULES) {
-                for (const key of BLFX_SETTING_KEYS) {
-                    const settingKey = `${mod}.${key}`;
-                    try {
-                        if (game.settings?.settings?.has?.(settingKey)) {
-                            await game.settings.set(mod, key, newPayload);
-                            log.info(`EMP | Directly saved custom auto-recognition payload to ${settingKey}`);
-                        }
-                    } catch (err) {
-                        log.debug(`EMP | Could not directly write to ${settingKey}:`, err);
+        // 1. Directly write the merged customAutoRecognition payload to all active BLFX settings
+        for (const mod of BLFX_MODULES) {
+            for (const key of BLFX_SETTING_KEYS) {
+                const settingKey = `${mod}.${key}`;
+                try {
+                    if (game.settings?.settings?.has?.(settingKey)) {
+                        await game.settings.set(mod, key, newPayload);
+                        log.info(`EMP | Directly saved custom auto-recognition payload to ${settingKey}`);
                     }
+                } catch (err) {
+                    log.debug(`EMP | Could not directly write to ${settingKey}:`, err);
                 }
             }
-
-            // 2. Compute an effective version string that satisfies BLFX's isNewerVersion guard
-            const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
-            const effectiveVersion = rawVersion === "#{VERSION}#" 
-                ? BlfxAutorecUpdateApp._getDevelopmentVersion() 
-                : `${rawVersion}.${Date.now()}`;
-
-            // 3. Dispatch the official BLFX registration Hook
-            Hooks.call('blfx.register.CustomAutoRec', newPayload, MODULE_ID, effectiveVersion);
-
-            // 4. Update EMP's internal tracking version
-            if (game.settings?.settings?.has?.(`${MODULE_ID}.blfxAutorecVersion`)) {
-                await game.settings.set(MODULE_ID, "blfxAutorecVersion", effectiveVersion);
-            }
-
-            log.info("EMP | Custom animations have been updated in Boss Loot FX.");
-            log.groupEnd();
         }
+
+        // 2. Compute an effective version string that satisfies BLFX's isNewerVersion guard
+        const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
+        const effectiveVersion = rawVersion === "#{VERSION}#" 
+            ? BlfxAutorecUpdateApp._getDevelopmentVersion() 
+            : `${rawVersion}.${Date.now()}`;
+
+        // 3. Dispatch the official BLFX registration Hook
+        Hooks.callAll('blfx.register.CustomAutoRec', newPayload, MODULE_ID, effectiveVersion);
+
+        // 4. Update EMP's internal tracking version
+        if (game.settings?.settings?.has?.(`${MODULE_ID}.blfxAutorecVersion`)) {
+            await game.settings.set(MODULE_ID, "blfxAutorecVersion", effectiveVersion);
+        }
+
+        log.info("EMP | Custom animations have been updated in Boss Loot FX.");
+        log.groupEnd();
     }
 
     _getDevelopmentVersion() {

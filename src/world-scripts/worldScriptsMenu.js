@@ -45,8 +45,8 @@ export class WorldScriptsApp extends adapter.foundry.HandlebarsApplicationMixin(
         const scripts = WORLD_SCRIPTS_REGISTRY.map(script => {
             const data = {
                 ...script,
-                name: game.i18n?.localize(script.name) ?? script.name,
-                description: game.i18n?.localize(script.description) ?? script.description,
+                name: game.i18n?.localize?.(script.name) ?? script.name,
+                description: game.i18n?.localize?.(script.description) ?? script.description,
                 enabled: Boolean(currentConfig[script.id])
             };
             // Dynamically attach the auto-detected system name to the roll animations script
@@ -58,7 +58,7 @@ export class WorldScriptsApp extends adapter.foundry.HandlebarsApplicationMixin(
 
         return {
             scripts,
-            menuHint: game.i18n?.localize("EMP.worldScripts.menuHint") ?? ""
+            menuHint: game.i18n?.localize?.("EMP.worldScripts.menuHint") ?? ""
         };
     }
 
@@ -79,18 +79,23 @@ export class WorldScriptsApp extends adapter.foundry.HandlebarsApplicationMixin(
 
     static async _formHandler(event, form, formData) {
         const rawData = formData.object ?? formData;
-        log.info("Saving World Scripts Configuration:", rawData);
+        const config = {};
+        for (const script of WORLD_SCRIPTS_REGISTRY) {
+            const input = form?.querySelector ? form.querySelector(`input[name="${script.id}"]`) : null;
+            config[script.id] = input ? input.checked : Boolean(rawData?.[script.id]);
+        }
+        log.info("Saving World Scripts Configuration:", config);
 
         // 1. Save the settings object
         if (game.settings) {
-            await game.settings.set(MODULE_ID, "worldScriptsConfig", rawData);
+            await game.settings.set(MODULE_ID, "worldScriptsConfig", config);
         }
 
         // 2. Dynamically enable/disable scripts in real-time (no page reload required!)
         updateWorldScripts();
 
         // 3. Show a friendly notification
-        ui.notifications?.info(game.i18n?.localize("EMP.worldScripts.savedNotify") ?? "World Scripts Saved");
+        ui.notifications?.info(game.i18n?.localize?.("EMP.worldScripts.savedNotify") ?? "World Scripts Saved");
     }
 }
 

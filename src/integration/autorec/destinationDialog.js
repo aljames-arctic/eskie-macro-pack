@@ -90,9 +90,13 @@ export class AutorecDestinationDialog extends adapter.foundry.HandlebarsApplicat
     }
 
     static async _formHandler(event, form, formData) {
+        const isCancel = event.submitter && event.submitter.name === "cancel";
+        if (isCancel) return;
+
+        const appInstance = (this instanceof AutorecDestinationDialog) ? this : (form?.app ?? null);
         const rawData = formData.object ?? formData;
-        const target = rawData?.autorecTarget ?? 'none';
-        const remember = Boolean(rawData?.rememberChoice);
+        const target = rawData?.autorecTarget ?? form?.querySelector?.('input[name="autorecTarget"]:checked')?.value ?? 'none';
+        const remember = Boolean(rawData?.rememberChoice ?? form?.querySelector?.('input[name="rememberChoice"]')?.checked);
 
         log.info(`EMP | Autorec integration destination selected: "${target}" (remember: ${remember})`);
 
@@ -100,8 +104,8 @@ export class AutorecDestinationDialog extends adapter.foundry.HandlebarsApplicat
             await game.settings.set(MODULE_ID, 'autorecTarget', target);
         }
 
-        if (this.onSelectedCallback) {
-            await this.onSelectedCallback(target);
+        if (appInstance?.onSelectedCallback) {
+            await appInstance.onSelectedCallback(target);
         } else {
             if (target === 'autoanimations') {
                 await autoanimations.submit();
@@ -111,3 +115,5 @@ export class AutorecDestinationDialog extends adapter.foundry.HandlebarsApplicat
         }
     }
 }
+
+export { AutorecDestinationDialog as destinationDialog };

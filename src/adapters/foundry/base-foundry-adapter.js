@@ -1,0 +1,543 @@
+/**
+ * User permission tiers for ownership priority evaluation.
+ * Tier 1: Players (least permissions)
+ * Tier 2: Trusted Players
+ * Tier 3: GM / Co-GM (most permissions)
+ * @type {Readonly<{ PLAYER: 1, TRUSTED: 2, GM: 3 }>}
+ */
+export const USER_PERMISSION_TIERS = Object.freeze({
+    PLAYER: 1,
+    TRUSTED: 2,
+    GM: 3
+});
+
+/**
+ * Baseline Foundry VTT platform adapter (Foundry V12 / V13).
+ * Abstract interface for versioned Foundry Application, placeable, tile math, template, and utility operations.
+ */
+export class BaseFoundryAdapter {
+    /**
+     * The major generation version of Foundry VTT (e.g. 12, 13, 14).
+     * @returns {number}
+     */
+    get generation() {
+        if (typeof game !== 'undefined' && game.release?.generation !== undefined) {
+            return game.release.generation;
+        }
+        if (typeof game !== 'undefined' && game.version) {
+            const major = parseInt(String(game.version).split('.')[0], 10);
+            if (!Number.isNaN(major)) return major;
+        }
+        return 12;
+    }
+
+    /**
+     * The active ContextMenu constructor (global in v12/v13 baseline).
+     */
+    get ContextMenu() {
+        return globalThis.ContextMenu;
+    }
+
+    /**
+     * The active KeyboardManager constructor (global in v12/v13 baseline).
+     */
+    get KeyboardManager() {
+        return globalThis.KeyboardManager;
+    }
+
+    /**
+     * The active Token placeable constructor (global in v12/v13 baseline).
+     */
+    get Token() {
+        return globalThis.Token;
+    }
+
+    /**
+     * The active Tile placeable constructor (global in v12/v13 baseline).
+     */
+    get Tile() {
+        return globalThis.Tile;
+    }
+
+    /**
+     * The active ApplicationV2 constructor (introduced in v12 under foundry.applications.api).
+     */
+    get ApplicationV2() {
+        return globalThis.foundry?.applications?.api?.ApplicationV2;
+    }
+
+    /**
+     * The active HandlebarsApplicationMixin wrapper (introduced in v12 under foundry.applications.api).
+     */
+    get HandlebarsApplicationMixin() {
+        return globalThis.foundry?.applications?.api?.HandlebarsApplicationMixin;
+    }
+
+    /**
+     * The active FilePicker constructor / implementation (global in v12/v13 baseline).
+     */
+    get FilePicker() {
+        return globalThis.FilePicker?.implementation ?? globalThis.FilePicker;
+    }
+
+    /**
+     * The active TextEditor constructor / implementation (global in v12/v13 baseline).
+     */
+    get TextEditor() {
+        return globalThis.TextEditor?.implementation ?? globalThis.TextEditor;
+    }
+
+    /**
+     * Browse a directory using the active FilePicker implementation.
+     * @param {string} source Storage source (e.g. 'data', 'public', 'client')
+     * @param {string} target Directory target path
+     * @param {Object} [options={}] Browse options
+     * @returns {Promise<{ target: string, files: string[], dirs: string[] }>}
+     */
+    async browseDirectory(source, target, options = {}) {
+        return this.FilePicker?.browse(source, target, options);
+    }
+
+    /**
+     * Safely resolve a document from UUID synchronously.
+     * @param {string} uuid Document UUID
+     * @param {Object} [options={}] Resolution options
+     * @returns {Document|null}
+     */
+    fromUuidSync(uuid, options = {}) {
+        if (!uuid) return null;
+        try {
+            return globalThis.foundry?.utils?.fromUuidSync(uuid, options) ?? null;
+        } catch (_) {
+            return null;
+        }
+    }
+
+    /**
+     * Safely resolve a document from UUID asynchronously.
+     * @param {string} uuid Document UUID
+     * @param {Object} [options={}] Resolution options
+     * @returns {Promise<Document|null>}
+     */
+    async fromUuid(uuid, options = {}) {
+        if (!uuid) return null;
+        try {
+            return (await globalThis.foundry?.utils?.fromUuid(uuid, options)) ?? null;
+        } catch (_) {
+            return null;
+        }
+    }
+
+    /**
+     * Merge two objects recursively.
+     * @param {Object} original Target object
+     * @param {Object} [other={}] Source object
+     * @param {Object} [options={}] Merge options
+     * @returns {Object}
+     */
+    mergeObject(original, other = {}, options = {}) {
+        if (globalThis.foundry?.utils?.mergeObject) {
+            return globalThis.foundry.utils.mergeObject(original, other, options);
+        }
+        return Object.assign(original, other);
+    }
+
+    /**
+     * Deep duplicate an object.
+     * @param {Object} obj Target object
+     * @returns {Object}
+     */
+    duplicate(obj) {
+        if (globalThis.foundry?.utils?.duplicate) {
+            return globalThis.foundry.utils.duplicate(obj);
+        }
+        return JSON.parse(JSON.stringify(obj));
+    }
+
+    /**
+     * Deep clone an object.
+     * @param {Object} obj Target object
+     * @returns {Object}
+     */
+    deepClone(obj) {
+        if (globalThis.foundry?.utils?.deepClone) {
+            return globalThis.foundry.utils.deepClone(obj);
+        }
+        return JSON.parse(JSON.stringify(obj));
+    }
+
+    /**
+     * Retrieve a property from an object by dot-separated path.
+     * @param {Object} obj Target object
+     * @param {string} path Dot path
+     * @returns {*}
+     */
+    getProperty(obj, path) {
+        if (globalThis.foundry?.utils?.getProperty) {
+            return globalThis.foundry.utils.getProperty(obj, path);
+        }
+        if (!obj || !path) return undefined;
+        return path.split('.').reduce((acc, part) => acc?.[part], obj);
+    }
+
+    /**
+     * Set a property on an object by dot-separated path.
+     * @param {Object} obj Target object
+     * @param {string} path Dot path
+     * @param {*} value Property value
+     * @returns {boolean}
+     */
+    setProperty(obj, path, value) {
+        if (globalThis.foundry?.utils?.setProperty) {
+            return globalThis.foundry.utils.setProperty(obj, path, value);
+        }
+        if (!obj || !path) return false;
+        const parts = path.split('.');
+        const last = parts.pop();
+        let target = obj;
+        for (const part of parts) {
+            if (!(part in target)) target[part] = {};
+            target = target[part];
+        }
+        target[last] = value;
+        return true;
+    }
+
+    /**
+     * Generate a random string identifier.
+     * @param {number} [length=16] Length of the identifier
+     * @returns {string}
+     */
+    randomID(length = 16) {
+        if (globalThis.foundry?.utils?.randomID) {
+            return globalThis.foundry.utils.randomID(length);
+        }
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
+
+    /**
+     * Test whether an object is empty.
+     * @param {Object} obj Target object
+     * @returns {boolean}
+     */
+    isEmpty(obj) {
+        if (globalThis.foundry?.utils?.isEmpty) {
+            return globalThis.foundry.utils.isEmpty(obj);
+        }
+        if (!obj) return true;
+        if (Array.isArray(obj)) return obj.length === 0;
+        if (obj instanceof Map || obj instanceof Set) return obj.size === 0;
+        return Object.keys(obj).length === 0;
+    }
+
+    /**
+     * Test whether version a is strictly newer than version b.
+     * @param {string} a Primary version string
+     * @param {string} b Target version string to compare against
+     * @returns {boolean}
+     */
+    isNewerVersion(a, b) {
+        if (globalThis.foundry?.utils?.isNewerVersion) {
+            return globalThis.foundry.utils.isNewerVersion(a, b);
+        }
+        const partsA = String(a).split('.').map(n => parseInt(n, 10) || 0);
+        const partsB = String(b).split('.').map(n => parseInt(n, 10) || 0);
+        const len = Math.max(partsA.length, partsB.length);
+        for (let i = 0; i < len; i++) {
+            const valA = partsA[i] ?? 0;
+            const valB = partsB[i] ?? 0;
+            if (valA > valB) return true;
+            if (valA < valB) return false;
+        }
+        return false;
+    }
+
+    /**
+     * Enrich an HTML string with Foundry enrichers, roll data, and document links.
+     * @param {string} content HTML string to enrich
+     * @param {Object} [options={}] Enrichment options (rollData, secrets, relativeTo, etc.)
+     * @returns {Promise<string>}
+     */
+    async enrichHTML(content, options = {}) {
+        if (!content) return '';
+        if (this.TextEditor?.enrichHTML) {
+            return this.TextEditor.enrichHTML(content, { secrets: false, async: true, ...options });
+        }
+        return content;
+    }
+
+    /* -------------------------------------------- */
+    /*  Combat & Token Helpers                      */
+    /* -------------------------------------------- */
+
+    /**
+     * Retrieve all combatants associated with a token in combat for baseline v12/v13.
+     * @param {Combat} combat Target combat encounter
+     * @param {string|TokenDocument|Token} token Token ID or Document or Placeable
+     * @returns {Combatant[]}
+     */
+    getCombatantsByToken(combat, token) {
+        if (!combat) return [];
+        const tokenId = typeof token === 'string' ? token : (token?.id ?? token?.document?.id);
+        if (!tokenId) return [];
+
+        const single = combat.getCombatantByToken?.(tokenId);
+        return single ? [single] : [];
+    }
+
+    /**
+     * Retrieve the primary combatant associated with a token in combat for baseline v12/v13.
+     * @param {Combat} combat Target combat encounter
+     * @param {string|TokenDocument|Token} token Token ID or Document or Placeable
+     * @returns {Combatant|null}
+     */
+    getCombatantByToken(combat, token) {
+        if (!combat) return null;
+        const tokenId = typeof token === 'string' ? token : (token?.id ?? token?.document?.id);
+        if (!tokenId) return null;
+
+        return combat.getCombatantByToken?.(tokenId) ?? null;
+    }
+
+    /* -------------------------------------------- */
+    /*  User Ownership & Permission Helpers         */
+    /* -------------------------------------------- */
+
+    /**
+     * User permission tiers for ownership priority evaluation.
+     * @type {Readonly<{ PLAYER: 1, TRUSTED: 2, GM: 3 }>}
+     */
+    get USER_PERMISSION_TIERS() {
+        return USER_PERMISSION_TIERS;
+    }
+
+    /**
+     * Classify a Foundry User into a standard permission tier (1: Player, 2: Trusted Player, 3: GM / Co-GM).
+     * @param {User} user Concrete User document
+     * @returns {number|null} 1 for Player, 2 for Trusted, 3 for GM, or null if invalid/none
+     */
+    getUserPermissionTier(user) {
+        if (!user) return null;
+        const isGM = Boolean(user.isGM);
+        const userRole = user.role ?? null;
+        const assistantRole = globalThis.CONST?.USER_ROLES?.ASSISTANT ?? 3;
+        const trustedRole = globalThis.CONST?.USER_ROLES?.TRUSTED ?? 2;
+        const playerRole = globalThis.CONST?.USER_ROLES?.PLAYER ?? 1;
+
+        if (isGM || (userRole !== null && userRole >= assistantRole)) {
+            return USER_PERMISSION_TIERS.GM;
+        }
+        if ((userRole !== null && userRole === trustedRole) || (Boolean(user.isTrusted) && !isGM)) {
+            return USER_PERMISSION_TIERS.TRUSTED;
+        }
+        if ((userRole !== null && userRole === playerRole) || (!isGM && !user.isTrusted && userRole !== 0)) {
+            return USER_PERMISSION_TIERS.PLAYER;
+        }
+        return null;
+    }
+
+    /**
+     * Test whether a user possesses an ownership role for a given actor and token document.
+     * @param {User} user Concrete User document
+     * @param {Actor|null} actor Concrete Actor document
+     * @param {Document|null} tokenDoc Concrete TokenDocument
+     * @returns {boolean} True if the user has an ownership role
+     */
+    isUserDocumentOwner(user, actor, tokenDoc) {
+        if (!user) return false;
+
+        // GM / Co-GM always has ownership over all documents in Foundry
+        if (this.getUserPermissionTier(user) === USER_PERMISSION_TIERS.GM) {
+            return true;
+        }
+
+        const ownerLevel = globalThis.CONST?.DOCUMENT_OWNERSHIP_LEVELS?.OWNER ?? 3;
+
+        // Test actor document permissions
+        if (actor) {
+            if (actor.testUserPermission?.(user, 'OWNER')) return true;
+            if (actor.getUserLevel?.(user) >= ownerLevel) return true;
+            if (actor.ownership) {
+                const level = actor.ownership[user.id] ?? actor.ownership.default ?? 0;
+                if (level >= ownerLevel) return true;
+            }
+            if ((user.id === game?.user?.id || user === game?.user) && Boolean(actor.isOwner)) {
+                return true;
+            }
+        }
+
+        // Test token document permissions
+        if (tokenDoc) {
+            if (tokenDoc.testUserPermission?.(user, 'OWNER')) return true;
+            if (tokenDoc.getUserLevel?.(user) >= ownerLevel) return true;
+            if (tokenDoc.ownership) {
+                const level = tokenDoc.ownership[user.id] ?? tokenDoc.ownership.default ?? 0;
+                if (level >= ownerLevel) return true;
+            }
+            if ((user.id === game?.user?.id || user === game?.user) && Boolean(tokenDoc.isOwner)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if a user is "in-charge" of a token.
+     * A user is in-charge of a token if:
+     * 1. The user has an ownership role of the token.
+     * 2. There is no other currently connected user with fewer permissions (lower tier) who also has an ownership role of that token.
+     *
+     * @param {Token|TokenDocument} token Token placeable or TokenDocument
+     * @param {User} [user=game.user] Target user to evaluate (defaults to active client user)
+     * @returns {boolean} True if the user is in-charge of the token
+     */
+    isUserInCharge(token, user = game.user) {
+        if (!token || !user) return false;
+
+        const tokenDoc = token.document ?? token;
+        const actor = token.actor ?? tokenDoc?.actor ?? null;
+
+        if (!this.isUserDocumentOwner(user, actor, tokenDoc)) {
+            return false;
+        }
+
+        const userTier = this.getUserPermissionTier(user);
+        if (!userTier) return false;
+
+        if (userTier === USER_PERMISSION_TIERS.PLAYER) {
+            return true;
+        }
+
+        const usersCollection = game?.users;
+        const allUsers = usersCollection?.contents
+            ?? (usersCollection?.values ? Array.from(usersCollection.values()) : null)
+            ?? (usersCollection ? Array.from(usersCollection) : [user]);
+
+        const activeOtherUsers = allUsers.filter(otherUser => {
+            if (otherUser.id === user.id || otherUser === user) return false;
+            return Boolean(otherUser.active);
+        });
+
+        if (userTier === USER_PERMISSION_TIERS.TRUSTED) {
+            const hasConnectedPlayerOwner = activeOtherUsers.some(otherUser => {
+                return this.getUserPermissionTier(otherUser) === USER_PERMISSION_TIERS.PLAYER
+                    && this.isUserDocumentOwner(otherUser, actor, tokenDoc);
+            });
+            return !hasConnectedPlayerOwner;
+        }
+
+        if (userTier === USER_PERMISSION_TIERS.GM) {
+            const hasConnectedLowerTierOwner = activeOtherUsers.some(otherUser => {
+                const otherTier = this.getUserPermissionTier(otherUser);
+                return (otherTier === USER_PERMISSION_TIERS.PLAYER || otherTier === USER_PERMISSION_TIERS.TRUSTED)
+                    && this.isUserDocumentOwner(otherUser, actor, tokenDoc);
+            });
+            return !hasConnectedLowerTierOwner;
+        }
+
+        return false;
+    }
+
+    /* -------------------------------------------- */
+    /*  Tile Anchor & Coordinate Math (V12 / V13)   */
+    /* -------------------------------------------- */
+
+    /**
+     * Calculate reveal tile placement offset for Foundry V12 / V13 (legacy top-left anchor (0, 0)).
+     * Compares token/tile size and scale to offset top-left origin.
+     *
+     * @param {PlaceableObject|Document} object Token or Tile object/document
+     * @param {number} [scale=1] Additional scale multiplier
+     * @returns {{x: number, y: number}} Offset coordinates
+     */
+    getRevealOffset(object, scale = 1) {
+        if (!object) return { x: 0, y: 0 };
+        const doc = object.document ?? object;
+        const isToken = (doc.documentName === 'Token' || object.documentName === 'Token');
+        const widthAdjustment = isToken ? (globalThis.canvas?.grid?.size ?? 100) : 1;
+        const scaleXY = doc.texture?.scaleX ?? 1;
+        const totalScale = scaleXY * scale;
+        const objX = object.x ?? doc.x ?? 0;
+        const objY = object.y ?? doc.y ?? 0;
+        const docWidth = doc.width ?? 1;
+        const docHeight = doc.height ?? 1;
+
+        return {
+            x: objX - (widthAdjustment * docWidth * (totalScale - 1) / 2),
+            y: objY - (widthAdjustment * docHeight * (totalScale - 1) / 2)
+        };
+    }
+
+    /**
+     * Calculate shape tile placement offset for Foundry V12 / V13 (legacy top-left anchor (0, 0)).
+     *
+     * @param {PlaceableObject|Document} object Token or Tile object/document
+     * @returns {{x: number, y: number}} Offset coordinates
+     */
+    getShapeOffset(object) {
+        if (!object) return { x: 0, y: 0 };
+        const doc = object.document ?? object;
+        return {
+            x: object.x ?? doc.x ?? 0,
+            y: object.y ?? doc.y ?? 0
+        };
+    }
+
+    /**
+     * Unified tile offset resolver for Foundry V12 / V13.
+     *
+     * @param {PlaceableObject|Document} object Token or Tile object/document
+     * @param {'reveal'|'shape'} type Offset type
+     * @param {number} [scale=1] Scale multiplier
+     * @returns {{x: number, y: number}} Resolved coordinates
+     */
+    getTileOffset(object, type, scale = 1) {
+        if (type === 'reveal') return this.getRevealOffset(object, scale);
+        if (type === 'shape') return this.getShapeOffset(object);
+        throw new Error(`Invalid offset type: ${type}`);
+    }
+
+    /* -------------------------------------------- */
+    /*  Template Position Extraction (V12 / V13)    */
+    /* -------------------------------------------- */
+
+    /**
+     * Gets position coordinates from a legacy MeasuredTemplate document or placeable.
+     *
+     * @param {Document|PlaceableObject} template The MeasuredTemplate document or placeable
+     * @param {Object} [config={}] Configuration options
+     * @returns {[ {x: number, y: number}, {x: number, y: number}, {x: number, y: number} ]} Array of [primary, secondary, center] coordinates
+     */
+    getTemplatePosition(template, config = {}) {
+        if (!template) return [];
+
+        const farpoint = template.object?.ray?.B ?? template.ray?.B;
+        const secondary = {
+            x: farpoint?.x ?? template.x ?? 0,
+            y: farpoint?.y ?? template.y ?? 0
+        };
+        const primary = {
+            x: template.x ?? 0,
+            y: template.y ?? 0
+        };
+
+        const gridSize = globalThis.canvas?.grid?.size ?? 100;
+        const gridDistance = globalThis.canvas?.grid?.distance ?? globalThis.canvas?.scene?.grid?.distance ?? 5;
+        const distance = template.distance ?? 0;
+        const width = template.width ?? 0;
+        const height = Math.sqrt(Math.max(0, distance * distance - width * width));
+
+        const center = {
+            x: primary.x + (width / 2) * (gridSize / gridDistance),
+            y: primary.y + (height / 2) * (gridSize / gridDistance)
+        };
+
+        return [primary, secondary, center];
+    }
+}

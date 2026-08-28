@@ -1,0 +1,175 @@
+import { initializeFoundryAdapter, BaseFoundryAdapter, FoundryCurrentAdapter, USER_PERMISSION_TIERS } from './foundry/index.js';
+import { initializeSystemAdapter, BaseSystemAdapter, Dnd5eSystemAdapter, Pf2eSystemAdapter, GenericSystemAdapter, parseAndNormalizeAbility, BASE_ABILITY_MAP } from './system/index.js';
+import { initializeModuleAdapters, BaseModuleAdapter, MidiQolModuleAdapter, midiQolAdapter } from './module/index.js';
+import { log } from '../lib/logger.js';
+
+/**
+ * Unified Adapter Singleton for Eskie Macro Pack.
+ * Centralizes and abstracts Foundry platform generations (V12, V13, V14+), Game Systems, and Modules.
+ */
+export class Adapter {
+    constructor() {
+        this.foundry = new BaseFoundryAdapter();
+        this.system = new GenericSystemAdapter(this.foundry);
+        this.modules = new Map();
+        this._initialized = false;
+    }
+
+    /**
+     * Backward-compatible getter for active system adapter.
+     * @type {BaseSystemAdapter}
+     */
+    get activeSystemAdapter() {
+        return this.system;
+    }
+
+    set activeSystemAdapter(sys) {
+        this.system = sys;
+    }
+
+    /**
+     * Initialize all adapter layers (Foundry, System, Module).
+     * @returns {Promise<void>}
+     */
+    async init() {
+        this.foundry = initializeFoundryAdapter();
+        this.system = await initializeSystemAdapter(globalThis.game?.system?.id, this.foundry);
+        this.modules = initializeModuleAdapters();
+        this._initialized = true;
+        const systemLabel = this.system.isSupported ? this.system.systemId : `${this.system.systemId} (unsupported)`;
+        log.info(`Unified Adapter initialized [Foundry: v${this.foundry.generation}, System: ${systemLabel}, Modules: ${this.modules.size}]`);
+    }
+
+    /* -------------------------------------------- */
+    /*  Foundry Platform Delegates                  */
+    /* -------------------------------------------- */
+
+    get generation() {
+        return this.foundry.generation;
+    }
+
+    isNewerVersion(a, b) {
+        return this.foundry.isNewerVersion(a, b);
+    }
+
+    fromUuidSync(uuid, options = {}) {
+        return this.foundry.fromUuidSync(uuid, options);
+    }
+
+    async fromUuid(uuid, options = {}) {
+        return this.foundry.fromUuid(uuid, options);
+    }
+
+    mergeObject(original, other = {}, options = {}) {
+        return this.foundry.mergeObject(original, other, options);
+    }
+
+    duplicate(obj) {
+        return this.foundry.duplicate(obj);
+    }
+
+    deepClone(obj) {
+        return this.foundry.deepClone(obj);
+    }
+
+    getProperty(obj, path) {
+        return this.foundry.getProperty(obj, path);
+    }
+
+    setProperty(obj, path, value) {
+        return this.foundry.setProperty(obj, path, value);
+    }
+
+    randomID(length = 16) {
+        return this.foundry.randomID(length);
+    }
+
+    isEmpty(obj) {
+        return this.foundry.isEmpty(obj);
+    }
+
+    async enrichHTML(content, options = {}) {
+        return this.foundry.enrichHTML(content, options);
+    }
+
+    getCombatantsByToken(combat, token) {
+        return this.foundry.getCombatantsByToken(combat, token);
+    }
+
+    getCombatantByToken(combat, token) {
+        return this.foundry.getCombatantByToken(combat, token);
+    }
+
+    getUserPermissionTier(user) {
+        return this.foundry.getUserPermissionTier(user);
+    }
+
+    isUserDocumentOwner(user, actor, tokenDoc) {
+        return this.foundry.isUserDocumentOwner(user, actor, tokenDoc);
+    }
+
+    isUserInCharge(token, user = globalThis.game?.user) {
+        return this.foundry.isUserInCharge(token, user);
+    }
+
+    /* -------------------------------------------- */
+    /*  Tile & Placeable Geometric Operations       */
+    /* -------------------------------------------- */
+
+    getRevealOffset(object, scale = 1) {
+        return this.foundry.getRevealOffset(object, scale);
+    }
+
+    getShapeOffset(object) {
+        return this.foundry.getShapeOffset(object);
+    }
+
+    getTileOffset(object, type, scale = 1) {
+        return this.foundry.getTileOffset(object, type, scale);
+    }
+
+    getTemplatePosition(template, config = {}) {
+        return this.foundry.getTemplatePosition(template, config);
+    }
+
+    /* -------------------------------------------- */
+    /*  System Layer Delegates                      */
+    /* -------------------------------------------- */
+
+    qualifyMessage(message) {
+        return this.system.qualifyMessage(message);
+    }
+
+    extractRolls(message) {
+        return this.system.extractRolls(message);
+    }
+
+    normalizeAbility(rawAbility, combinedText = "", customMap = {}) {
+        return this.system.normalizeAbility(rawAbility, combinedText, customMap);
+    }
+
+    getSpellLevel(config = {}) {
+        return this.system.getSpellLevel(config);
+    }
+
+    getCreatureType(actor) {
+        return this.system.getCreatureType(actor);
+    }
+}
+
+export const adapter = new Adapter();
+
+export {
+    BaseFoundryAdapter,
+    FoundryCurrentAdapter,
+    USER_PERMISSION_TIERS,
+    BaseSystemAdapter,
+    Dnd5eSystemAdapter,
+    Pf2eSystemAdapter,
+    GenericSystemAdapter,
+    parseAndNormalizeAbility,
+    BASE_ABILITY_MAP,
+    BaseModuleAdapter,
+    MidiQolModuleAdapter,
+    midiQolAdapter
+};

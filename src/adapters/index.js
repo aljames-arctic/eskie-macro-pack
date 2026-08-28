@@ -136,6 +136,38 @@ export class Adapter {
         return this.foundry.getSceneBackground(scene, level);
     }
 
+    buttonDialog(buttonData, options = {}) {
+        return this.foundry.buttonDialog(buttonData, options);
+    }
+
+    getDocumentName(target) {
+        return this.foundry.getDocumentName(target);
+    }
+
+    isDocumentOfType(target, type) {
+        return this.foundry.isDocumentOfType(target, type);
+    }
+
+    getPlaceable(id) {
+        return this.foundry.getPlaceable(id);
+    }
+
+    getSpeakerToken(message, extractedTokenId = null) {
+        return this.foundry.getSpeakerToken(message, extractedTokenId);
+    }
+
+    getSpeakerActor(message) {
+        return this.foundry.getSpeakerActor(message);
+    }
+
+    getDistance(t1, t2) {
+        return this.foundry.getDistance(t1, t2);
+    }
+
+    getNearestSquareCenter(token, target) {
+        return this.foundry.getNearestSquareCenter(token, target);
+    }
+
     /* -------------------------------------------- */
     /*  System Layer Delegates                      */
     /* -------------------------------------------- */

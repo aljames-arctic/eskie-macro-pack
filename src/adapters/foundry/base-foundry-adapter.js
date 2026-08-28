@@ -74,6 +74,42 @@ export class BaseFoundryAdapter {
     }
 
     /**
+     * The active DialogV2 constructor (introduced in v12 under foundry.applications.api).
+     */
+    get DialogV2() {
+        return globalThis.foundry?.applications?.api?.DialogV2;
+    }
+
+    /**
+     * Displays a button-choice dialog using Foundry's native DialogV2.
+     * @param {{ buttons: {label: string, value: any}[], title?: string }} buttonData
+     * @param {object} [options={}] Extra options forwarded to DialogV2.wait()
+     * @returns {Promise<string|false>} The chosen button's value as a string, or false on cancel.
+     */
+    async buttonDialog(buttonData, options = {}) {
+        const dialogCls = this.DialogV2;
+        if (!dialogCls?.wait) {
+            throw new Error("DialogV2 is not available in the current Foundry environment.");
+        }
+        const opt = this.mergeObject({ position: { width: 300 } }, options, { inplace: false });
+        const buttons = (buttonData.buttons ?? []).map(btn => ({
+            label: btn.label,
+            action: String(btn.value),
+            default: false
+        }));
+
+        const result = await dialogCls.wait({
+            window: { title: buttonData.title ?? 'Choose an Option' },
+            buttons,
+            rejectClose: false,
+            ...opt
+        });
+
+        if (result === null || result === undefined) return false;
+        return result;
+    }
+
+    /**
      * The active FilePicker constructor / implementation (global in v12/v13 baseline).
      */
     get FilePicker() {
@@ -559,5 +595,151 @@ export class BaseFoundryAdapter {
             offsetX: bg?.offsetX ?? 0,
             offsetY: bg?.offsetY ?? 0
         };
+    }
+
+    /* -------------------------------------------- */
+    /*  Document Inspection & Placeable Lookup      */
+    /* -------------------------------------------- */
+
+    /**
+     * Gets the native Foundry VTT document name of a placeable object or document.
+     * @param {PlaceableObject|Document|null} target Target document or placeable
+     * @returns {string|undefined} Document name (e.g. 'Token', 'Tile')
+     */
+    getDocumentName(target) {
+        if (!target) return undefined;
+        return target.documentName ?? target.document?.documentName ?? undefined;
+    }
+
+    /**
+     * Test whether a target document or placeable matches a specific document type.
+     * @param {PlaceableObject|Document|null} target Target document or placeable
+     * @param {string} type Target document name ('Token', 'Tile', 'MeasuredTemplate', 'Region')
+     * @returns {boolean}
+     */
+    isDocumentOfType(target, type) {
+        return this.getDocumentName(target) === type;
+    }
+
+    /**
+     * Resolve a PlaceableObject by its unique identifier across primary canvas layers.
+     * @param {string} id Target placeable ID
+     * @returns {PlaceableObject|null}
+     */
+    getPlaceable(id) {
+        if (!id) return null;
+        return globalThis.canvas?.tokens?.get(id)
+            ?? globalThis.canvas?.tiles?.get(id)
+            ?? globalThis.canvas?.walls?.get(id)
+            ?? null;
+    }
+
+    /* -------------------------------------------- */
+    /*  Speaker Resolution                          */
+    /* -------------------------------------------- */
+
+    /**
+     * Pinpoints the active rolling or speaker token for a chat message or active user.
+     * @param {ChatMessage|object|null} message Chat message or speaker context
+     * @param {string|null} [extractedTokenId=null] Optional pre-extracted token ID
+     * @returns {Token|null}
+     */
+    getSpeakerToken(message, extractedTokenId = null) {
+        const canvasObj = globalThis.canvas;
+        if (!canvasObj?.ready || !canvasObj.tokens) return null;
+
+        if (extractedTokenId) {
+            const htmlTarget = canvasObj.tokens.get(extractedTokenId);
+            if (htmlTarget) return htmlTarget;
+        }
+
+        const speakerTokenId = message?.speaker?.token;
+        if (speakerTokenId) {
+            const speakerTarget = canvasObj.tokens.get(speakerTokenId);
+            if (speakerTarget) return speakerTarget;
+        }
+
+        return canvasObj.tokens.controlled?.[0]
+            ?? globalThis.game?.user?.character?.getActiveTokens?.()?.[0]
+            ?? null;
+    }
+
+    /**
+     * Resolves the actor associated with a chat message speaker.
+     * @param {ChatMessage|object|null} message Chat message or speaker context
+     * @returns {Actor|null}
+     */
+    getSpeakerActor(message) {
+        const speaker = message?.speaker ?? message;
+        if (speaker && globalThis.ChatMessage?.getSpeakerActor) {
+            const actor = globalThis.ChatMessage.getSpeakerActor(speaker);
+            if (actor) return actor;
+        }
+        const speakerToken = this.getSpeakerToken(message);
+        return speakerToken?.actor ?? globalThis.game?.user?.character ?? null;
+    }
+
+    /* -------------------------------------------- */
+    /*  Token Distance & Grid Centering Math        */
+    /* -------------------------------------------- */
+
+    /**
+     * Calculates the 3D distance between two tokens in scene units (e.g. feet/meters), rounded up.
+     * @param {Token} t1 The source token
+     * @param {Token} t2 The target token
+     * @returns {number} Distance in scene units, rounded up
+     */
+    getDistance(t1, t2) {
+        if (!t1 || !t2) return 0;
+        const p1 = t1.center ?? { x: t1.x ?? 0, y: t1.y ?? 0 };
+        const p2 = t2.center ?? { x: t2.x ?? 0, y: t2.y ?? 0 };
+        const dist2DPx = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+
+        const gridSize = globalThis.canvas?.grid?.size ?? 100;
+        const gridDistance = globalThis.canvas?.scene?.grid?.distance ?? globalThis.canvas?.grid?.distance ?? 5;
+        const dist2DUnits = (dist2DPx / gridSize) * gridDistance;
+
+        const el1 = t1.document?.elevation ?? 0;
+        const el2 = t2.document?.elevation ?? 0;
+        const elDiff = el1 - el2;
+
+        const dist3DUnits = Math.hypot(dist2DUnits, elDiff);
+        return Math.ceil(dist3DUnits);
+    }
+
+    /**
+     * Finds the center coordinate of the grid square on a target token nearest to a source token.
+     * @param {Token} token The source token
+     * @param {Token} target The target token
+     * @returns {{x: number, y: number}|null} Coordinate of nearest square center
+     */
+    getNearestSquareCenter(token, target) {
+        if (!token || !target) return null;
+        const gs = globalThis.canvas?.grid?.size ?? 100;
+        const srcCenter = token.center ?? { x: token.x ?? 0, y: token.y ?? 0 };
+
+        const w = target.document?.width ?? target.width ?? 1;
+        const h = target.document?.height ?? target.height ?? 1;
+
+        let bestPoint = null;
+        let bestDist2 = Infinity;
+
+        for (let gx = 0; gx < w; gx++) {
+            for (let gy = 0; gy < h; gy++) {
+                const cx = (target.x ?? 0) + (gx + 0.5) * gs;
+                const cy = (target.y ?? 0) + (gy + 0.5) * gs;
+
+                const dx = cx - srcCenter.x;
+                const dy = cy - srcCenter.y;
+                const d2 = dx * dx + dy * dy;
+
+                if (d2 < bestDist2) {
+                    bestDist2 = d2;
+                    bestPoint = { x: cx, y: cy };
+                }
+            }
+        }
+
+        return bestPoint;
     }
 }

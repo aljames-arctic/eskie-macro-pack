@@ -25,7 +25,7 @@ async function createLeap(token, config = {}) {
     // UI/Interaction Logic
     if (!position) {
         const crosshairConfig = {
-            size: token.document.width / canvas.grid.size,
+            size: token.document.width,
             icon: 'icons/skills/movement/feet-winged-boots-brown.webp',
             label: 'Jump',
             tag: 'leap power', // Changed from 'chop power' as it makes more sense for leap
@@ -76,7 +76,7 @@ async function createLeap(token, config = {}) {
         .atLocation(token)
         .duration(1000)
         .opacity(1)
-        .scale(token.document.width / canvas.grid.size * 0.025)
+        .scale(token.document.width * 0.025)
         .moveTowards(position)
         .mirrorX()
         .zIndex(1)

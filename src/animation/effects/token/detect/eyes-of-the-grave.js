@@ -3,11 +3,12 @@
 
 import { closest } from '../../../../lib/filemanager.js';
 import { autoanimations } from '../../../../integration/autoanimations.js';
+import { adapter } from '../../../../adapters/index.js';
 
 const DEFAULT_CONFIG = {
     id: 'eyesOfTheGrave',
     radius: 60,
-    path: 'actor.system.details.type.value',
+    path: null,
     color: 'green'
 };
 
@@ -49,7 +50,7 @@ async function create(token, config = {}) {
         .belowTokens();
 
     for (const target of collectedTargets) {
-        const value = foundry.utils.getProperty(target, path);
+        const value = path ? foundry.utils.getProperty(target, path) : adapter.getCreatureType(target?.actor);
         const isUndead = Array.isArray(value)
             ? value.map(v => String(v).toLowerCase()).includes('undead')
             : String(value ?? '').toLowerCase().includes('undead');

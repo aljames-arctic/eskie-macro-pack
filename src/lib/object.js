@@ -1,14 +1,15 @@
 import { dependency } from './dependency.js';
 import { log } from './logger.js';
+import { adapter } from '../adapters/index.js';
 
 /**
  * Gets the native Foundry VTT document name of a placeable object or document.
- * Safe and compatible across all Foundry versions.
+ * Delegates to the active Foundry adapter.
  * @param {PlaceableObject|Document} object - The object to inspect.
  * @returns {string|undefined} The document name (e.g., "Token", "Tile") or undefined.
  */
 export function getDocumentName(object) {
-    return object?.document?.documentName ?? object?.documentName;
+    return adapter.getDocumentName(object);
 }
 
 /**
@@ -19,7 +20,7 @@ export function getDocumentName(object) {
  * @param {PlaceableObject} target - Target Token or Tile.
  */
 async function attach(elements, target) {
-    const isTile = getDocumentName(target) === 'Tile';
+    const isTile = adapter.isDocumentOfType(target, 'Tile');
 
     if (isTile) {
         dependency.required([
@@ -47,7 +48,7 @@ async function attach(elements, target) {
  * @param {PlaceableObject} target - Target Token or Tile.
  */
 async function detach(elements, target) {
-    const isTile = getDocumentName(target) === 'Tile';
+    const isTile = adapter.isDocumentOfType(target, 'Tile');
 
     if (isTile) {
         dependency.required([

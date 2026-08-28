@@ -210,3 +210,89 @@ test('getSceneBackground: V12/V13 Scene#background vs V14+ Level#background and 
     });
 });
 
+test('DialogV2 and buttonDialog delegation on BaseFoundryAdapter', async () => {
+    const v12 = new BaseFoundryAdapter();
+    assert.ok(v12.DialogV2);
+
+    const buttonData = {
+        title: 'Select Spell',
+        buttons: [
+            { label: 'Fireball', value: 'fireball' },
+            { label: 'Lightning', value: 'lightning' }
+        ]
+    };
+    const chosen = await v12.buttonDialog(buttonData);
+    assert.equal(chosen, 'fireball');
+});
+
+test('getDocumentName, isDocumentOfType, and getPlaceable resolution', () => {
+    const v12 = new BaseFoundryAdapter();
+
+    const mockToken = { id: 'tok-1', documentName: 'Token' };
+    const mockTile = { id: 'tile-1', document: { documentName: 'Tile' } };
+
+    assert.equal(v12.getDocumentName(mockToken), 'Token');
+    assert.equal(v12.getDocumentName(mockTile), 'Tile');
+    assert.equal(v12.getDocumentName(null), undefined);
+
+    assert.equal(v12.isDocumentOfType(mockToken, 'Token'), true);
+    assert.equal(v12.isDocumentOfType(mockToken, 'Tile'), false);
+    assert.equal(v12.isDocumentOfType(mockTile, 'Tile'), true);
+
+    canvas.tokens.get = (id) => id === 'tok-1' ? mockToken : null;
+    canvas.tiles.get = (id) => id === 'tile-1' ? mockTile : null;
+
+    assert.equal(v12.getPlaceable('tok-1'), mockToken);
+    assert.equal(v12.getPlaceable('tile-1'), mockTile);
+    assert.equal(v12.getPlaceable('unknown'), null);
+});
+
+test('getSpeakerToken and getSpeakerActor resolution', () => {
+    const v12 = new BaseFoundryAdapter();
+
+    const mockActor = { id: 'act-1', name: 'Hero' };
+    const mockToken = { id: 'tok-1', name: 'Hero Token', actor: mockActor };
+
+    canvas.tokens.get = (id) => id === 'tok-1' ? mockToken : null;
+    canvas.tokens.controlled = [];
+    game.user.character = mockActor;
+
+    const message = {
+        speaker: { token: 'tok-1', actor: 'act-1' }
+    };
+
+    assert.equal(v12.getSpeakerToken(message), mockToken);
+    assert.equal(v12.getSpeakerToken(null, 'tok-1'), mockToken);
+    assert.equal(v12.getSpeakerActor(message), mockActor);
+});
+
+test('getDistance and getNearestSquareCenter 3D math', () => {
+    const v12 = new BaseFoundryAdapter();
+
+    canvas.grid.size = 100;
+    canvas.grid.distance = 5;
+
+    const t1 = {
+        x: 0,
+        y: 0,
+        center: { x: 50, y: 50 },
+        document: { elevation: 10 }
+    };
+    const t2 = {
+        x: 300,
+        y: 400,
+        center: { x: 350, y: 450 },
+        document: { width: 2, height: 2, elevation: 10 }
+    };
+
+    // 2D distance between centers (50, 50) and (350, 450) = hypot(300, 400) = 500px = 25 units
+    // Elevation diff = 0. 3D distance = 25
+    assert.equal(v12.getDistance(t1, t2), 25);
+
+    // Nearest square center on 2x2 target t2 (x: 300..500, y: 400..600) to t1 (50, 50)
+    // Nearest square is gx=0, gy=0 -> cx = 300 + 50 = 350, cy = 400 + 50 = 450
+    const nearest = v12.getNearestSquareCenter(t1, t2);
+    assert.deepEqual(nearest, { x: 350, y: 450 });
+});
+
+

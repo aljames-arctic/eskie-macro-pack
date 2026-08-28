@@ -1,15 +1,16 @@
-import { detectUtil } from './detectUtil.js'
+import { detectUtil } from './detectUtil.js';
+import { adapter } from '../../../../adapters/index.js';
 
 const defaultDetectionConfig = {
     celestial: 'jb2a.condition.curse.01.002.blue',
     fiend: 'jb2a.condition.curse.01.024.red',
-    undead : 'jb2a.condition.curse.01.021.purple',
+    undead: 'jb2a.condition.curse.01.021.purple',
 };
 
 const defaultValidator = async function (target, tags) {
-    const targetRace = target?.actor.system.details.type.value;
-    return (targetRace && tags.includes(targetRace)) || Tagger?.hasTags(target, tags);
-}
+    const targetRace = adapter.getCreatureType(target?.actor);
+    return (targetRace && tags.includes(targetRace)) || Boolean(globalThis.Tagger?.hasTags(target, tags));
+};
 
 const DEFAULT_CONFIG = {
     distance: 60,
@@ -20,10 +21,10 @@ const DEFAULT_CONFIG = {
     },
     detection: defaultDetectionConfig,
     validator: defaultValidator,
-}
+};
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     return detectUtil.create(token, mConfig);
 }
 

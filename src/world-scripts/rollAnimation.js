@@ -136,17 +136,10 @@ export class RollTracker {
     }
 
     /**
-     * Pinpoints the exact rolling token document.
+     * Pinpoints the exact rolling token document via the unified adapter.
      */
     getSpeakerToken(message, extractedTokenId) {
-        if (!canvas.ready || !canvas.tokens) return null;
-        if (extractedTokenId) {
-            const htmlTarget = canvas.tokens.get(extractedTokenId);
-            if (htmlTarget) return htmlTarget;
-        }
-        return canvas.tokens.get(message?.speaker?.token) 
-               ?? canvas.tokens.controlled[0] 
-               ?? game.user?.character?.getActiveTokens?.()?.[0];
+        return adapter.getSpeakerToken(message, extractedTokenId);
     }
 
     /**

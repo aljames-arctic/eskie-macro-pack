@@ -73,6 +73,11 @@ globalThis.foundry = {
                 async _prepareContext(options = {}) {
                     return super._prepareContext ? await super._prepareContext(options) : {};
                 }
+            },
+            DialogV2: class DialogV2 {
+                static async wait(options = {}) {
+                    return options.buttons?.[0]?.action ?? false;
+                }
             }
         },
         ux: {

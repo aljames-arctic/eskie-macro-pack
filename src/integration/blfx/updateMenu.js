@@ -1,6 +1,7 @@
 import { MODULE_ID } from "../../lib/constants.js";
 import { EMP_BLFX_Registry } from "../blfx.js";
 import { log } from '../../lib/logger.js';
+import { adapter } from '../../adapters/index.js';
 
 /**
  * Extracts a semver version string from an EMP note field, e.g. "Eskie Macro Pack (1.0.0)".
@@ -126,32 +127,44 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
 }
 
 /**
- * Interactive FormApplication for reviewing and synchronizing Boss Loot FX custom auto-recognition presets.
+ * Interactive ApplicationV2 for reviewing and synchronizing Boss Loot FX custom auto-recognition presets.
  */
-export class BlfxAutorecUpdateFormApplication extends FormApplication {
-    constructor(registry = EMP_BLFX_Registry) {
-        super();
+export class BlfxAutorecUpdateApp extends adapter.foundry.HandlebarsApplicationMixin(adapter.foundry.ApplicationV2) {
+    constructor(registry = EMP_BLFX_Registry, options = {}) {
+        super(options);
         this.registry = registry;
+    }
+
+    static DEFAULT_OPTIONS = {
+        id: "empBlfxAutorecUpdateMenu",
+        classes: ["eskie-world-scripts-form", "eskie-aa-update-form"],
+        tag: "form",
+        window: {
+            title: "EMP.blfxUpdateMenu.menuTitle"
+        },
+        position: {
+            width: 640,
+            height: "auto"
+        },
+        form: {
+            handler: BlfxAutorecUpdateApp._formHandler,
+            closeOnSubmit: true
+        }
+    };
+
+    static get PARTS() {
+        return {
+            form: {
+                template: `modules/${MODULE_ID}/src/integration/blfx/autorecUpdateMenu.html`
+            }
+        };
     }
 
     async settings(excludedKeys = new Set()) {
         return await generateBlfxAutorecUpdate(this.registry, excludedKeys);
     }
 
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            classes: ["eskie-world-scripts-form", "eskie-aa-update-form"],
-            popOut: true,
-            template: `modules/${MODULE_ID}/src/integration/blfx/autorecUpdateMenu.html`,
-            id: "empBlfxAutorecUpdateMenu",
-            title: "EMP.blfxUpdateMenu.menuTitle",
-            width: 640,
-            height: "auto",
-            closeOnSubmit: true
-        });
-    }
-
-    async getData() {
+    async _prepareContext(options) {
         const {
             missingEntries,
             updatedEntries,
@@ -168,29 +181,24 @@ export class BlfxAutorecUpdateFormApplication extends FormApplication {
         };
     }
 
-    async activateListeners(html) {
-        const {
-            missingEntries,
-            updatedEntries,
-            customEntries,
-        } = await this.settings();
-
-        if (!missingEntries.length && !updatedEntries.length && !customEntries.length) {
-            html.find('[name="update"]').remove();
-        }
-        super.activateListeners(html);
-
-        html.find('button[name="cancel"]').on('click', () => this.close());
+    _onRender(context, options) {
+        super._onRender?.(context, options);
+        const cancelBtn = this.element?.querySelector('button[name="cancel"]');
+        cancelBtn?.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.close();
+        });
     }
 
-    async _updateObject(event, formData) {
-        $(".emp-animations-autorec-update-footer button").attr("disabled", true);
-        if (event.submitter && event.submitter.name === "update") {
+    static async _formHandler(event, form, formData) {
+        const submitter = event.submitter;
+        if (submitter && submitter.name === "update") {
             log.group("Boss Loot FX Autorec Menu Update");
 
             const excludedKeys = new Set();
-            if (formData) {
-                for (const [key, value] of Object.entries(formData)) {
+            const rawData = formData.object ?? formData;
+            if (rawData) {
+                for (const [key, value] of Object.entries(rawData)) {
                     if (key.startsWith("missing_") && !value) {
                         const entryKey = key.replace("missing_", "");
                         excludedKeys.add(entryKey);
@@ -221,6 +229,10 @@ export class BlfxAutorecUpdateFormApplication extends FormApplication {
     }
 
     _getDevelopmentVersion() {
+        return BlfxAutorecUpdateApp._getDevelopmentVersion();
+    }
+
+    static _getDevelopmentVersion() {
         const now = new Date();
         const yy = String(now.getFullYear()).slice(-2);
         const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -231,3 +243,5 @@ export class BlfxAutorecUpdateFormApplication extends FormApplication {
         return `${yy}.${mm}.${dd}.${hh}.${min}.${ss}`;
     }
 }
+
+export { BlfxAutorecUpdateApp as BlfxAutorecUpdateFormApplication };

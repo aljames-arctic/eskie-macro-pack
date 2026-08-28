@@ -50,8 +50,30 @@ globalThis.CONST = {
 globalThis.foundry = {
     applications: {
         api: {
-            ApplicationV2: class ApplicationV2 {},
-            HandlebarsApplicationMixin: (Base) => class extends Base {}
+            ApplicationV2: class ApplicationV2 {
+                constructor(options = {}) {
+                    this.options = options;
+                    this.rendered = false;
+                    this.element = null;
+                }
+                async render(force = false, options = {}) {
+                    this.rendered = true;
+                    return this;
+                }
+                async close(options = {}) {
+                    this.rendered = false;
+                    return this;
+                }
+                async _prepareContext(options = {}) {
+                    return {};
+                }
+                _onRender(context, options = {}) {}
+            },
+            HandlebarsApplicationMixin: (Base) => class extends Base {
+                async _prepareContext(options = {}) {
+                    return super._prepareContext ? await super._prepareContext(options) : {};
+                }
+            }
         },
         ux: {
             ContextMenu: class ContextMenuV14 extends globalThis.ContextMenu {},

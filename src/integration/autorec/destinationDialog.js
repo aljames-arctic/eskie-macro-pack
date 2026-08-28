@@ -2,30 +2,43 @@ import { MODULE_ID } from "../../lib/constants.js";
 import { log } from '../../lib/logger.js';
 import { autoanimations } from "../autoanimations.js";
 import { blfx } from "../blfx.js";
+import { adapter } from "../../adapters/index.js";
 
 /**
- * Dialog prompting the GM to select which auto-recognition system Eskie Macro Pack should integrate with.
+ * Modern ApplicationV2 Dialog prompting the GM to select which auto-recognition system Eskie Macro Pack should integrate with.
  */
-export class AutorecDestinationDialog extends FormApplication {
+export class AutorecDestinationDialog extends adapter.foundry.HandlebarsApplicationMixin(adapter.foundry.ApplicationV2) {
     constructor(options = {}) {
-        super({}, options);
+        super(options);
         this.onSelectedCallback = options.onSelectedCallback ?? null;
     }
 
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            classes: ["eskie-world-scripts-form", "eskie-autorec-destination-app"],
-            popOut: true,
-            template: `modules/${MODULE_ID}/src/integration/autorec/destinationDialog.html`,
-            id: "empAutorecDestinationDialog",
-            title: "EMP.autorecManager.menuTitle",
+    static DEFAULT_OPTIONS = {
+        id: "empAutorecDestinationDialog",
+        classes: ["eskie-world-scripts-form", "eskie-autorec-destination-app"],
+        tag: "form",
+        window: {
+            title: "EMP.autorecManager.menuTitle"
+        },
+        position: {
             width: 580,
-            height: "auto",
+            height: "auto"
+        },
+        form: {
+            handler: AutorecDestinationDialog._formHandler,
             closeOnSubmit: true
-        });
+        }
+    };
+
+    static get PARTS() {
+        return {
+            form: {
+                template: `modules/${MODULE_ID}/src/integration/autorec/destinationDialog.html`
+            }
+        };
     }
 
-    async getData() {
+    async _prepareContext(options) {
         const isAaInstalled = Boolean(game.modules?.get('autoanimations'));
         const isAaActive = Boolean(game.modules?.get('autoanimations')?.active);
 
@@ -58,23 +71,28 @@ export class AutorecDestinationDialog extends FormApplication {
         };
     }
 
-    activateListeners(html) {
-        super.activateListeners(html);
+    _onRender(context, options) {
+        super._onRender?.(context, options);
 
         // Highlight selected card visually
-        html.find('input[name="autorecTarget"]').on('change', (event) => {
-            html.find('.eskie-script-card').removeClass('active');
-            $(event.currentTarget).closest('.eskie-script-card').addClass('active');
+        this.element?.querySelectorAll?.('input[name="autorecTarget"]').forEach(input => {
+            input.addEventListener('change', (event) => {
+                this.element?.querySelectorAll('.eskie-script-card').forEach(card => card.classList.remove('active'));
+                event.currentTarget.closest('.eskie-script-card')?.classList.add('active');
+            });
         });
 
-        html.find('button[name="cancel"]').on('click', () => {
+        const cancelBtn = this.element?.querySelector('button[name="cancel"]');
+        cancelBtn?.addEventListener('click', (event) => {
+            event.preventDefault();
             this.close();
         });
     }
 
-    async _updateObject(event, formData) {
-        const target = formData?.autorecTarget ?? 'none';
-        const remember = Boolean(formData?.rememberChoice);
+    static async _formHandler(event, form, formData) {
+        const rawData = formData.object ?? formData;
+        const target = rawData?.autorecTarget ?? 'none';
+        const remember = Boolean(rawData?.rememberChoice);
 
         log.info(`EMP | Autorec integration destination selected: "${target}" (remember: ${remember})`);
 

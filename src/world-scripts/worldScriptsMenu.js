@@ -1,6 +1,7 @@
 import { MODULE_ID } from "../lib/constants.js";
 import { updateWorldScripts } from "./loader.js";
 import { log } from '../lib/logger.js';
+import { adapter } from '../adapters/index.js';
 
 export const WORLD_SCRIPTS_REGISTRY = [
     {
@@ -11,29 +12,42 @@ export const WORLD_SCRIPTS_REGISTRY = [
     }
 ];
 
-export class WorldScriptsFormApplication extends FormApplication {
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            id: "eskie-world-scripts-menu",
-            title: "EMP.worldScripts.menuTitle",
-            template: `modules/${MODULE_ID}/src/world-scripts/worldScriptsMenu.html`,
-            classes: ["eskie-world-scripts-form"],
+export class WorldScriptsApp extends adapter.foundry.HandlebarsApplicationMixin(adapter.foundry.ApplicationV2) {
+    static DEFAULT_OPTIONS = {
+        id: "eskie-world-scripts-menu",
+        classes: ["eskie-world-scripts-form"],
+        tag: "form",
+        window: {
+            title: "EMP.worldScripts.menuTitle"
+        },
+        position: {
             width: 580,
-            height: "auto",
+            height: "auto"
+        },
+        form: {
+            handler: WorldScriptsApp._formHandler,
             closeOnSubmit: true
-        });
+        }
+    };
+
+    static get PARTS() {
+        return {
+            form: {
+                template: `modules/${MODULE_ID}/src/world-scripts/worldScriptsMenu.html`
+            }
+        };
     }
 
-    async getData(options) {
-        const currentConfig = game.settings.get(MODULE_ID, "worldScriptsConfig") ?? {};
-        const activeSystem = game.system.title;
-        
+    async _prepareContext(options) {
+        const currentConfig = game.settings?.get(MODULE_ID, "worldScriptsConfig") ?? {};
+        const activeSystem = game.system?.title ?? "";
+
         const scripts = WORLD_SCRIPTS_REGISTRY.map(script => {
             const data = {
                 ...script,
-                name: game.i18n.localize(script.name),
-                description: game.i18n.localize(script.description),
-                enabled: !!currentConfig[script.id]
+                name: game.i18n?.localize(script.name) ?? script.name,
+                description: game.i18n?.localize(script.description) ?? script.description,
+                enabled: Boolean(currentConfig[script.id])
             };
             // Dynamically attach the auto-detected system name to the roll animations script
             if (script.id === "rollAnimation") {
@@ -44,33 +58,40 @@ export class WorldScriptsFormApplication extends FormApplication {
 
         return {
             scripts,
-            menuHint: game.i18n.localize("EMP.worldScripts.menuHint")
+            menuHint: game.i18n?.localize("EMP.worldScripts.menuHint") ?? ""
         };
     }
 
-    activateListeners(html) {
-        super.activateListeners(html);
+    _onRender(context, options) {
+        super._onRender?.(context, options);
 
         // Instantly toggle the .active class on the card when the checkbox changes for real-time visual feedback
-        html.find(".eskie-switch input").on("change", (event) => {
-            const checkbox = event.currentTarget;
-            const card = checkbox.closest(".eskie-script-card");
-            if (card) {
-                card.classList.toggle("active", checkbox.checked);
-            }
+        this.element?.querySelectorAll?.(".eskie-switch input").forEach(input => {
+            input.addEventListener("change", (event) => {
+                const checkbox = event.currentTarget;
+                const card = checkbox.closest(".eskie-script-card");
+                if (card) {
+                    card.classList.toggle("active", checkbox.checked);
+                }
+            });
         });
     }
 
-    async _updateObject(event, formData) {
-        log.info("Saving World Scripts Configuration:", formData);
-        
+    static async _formHandler(event, form, formData) {
+        const rawData = formData.object ?? formData;
+        log.info("Saving World Scripts Configuration:", rawData);
+
         // 1. Save the settings object
-        await game.settings.set(MODULE_ID, "worldScriptsConfig", formData);
-        
+        if (game.settings) {
+            await game.settings.set(MODULE_ID, "worldScriptsConfig", rawData);
+        }
+
         // 2. Dynamically enable/disable scripts in real-time (no page reload required!)
         updateWorldScripts();
-        
+
         // 3. Show a friendly notification
-        ui.notifications.info(game.i18n.localize("EMP.worldScripts.savedNotify"));
+        ui.notifications?.info(game.i18n?.localize("EMP.worldScripts.savedNotify") ?? "World Scripts Saved");
     }
 }
+
+export { WorldScriptsApp as WorldScriptsFormApplication };

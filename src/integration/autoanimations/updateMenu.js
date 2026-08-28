@@ -1,6 +1,7 @@
 import { MODULE_ID } from "../../lib/constants.js";
 import { EMP_AA_Menu } from "../autoanimations.js";
 import { log } from '../../lib/logger.js';
+import { adapter } from '../../adapters/index.js';
 
 export async function generateAutorecUpdate(autorec, excludedIds = new Set()) {
     log.group("Autorecognition Menu Check", 'debug');
@@ -82,7 +83,7 @@ export async function generateAutorecUpdate(autorec, excludedIds = new Set()) {
         ];
         newSettings[key] = [...new Map(newEntriesForKey.map((v) => [v.id, v])).values()].sort((a, b) => (a.label || "").localeCompare(b.label || ""));
     }
-    newSettings.version = await game.settings.get("autoanimations", "aaAutorec").version;
+    newSettings.version = (await game.settings.get("autoanimations", "aaAutorec"))?.version ?? "0.0.0";
 
     return {
         newSettings,
@@ -92,37 +93,52 @@ export async function generateAutorecUpdate(autorec, excludedIds = new Set()) {
     };
 }
 
-export class autorecUpdateFormApplication extends FormApplication {
-    constructor(autorec) {
-        super();
+/**
+ * Interactive ApplicationV2 for reviewing and synchronizing Automated Animations custom auto-recognition presets.
+ */
+export class AutorecUpdateApp extends adapter.foundry.HandlebarsApplicationMixin(adapter.foundry.ApplicationV2) {
+    constructor(autorec = EMP_AA_Menu, options = {}) {
+        super(options);
         this.autorec = autorec ?? EMP_AA_Menu;
+    }
+
+    static DEFAULT_OPTIONS = {
+        id: "empAutorecUpdateMenu",
+        classes: ["eskie-world-scripts-form", "eskie-aa-update-form"],
+        tag: "form",
+        window: {
+            title: "EMP.updateMenu.menuTitle"
+        },
+        position: {
+            width: 640,
+            height: "auto"
+        },
+        form: {
+            handler: AutorecUpdateApp._formHandler,
+            closeOnSubmit: true
+        }
+    };
+
+    static get PARTS() {
+        return {
+            form: {
+                template: `modules/${MODULE_ID}/src/integration/autoanimations/autorecUpdateMenu.html`
+            }
+        };
     }
 
     async settings(excludedIds = new Set()) {
         return await generateAutorecUpdate(this.autorec, excludedIds);
     }
 
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            classes: ["eskie-world-scripts-form", "eskie-aa-update-form"],
-            popOut: true,
-            template: `modules/${MODULE_ID}/src/integration/autoanimations/autorecUpdateMenu.html`,
-            id: "empAutorecUpdateMenu",
-            title: "EMP.updateMenu.menuTitle",
-            width: 640,
-            height: "auto",
-            closeOnSubmit: true
-        });
-    }
-
-    async getData() {
+    async _prepareContext(options) {
         const {
             missingEntriesList,
             updatedEntriesList,
             customEntriesList,
         } = await this.settings();
 
-        const hasChanges = !!(missingEntriesList.length || updatedEntriesList.length || customEntriesList.length);
+        const hasChanges = Boolean(missingEntriesList.length || updatedEntriesList.length || customEntriesList.length);
 
         return {
             missingEntries: missingEntriesList,
@@ -132,29 +148,24 @@ export class autorecUpdateFormApplication extends FormApplication {
         };
     }
 
-    async activateListeners(html) {
-        const {
-            missingEntriesList,
-            updatedEntriesList,
-            customEntriesList,
-        } = await this.settings();
-
-        if (!(missingEntriesList.length || updatedEntriesList.length || customEntriesList.length)) {
-            html.find('[name="update"]').remove();
-        }
-        super.activateListeners(html);
-
-        html.find('button[name="cancel"]').on('click', () => this.close());
+    _onRender(context, options) {
+        super._onRender?.(context, options);
+        const cancelBtn = this.element?.querySelector('button[name="cancel"]');
+        cancelBtn?.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.close();
+        });
     }
 
-    async _updateObject(event, formData) {
-        $(".emp-animations-autorec-update-footer button").attr("disabled", true);
-        if (event.submitter && event.submitter.name === "update") {
+    static async _formHandler(event, form, formData) {
+        const submitter = event.submitter;
+        if (submitter && submitter.name === "update") {
             log.group("Autorecognition Menu Update");
 
             const excludedIds = new Set();
-            if (formData) {
-                for (const [key, value] of Object.entries(formData)) {
+            const rawData = formData.object ?? formData;
+            if (rawData) {
+                for (const [key, value] of Object.entries(rawData)) {
                     if (key.startsWith("missing_") && !value) {
                         const entryId = key.replace("missing_", "");
                         excludedIds.add(entryId);
@@ -163,12 +174,19 @@ export class autorecUpdateFormApplication extends FormApplication {
             }
 
             const { newSettings } = await this.settings(excludedIds);
-            if (Object.keys(newSettings).length === 0)
-                return log.debug("Nothing to update!");
+            if (!newSettings || Object.keys(newSettings).length === 0) {
+                log.debug("Nothing to update!");
+                log.groupEnd();
+                return;
+            }
 
-            await AutomatedAnimations.AutorecManager.overwriteMenus(JSON.stringify(newSettings), { submitAll: true });
+            if (globalThis.AutomatedAnimations?.AutorecManager?.overwriteMenus) {
+                await globalThis.AutomatedAnimations.AutorecManager.overwriteMenus(JSON.stringify(newSettings), { submitAll: true });
+            }
             log.info("Animations have been updated in Automated Animations.");
             log.groupEnd();
         }
     }
 }
+
+export { AutorecUpdateApp as autorecUpdateFormApplication };

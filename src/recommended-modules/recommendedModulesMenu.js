@@ -1,5 +1,6 @@
 import { MODULE_ID } from "../lib/constants.js";
 import { log } from '../lib/logger.js';
+import { adapter } from '../adapters/index.js';
 
 export const RECOMMENDED_CATEGORIES = [
     {
@@ -119,7 +120,7 @@ export const RECOMMENDED_CATEGORIES = [
 ];
 
 function processModule(mod) {
-    const primaryMod = game.modules.get(mod.id);
+    const primaryMod = game.modules?.get(mod.id);
     let activeMod = null;
     let isInstalled = false;
     let isActive = false;
@@ -134,7 +135,7 @@ function processModule(mod) {
 
     if (!isActive && mod.altIds) {
         for (const altId of mod.altIds) {
-            const altMod = game.modules.get(altId);
+            const altMod = game.modules?.get(altId);
             if (altMod) {
                 isInstalled = true;
                 if (altMod.active) {
@@ -147,7 +148,7 @@ function processModule(mod) {
     }
 
     let statusKey = "missing";
-    let statusLabel = game.i18n.localize("EMP.recommendedModules.status.missing");
+    let statusLabel = game.i18n?.localize("EMP.recommendedModules.status.missing") ?? "Missing";
     let statusClass = "missing";
     let statusIcon = "fa-solid fa-circle-xmark";
 
@@ -155,19 +156,19 @@ function processModule(mod) {
         statusKey = "active";
         statusClass = "active";
         statusIcon = "fa-solid fa-check-circle";
-        statusLabel = game.i18n.localize("EMP.recommendedModules.status.active");
+        statusLabel = game.i18n?.localize("EMP.recommendedModules.status.active") ?? "Active";
     } else if (isInstalled) {
         statusKey = "disabled";
         statusClass = "disabled";
         statusIcon = "fa-solid fa-pause-circle";
-        statusLabel = game.i18n.localize("EMP.recommendedModules.status.disabled");
+        statusLabel = game.i18n?.localize("EMP.recommendedModules.status.disabled") ?? "Disabled";
     }
 
     return {
         ...mod,
-        name: game.i18n.localize(mod.name),
-        description: game.i18n.localize(mod.description),
-        note: mod.note ? game.i18n.localize(mod.note) : null,
+        name: game.i18n?.localize(mod.name) ?? mod.name,
+        description: game.i18n?.localize(mod.description) ?? mod.description,
+        note: mod.note ? (game.i18n?.localize(mod.note) ?? mod.note) : null,
         statusKey,
         statusLabel,
         statusClass,
@@ -176,24 +177,36 @@ function processModule(mod) {
     };
 }
 
-export class RecommendedModulesFormApplication extends FormApplication {
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            id: "eskie-recommended-modules-menu",
-            title: "EMP.recommendedModules.menuTitle",
-            template: `modules/${MODULE_ID}/src/recommended-modules/recommendedModulesMenu.html`,
-            classes: ["eskie-world-scripts-form", "eskie-recommended-modules-form"],
+export class RecommendedModulesApp extends adapter.foundry.HandlebarsApplicationMixin(adapter.foundry.ApplicationV2) {
+    static DEFAULT_OPTIONS = {
+        id: "eskie-recommended-modules-menu",
+        classes: ["eskie-world-scripts-form", "eskie-recommended-modules-form"],
+        tag: "div",
+        window: {
+            title: "EMP.recommendedModules.menuTitle"
+        },
+        position: {
             width: 600,
-            height: "auto",
+            height: "auto"
+        },
+        form: {
             closeOnSubmit: true
-        });
+        }
+    };
+
+    static get PARTS() {
+        return {
+            form: {
+                template: `modules/${MODULE_ID}/src/recommended-modules/recommendedModulesMenu.html`
+            }
+        };
     }
 
-    async getData(options) {
+    async _prepareContext(options) {
         const categories = RECOMMENDED_CATEGORIES.map(cat => {
             const catData = {
                 id: cat.id,
-                name: game.i18n.localize(cat.name),
+                name: game.i18n?.localize(cat.name) ?? cat.name,
                 icon: cat.icon
             };
 
@@ -209,14 +222,14 @@ export class RecommendedModulesFormApplication extends FormApplication {
                             statusClass: hasActive ? "active" : "warning",
                             statusIcon: hasActive ? "fa-solid fa-check-circle" : "fa-solid fa-circle-info",
                             statusLabel: hasActive
-                                ? game.i18n.localize("EMP.recommendedModules.status.supported")
-                                : game.i18n.localize("EMP.recommendedModules.status.requireOne")
+                                ? (game.i18n?.localize("EMP.recommendedModules.status.supported") ?? "Supported")
+                                : (game.i18n?.localize("EMP.recommendedModules.status.requireOne") ?? "At least one recommended")
                         };
                     }
 
                     return {
                         id: sub.id,
-                        name: game.i18n.localize(sub.name),
+                        name: game.i18n?.localize(sub.name) ?? sub.name,
                         icon: sub.icon,
                         subStatus,
                         modules: processedModules
@@ -231,12 +244,9 @@ export class RecommendedModulesFormApplication extends FormApplication {
 
         return {
             categories,
-            menuHint: game.i18n.localize("EMP.recommendedModules.menuHint")
+            menuHint: game.i18n?.localize("EMP.recommendedModules.menuHint") ?? ""
         };
     }
-
-    async _updateObject(event, formData) {
-        // Informational modal - no settings to persist
-        return;
-    }
 }
+
+export { RecommendedModulesApp as RecommendedModulesFormApplication };

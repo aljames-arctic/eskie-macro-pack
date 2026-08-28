@@ -6,6 +6,7 @@
 import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
+import { adapter } from "../../../adapters/index.js";
 
 const DEFAULT_CONFIG = {
     id: 'banish',
@@ -25,10 +26,9 @@ function modifyPortal(portal, target) {
     if (portal?.file) return;
     
     let color = portal.color;
-    if (game.system.id === "dnd5e") {
-        const creatureType = target.actor?.system.details?.type?.value;
+    const creatureType = adapter.getCreatureType(target?.actor);
 
-        // Colors -- Red, White, Purple, Blue, Green, Yellow, Orange
+    // Colors -- Red, White, Purple, Blue, Green, Yellow, Orange
         if (creatureType) {
             switch (creatureType.toLowerCase()) {
                 // Red
@@ -106,7 +106,6 @@ function modifyPortal(portal, target) {
                     return;
             }
         }
-    }
 
     // Pure default
     return closest(`jb2a.portals.vertical.vortex.${color}`);

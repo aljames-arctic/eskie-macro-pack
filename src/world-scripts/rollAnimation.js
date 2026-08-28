@@ -4,9 +4,7 @@
  * Supports D&D 5e (with or without Midi-QOL), Pathfinder 2e (PF2e), and generic d20 systems.
  */
 
-import { Dnd5eAdapter } from "./adapters/system/dnd5e.js";
-import { Pf2eAdapter } from "./adapters/system/pf2e.js";
-import { GenericAdapter } from "./adapters/system/generic.js";
+import { adapter } from "../adapters/index.js";
 import { closest } from "../lib/filemanager.js";
 import { log } from '../lib/logger.js';
 
@@ -60,23 +58,11 @@ async function playRollAnimation(token, config = {}) {
 export class RollTracker {
     constructor() {
         this.hookIds = [];
-        this._activeAdapter = null;
         this.localAnimatedTokens = new Map();
     }
 
     get activeAdapter() {
-        if (!this._activeAdapter) {
-            // Instantiate polymorphic system adapter dynamically based on active system
-            const systemId = game.system.id;
-            if (systemId === "dnd5e") {
-                this._activeAdapter = new Dnd5eAdapter();
-            } else if (systemId === "pf2e") {
-                this._activeAdapter = new Pf2eAdapter();
-            } else {
-                this._activeAdapter = new GenericAdapter();
-            }
-        }
-        return this._activeAdapter;
+        return adapter.system;
     }
 
     /**
@@ -124,8 +110,8 @@ export class RollTracker {
         const rolls = this.activeAdapter.extractRolls(message);
         if (rolls.length === 0) return [];
 
-        const flavorText = message.flavor?.toLowerCase() ?? "";
-        const contentText = message.content ?? "";
+        const flavorText = (message?.flavor ?? "").toLowerCase();
+        const contentText = message?.content ?? "";
         const contentLower = contentText.toLowerCase();
         const combinedText = `${flavorText} ${contentLower}`;
 
@@ -158,9 +144,9 @@ export class RollTracker {
             const htmlTarget = canvas.tokens.get(extractedTokenId);
             if (htmlTarget) return htmlTarget;
         }
-        return canvas.tokens.get(message.speaker.token) 
+        return canvas.tokens.get(message?.speaker?.token) 
                ?? canvas.tokens.controlled[0] 
-               ?? game.user.character?.getActiveTokens()[0];
+               ?? game.user?.character?.getActiveTokens?.()?.[0];
     }
 
     /**
@@ -176,7 +162,7 @@ export class RollTracker {
      */
     async processMessageAndPlay(message, userId) {
         // Only run validation calculations once on the user machine modifying the doc
-        if (game.user.id !== userId) return;
+        if (game.user?.id !== userId) return;
 
         // Centralized Qualification Gate: Only proceed for saving throws and ability checks
         const messageType = this.qualifyMessage(message);
@@ -197,7 +183,7 @@ export class RollTracker {
         const localFired = this.localAnimatedTokens.get(messageId);
 
         // Retrieve the list of token IDs that have already animated for this message
-        const firedTokens = message.flags?.world?.rollAnimatedTokens ?? [];
+        const firedTokens = message?.flags?.world?.rollAnimatedTokens ?? [];
         
         // Checking newFiredTokens and localFired dynamically prevents race conditions
         // during rapid updates where multiple hooks fire before database flag write completes.

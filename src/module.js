@@ -8,6 +8,7 @@ import { MODULE_ID } from './lib/constants.js';
 import { crosshair } from './lib/crosshairs.js';
 import { standaloneMacros } from './lib/standalone-macros.js';
 import { template } from './lib/templates.js';
+import { adapter } from './adapters/index.js';
 
 // Import module settings to also run its initialization code
 import './settings.js';
@@ -19,6 +20,9 @@ const status = {
 };
 
 Hooks.once('init', async () => {
+    // Initialize unified adapter layer across Foundry platform, game system, and active modules
+    await adapter.init();
+
     function setupModule() {
         function setupApiCalls(exportedFunctions) {
             globalThis.eskie = foundry.utils.mergeObject(
@@ -29,8 +33,9 @@ Hooks.once('init', async () => {
 
         const { effect, mask, overlay, showcase, traps } = animation;
 
-        // Expose only active sequencer play/animation APIs on globalThis.eskie
+        // Expose only active sequencer play/animation APIs and adapter on globalThis.eskie
         setupApiCalls({
+            adapter,
             effect,
             traps,
             mask,
@@ -42,6 +47,7 @@ Hooks.once('init', async () => {
         const moduleRecord = game.modules.get(MODULE_ID);
         if (moduleRecord) {
             moduleRecord.api = {
+                adapter,
                 autorec,
                 autoanimations,
                 blfx,

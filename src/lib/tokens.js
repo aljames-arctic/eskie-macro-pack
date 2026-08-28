@@ -1,59 +1,66 @@
-import { dependency } from './dependency.js';
+import { adapter } from '../adapters/index.js';
 
 /**
  * Finds the center of the grid square on a target token that is nearest to a source token.
  * @param {Token} token - The source token.
- *
  * @param {Token} target - The target token.
  * @returns {{x: number, y: number}} The coordinates of the center of the nearest square.
  */
 function getNearestSquareCenter(token, target) {
-  const gs = canvas.grid.size;
-  const srcCenter = token.center;
+    const gs = globalThis.canvas?.grid?.size ?? 100;
+    const srcCenter = token.center ?? { x: token.x ?? 0, y: token.y ?? 0 };
 
-  const w = target.document.width;  
-  const h = target.document.height; 
+    const w = target.document?.width ?? target.width ?? 1;
+    const h = target.document?.height ?? target.height ?? 1;
 
-  let bestPoint = null;
-  let bestDist2 = Infinity;
+    let bestPoint = null;
+    let bestDist2 = Infinity;
 
-  for (let gx = 0; gx < w; gx++) {
-    for (let gy = 0; gy < h; gy++) {
-      const cx = target.x + (gx + 0.5) * gs;
-      const cy = target.y + (gy + 0.5) * gs;
+    for (let gx = 0; gx < w; gx++) {
+        for (let gy = 0; gy < h; gy++) {
+            const cx = (target.x ?? 0) + (gx + 0.5) * gs;
+            const cy = (target.y ?? 0) + (gy + 0.5) * gs;
 
-      const dx = cx - srcCenter.x;
-      const dy = cy - srcCenter.y;
-      const d2 = dx * dx + dy * dy;
+            const dx = cx - srcCenter.x;
+            const dy = cy - srcCenter.y;
+            const d2 = dx * dx + dy * dy;
 
-      if (d2 < bestDist2) {
-        bestDist2 = d2;
-        bestPoint = { x: cx, y: cy };
-      }
+            if (d2 < bestDist2) {
+                bestDist2 = d2;
+                bestPoint = { x: cx, y: cy };
+            }
+        }
     }
-  }
 
-  return bestPoint;
+    return bestPoint;
 }
 
 /**
  * Returns an array of users who are owners of a given token.
+ * Evaluates document ownership permissions via the unified adapter.
  * @param {Token} token - The token to check for owners.
- * @param {object} [config] - Optional configuration.
+ * @param {object} [config={}] - Optional configuration.
  * @param {boolean} [config.applyPC=true] - Whether to include player characters.
  * @param {boolean} [config.applyGM=true] - Whether to include Game Masters.
  * @returns {User[]} An array of User objects who are owners of the token.
  */
 function owners(token, config = {}) {
     if (!token) return [];
-    const ownership = token.actor.ownership;
+    const applyPC = config.applyPC !== false;
+    const applyGM = config.applyGM !== false;
+    const doc = token.document ?? token;
+    const actor = token.actor ?? doc?.actor ?? null;
 
-    // Filter users: Level 3 is "Owner"
-    let owners = game.users.filter(user => { return ownership[user.id] === 3; });
-    if (!config.applyPC) owners = owners.filter(user => { return user.isGM === true; });
-    if (!config.applyGM) owners = owners.filter(user => { return user.isGM === false; });
-    return owners;
-};
+    const usersCollection = globalThis.game?.users;
+    const allUsers = usersCollection?.contents
+        ?? (usersCollection?.values ? Array.from(usersCollection.values()) : null)
+        ?? (usersCollection ? Array.from(usersCollection) : []);
+
+    let matched = allUsers.filter(user => adapter.isUserDocumentOwner(user, actor, doc));
+    if (!applyPC) matched = matched.filter(user => Boolean(user.isGM));
+    if (!applyGM) matched = matched.filter(user => !user.isGM);
+    return matched;
+}
 
 /**
  * Calculates the 3D distance between two tokens in scene units (e.g., feet), rounded up.
@@ -62,13 +69,13 @@ function owners(token, config = {}) {
  * @returns {number} The 3D distance in scene units, rounded up.
  */
 function getDistance(t1, t2) {
-    const p1 = t1.center || { x: t1.x, y: t1.y };
-    const p2 = t2.center || { x: t2.x, y: t2.y };
+    const p1 = t1.center ?? { x: t1.x ?? 0, y: t1.y ?? 0 };
+    const p2 = t2.center ?? { x: t2.x ?? 0, y: t2.y ?? 0 };
     const dist2DPx = Math.hypot(p1.x - p2.x, p1.y - p2.y);
     
     // Convert 2D pixel distance to scene units (e.g., feet/meters)
-    const gridSize = canvas.grid?.size || 100;
-    const gridDistance = canvas.scene?.grid?.distance || 5;
+    const gridSize = globalThis.canvas?.grid?.size ?? 100;
+    const gridDistance = globalThis.canvas?.scene?.grid?.distance ?? globalThis.canvas?.grid?.distance ?? 5;
     const dist2DUnits = (dist2DPx / gridSize) * gridDistance;
     
     // Get elevation difference (already in scene units)
@@ -85,4 +92,4 @@ export const tokens = {
     owners,
     getNearestSquareCenter,
     getDistance
-}
+};

@@ -27,7 +27,7 @@ function getColor(color) {
 async function create(token, targets, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id, color, word } = mConfig;
-    if (!Array.isArray(targets)) targets = [targets];
+    const targetList = [targets].flat().filter(Boolean);
 
     const colorVal = getColor(color);
     const hue = colorVal.hue;
@@ -42,7 +42,7 @@ async function create(token, targets, config = {}) {
         fontWeight: "bold",
     };
 
-    for (let target of targets) {
+    for (const target of targetList) {
         const target_seq = new Sequence()
             .effect()
             .atLocation(target, { offset: { x: 0, y: -0.55 * target.document.width }, gridUnits: true })

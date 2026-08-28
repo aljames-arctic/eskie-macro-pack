@@ -123,13 +123,7 @@ async function play(tile, targets, config = {}) {
     return seq.play();
 }
 
-async function stop(tile, targets, config = {}) {
-    // If the second parameter is config instead of targets, handle it
-    if (targets && !Array.isArray(targets) && typeof targets === 'object') {
-        config = targets;
-        targets = null;
-    }
-
+async function stop(tile, config = {}) {
     config = settingsOverride(config);
 
     // Target all tokens currently overlapping the trap tile bounds to restore them

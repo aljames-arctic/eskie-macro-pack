@@ -201,7 +201,7 @@ if (!token) return;
 const animation = tile.getFlag('${MODULE_ID}', 'trap.animation');
 if (!animation) return;
 const trap = foundry.utils.getProperty(globalThis, animation);
-if (!trap || typeof trap.play !== 'function') return;
+if (!trap?.play) return;
 
 // Play the trap animation for the token(s)
 const originIds = tile.getFlag('${MODULE_ID}', 'trap.originIds') ?? [];

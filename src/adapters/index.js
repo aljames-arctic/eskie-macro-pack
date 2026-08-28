@@ -33,7 +33,7 @@ export class Adapter {
      */
     async init() {
         this.foundry = initializeFoundryAdapter();
-        this.system = await initializeSystemAdapter(globalThis.game?.system?.id, this.foundry);
+        this.system = await initializeSystemAdapter(game?.system?.id, this.foundry);
         this.modules = initializeModuleAdapters();
         this._initialized = true;
         const systemLabel = this.system.isSupported ? this.system.systemId : `${this.system.systemId} (unsupported)`;
@@ -108,7 +108,7 @@ export class Adapter {
         return this.foundry.isUserDocumentOwner(user, actor, tokenDoc);
     }
 
-    isUserInCharge(token, user = globalThis.game?.user) {
+    isUserInCharge(token, user = game?.user) {
         return this.foundry.isUserInCharge(token, user);
     }
 
@@ -132,7 +132,7 @@ export class Adapter {
         return this.foundry.getTemplatePosition(template, config);
     }
 
-    getSceneBackground(scene = globalThis.canvas?.scene, level = null) {
+    getSceneBackground(scene = canvas?.scene, level = null) {
         return this.foundry.getSceneBackground(scene, level);
     }
 

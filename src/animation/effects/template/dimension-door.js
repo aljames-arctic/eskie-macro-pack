@@ -1,7 +1,7 @@
 // Original Author: Unknown (from Discord animations)
 // Modular Conversion: bakanabaka
 
-import { closest } from '../../../lib/filemanager.js';
+import { closest, absolutePath } from '../../../lib/filemanager.js';
 import { template } from '../../../lib/templates.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
@@ -12,13 +12,10 @@ const DEFAULT_CONFIG = {
 async function create(token, config = {}) {
     const { id, template } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
 
-    const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
-    const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
-
     const cfg = { 
         radius: 1,
         max: 500,
-        icon: portalPath, 
+        icon: absolutePath("jb2a.portals.vertical.vortex.purple"), 
         label: 'Dimension Door'
     };
     let [position, _] = await template.getPosition(template, cfg);

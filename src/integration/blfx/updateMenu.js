@@ -256,7 +256,7 @@ export class BlfxAutorecUpdateApp extends adapter.foundry.HandlebarsApplicationM
             }
         }
 
-        const appInstance = (this instanceof BlfxAutorecUpdateApp) ? this : (form?.app ?? null);
+        const appInstance = this;
         const { newPayload } = appInstance?.settings ? await appInstance.settings(excludedKeys) : await generateBlfxAutorecUpdate(EMP_BLFX_Registry, excludedKeys);
 
         if (!newPayload?.customAutoRecognition || Object.keys(newPayload.customAutoRecognition).length === 0) {

@@ -34,8 +34,7 @@ export function getBestAdjacentLocation(token, target) {
 
             const cellX = tDoc.x + (i * size);
             const cellY = tDoc.y + (j * size);
-            const center = grid.getCenterPoint ? grid.getCenterPoint({ x: cellX, y: cellY }) : grid.getCenter(cellX, cellY);
-            const pos = Array.isArray(center) ? { x: center[0], y: center[1] } : center;
+            const pos = grid.getCenterPoint({ x: cellX, y: cellY });
             candidates.push(pos);
         }
     }

@@ -10,7 +10,7 @@ import { log } from '../../lib/logger.js';
 export function initializeModuleAdapters() {
     const activeMap = new Map();
     for (const [moduleId, AdapterClass] of Object.entries(MODULE_ADAPTERS)) {
-        if (globalThis.game?.modules?.get(moduleId)?.active) {
+        if (game?.modules?.get(moduleId)?.active) {
             try {
                 activeMap.set(moduleId, new AdapterClass());
                 log.info(`Initialized module adapter for: ${moduleId}`);
@@ -27,7 +27,7 @@ export function initializeModuleAdapters() {
  * @returns {boolean}
  */
 export function hasActiveModuleAdapters() {
-    return Object.keys(MODULE_ADAPTERS).some(moduleId => Boolean(globalThis.game?.modules?.get(moduleId)?.active));
+    return Object.keys(MODULE_ADAPTERS).some(moduleId => Boolean(game?.modules?.get(moduleId)?.active));
 }
 
 export { BaseModuleAdapter, MidiQolModuleAdapter, midiQolAdapter, MODULE_ADAPTERS };

@@ -51,9 +51,7 @@ async function create(token, config = {}) {
 
     for (const target of collectedTargets) {
         const value = path ? foundry.utils.getProperty(target, path) : adapter.getCreatureType(target?.actor);
-        const isUndead = Array.isArray(value)
-            ? value.map(v => String(v).toLowerCase()).includes('undead')
-            : String(value ?? '').toLowerCase().includes('undead');
+        const isUndead = String(value ?? '').toLowerCase().includes('undead');
 
         const distance = Math.hypot(target.x - token.x, target.y - token.y);
         const gridDistance = distance / canvas.grid.size;

@@ -26,7 +26,7 @@ async function create(tile, targets, config = {}) {
         endTile = endTileIds.length ? canvas.tiles.get(endTileIds[0]) : null;
     }
 
-    if (!endTile && typeof Tagger !== 'undefined') {
+    if (!endTile && Tagger) {
         const tagged = await Tagger.getByTag('Rolling Boulder End');
         endTile = tagged[0]?.object || tagged[0];
     }

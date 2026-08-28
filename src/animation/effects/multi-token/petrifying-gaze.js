@@ -20,7 +20,7 @@ const DEFAULT_CONFIG = {
  * @returns {Promise<Sequence>} A promise that resolves with the complete effect sequence.
  */
 async function create(token, targetTokens, config = {}) {
-    targetTokens = targetTokens ? (Array.isArray(targetTokens) ? targetTokens : [targetTokens]) : [];
+    const targets = [targetTokens].flat().filter(Boolean);
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id } = mConfig;
     const eyeAnimation = "jb2a.eyes.01.single.orangeyellow";
@@ -70,7 +70,7 @@ async function create(token, targetTokens, config = {}) {
         .fadeOut(500);
 
     // Effects for each target
-    for (const target of targetTokens) {
+    for (const target of targets) {
         sequence
             .effect()
             .file(closest(eyeAnimation))

@@ -22,7 +22,7 @@ export const SYSTEM_ADAPTERS = {
  * @param {BaseFoundryAdapter} [foundryAdapter=null]
  * @returns {Promise<BaseSystemAdapter>}
  */
-export async function initializeSystemAdapter(systemId = globalThis.game?.system?.id, foundryAdapter = null) {
+export async function initializeSystemAdapter(systemId = game?.system?.id, foundryAdapter = null) {
     if (!systemId) {
         return new GenericSystemAdapter(foundryAdapter);
     }

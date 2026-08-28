@@ -37,49 +37,49 @@ export class BaseFoundryAdapter {
      * The active ContextMenu constructor (global in v12/v13 baseline).
      */
     get ContextMenu() {
-        return globalThis.ContextMenu;
+        return ContextMenu;
     }
 
     /**
      * The active KeyboardManager constructor (global in v12/v13 baseline).
      */
     get KeyboardManager() {
-        return globalThis.KeyboardManager;
+        return KeyboardManager;
     }
 
     /**
      * The active Token placeable constructor (global in v12/v13 baseline).
      */
     get Token() {
-        return globalThis.Token;
+        return Token;
     }
 
     /**
      * The active Tile placeable constructor (global in v12/v13 baseline).
      */
     get Tile() {
-        return globalThis.Tile;
+        return Tile;
     }
 
     /**
      * The active ApplicationV2 constructor (introduced in v12 under foundry.applications.api).
      */
     get ApplicationV2() {
-        return globalThis.foundry?.applications?.api?.ApplicationV2;
+        return foundry.applications?.api?.ApplicationV2;
     }
 
     /**
      * The active HandlebarsApplicationMixin wrapper (introduced in v12 under foundry.applications.api).
      */
     get HandlebarsApplicationMixin() {
-        return globalThis.foundry?.applications?.api?.HandlebarsApplicationMixin;
+        return foundry.applications?.api?.HandlebarsApplicationMixin;
     }
 
     /**
      * The active DialogV2 constructor (introduced in v12 under foundry.applications.api).
      */
     get DialogV2() {
-        return globalThis.foundry?.applications?.api?.DialogV2;
+        return foundry.applications?.api?.DialogV2;
     }
 
     /**
@@ -115,14 +115,14 @@ export class BaseFoundryAdapter {
      * The active FilePicker constructor / implementation (global in v12/v13 baseline).
      */
     get FilePicker() {
-        return globalThis.FilePicker?.implementation ?? globalThis.FilePicker;
+        return FilePicker?.implementation ?? FilePicker;
     }
 
     /**
      * The active TextEditor constructor / implementation (global in v12/v13 baseline).
      */
     get TextEditor() {
-        return globalThis.TextEditor?.implementation ?? globalThis.TextEditor;
+        return TextEditor?.implementation ?? TextEditor;
     }
 
     /**
@@ -145,7 +145,7 @@ export class BaseFoundryAdapter {
     fromUuidSync(uuid, options = {}) {
         if (!uuid) return null;
         try {
-            return globalThis.foundry?.utils?.fromUuidSync(uuid, options) ?? null;
+            return foundry.utils?.fromUuidSync(uuid, options) ?? null;
         } catch (_) {
             return null;
         }
@@ -160,7 +160,7 @@ export class BaseFoundryAdapter {
     async fromUuid(uuid, options = {}) {
         if (!uuid) return null;
         try {
-            return (await globalThis.foundry?.utils?.fromUuid(uuid, options)) ?? null;
+            return (await foundry.utils?.fromUuid(uuid, options)) ?? null;
         } catch (_) {
             return null;
         }
@@ -174,10 +174,7 @@ export class BaseFoundryAdapter {
      * @returns {Object}
      */
     mergeObject(original, other = {}, options = {}) {
-        if (globalThis.foundry?.utils?.mergeObject) {
-            return globalThis.foundry.utils.mergeObject(original, other, options);
-        }
-        return Object.assign(original, other);
+        return foundry.utils.mergeObject(original, other, options);
     }
 
     /**
@@ -186,10 +183,7 @@ export class BaseFoundryAdapter {
      * @returns {Object}
      */
     duplicate(obj) {
-        if (globalThis.foundry?.utils?.duplicate) {
-            return globalThis.foundry.utils.duplicate(obj);
-        }
-        return JSON.parse(JSON.stringify(obj));
+        return foundry.utils.duplicate(obj);
     }
 
     /**
@@ -198,10 +192,7 @@ export class BaseFoundryAdapter {
      * @returns {Object}
      */
     deepClone(obj) {
-        if (globalThis.foundry?.utils?.deepClone) {
-            return globalThis.foundry.utils.deepClone(obj);
-        }
-        return JSON.parse(JSON.stringify(obj));
+        return foundry.utils.deepClone(obj);
     }
 
     /**
@@ -211,11 +202,7 @@ export class BaseFoundryAdapter {
      * @returns {*}
      */
     getProperty(obj, path) {
-        if (globalThis.foundry?.utils?.getProperty) {
-            return globalThis.foundry.utils.getProperty(obj, path);
-        }
-        if (!obj || !path) return undefined;
-        return path.split('.').reduce((acc, part) => acc?.[part], obj);
+        return foundry.utils.getProperty(obj, path);
     }
 
     /**
@@ -226,19 +213,7 @@ export class BaseFoundryAdapter {
      * @returns {boolean}
      */
     setProperty(obj, path, value) {
-        if (globalThis.foundry?.utils?.setProperty) {
-            return globalThis.foundry.utils.setProperty(obj, path, value);
-        }
-        if (!obj || !path) return false;
-        const parts = path.split('.');
-        const last = parts.pop();
-        let target = obj;
-        for (const part of parts) {
-            if (!(part in target)) target[part] = {};
-            target = target[part];
-        }
-        target[last] = value;
-        return true;
+        return foundry.utils.setProperty(obj, path, value);
     }
 
     /**
@@ -247,15 +222,7 @@ export class BaseFoundryAdapter {
      * @returns {string}
      */
     randomID(length = 16) {
-        if (globalThis.foundry?.utils?.randomID) {
-            return globalThis.foundry.utils.randomID(length);
-        }
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let result = '';
-        for (let i = 0; i < length; i++) {
-            result += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return result;
+        return foundry.utils.randomID(length);
     }
 
     /**
@@ -264,13 +231,7 @@ export class BaseFoundryAdapter {
      * @returns {boolean}
      */
     isEmpty(obj) {
-        if (globalThis.foundry?.utils?.isEmpty) {
-            return globalThis.foundry.utils.isEmpty(obj);
-        }
-        if (!obj) return true;
-        if (Array.isArray(obj)) return obj.length === 0;
-        if (obj instanceof Map || obj instanceof Set) return obj.size === 0;
-        return Object.keys(obj).length === 0;
+        return foundry.utils.isEmpty(obj);
     }
 
     /**
@@ -280,19 +241,7 @@ export class BaseFoundryAdapter {
      * @returns {boolean}
      */
     isNewerVersion(a, b) {
-        if (globalThis.foundry?.utils?.isNewerVersion) {
-            return globalThis.foundry.utils.isNewerVersion(a, b);
-        }
-        const partsA = String(a).split('.').map(n => parseInt(n, 10) || 0);
-        const partsB = String(b).split('.').map(n => parseInt(n, 10) || 0);
-        const len = Math.max(partsA.length, partsB.length);
-        for (let i = 0; i < len; i++) {
-            const valA = partsA[i] ?? 0;
-            const valB = partsB[i] ?? 0;
-            if (valA > valB) return true;
-            if (valA < valB) return false;
-        }
-        return false;
+        return foundry.utils.isNewerVersion(a, b);
     }
 
     /**
@@ -363,9 +312,9 @@ export class BaseFoundryAdapter {
         if (!user) return null;
         const isGM = Boolean(user.isGM);
         const userRole = user.role ?? null;
-        const assistantRole = globalThis.CONST?.USER_ROLES?.ASSISTANT ?? 3;
-        const trustedRole = globalThis.CONST?.USER_ROLES?.TRUSTED ?? 2;
-        const playerRole = globalThis.CONST?.USER_ROLES?.PLAYER ?? 1;
+        const assistantRole = CONST?.USER_ROLES?.ASSISTANT ?? 3;
+        const trustedRole = CONST?.USER_ROLES?.TRUSTED ?? 2;
+        const playerRole = CONST?.USER_ROLES?.PLAYER ?? 1;
 
         if (isGM || (userRole !== null && userRole >= assistantRole)) {
             return USER_PERMISSION_TIERS.GM;
@@ -394,7 +343,7 @@ export class BaseFoundryAdapter {
             return true;
         }
 
-        const ownerLevel = globalThis.CONST?.DOCUMENT_OWNERSHIP_LEVELS?.OWNER ?? 3;
+        const ownerLevel = CONST?.DOCUMENT_OWNERSHIP_LEVELS?.OWNER ?? 3;
 
         // Test actor document permissions
         if (actor) {
@@ -498,7 +447,7 @@ export class BaseFoundryAdapter {
         if (!object) return { x: 0, y: 0 };
         const doc = object.document ?? object;
         const isToken = (doc.documentName === 'Token' || object.documentName === 'Token');
-        const widthAdjustment = isToken ? (globalThis.canvas?.grid?.size ?? 100) : 1;
+        const widthAdjustment = isToken ? (canvas?.grid?.size ?? 100) : 1;
         const scaleXY = doc.texture?.scaleX ?? 1;
         const totalScale = scaleXY * scale;
         const objX = object.x ?? doc.x ?? 0;
@@ -565,8 +514,8 @@ export class BaseFoundryAdapter {
             y: template.y ?? 0
         };
 
-        const gridSize = globalThis.canvas?.grid?.size ?? 100;
-        const gridDistance = globalThis.canvas?.grid?.distance ?? globalThis.canvas?.scene?.grid?.distance ?? 5;
+        const gridSize = canvas?.grid?.size ?? 100;
+        const gridDistance = canvas?.grid?.distance ?? canvas?.scene?.grid?.distance ?? 5;
         const distance = template.distance ?? 0;
         const width = template.width ?? 0;
         const height = Math.sqrt(Math.max(0, distance * distance - width * width));
@@ -589,7 +538,7 @@ export class BaseFoundryAdapter {
      * @param {Level|null} [_level=null] Unused in V12/V13
      * @returns {{ src: string|null, offsetX: number, offsetY: number }}
      */
-    getSceneBackground(scene = globalThis.canvas?.scene, _level = null) {
+    getSceneBackground(scene = canvas?.scene, _level = null) {
         if (!scene) return { src: null, offsetX: 0, offsetY: 0 };
         const bg = scene.background;
         return {
@@ -630,9 +579,9 @@ export class BaseFoundryAdapter {
      */
     getPlaceable(id) {
         if (!id) return null;
-        return globalThis.canvas?.tokens?.get(id)
-            ?? globalThis.canvas?.tiles?.get(id)
-            ?? globalThis.canvas?.walls?.get(id)
+        return canvas?.tokens?.get(id)
+            ?? canvas?.tiles?.get(id)
+            ?? canvas?.walls?.get(id)
             ?? null;
     }
 
@@ -647,7 +596,7 @@ export class BaseFoundryAdapter {
      * @returns {Token|null}
      */
     getSpeakerToken(message, extractedTokenId = null) {
-        const canvasObj = globalThis.canvas;
+        const canvasObj = canvas;
         if (!canvasObj?.ready || !canvasObj.tokens) return null;
 
         if (extractedTokenId) {
@@ -662,7 +611,7 @@ export class BaseFoundryAdapter {
         }
 
         return canvasObj.tokens.controlled?.[0]
-            ?? globalThis.game?.user?.character?.getActiveTokens?.()?.[0]
+            ?? game?.user?.character?.getActiveTokens?.()?.[0]
             ?? null;
     }
 
@@ -673,12 +622,12 @@ export class BaseFoundryAdapter {
      */
     getSpeakerActor(message) {
         const speaker = message?.speaker ?? message;
-        if (speaker && globalThis.ChatMessage?.getSpeakerActor) {
-            const actor = globalThis.ChatMessage.getSpeakerActor(speaker);
+        if (speaker && ChatMessage?.getSpeakerActor) {
+            const actor = ChatMessage.getSpeakerActor(speaker);
             if (actor) return actor;
         }
         const speakerToken = this.getSpeakerToken(message);
-        return speakerToken?.actor ?? globalThis.game?.user?.character ?? null;
+        return speakerToken?.actor ?? game?.user?.character ?? null;
     }
 
     /* -------------------------------------------- */
@@ -697,8 +646,8 @@ export class BaseFoundryAdapter {
         const p2 = t2.center ?? { x: t2.x ?? 0, y: t2.y ?? 0 };
         const dist2DPx = Math.hypot(p1.x - p2.x, p1.y - p2.y);
 
-        const gridSize = globalThis.canvas?.grid?.size ?? 100;
-        const gridDistance = globalThis.canvas?.scene?.grid?.distance ?? globalThis.canvas?.grid?.distance ?? 5;
+        const gridSize = canvas?.grid?.size ?? 100;
+        const gridDistance = canvas?.scene?.grid?.distance ?? canvas?.grid?.distance ?? 5;
         const dist2DUnits = (dist2DPx / gridSize) * gridDistance;
 
         const el1 = t1.document?.elevation ?? 0;
@@ -717,7 +666,7 @@ export class BaseFoundryAdapter {
      */
     getNearestSquareCenter(token, target) {
         if (!token || !target) return null;
-        const gs = globalThis.canvas?.grid?.size ?? 100;
+        const gs = canvas?.grid?.size ?? 100;
         const srcCenter = token.center ?? { x: token.x ?? 0, y: token.y ?? 0 };
 
         const w = target.document?.width ?? target.width ?? 1;
@@ -761,7 +710,7 @@ export class BaseFoundryAdapter {
         const doc = token.document ?? token;
         const actor = token.actor ?? doc?.actor ?? null;
 
-        const usersCollection = globalThis.game?.users;
+        const usersCollection = game?.users;
         const allUsers = usersCollection?.contents
             ?? (usersCollection?.values ? Array.from(usersCollection.values()) : null)
             ?? (usersCollection ? Array.from(usersCollection) : []);
@@ -791,14 +740,14 @@ export class BaseFoundryAdapter {
             dependency.required([
                 { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
             ]);
-            return Promise.all(elements.map(element => globalThis.MassEdit?.linker?.link?.([element, target])));
+            return Promise.all(elements.map(element => MassEdit?.linker?.link?.([element, target])));
         }
 
         // Default Token behavior
         if (dependency.isActivated({ id: 'token-attacher', ref: "Token Attacher" })) {
-            return globalThis.tokenAttacher?.attachElementsToToken?.(elements, target, true);
+            return tokenAttacher?.attachElementsToToken?.(elements, target, true);
         } else if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
-            return Promise.all(elements.map(element => globalThis.MassEdit?.linker?.link?.([element, target])));
+            return Promise.all(elements.map(element => MassEdit?.linker?.link?.([element, target])));
         }
 
         dependency.someRequired([
@@ -820,14 +769,14 @@ export class BaseFoundryAdapter {
             dependency.required([
                 { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
             ]);
-            return Promise.all(elements.map(element => globalThis.MassEdit?.linker?.removeLinks?.([element, target])));
+            return Promise.all(elements.map(element => MassEdit?.linker?.removeLinks?.([element, target])));
         }
 
         // Default Token behavior
         if (dependency.isActivated({ id: 'token-attacher', ref: "Token Attacher" })) {
-            return globalThis.tokenAttacher?.detachElementsFromToken?.(elements, target, true);
+            return tokenAttacher?.detachElementsFromToken?.(elements, target, true);
         } else if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
-            return Promise.all(elements.map(element => globalThis.MassEdit?.linker?.removeLinks?.([element, target])));
+            return Promise.all(elements.map(element => MassEdit?.linker?.removeLinks?.([element, target])));
         }
 
         dependency.someRequired([

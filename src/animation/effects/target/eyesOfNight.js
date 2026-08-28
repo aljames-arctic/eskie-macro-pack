@@ -14,7 +14,7 @@ async function create(token, targets = [], config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const { id, darkMap } = mConfig;
 
-    const targetList = Array.isArray(targets) ? [...targets] : (targets ? [targets] : []);
+    const targetList = [targets].flat().filter(Boolean);
 
     const allPoints = [
         token.center,

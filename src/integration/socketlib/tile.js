@@ -114,8 +114,7 @@ async function createTile(updates = {}) {
  */
 async function destroyTiles(ids) {
     if (!canvas.scene) return [];
-    const arrayIds = Array.isArray(ids) ? ids : [ids];
-    return canvas.scene.deleteEmbeddedDocuments("Tile", arrayIds);
+    return canvas.scene.deleteEmbeddedDocuments("Tile", ids);
 }
 
 export const tileSockets = {
@@ -154,7 +153,7 @@ async function create(updates = {}) {
  * @returns {Promise<TileDocument[]>} An array containing the deleted tile document.
  */
 async function destroy(id) {
-    const ids = Array.isArray(id) ? id : [id];
+    const ids = [id].flat();
     if (game.user.isGM) return destroyTiles(ids);
     return socketlib.executeAsGM("destroyTiles", ids);
 }

@@ -136,11 +136,11 @@ function hasSomeRecommended(dependencyList) {
  * @returns {null | throw} 
  */
 function required(dependencyList) {
-    if (!Array.isArray(dependencyList)) return required([dependencyList]);
+    const list = [dependencyList].flat();
     let errorMsg = `Requires all of the following to be installed and activaged:\n`;
     let dependencyMet = true;
 
-    for (let dependency of dependencyList) {
+    for (let dependency of list) {
         let [isActivated, isValidVersion] = _isActivated(dependency);
         if (isActivated && isValidVersion) continue;
         dependencyMet = false;

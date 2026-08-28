@@ -15,7 +15,7 @@ const DEFAULT_CONFIG = {
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { size } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    targets = targets ? (Array.isArray(targets) ? targets : [targets]) : [];
+    const targetList = [targets].flat().filter(Boolean);
 
     const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') || [];
     let targetTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
@@ -26,7 +26,7 @@ async function create(tile, targets, config = {}) {
     }
 
     const targetTilePlaceable = targetTile?.object || targetTile;
-    const targetLoc = targetTilePlaceable?.center || (targets.length ? (targets[0].object?.center || targets[0]) : null);
+    const targetLoc = targetTilePlaceable?.center || (targetList.length ? (targetList[0].object?.center || targetList[0]) : null);
 
     let seq = new Sequence();
 
@@ -41,8 +41,8 @@ async function create(tile, targets, config = {}) {
             .zIndex(1);
     }
 
-    if (targets.length > 0) {
-        targets.forEach(target => {
+    if (targetList.length > 0) {
+        targetList.forEach(target => {
             seq = seq
                 // Burning token shake effect
                 .effect()

@@ -184,7 +184,7 @@ export class AutorecUpdateApp extends adapter.foundry.HandlebarsApplicationMixin
             }
         }
 
-        const appInstance = (this instanceof AutorecUpdateApp) ? this : (form?.app ?? null);
+        const appInstance = this;
         const { newSettings } = appInstance?.settings ? await appInstance.settings(excludedIds) : await generateAutorecUpdate(EMP_AA_Menu, excludedIds);
         if (!newSettings || Object.keys(newSettings).length === 0) {
             log.debug("Nothing to update!");
@@ -192,8 +192,8 @@ export class AutorecUpdateApp extends adapter.foundry.HandlebarsApplicationMixin
             return;
         }
 
-        if (globalThis.AutomatedAnimations?.AutorecManager?.overwriteMenus) {
-            await globalThis.AutomatedAnimations.AutorecManager.overwriteMenus(JSON.stringify(newSettings), { submitAll: true });
+        if (AutomatedAnimations?.AutorecManager?.overwriteMenus) {
+            await AutomatedAnimations.AutorecManager.overwriteMenus(JSON.stringify(newSettings), { submitAll: true });
         }
 
         const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";

@@ -116,7 +116,7 @@ function JSONformatObject(obj, depth = 1) {
     if(type === 'string') return '\'' + obj + '\'';
     if(type === 'boolean' || type === 'number') return obj;
     if(type === 'function') return obj.toString();
-    if(obj instanceof Array) return JSON.stringify(obj);
+    if(Array.isArray(obj)) return JSON.stringify(obj);
 
     var ret = [];
     for(var prop in obj) {

@@ -11,7 +11,7 @@ const BBC_DEPENDENCY = { id: 'bakana-better-crosshairs', ref: "Bakana's Better C
  */
 function getBbcApi() {
     dependency.required([BBC_DEPENDENCY]);
-    const api = globalThis.bbc ?? game.modules?.get('bakana-better-crosshairs')?.api;
+    const api = game.modules?.get('bakana-better-crosshairs')?.api;
     if (!api?.crosshair) {
         const errorMsg = "Bakana's Better Crosshairs (BBC) API is not initialized.";
         log.error(errorMsg);
@@ -64,7 +64,7 @@ async function playShape(shape, targetOrPlaceable, rawConfig = {}) {
     const { placeable, config } = normalizeCrosshairInvocation(targetOrPlaceable, rawConfig);
     log.debug(`Delegating crosshair "${shape}" play to BBC API for target:`, placeable?.id ?? config.token?.name);
     const shapeBuilder = api.crosshair?.[shape] ?? api.crosshair?.circle;
-    if (typeof shapeBuilder?.play === 'function') {
+    if (shapeBuilder?.play) {
         return shapeBuilder.play(placeable, config);
     }
     return api.crosshair.play(shape, placeable, config);

@@ -1,7 +1,7 @@
 // Original Author: .eskie / EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { closest } from '../../../lib/filemanager.js';
+import { closest, absolutePath } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
@@ -43,12 +43,10 @@ async function createCloud(token, config = {}) {
     const { id, template, color } = mConfig;
     const { tintColor, hue, hue2 } = getTintAndHue(color);
 
-    const portalEntry = Sequencer.Database.getEntry(closest('eskie.crosshair.rectangle.fantasy_01.white.full.20x20ft'));
-    const portalPath = typeof portalEntry === 'string' ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
     const cfg = {
         radius: 20,
         max: 60,
-        icon: portalPath,
+        icon: absolutePath('eskie.crosshair.rectangle.fantasy_01.white.full.20x20ft'),
         label: 'Faerie Fire'
     };
     let [primary, secondary, center] = await templatelib.getPosition(template, cfg);

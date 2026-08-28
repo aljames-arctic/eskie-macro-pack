@@ -13,7 +13,7 @@ async function getPosition(template, config = {}) {
         return adapter.getTemplatePosition(template, config);
     }
 
-    const position = await globalThis.Sequencer?.Crosshair?.show?.();
+    const position = await Sequencer?.Crosshair?.show?.();
     if (position?.cancelled) {
         return [];
     }

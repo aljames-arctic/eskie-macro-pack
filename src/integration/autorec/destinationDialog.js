@@ -93,7 +93,6 @@ export class AutorecDestinationDialog extends adapter.foundry.HandlebarsApplicat
         const isCancel = event.submitter && event.submitter.name === "cancel";
         if (isCancel) return;
 
-        const appInstance = (this instanceof AutorecDestinationDialog) ? this : (form?.app ?? null);
         const rawData = formData.object ?? formData;
         const target = rawData?.autorecTarget ?? form?.querySelector?.('input[name="autorecTarget"]:checked')?.value ?? 'none';
         const remember = Boolean(rawData?.rememberChoice ?? form?.querySelector?.('input[name="rememberChoice"]')?.checked);

@@ -32,12 +32,11 @@ const DEFAULT_CONFIG = {
 async function create(token, targets, config = {}) {
     config = settingsOverride(config);
     const { id, animations, sound, teleport } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    if (!Array.isArray(targets)) targets = [targets];
-    targets = targets.filter(target => target.id != token.id);
-    if (targets.length === 0) return;
+    const targetList = [targets].flat().filter(target => target && target.id !== token.id);
+    if (targetList.length === 0) return;
     
-    const A = targets[0];
-    const B = (targets.length > 1) ? targets[1] : token;
+    const A = targetList[0];
+    const B = (targetList.length > 1) ? targetList[1] : token;
     // Snapshot primitive numbers instead of keeping live object references to token.center
     const ADest = { x: A.center.x, y: A.center.y };
     const BDest = { x: B.center.x, y: B.center.y };

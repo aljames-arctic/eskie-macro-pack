@@ -13,9 +13,34 @@ const DEFAULT_CONFIG = {
     durationY: 11000,
 };
 
-function create(users = [], config = {}){
-    // Catch the case where we pass in an array of users
-    // Preference of this create function is single users
+function createUserBlur(user, bg, config = {}) {
+    const { id, opacity, blur, sway, durationX, durationY } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+
+    const x = (canvas?.scene?.dimensions?.width ?? canvas?.dimensions?.width ?? 0) / 2;
+    const y = (canvas?.scene?.dimensions?.height ?? canvas?.dimensions?.height ?? 0) / 2;
+    const drift = ((canvas?.grid?.size ?? 100) / 8) * sway;
+
+    const seq = new Sequence();
+    seq.effect()
+        .name(`${id} - ${user.name}`)
+        .file(bg.src)
+        .atLocation({ x, y })
+        .size({
+            width: canvas?.scene?.dimensions?.sceneWidth ?? canvas?.dimensions?.sceneWidth ?? canvas?.dimensions?.width ?? 100,
+            height: canvas?.scene?.dimensions?.sceneHeight ?? canvas?.dimensions?.sceneHeight ?? canvas?.dimensions?.height ?? 100
+        })
+        .belowTokens()
+        .belowTiles()
+        .filter("Blur", { blurX: blur, blurY: blur })
+        .opacity(opacity)
+        .loopProperty('spriteContainer', 'position.x', { from: -drift, to: drift, duration: durationX, pingPong: true })
+        .loopProperty('spriteContainer', 'position.y', { from: -drift, to: drift, duration: durationY, pingPong: true })
+        .forUsers(user.id)
+        .persist();
+    return seq;
+}
+
+function create(users = [], config = {}) {
     const seq = new Sequence();
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (!bg?.src) {
@@ -23,33 +48,9 @@ function create(users = [], config = {}){
         return seq;
     }
 
-    if (Array.isArray(users)) {
-        users.forEach( u => { seq.addSequence(create(u, config)); });
-        return seq;
+    for (const user of users) {
+        seq.addSequence(createUserBlur(user, bg, config));
     }
-
-    const { id, opacity, blur, sway, durationX, durationY } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-
-    const x = (canvas?.scene?.dimensions?.width ?? canvas?.dimensions?.width ?? 0) / 2;
-    const y = (canvas?.scene?.dimensions?.height ?? canvas?.dimensions?.height ?? 0) / 2;
-    const drift = ((canvas?.grid?.size ?? 100) / 8) * sway;
-
-    seq.effect()
-            .name(`${id} - ${users.name}`)
-            .file(bg.src)
-            .atLocation({ x, y })
-            .size({
-                width: canvas?.scene?.dimensions?.sceneWidth ?? canvas?.dimensions?.sceneWidth ?? canvas?.dimensions?.width ?? 100,
-                height: canvas?.scene?.dimensions?.sceneHeight ?? canvas?.dimensions?.sceneHeight ?? canvas?.dimensions?.height ?? 100
-            })
-            .belowTokens()
-            .belowTiles()
-            .filter("Blur", { blurX: blur, blurY: blur })
-            .opacity(opacity)
-            .loopProperty('spriteContainer', 'position.x', { from: -drift, to: drift, duration: durationX, pingPong: true })
-            .loopProperty('spriteContainer', 'position.y', { from: -drift, to: drift, duration: durationY, pingPong: true })
-            .forUsers(users.id)
-            .persist();
     return seq;
 }
 
@@ -60,9 +61,9 @@ async function play(users = [], config = {}) {
 
 function createDrunkBlur(users = []) {
     const seq = new Sequence();
-    seq.addSequence(create(users, {opacity: 1.00, sway:  1.0, durationX:  6500, durationY: 11000}));
-    seq.addSequence(create(users, {opacity: 0.57, sway: -0.9, durationX: 16500, durationY:  7000}));
-    seq.addSequence(create(users, {opacity: 0.47, sway:  1.1, durationX: 13000, durationY: 10500}));
+    seq.addSequence(create(users, { opacity: 1.00, sway: 1.0, durationX: 6500, durationY: 11000 }));
+    seq.addSequence(create(users, { opacity: 0.57, sway: -0.9, durationX: 16500, durationY: 7000 }));
+    seq.addSequence(create(users, { opacity: 0.47, sway: 1.1, durationX: 13000, durationY: 10500 }));
     return seq;
 }
 
@@ -72,11 +73,8 @@ async function playDrunkBlur(users = []) {
 }
 
 async function stop(users = [], config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    if (Array.isArray(users))
-        return Promise.all(users.map(user => Sequencer.EffectManager.endEffects({ name: `${id} - ${user.name}` })));
-    else
-        return Sequencer.EffectManager.endEffects({ name: `${id} - ${users.name}` });
+    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    return Promise.all(users.map(user => Sequencer.EffectManager.endEffects({ name: `${id} - ${user.name}` })));
 }
 
 export const blur = { 

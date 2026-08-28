@@ -8,7 +8,7 @@ import { object } from './socketlib/object.js';
 export let socketlib;
 
 async function register() {
-    const socket = globalThis.socketlib.registerModule(MODULE_ID);
+    const socket = socketlib.registerModule(MODULE_ID);
     const socketAPI = {
         doorSockets,
         tileSockets,

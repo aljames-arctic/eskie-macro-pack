@@ -1,7 +1,7 @@
 // Original Author: Unknown (from discord)
 // Modular Conversion: bakanabaka
 
-import { closest } from '../../../lib/filemanager.js';
+import { closest, absolutePath } from '../../../lib/filemanager.js';
 import { template } from '../../../lib/templates.js';
 import { teleportIn } from "./teleport/teleportIn.js";
 import { teleportOut } from "./teleport/teleportOut.js";
@@ -14,13 +14,10 @@ const DEFAULT_CONFIG = {
 async function create(token, config = {}) {
     const { id, template, targets } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
 
-    const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
-    const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
-
     const cfg = { 
         radius: 1,
         max: 500,
-        icon: portalPath, 
+        icon: absolutePath("jb2a.portals.vertical.vortex.purple"), 
         label: 'Teleportation Destination',
     };
     [config.position, _] = await template.getPosition(template, cfg);

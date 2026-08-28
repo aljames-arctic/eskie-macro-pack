@@ -17,8 +17,7 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { repeats, repeatDelay, splashScale } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    targets = targets ? (Array.isArray(targets) ? targets : [targets]) : [];
+    const targetList = [targets].flat().filter(Boolean);
 
     // Retrieve projectile type from flags, defaulting to arrow
     const projectileType = tile.document?.getFlag(MODULE_ID, 'trap.projectileType') || config.projectileType || 'arrow';
@@ -33,7 +32,7 @@ async function create(tile, targets, config = {}) {
     }
 
     const targetTilePlaceable = targetTile?.object || targetTile;
-    const targetLoc = targetTilePlaceable?.center || (targets.length ? (targets[0].object?.center || targets[0]) : null);
+    const targetLoc = targetTilePlaceable?.center || (targetList.length ? (targetList[0].object?.center || targetList[0]) : null);
 
     let seq = new Sequence();
     if (projectileType === 'javelin') {

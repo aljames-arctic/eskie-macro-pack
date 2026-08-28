@@ -9,42 +9,42 @@ export class FoundryCurrentAdapter extends BaseFoundryAdapter {
      * The active ContextMenu constructor in v14+.
      */
     get ContextMenu() {
-        return globalThis.foundry?.applications?.ux?.ContextMenu ?? super.ContextMenu;
+        return foundry.applications?.ux?.ContextMenu ?? super.ContextMenu;
     }
 
     /**
      * The active KeyboardManager constructor in v14+.
      */
     get KeyboardManager() {
-        return globalThis.foundry?.helpers?.interaction?.KeyboardManager ?? super.KeyboardManager;
+        return foundry.helpers?.interaction?.KeyboardManager ?? super.KeyboardManager;
     }
 
     /**
      * The active Token placeable constructor in v14+.
      */
     get Token() {
-        return globalThis.foundry?.canvas?.placeables?.Token ?? super.Token;
+        return foundry.canvas?.placeables?.Token ?? super.Token;
     }
 
     /**
      * The active Tile placeable constructor in v14+.
      */
     get Tile() {
-        return globalThis.foundry?.canvas?.placeables?.Tile ?? super.Tile;
+        return foundry.canvas?.placeables?.Tile ?? super.Tile;
     }
 
     /**
      * The active FilePicker constructor / implementation in v14+.
      */
     get FilePicker() {
-        return globalThis.foundry?.applications?.apps?.FilePicker?.implementation ?? super.FilePicker;
+        return foundry.applications?.apps?.FilePicker?.implementation ?? super.FilePicker;
     }
 
     /**
      * The active TextEditor constructor / implementation in v14+.
      */
     get TextEditor() {
-        return globalThis.foundry?.applications?.ux?.TextEditor?.implementation ?? super.TextEditor;
+        return foundry.applications?.ux?.TextEditor?.implementation ?? super.TextEditor;
     }
 
     /**
@@ -188,11 +188,11 @@ export class FoundryCurrentAdapter extends BaseFoundryAdapter {
      * @param {Level|null} [level=null] Target level document or placeable (defaults to active level)
      * @returns {{ src: string|null, offsetX: number, offsetY: number }}
      */
-    getSceneBackground(scene = globalThis.canvas?.scene, level = null) {
+    getSceneBackground(scene = canvas?.scene, level = null) {
         if (!scene) return { src: null, offsetX: 0, offsetY: 0 };
 
         const activeLevel = level
-            ?? globalThis.canvas?.level
+            ?? canvas?.level
             ?? scene.levels?.get?.(scene.activeLevel)
             ?? scene.levels?.contents?.[0]
             ?? (Array.isArray(scene.levels) ? scene.levels[0] : null)

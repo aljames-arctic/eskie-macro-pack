@@ -50,9 +50,9 @@ function buildBlfxMacroCommand(animation, trigger, config) {
 
     if (isTargeted) {
         return `// Eskie Macro Pack Autorec (Targeted)
-const speakerActor = typeof speaker !== 'undefined' && speaker ? (globalThis.ChatMessage?.getSpeakerActor?.(speaker) ?? globalThis.ChatMessage?.implementation?.getSpeakerActor?.(speaker)) : null;
+const speakerActor = typeof speaker !== 'undefined' && speaker ? ChatMessage?.getSpeakerActor?.(speaker) : null;
 const token = (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || speakerActor?.getActiveTokens?.()?.[0] || null;
-const target = (typeof workflow !== 'undefined' && (workflow?.targets?.first?.() ?? (workflow?.targets instanceof Set ? Array.from(workflow.targets)[0] : workflow?.targets?.[0]))) || (typeof targets !== 'undefined' && (targets instanceof Set ? Array.from(targets)[0] : targets?.[0])) || Array.from(game.user?.targets ?? [])[0] || null;
+const target = (typeof workflow !== 'undefined' && (workflow?.targets?.first?.() ?? Array.from(workflow?.targets ?? [])[0])) || (typeof targets !== 'undefined' && (targets?.first?.() ?? Array.from(targets ?? [])[0])) || Array.from(game.user?.targets ?? [])[0] || null;
 const config = ${serializedConfig};
 const effect = foundry.utils.getProperty(globalThis, '${animation}');
 if (effect?.play) {
@@ -65,7 +65,7 @@ if (effect?.play) {
     }
 
     return `// Eskie Macro Pack Autorec
-const speakerActor = typeof speaker !== 'undefined' && speaker ? (globalThis.ChatMessage?.getSpeakerActor?.(speaker) ?? globalThis.ChatMessage?.implementation?.getSpeakerActor?.(speaker)) : null;
+const speakerActor = typeof speaker !== 'undefined' && speaker ? ChatMessage?.getSpeakerActor?.(speaker) : null;
 const token = (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || speakerActor?.getActiveTokens?.()?.[0] || null;
 const config = ${serializedConfig};
 const effect = foundry.utils.getProperty(globalThis, '${animation}');

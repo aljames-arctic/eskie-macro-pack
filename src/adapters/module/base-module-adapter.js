@@ -15,7 +15,7 @@ export class BaseModuleAdapter {
      * @returns {boolean}
      */
     isActive() {
-        return Boolean(globalThis.game?.modules?.get(this.moduleId)?.active);
+        return Boolean(game?.modules?.get(this.moduleId)?.active);
     }
 
     /**

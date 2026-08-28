@@ -154,7 +154,7 @@ Hooks.once('init', function() {
 
 // Dynamic visibility of AA and BLFX buttons in settings config
 Hooks.on('renderSettingsConfig', function(app, html, data) {
-    const root = html instanceof jQuery ? html[0] : (html.querySelector ? html : html?.[0]);
+    const root = html?.querySelector ? html : html?.[0];
     if (!root) return;
 
     const isAaActive = Boolean(game.modules?.get("autoanimations")?.active);

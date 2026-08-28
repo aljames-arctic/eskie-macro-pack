@@ -38,7 +38,7 @@ async function setup (config = {}) {
     }
 
     const trap = traps[chosenTrapKey];
-    if (trap && typeof trap.setup === 'function') {
+    if (trap?.setup) {
         return trap.setup(config);
     } else {
         ui.notifications.error(format('EMP.traps.setup.noSetupMethod', { name: chosenTrapKey }));

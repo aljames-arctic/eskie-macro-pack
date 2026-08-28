@@ -10,8 +10,8 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, targets, config = {}) {
-    targets = targets ? (Array.isArray(targets) ? targets : [targets]) : [];
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const targetList = [targets].flat().filter(Boolean);
+    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const {darkMap} = mConfig;
 
     const sequence = new Sequence();
@@ -134,7 +134,7 @@ async function create(token, targets, config = {}) {
         .filter("ColorMatrix", { brightness: 0 })
         .tint("#e51e19");
 
-    targets.forEach(target => {
+    targetList.forEach(target => {
         sequence.effect()
             .file(closest("jb2a.toll_the_dead.red.skull_smoke"))
             .attachTo(target)

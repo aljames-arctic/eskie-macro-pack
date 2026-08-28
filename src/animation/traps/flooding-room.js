@@ -20,7 +20,7 @@ async function create(tile, targets, config = {}) {
     const originIds = tile.document.getFlag(MODULE_ID, 'trap.floodingRoomSplashOrigins') || [];
     let splashOrigins = originIds.map(id => canvas.tiles.get(id)).filter(t => t);
     
-    if (splashOrigins.length === 0 && typeof Tagger !== 'undefined') {
+    if (splashOrigins.length === 0 && Tagger) {
         const taggedOrigins = await Tagger.getByTag('Flooding Room Trap Origin');
         splashOrigins = taggedOrigins.map(t => t.object || t).filter(t => t);
     }

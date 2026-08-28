@@ -1,5 +1,6 @@
 import { closest } from '../../lib/filemanager.js';
 import { teleport } from '../utils/teleport.js';
+import { adapter } from '../../adapters/index.js';
 
 const DEFAULT_CONFIG = {
     zoom: 1.8,
@@ -531,17 +532,18 @@ function movement2create(red, blue, config = {}) {
 
     .wait(4600);
 
-    if (canvas?.scene?.background?.src) {
+    const bg = adapter.getSceneBackground(canvas?.scene);
+    if (bg?.src) {
         seq.effect()
-            .file(closest(canvas.scene.background.src))
+            .file(closest(bg.src))
             .atLocation({x:(canvas.dimensions.width)/2,y:(canvas.dimensions.height)/2})
             .size({width:canvas.scene.width/canvas.grid.size+10, height:canvas.scene.height/canvas.grid.size}, {gridUnits: true})
             .fadeOut(1000, {ease: "easeInQuint"})
             .belowTiles()
-            .spriteOffset({x:-canvas.scene.background.offsetX,y:-canvas.scene.background.offsetY})
+            .spriteOffset({x:-bg.offsetX,y:-bg.offsetY})
             .filter("Blur", { blurX: 10, blurY: 5 })
             .opacity(0.75)
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -5, duration: 1000, gridUnits: true, ease: "easeOutQuint"})
+            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -5, duration: 1000, gridUnits: true, ease: "easeOutQuint"});
     }
 
     seq.canvasPan() 

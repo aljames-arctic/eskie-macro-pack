@@ -1,5 +1,6 @@
 import { closest } from '../../lib/filemanager.js';
 import { deathEffect } from './sun-halo-dragon/death-effect.js';
+import { adapter } from '../../adapters/index.js';
 
 async function getPositions(token) {
     const pos1 = {x: token.x, y: token.y };
@@ -128,11 +129,12 @@ async function create(token, targets = [], config = {}) {
                 }
             });
             
-        if (canvas.scene.background.src) {
+        const bg = adapter.getSceneBackground(canvas?.scene);
+        if (bg?.src) {
             seq.effect()
                 .delay(2100)
                 .name(`Casting ${token.name}`)
-                .file(closest(canvas.scene.background.src))
+                .file(closest(bg.src))
                 .filter("ColorMatrix", {saturate: 1, brightness: 0.6})
                 .atLocation({x:(canvas.dimensions.width)/2,y:(canvas.dimensions.height)/2})
                 .size({width:canvas.scene.width/canvas.grid.size, height:canvas.scene.height/canvas.grid.size}, {gridUnits: true})
@@ -142,7 +144,7 @@ async function create(token, targets = [], config = {}) {
                 .fadeOut(125)
                 .fadeIn(125)
                 .opacity(1)
-                .spriteOffset({x:-canvas.scene.background.offsetX,y:-canvas.scene.background.offsetY})
+                .spriteOffset({x:-bg.offsetX,y:-bg.offsetY})
                 .playIf(impact);
         }
 

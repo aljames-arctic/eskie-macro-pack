@@ -2,6 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
+import { adapter } from "../../../adapters/index.js";
 
 const DEFAULT_CONFIG = {
     id: 'dreadLord',
@@ -11,7 +12,7 @@ const DEFAULT_CONFIG = {
         baseForm: null,
         dreadForm: null,
     }
-}
+};
 
 async function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
@@ -41,17 +42,18 @@ async function create(token, config = {}) {
         .belowTokens()
         .zIndex(2);
 
-    if (darkMap && canvas.scene.background?.src) {
+    const bg = adapter.getSceneBackground(canvas?.scene);
+    if (darkMap && bg?.src) {
         seq = seq.effect()
-            .file(closest(canvas.scene.background.src))
+            .file(closest(bg.src))
             .filter("ColorMatrix", { brightness: 0.3 })
             .atLocation({ x: (canvas.dimensions.width) / 2, y: (canvas.dimensions.height) / 2 })
             .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
-            .spriteOffset({ x: -0 }, { gridUnits: true })
+            .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY })
             .duration(7000)
             .fadeIn(500)
             .fadeOut(1000)
-            .belowTokens()
+            .belowTokens();
     }
 
     seq = seq.effect()

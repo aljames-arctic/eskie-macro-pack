@@ -2,11 +2,12 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
+import { adapter } from "../../../adapters/index.js";
 
 const DEFAULT_CONFIG = {
     id: 'ChannelDivinityDreadAspect',
     darkMap: true,
-}
+};
 
 async function create(token, targets, config = {}) {
     targets = targets ? (Array.isArray(targets) ? targets : [targets]) : [];
@@ -35,13 +36,14 @@ async function create(token, targets, config = {}) {
         .belowTokens()
         .zIndex(2);
 
-    if (darkMap && canvas.scene.background.src) {
+    const bg = adapter.getSceneBackground(canvas?.scene);
+    if (darkMap && bg?.src) {
         sequence.effect()
-            .file(closest(canvas.scene.background.src))
+            .file(closest(bg.src))
             .filter("ColorMatrix", { brightness: 0.3 })
             .atLocation({ x: (canvas.dimensions.width) / 2, y: (canvas.dimensions.height) / 2 })
             .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
-            .spriteOffset({ x: -0 }, { gridUnits: true })
+            .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY })
             .duration(3000)
             .fadeIn(500)
             .fadeOut(1000)

@@ -3,6 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
+import { adapter } from '../../../adapters/index.js';
 
 const DEFAULT_CONFIG = {
     id: 'vigilantBlessing',
@@ -19,10 +20,11 @@ async function create(token, target, config = {}) {
     const label = `${id} - ${recipient.id}`;
     const seq = new Sequence();
 
-    if (darkMap && canvas?.scene?.background?.src) {
+    const bg = adapter.getSceneBackground(canvas?.scene);
+    if (darkMap && bg?.src) {
         seq.effect()
             .name(label)
-            .file(closest(canvas.scene.background.src))
+            .file(closest(bg.src))
             .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
             .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
             .fadeIn(750)
@@ -31,7 +33,7 @@ async function create(token, target, config = {}) {
             .filter('ColorMatrix', { brightness: 0 })
             .belowTokens()
             .opacity(0.5)
-            .spriteOffset({ x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY });
+            .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY });
     }
 
     seq.effect()
@@ -149,6 +151,3 @@ export const vigilantBlessing = {
 
 autoanimations.register('vigilantBlessing', 'ranged-target', 'eskie.effect.vigilantBlessing.target', DEFAULT_CONFIG, '0.0.0', 'Vigilant Blessing');
 autoanimations.register('vigilantBlessing', 'effect', 'eskie.effect.vigilantBlessing.effect', DEFAULT_CONFIG, '0.0.0', 'Vigilant Blessing');
-
-
-

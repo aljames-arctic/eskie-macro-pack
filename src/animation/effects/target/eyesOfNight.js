@@ -3,6 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
+import { adapter } from '../../../adapters/index.js';
 
 const DEFAULT_CONFIG = {
     id: 'eyesOfNight',
@@ -32,14 +33,15 @@ async function create(token, targets = [], config = {}) {
 
     const sequence = new Sequence();
 
-    if (darkMap && canvas?.scene?.background?.src) {
+    const bg = adapter.getSceneBackground(canvas?.scene);
+    if (darkMap && bg?.src) {
         sequence.effect()
             .name(`${id} - ${token.id}`)
-            .file(closest(canvas.scene.background.src))
+            .file(closest(bg.src))
             .filter('ColorMatrix', { brightness: 0 })
             .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
             .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
-            .spriteOffset({ x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY })
+            .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY })
             .duration(4000)
             .fadeIn(750)
             .fadeOut(750)
@@ -164,6 +166,3 @@ export const eyesOfNight = {
 
 autoanimations.register('eyesOfNight', 'ranged-target', 'eskie.effect.eyesOfNight.target', DEFAULT_CONFIG, '0.0.0', 'Eyes of Night');
 autoanimations.register('eyesOfNight', 'effect', 'eskie.effect.eyesOfNight.effect', DEFAULT_CONFIG, '0.0.0', 'Eyes of Night');
-
-
-

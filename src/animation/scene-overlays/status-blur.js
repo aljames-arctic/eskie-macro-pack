@@ -2,6 +2,7 @@
 // Updates by: Bakana
 
 import { log } from '../../lib/logger.js';
+import { adapter } from '../../adapters/index.js';
 
 const DEFAULT_CONFIG = {
     id: 'drunken-blur',
@@ -10,14 +11,15 @@ const DEFAULT_CONFIG = {
     sway: 1,
     durationX: 7000,
     durationY: 11000,
-}
+};
 
 function create(users = [], config = {}){
     // Catch the case where we pass in an array of users
     // Preference of this create function is single users
     const seq = new Sequence();
-    if (!canvas?.scene?.background?.src) {
-        log.warn('canvas.scene.background.src not set. Background blurring failed');
+    const bg = adapter.getSceneBackground(canvas?.scene);
+    if (!bg?.src) {
+        log.warn('Scene background texture not set. Background blurring failed');
         return seq;
     }
 
@@ -28,17 +30,17 @@ function create(users = [], config = {}){
 
     const { id, opacity, blur, sway, durationX, durationY } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
 
-    const x = canvas.scene.dimensions.width / 2;
-    const y = canvas.scene.dimensions.height / 2;
-    const drift = (canvas.grid.size / 8) * sway;
+    const x = (canvas?.scene?.dimensions?.width ?? canvas?.dimensions?.width ?? 0) / 2;
+    const y = (canvas?.scene?.dimensions?.height ?? canvas?.dimensions?.height ?? 0) / 2;
+    const drift = ((canvas?.grid?.size ?? 100) / 8) * sway;
 
     seq.effect()
             .name(`${id} - ${users.name}`)
-            .file(canvas.scene.background.src)
+            .file(bg.src)
             .atLocation({ x, y })
             .size({
-                width: canvas.scene.dimensions.sceneWidth,
-                height: canvas.scene.dimensions.sceneHeight
+                width: canvas?.scene?.dimensions?.sceneWidth ?? canvas?.dimensions?.sceneWidth ?? canvas?.dimensions?.width ?? 100,
+                height: canvas?.scene?.dimensions?.sceneHeight ?? canvas?.dimensions?.sceneHeight ?? canvas?.dimensions?.height ?? 100
             })
             .belowTokens()
             .belowTiles()
@@ -47,7 +49,7 @@ function create(users = [], config = {}){
             .loopProperty('spriteContainer', 'position.x', { from: -drift, to: drift, duration: durationX, pingPong: true })
             .loopProperty('spriteContainer', 'position.y', { from: -drift, to: drift, duration: durationY, pingPong: true })
             .forUsers(users.id)
-            .persist()
+            .persist();
     return seq;
 }
 

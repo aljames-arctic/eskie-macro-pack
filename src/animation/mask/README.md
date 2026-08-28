@@ -82,7 +82,7 @@ flowchart TD
 
 1. **Base Scene Background (Layer 1)**: The standard Foundry VTT canvas map tile.
 2. **Masked Scene Background Cutout (Layer 2)**:
-   - Uses `Sequencer.effect().file(canvas.scene.background.src).mask(sceneRevealMask).belowTokens()`.
+   - Uses `Sequencer.effect().file(adapter.getSceneBackground(canvas.scene).src).mask(sceneRevealMask).belowTokens()`.
    - *Why it is needed*: When a portal tears open or a token vanishes, the area behind the token must match the scene background cleanly. If there are background token drop-shadows or under-token lighting artifacts, this cutout ensures an unobstructed view directly through the portal aperture.
 3. **Portal / Environmental Background VFX (Layer 3)**:
    - Uses `Sequencer.effect().file(tokenOverlayPath).belowTokens()`.
@@ -155,7 +155,7 @@ graph LR
 
     subgraph SEQ["Sequencer Effects Chain"]
         E1["Token Sprite Clone<br/>(copySprite)"]
-        E2["Scene Background Cutout<br/>(canvas.scene.background)"]
+        E2["Scene Background Cutout<br/>(adapter.getSceneBackground)"]
         E3["Surface VFX Overlay<br/>(burn / energy texture)"]
     end
 

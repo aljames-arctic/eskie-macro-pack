@@ -3,6 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
+import { adapter } from '../../../adapters/index.js';
 
 const DEFAULT_CONFIG = {
     darkMap: true,
@@ -72,13 +73,14 @@ async function createMelee(token, target, config = {}) {
             .zIndex(2);
     }
 
-    if (darkMap && canvas?.scene?.background?.src) {
+    const bg = adapter.getSceneBackground(canvas?.scene);
+    if (darkMap && bg?.src) {
         sequence.effect()
-            .file(closest(canvas.scene.background.src))
+            .file(closest(bg.src))
             .filter('ColorMatrix', { brightness: 0.5 })
             .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
             .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
-            .spriteOffset({ x: -0 }, { gridUnits: true })
+            .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY })
             .duration(2500)
             .fadeIn(250)
             .fadeOut(500)
@@ -189,13 +191,14 @@ async function createRanged(token, target, config = {}) {
             .zIndex(2);
     }
 
-    if (darkMap && canvas?.scene?.background?.src) {
+    const bg = adapter.getSceneBackground(canvas?.scene);
+    if (darkMap && bg?.src) {
         sequence.effect()
-            .file(closest(canvas.scene.background.src))
+            .file(closest(bg.src))
             .filter('ColorMatrix', { brightness: 0.5 })
             .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
             .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
-            .spriteOffset({ x: -0 }, { gridUnits: true })
+            .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY })
             .duration(2000)
             .fadeIn(250)
             .fadeOut(500)
@@ -246,10 +249,11 @@ async function createTwilightMelee(token, target, config = {}) {
 
     const sequence = new Sequence();
 
-    if (darkMap && canvas?.scene?.background?.src) {
+    const bg = adapter.getSceneBackground(canvas?.scene);
+    if (darkMap && bg?.src) {
         sequence.effect()
             .name(`Casting ${target.document.name}`)
-            .file(closest(canvas.scene.background.src))
+            .file(closest(bg.src))
             .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
             .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
             .fadeIn(750)
@@ -258,7 +262,7 @@ async function createTwilightMelee(token, target, config = {}) {
             .filter('ColorMatrix', { brightness: 0 })
             .belowTokens()
             .opacity(0.5)
-            .spriteOffset({ x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY });
+            .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY });
     }
 
     sequence.wait(500);
@@ -341,10 +345,11 @@ async function createTwilightRanged(token, target, config = {}) {
 
     const sequence = new Sequence();
 
-    if (darkMap && canvas?.scene?.background?.src) {
+    const bg = adapter.getSceneBackground(canvas?.scene);
+    if (darkMap && bg?.src) {
         sequence.effect()
             .name(`Casting ${target.document.name}`)
-            .file(closest(canvas.scene.background.src))
+            .file(closest(bg.src))
             .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
             .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
             .fadeIn(750)
@@ -353,7 +358,7 @@ async function createTwilightRanged(token, target, config = {}) {
             .filter('ColorMatrix', { brightness: 0 })
             .belowTokens()
             .opacity(0.5)
-            .spriteOffset({ x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY });
+            .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY });
     }
 
     sequence.wait(500);

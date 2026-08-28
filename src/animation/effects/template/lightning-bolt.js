@@ -7,6 +7,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { template } from '../../../lib/templates.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
+import { adapter } from '../../../adapters/index.js';
 
 const DEFAULT_CONFIG = {
     id: 'Lightning Bolt',
@@ -51,10 +52,11 @@ async function create(token, config = {}) {
             .delay(500);
     }
 
-    if (canvas.scene.background.src && tintMap){
+    const bg = adapter.getSceneBackground(canvas?.scene);
+    if (bg?.src && tintMap){
         sequence.effect()
             .name(`Casting ${token.document.name}`)
-            .file(canvas.scene.background.src)
+            .file(bg.src)
             .filter("ColorMatrix", {saturate: 1, brightness: 0.6})
             .atLocation({x:(canvas.dimensions.width)/2,y:(canvas.dimensions.height)/2})
             .size({width:canvas.scene.width/canvas.grid.size, height:canvas.scene.height/canvas.grid.size}, {gridUnits: true})
@@ -63,8 +65,8 @@ async function create(token, config = {}) {
             .fadeOut(3000)
             .tint("#9eecff")
             .belowTokens()
-            .spriteOffset({x:-canvas.scene.background.offsetX,y:-canvas.scene.background.offsetY})
-    };
+            .spriteOffset({x:-bg.offsetX,y:-bg.offsetY});
+    }
 
     sequence.effect()
             .file(closest("jb2a.static_electricity.01.blue"))

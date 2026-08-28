@@ -3,6 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { autoanimations, CONCENTRATING } from '../../../integration/autoanimations.js';
+import { adapter } from '../../../adapters/index.js';
 
 const DEFAULT_CONFIG = {
     id: 'twilightSanctuary',
@@ -19,10 +20,11 @@ async function create(token, config = {}) {
     const label = `${id} - ${token.id}`;
     const seq = new Sequence();
 
-    if (darkMap && canvas?.scene?.background?.src) {
+    const bg = adapter.getSceneBackground(canvas?.scene);
+    if (darkMap && bg?.src) {
         seq.effect()
             .name(label)
-            .file(closest(canvas.scene.background.src))
+            .file(closest(bg.src))
             .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
             .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
             .fadeIn(750)
@@ -32,7 +34,7 @@ async function create(token, config = {}) {
             .belowTokens()
             .persist()
             .opacity(0.5)
-            .spriteOffset({ x: -canvas.scene.background.offsetX, y: -canvas.scene.background.offsetY });
+            .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY });
     }
 
     seq.wait(250);
@@ -125,4 +127,3 @@ export const twilightSanctuary = {
 autoanimations.register('twilightSanctuary', 'aura', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG, '0.0.0', 'Twilight Sanctuary');
 autoanimations.register('channelDivinityTwilightSanctuary', 'aura', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG, '0.0.0', 'Channel Divinity: Twilight Sanctuary');
 autoanimations.register(CONCENTRATING('twilightSanctuary', 'Twilight Sanctuary'), 'effect', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG);
-

@@ -1,6 +1,7 @@
 import { closest } from "../../../lib/filemanager.js";
 import { template } from '../../../lib/templates.js';
 import { autoanimations } from "../../../integration/autoanimations.js";
+import { adapter } from "../../../adapters/index.js";
 
 const DEFAULT_CONFIG = {
     id: 'starwardSword',
@@ -81,9 +82,10 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
     //Opening
     const mainSequence = new Sequence();
+    const bg = adapter.getSceneBackground(canvas?.scene);
     mainSequence
         .effect()
-        .file(canvas.scene.background.src)
+        .file(bg?.src)
         .name("Starward Sword")
         .filter("ColorMatrix", { brightness: 0.3 })
         .atLocation({ x: (canvas.dimensions.width) / 2, y: (canvas.dimensions.height) / 2 })
@@ -92,8 +94,9 @@ async function createStarwardSword(token, config = {}, options = {}) {
         .fadeIn(500)
         .fadeOut(1000)
         .belowTokens()
+        .spriteOffset({ x: -(bg?.offsetX ?? 0), y: -(bg?.offsetY ?? 0) })
         .playIf(() => {
-            return darkMap == true;
+            return Boolean(darkMap && bg?.src);
         })
 
         .thenDo(function () {

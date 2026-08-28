@@ -2,7 +2,7 @@ import { BaseModuleAdapter } from "../base-module-adapter.js";
 import { MODULE_ID } from "../../../lib/constants.js";
 import { log } from '../../../lib/logger.js';
 import { localize } from "../../../lib/utils.js";
-import { BlfxAutorecUpdateFormApplication, generateBlfxAutorecUpdate } from "./updateMenu.js";
+import { BlfxAutorecUpdateFormApplication, generateBlfxAutorecUpdate } from "../../../ui/blfx/updateMenu.js";
 
 /**
  * Internal registry storing Boss Loot FX auto-recognition entries grouped by system -> item -> activity -> trigger.

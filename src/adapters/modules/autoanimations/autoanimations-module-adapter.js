@@ -2,7 +2,7 @@ import { BaseModuleAdapter } from "../base-module-adapter.js";
 import { MODULE_ID } from "../../../lib/constants.js";
 import { dependency } from "../../../lib/dependency.js";
 import { defaultMenuSettings } from "./defaultMenuSettings.js";
-import { autorecUpdateFormApplication, generateAutorecUpdate } from "./updateMenu.js";
+import { autorecUpdateFormApplication, generateAutorecUpdate } from "../../../ui/autoanimations/updateMenu.js";
 import { blfxAdapter } from "../blfx/blfx-module-adapter.js";
 import { log } from '../../../lib/logger.js';
 import { localize, format } from "../../../lib/utils.js";

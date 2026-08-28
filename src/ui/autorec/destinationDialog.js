@@ -1,8 +1,8 @@
-import { MODULE_ID } from "../../../lib/constants.js";
-import { log } from '../../../lib/logger.js';
-import { autoanimations } from "../autoanimations/autoanimations.js";
-import { blfx } from "../blfx/blfx.js";
-import { BaseFoundryAdapter } from "../../foundry/index.js";
+import { MODULE_ID } from "../../lib/constants.js";
+import { log } from '../../lib/logger.js';
+import { autoanimations } from "../../adapters/modules/autoanimations/autoanimations.js";
+import { blfx } from "../../adapters/modules/blfx/blfx.js";
+import { BaseFoundryAdapter } from "../../adapters/foundry/index.js";
 
 const foundryPlatform = new BaseFoundryAdapter();
 
@@ -35,7 +35,7 @@ export class AutorecDestinationDialog extends foundryPlatform.HandlebarsApplicat
     static get PARTS() {
         return {
             form: {
-                template: `modules/${MODULE_ID}/src/adapters/modules/autorec/destinationDialog.html`
+                template: `modules/${MODULE_ID}/src/ui/autorec/destinationDialog.html`
             }
         };
     }

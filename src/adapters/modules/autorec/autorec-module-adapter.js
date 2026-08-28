@@ -3,7 +3,7 @@ import { log } from '../../../lib/logger.js';
 import { localize, format } from "../../../lib/utils.js";
 import { autoanimationsAdapter } from "../autoanimations/autoanimations-module-adapter.js";
 import { blfxAdapter } from "../blfx/blfx-module-adapter.js";
-import { AutorecDestinationDialog } from "./destinationDialog.js";
+import { AutorecDestinationDialog } from "../../../ui/autorec/destinationDialog.js";
 
 /**
  * Unified Auto-Recognition (Autorec) Manager for Eskie Macro Pack.

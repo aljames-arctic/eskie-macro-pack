@@ -1,7 +1,7 @@
-import { MODULE_ID } from "../../../lib/constants.js";
-import { EMP_BLFX_Registry } from "./blfx.js";
-import { log } from '../../../lib/logger.js';
-import { BaseFoundryAdapter } from '../../foundry/index.js';
+import { MODULE_ID } from "../../lib/constants.js";
+import { EMP_BLFX_Registry } from "../../adapters/modules/blfx/blfx.js";
+import { log } from '../../lib/logger.js';
+import { BaseFoundryAdapter } from '../../adapters/foundry/index.js';
 
 const foundryPlatform = new BaseFoundryAdapter();
 
@@ -196,7 +196,7 @@ export class BlfxAutorecUpdateApp extends foundryPlatform.HandlebarsApplicationM
     static get PARTS() {
         return {
             form: {
-                template: `modules/${MODULE_ID}/src/adapters/modules/blfx/autorecUpdateMenu.html`
+                template: `modules/${MODULE_ID}/src/ui/blfx/autorecUpdateMenu.html`
             }
         };
     }

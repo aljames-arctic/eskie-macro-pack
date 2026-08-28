@@ -1,7 +1,7 @@
-import { MODULE_ID } from "../../../lib/constants.js";
-import { EMP_AA_Menu } from "./autoanimations.js";
-import { log } from '../../../lib/logger.js';
-import { BaseFoundryAdapter } from '../../foundry/index.js';
+import { MODULE_ID } from "../../lib/constants.js";
+import { EMP_AA_Menu } from "../../adapters/modules/autoanimations/autoanimations.js";
+import { log } from '../../lib/logger.js';
+import { BaseFoundryAdapter } from '../../adapters/foundry/index.js';
 
 const foundryPlatform = new BaseFoundryAdapter();
 
@@ -124,7 +124,7 @@ export class AutorecUpdateApp extends foundryPlatform.HandlebarsApplicationMixin
     static get PARTS() {
         return {
             form: {
-                template: `modules/${MODULE_ID}/src/adapters/modules/autoanimations/autorecUpdateMenu.html`
+                template: `modules/${MODULE_ID}/src/ui/autoanimations/autorecUpdateMenu.html`
             }
         };
     }

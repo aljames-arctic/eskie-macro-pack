@@ -1,7 +1,7 @@
-import { MODULE_ID } from "../lib/constants.js";
-import { updateWorldScripts } from "./loader.js";
-import { log } from '../lib/logger.js';
-import { adapter } from '../adapters/index.js';
+import { MODULE_ID } from "../../lib/constants.js";
+import { updateWorldScripts } from "../../world-scripts/loader.js";
+import { log } from '../../lib/logger.js';
+import { adapter } from '../../adapters/index.js';
 
 export const WORLD_SCRIPTS_REGISTRY = [
     {
@@ -33,7 +33,7 @@ export class WorldScriptsApp extends adapter.foundry.HandlebarsApplicationMixin(
     static get PARTS() {
         return {
             form: {
-                template: `modules/${MODULE_ID}/src/world-scripts/worldScriptsMenu.html`
+                template: `modules/${MODULE_ID}/src/ui/world-scripts/worldScriptsMenu.html`
             }
         };
     }

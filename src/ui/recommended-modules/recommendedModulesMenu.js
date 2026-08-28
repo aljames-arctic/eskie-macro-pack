@@ -1,6 +1,6 @@
-import { MODULE_ID } from "../lib/constants.js";
-import { log } from '../lib/logger.js';
-import { adapter } from '../adapters/index.js';
+import { MODULE_ID } from "../../lib/constants.js";
+import { log } from '../../lib/logger.js';
+import { adapter } from '../../adapters/index.js';
 
 export const RECOMMENDED_CATEGORIES = [
     {
@@ -197,7 +197,7 @@ export class RecommendedModulesApp extends adapter.foundry.HandlebarsApplication
     static get PARTS() {
         return {
             form: {
-                template: `modules/${MODULE_ID}/src/recommended-modules/recommendedModulesMenu.html`
+                template: `modules/${MODULE_ID}/src/ui/recommended-modules/recommendedModulesMenu.html`
             }
         };
     }

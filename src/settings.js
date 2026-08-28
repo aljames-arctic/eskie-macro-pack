@@ -4,7 +4,7 @@ import { BlfxAutorecUpdateFormApplication } from "./adapters/modules/blfx/update
 import { AutorecDestinationDialog } from "./adapters/modules/autorec/destinationDialog.js";
 import { blfx } from "./adapters/modules/blfx/blfx.js";
 import { WorldScriptsFormApplication } from "./world-scripts/worldScriptsMenu.js";
-import { RecommendedModulesFormApplication } from "./recommended-modules/recommendedModulesMenu.js";
+import { RecommendedModulesFormApplication } from "./ui/recommended-modules/recommendedModulesMenu.js";
 import { updateMacroCompendiums } from "./lib/standalone-macros.js";
 import { log } from './lib/logger.js';
 import { adapter } from "./adapters/index.js";

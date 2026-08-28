@@ -1,5 +1,5 @@
 import { BaseSystemAdapter } from './base-system-adapter.js';
-import { midiQolAdapter } from '../module/midi-qol-module-adapter.js';
+import { midiQolAdapter } from '../modules/midi-qol/midi-qol-module-adapter.js';
 import { log } from '../../lib/logger.js';
 
 /**

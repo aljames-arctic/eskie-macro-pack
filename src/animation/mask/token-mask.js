@@ -2,7 +2,6 @@
 //Author: .eskie
 
 import { time } from '../../lib/time.js';
-import { object as objectAttachment, getDocumentName } from '../../lib/object.js';
 import { absolutePath } from '../../lib/filemanager.js';
 import { dependency } from '../../lib/dependency.js';
 import { socket, socketlib } from '../../integration/socketlib.js';
@@ -30,7 +29,7 @@ const DEFAULT_CONFIG = {
 
 /* Works for tokens and tiles */
 async function createMaskTiles(object, config = {}) {
-    const widthAdjustment = (getDocumentName(object) === 'Token') ? canvas.grid.size : 1;
+    const widthAdjustment = adapter.isDocumentOfType(object, 'Token') ? canvas.grid.size : 1;
 
     const { revealOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const revealOverlayPath = absolutePath(revealOverlay);
@@ -100,8 +99,8 @@ async function createLocal(object, tileIds, animationId, config = {}) {
         throw new Error("tokenMaskEffect.createLocal: 'animationId' is required.");
     }
 
-    const isToken = getDocumentName(object) === 'Token';
-    const isTile = getDocumentName(object) === 'Tile';
+    const isToken = adapter.isDocumentOfType(object, 'Token');
+    const isTile = adapter.isDocumentOfType(object, 'Tile');
     if (!isToken && !isTile) {
         ui.notifications?.warn("Eskie Macros | Provided object is not a Token or a Tile.");
         return log.warn("tokenMaskEffect.createLocal: Invalid object type. Effect aborted.");
@@ -261,8 +260,8 @@ async function create(object, config = {}) {
         return log.warn("tokenMaskEffect: No object provided. Effect aborted.");
     }
 
-    const isToken = getDocumentName(object) === 'Token';
-    const isTile = getDocumentName(object) === 'Tile';
+    const isToken = adapter.isDocumentOfType(object, 'Token');
+    const isTile = adapter.isDocumentOfType(object, 'Tile');
     if (!isToken && !isTile) {
         ui.notifications?.warn("Eskie Macros | Provided object is not a Token or a Tile.");
         return log.warn("tokenMaskEffect: Invalid object type. Effect aborted.");
@@ -306,7 +305,7 @@ async function playSocketed(object, config = {}) {
     await socket.object.edit(object.id, { [`flags.eskie-macros.token-masks.${animationId}`]: tileIds });
 
     // 3. Attach tiles to object
-    await objectAttachment.attach(tiles, object);
+    await adapter.attachPlaceableElements(tiles, object);
 
     // 4. Set up the tracking promise for all active users
     const activeUserIds = game.users.filter(u => u.active).map(u => u.id);

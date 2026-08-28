@@ -1,4 +1,4 @@
-import { tokens } from "../../../lib/tokens.js"
+import { adapter } from "../../../adapters/index.js";
 import { blur } from "../../scene-overlays/status-blur.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
 import { log } from '../../../lib/logger.js';
@@ -24,7 +24,7 @@ const DEFAULT_CONFIG = {
 function create(token, config = {}) {
     const { overlay, configs } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const seq = new Sequence();
-    const owners = tokens.owners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
+    const owners = adapter.getTokenOwners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
 
     const SEQUENCER_DEFAULT_OPACITY = 50;
     if (!overlay.applyGM && game.settings.get('sequencer', 'user-effect-opacity') === SEQUENCER_DEFAULT_OPACITY) {
@@ -45,7 +45,7 @@ async function play(token, config = {}) {
 
 async function stop(token, config = {}) {
     const { id, overlay, configs } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const owners = tokens.owners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
+    const owners = adapter.getTokenOwners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
     return Promise.all(configs.map(c => blur.stop(owners, c)));
 }
 

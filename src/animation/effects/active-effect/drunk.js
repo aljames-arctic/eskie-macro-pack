@@ -1,5 +1,5 @@
 import { closest } from "../../../lib/filemanager.js";
-import { tokens } from "../../../lib/tokens.js";
+import { adapter } from "../../../adapters/index.js";
 import { blur } from "../../scene-overlays/status-blur.js";
 import { autoanimations } from "../../../integration/autoanimations.js";
 import { log } from '../../../lib/logger.js';
@@ -94,7 +94,7 @@ async function play(token, config = {}) {
             log.warn('Sequencer user-effect-opacity is set to default (50). This may cause the blurred vision effect to appear for GMs as well. Consider lowering this if this is not intended.');
         }
 
-        const owners = tokens.owners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
+        const owners = adapter.getTokenOwners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
         blur.drunk.play(owners);
     }
 }
@@ -102,7 +102,7 @@ async function play(token, config = {}) {
 async function stop(token, config = {}) {
     const { id, overlay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     if (overlay.applyPC || overlay.applyGM) {
-        const owners = tokens.owners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
+        const owners = adapter.getTokenOwners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
         blur.drunk.stop(owners)
     }
     

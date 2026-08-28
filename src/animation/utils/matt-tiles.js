@@ -2,8 +2,7 @@ import { time } from '../../lib/time.js';
 import { dependency } from '../../lib/dependency.js';
 import { socket } from '../../integration/socketlib.js';
 import { SECONDS, MODULE_ID } from '../../lib/constants.js';
-import { dialog } from '../../lib/dialog.js';
-import { object } from '../../lib/object.js';
+import { adapter } from '../../adapters/index.js';
 
 const DEFAULT_CONFIG = {
     id: 'generic-tile-movement',
@@ -54,7 +53,7 @@ async function start(token, code, config = {}) {
     await socket.tile.edit(tile.id, updateData);
     await Tagger.addTags(tile, label);
 
-    await object.attach([tile], token);
+    await adapter.attachPlaceableElements([tile], token);
     await tile.setFlag(MODULE_ID, id, { tileData: getCenter(tile) });
     await tile.setFlag(MODULE_ID, 'config', nonInfoConfig);
 }
@@ -100,7 +99,7 @@ async function setup(animation, config = {}) {
     const tileCount = config.tileCount ?? 2;
 
     // Step 1: Prompt user to select trigger tiles
-    const triggerResult = await dialog.buttonDialog({
+    const triggerResult = await adapter.buttonDialog({
         title: game.i18n.format('EMP.traps.setup.step1Title', { name: trapKey }),
         buttons: [
             { label: game.i18n.localize('EMP.traps.common.continue'), value: 'continue' },
@@ -120,7 +119,7 @@ async function setup(animation, config = {}) {
 
     if (tileCount === 3) {
         // Step 2: Prompt user to select trap origin/launcher tiles
-        const originResult = await dialog.buttonDialog({
+        const originResult = await adapter.buttonDialog({
             title: game.i18n.format('EMP.traps.setup.step2OriginTitle', { name: trapKey }),
             buttons: [
                 { label: game.i18n.localize('EMP.traps.common.continue'), value: 'continue' },
@@ -136,7 +135,7 @@ async function setup(animation, config = {}) {
         if (originTiles.length === 0) return ui.notifications.warn(game.i18n.localize('EMP.traps.setup.noOriginTiles'));
 
         // Step 3: Prompt user to select trap target/landing tiles
-        const targetResult = await dialog.buttonDialog({
+        const targetResult = await adapter.buttonDialog({
             title: game.i18n.format('EMP.traps.setup.step3TargetTitle', { name: trapKey }),
             buttons: [
                 { label: game.i18n.localize('EMP.traps.common.continue'), value: 'continue' },
@@ -155,7 +154,7 @@ async function setup(animation, config = {}) {
         }
     } else {
         // Step 2: Prompt user to select trap animation tiles
-        const trapResult = await dialog.buttonDialog({
+        const trapResult = await adapter.buttonDialog({
             title: game.i18n.format('EMP.traps.setup.step2AnimTitle', { name: trapKey }),
             buttons: [
                 { label: game.i18n.localize('EMP.traps.common.continue'), value: 'continue' },
@@ -177,7 +176,7 @@ async function setup(animation, config = {}) {
     const extraTileResults = {};
     if (config.extraTiles) {
         for (const extra of config.extraTiles) {
-            const extraResult = await dialog.buttonDialog({
+            const extraResult = await adapter.buttonDialog({
                 title: game.i18n.format('EMP.traps.setup.extraTitle', { name: extra.label }),
                 buttons: [
                     { label: game.i18n.localize('EMP.traps.common.continue'), value: 'continue' },
@@ -267,7 +266,7 @@ originIds.forEach(id => {
 
 async function stop(token, label) {
     const tiles = Tagger.getByTag(label);
-    await object.detach(tiles, token);
+    await adapter.detachPlaceableElements(tiles, token);
     tiles.forEach(async (tile) => await socket.tile.destroy(tile.id));
 }
 

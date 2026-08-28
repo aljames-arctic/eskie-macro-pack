@@ -1,3 +1,5 @@
+import { dependency } from '../../lib/dependency.js';
+
 /**
  * User permission tiers for ownership priority evaluation.
  * Tier 1: Players (least permissions)
@@ -741,5 +743,96 @@ export class BaseFoundryAdapter {
         }
 
         return bestPoint;
+    }
+
+    /**
+     * Returns an array of users who are owners of a given token.
+     * Evaluates document ownership permissions via user permission tiers and ownership levels.
+     * @param {Token|TokenDocument} token Token placeable or document
+     * @param {object} [config={}] Configuration options
+     * @param {boolean} [config.applyPC=true] Whether to include player characters
+     * @param {boolean} [config.applyGM=true] Whether to include Game Masters
+     * @returns {User[]} Array of User objects
+     */
+    getTokenOwners(token, config = {}) {
+        if (!token) return [];
+        const applyPC = config.applyPC !== false;
+        const applyGM = config.applyGM !== false;
+        const doc = token.document ?? token;
+        const actor = token.actor ?? doc?.actor ?? null;
+
+        const usersCollection = globalThis.game?.users;
+        const allUsers = usersCollection?.contents
+            ?? (usersCollection?.values ? Array.from(usersCollection.values()) : null)
+            ?? (usersCollection ? Array.from(usersCollection) : []);
+
+        let matched = allUsers.filter(user => this.isUserDocumentOwner(user, actor, doc));
+        if (!applyPC) matched = matched.filter(user => Boolean(user.isGM));
+        if (!applyGM) matched = matched.filter(user => !user.isGM);
+        return matched;
+    }
+
+    /* -------------------------------------------- */
+    /*  Placeable Element Attachment Operations     */
+    /* -------------------------------------------- */
+
+    /**
+     * Attaches elements to a target PlaceableObject (Token or Tile).
+     * If the target is a Tile, uses Baileywiki Mass Edit if active.
+     * If the target is a Token, falls back to Token Attacher or Mass Edit.
+     * @param {Array} elements Elements to attach
+     * @param {PlaceableObject|Document} target Target Token or Tile
+     * @returns {Promise<unknown>}
+     */
+    async attachPlaceableElements(elements, target) {
+        const isTile = this.isDocumentOfType(target, 'Tile');
+
+        if (isTile) {
+            dependency.required([
+                { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
+            ]);
+            return Promise.all(elements.map(element => globalThis.MassEdit?.linker?.link?.([element, target])));
+        }
+
+        // Default Token behavior
+        if (dependency.isActivated({ id: 'token-attacher', ref: "Token Attacher" })) {
+            return globalThis.tokenAttacher?.attachElementsToToken?.(elements, target, true);
+        } else if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
+            return Promise.all(elements.map(element => globalThis.MassEdit?.linker?.link?.([element, target])));
+        }
+
+        dependency.someRequired([
+            { id: 'token-attacher', ref: "Token Attacher" },
+            { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
+        ]);
+    }
+
+    /**
+     * Detaches elements from a target PlaceableObject (Token or Tile).
+     * @param {Array} elements Elements to detach
+     * @param {PlaceableObject|Document} target Target Token or Tile
+     * @returns {Promise<unknown>}
+     */
+    async detachPlaceableElements(elements, target) {
+        const isTile = this.isDocumentOfType(target, 'Tile');
+
+        if (isTile) {
+            dependency.required([
+                { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
+            ]);
+            return Promise.all(elements.map(element => globalThis.MassEdit?.linker?.removeLinks?.([element, target])));
+        }
+
+        // Default Token behavior
+        if (dependency.isActivated({ id: 'token-attacher', ref: "Token Attacher" })) {
+            return globalThis.tokenAttacher?.detachElementsFromToken?.(elements, target, true);
+        } else if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
+            return Promise.all(elements.map(element => globalThis.MassEdit?.linker?.removeLinks?.([element, target])));
+        }
+
+        dependency.someRequired([
+            { id: 'token-attacher', ref: "Token Attacher" },
+            { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
+        ]);
     }
 }

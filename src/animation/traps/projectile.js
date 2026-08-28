@@ -7,7 +7,7 @@ import { MODULE_ID } from '../../lib/constants.js';
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
-import { dialog } from '../../lib/dialog.js';
+import { adapter } from '../../adapters/index.js';
 
 const DEFAULT_CONFIG = {
     repeats: 10,
@@ -163,7 +163,7 @@ async function stop(tile, config = {}) {
 async function setup(config = {}) {
     let projectileType = config.projectileType;
     if (!projectileType) {
-        projectileType = await dialog.buttonDialog({
+        projectileType = await adapter.buttonDialog({
             title: game.i18n.localize('EMP.traps.projectile.chooseTypeTitle'),
             buttons: [
                 { label: game.i18n.localize('EMP.traps.projectile.arrow'), value: 'arrow' },

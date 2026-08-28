@@ -1,8 +1,4 @@
-//Last Updated: 12/15/2025
-//Author: .eskie
-//Update: bakanabaka
-
-import { tokens } from '../../../lib/tokens.js';
+import { adapter } from '../../../adapters/index.js';
 import { closest } from '../../../lib/filemanager.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
@@ -28,7 +24,7 @@ async function createMelee(token, target, config = {}) {
     let effectOffset = -0.75 - (0.25 * weightIndex);
 
     //Determine nearest targetSquare
-    let targetSquare = tokens.getNearestSquareCenter(token, target);
+    let targetSquare = adapter.getNearestSquareCenter(token, target);
 
     let seq = new Sequence()
 

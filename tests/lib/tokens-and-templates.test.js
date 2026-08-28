@@ -2,7 +2,6 @@ import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { template } from '../../src/lib/templates.js';
-import { tokens } from '../../src/lib/tokens.js';
 import { adapter, FoundryCurrentAdapter } from '../../src/adapters/index.js';
 
 test('template.getPosition delegates to adapter.getTemplatePosition', async () => {
@@ -28,7 +27,7 @@ test('template.getPosition delegates to adapter.getTemplatePosition', async () =
     assert.deepEqual(pos[2], { x: 150, y: 250 });
 });
 
-test('tokens.owners and tokens.getDistance function contracts', () => {
+test('adapter.getTokenOwners and adapter.getDistance function contracts', () => {
     const p1 = { id: 'p1', isGM: false, active: true };
     const p2 = { id: 'p2', isGM: false, active: true };
     const gm = { id: 'gm1', isGM: true, role: 4, active: true };
@@ -49,12 +48,12 @@ test('tokens.owners and tokens.getDistance function contracts', () => {
         document: { id: 't1', actor }
     };
 
-    const allOwners = tokens.owners(token);
+    const allOwners = adapter.getTokenOwners(token);
     assert.equal(allOwners.length, 2); // p1 and GM
     assert.ok(allOwners.includes(p1));
     assert.ok(allOwners.includes(gm));
 
-    const pcOnly = tokens.owners(token, { applyGM: false });
+    const pcOnly = adapter.getTokenOwners(token, { applyGM: false });
     assert.equal(pcOnly.length, 1);
     assert.equal(pcOnly[0], p1);
 
@@ -64,5 +63,5 @@ test('tokens.owners and tokens.getDistance function contracts', () => {
     const t1 = { center: { x: 0, y: 0 }, document: { elevation: 0 } };
     const t2 = { center: { x: 300, y: 400 }, document: { elevation: 0 } };
     // 300, 400 -> hypot = 500 px. 500 / 100 * 5 = 25 scene units.
-    assert.equal(tokens.getDistance(t1, t2), 25);
+    assert.equal(adapter.getDistance(t1, t2), 25);
 });

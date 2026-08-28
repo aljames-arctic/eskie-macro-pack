@@ -4,7 +4,7 @@
 ** */
 
 import { closest } from '../../../lib/filemanager.js';
-import { dialog } from '../../../lib/dialog.js';
+import { adapter } from '../../../adapters/index.js';
 import { autoanimations } from '../../../integration/autoanimations.js';
 
 const DEFAULT_CONFIG = {
@@ -37,7 +37,7 @@ async function createShapechange(token, config = {}) {
     }
 
     // Ask the player which form to shift into.
-    const choice = await dialog.buttonDialog({
+    const choice = await adapter.buttonDialog({
         title: 'Change Shape',
         buttons: [
             { label: 'Hybrid Form', value: 'hybrid' },

@@ -168,6 +168,18 @@ export class Adapter {
         return this.foundry.getNearestSquareCenter(token, target);
     }
 
+    getTokenOwners(token, config = {}) {
+        return this.foundry.getTokenOwners(token, config);
+    }
+
+    attachPlaceableElements(elements, target) {
+        return this.foundry.attachPlaceableElements(elements, target);
+    }
+
+    detachPlaceableElements(elements, target) {
+        return this.foundry.detachPlaceableElements(elements, target);
+    }
+
     /* -------------------------------------------- */
     /*  System Layer Delegates                      */
     /* -------------------------------------------- */

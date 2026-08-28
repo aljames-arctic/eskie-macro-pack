@@ -3,7 +3,7 @@ import { settingsOverride } from "../../lib/settings.js";
 import { closest } from "../../lib/filemanager.js";
 import { socket } from "../../integration/socketlib.js";
 import { log } from "../../lib/logger.js";
-import { getDocumentName } from "../../lib/object.js";
+import { adapter } from "../../adapters/index.js";
 
 const DEFAULT_CONFIG = {
     id: 'swordArtOnlineShatter',
@@ -33,7 +33,7 @@ async function create(object, config = {}) {
             .fadeOutAudio(500);
     }
 
-    const widthAdjustment = (getDocumentName(object) === 'Token') ? canvas.grid.size : 1;
+    const widthAdjustment = adapter.isDocumentOfType(object, 'Token') ? canvas.grid.size : 1;
     const [visibleTile] = await socket.tile.create({
         "texture.src": null,
         "alpha": 1,                // Alphe must be 1 or else the animation will not render

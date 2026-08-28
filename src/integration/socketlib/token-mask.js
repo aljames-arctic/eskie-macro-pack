@@ -1,7 +1,6 @@
 import { MODULE_ID } from "../../lib/constants.js";
 import { log } from '../../lib/logger.js';
 import { socket, socketlib } from "../socketlib.js";
-import { object as objectAttachment } from "../../lib/object.js";
 import { tokenMaskEffect, tokenMaskTracker, playLocal, stopLocal } from "../../animation/mask/token-mask.js";
 import { tile } from "./tile.js";
 import { adapter } from "../../adapters/index.js";
@@ -82,7 +81,7 @@ async function cleanUpTokenMask(tokenId, animationId, tileIds, deleteObject) {
         // Resolve tiles and detach them in the database
         const tiles = tileIds ? tileIds.map(id => canvas.scene.tiles.get(id)).filter(t => t) : [];
         if (tiles.length > 0) {
-            await objectAttachment.detach(tiles, object);
+            await adapter.detachPlaceableElements(tiles, object);
         }
     }
 

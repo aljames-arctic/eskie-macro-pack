@@ -3,9 +3,9 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { primMST } from "../../../lib/algorithms.js";
-import { tokens } from "../../../lib/tokens.js";
 import { settingsOverride } from "../../../lib/settings.js";
 import { log } from "../../../lib/logger.js";
+import { adapter } from "../../../adapters/index.js";
 
 const DEFAULT_CONFIG = {
     releaseDelay: 200,
@@ -29,13 +29,14 @@ function create(token, targetTokens, config = {}) {
     config = settingsOverride(config);
     config = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     if (!targetTokens || targetTokens.length === 0) {
-        log.warn("Chain Lightning (Adjacent): No targets provided.");
-        return new Sequence();
+        log.warn("Chain Lightning called with no targets.");
+        return null;
     }
 
+    // Build the Minimum Spanning Tree using Prim's Algorithm
     const { sound } = config;
     const N = targetTokens.length;
-    const A = primMST(targetTokens, tokens.getDistance, config.fudgeFactor);
+    const A = primMST(targetTokens, (t1, t2) => adapter.getDistance(t1, t2), config.fudgeFactor);
 
     // 1. Build propagationLevels of levels using BFS on the MST tree structure
     // propagationLevels = [ 

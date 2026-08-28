@@ -295,4 +295,37 @@ test('getDistance and getNearestSquareCenter 3D math', () => {
     assert.deepEqual(nearest, { x: 350, y: 450 });
 });
 
+test('getTokenOwners and placeable attachment contracts on BaseFoundryAdapter', async () => {
+    const v12 = new BaseFoundryAdapter();
+
+    const p1 = { id: 'p1', isGM: false, active: true };
+    const gm = { id: 'gm1', isGM: true, role: 4, active: true };
+    game.users = [p1, gm];
+
+    const actor = {
+        ownership: { p1: 3, default: 0 },
+        getUserLevel: (u) => u.id === 'p1' ? 3 : 0
+    };
+    const token = { actor, document: { id: 't1', actor } };
+
+    const owners = v12.getTokenOwners(token);
+    assert.equal(owners.length, 2);
+    assert.ok(owners.includes(p1));
+    assert.ok(owners.includes(gm));
+
+    // Attachment with Token Attacher mock
+    globalThis.tokenAttacher = {
+        attachElementsToToken: async (elements, target) => ({ attached: true, count: elements.length }),
+        detachElementsFromToken: async (elements, target) => ({ detached: true, count: elements.length })
+    };
+    game.modules.set('token-attacher', { id: 'token-attacher', active: true });
+
+    const attachRes = await v12.attachPlaceableElements([{ id: 'tile-1' }], token);
+    assert.deepEqual(attachRes, { attached: true, count: 1 });
+
+    const detachRes = await v12.detachPlaceableElements([{ id: 'tile-1' }], token);
+    assert.deepEqual(detachRes, { detached: true, count: 1 });
+});
+
+
 

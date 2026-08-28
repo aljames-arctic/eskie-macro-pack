@@ -1,4 +1,4 @@
-import { dialog } from '../../lib/dialog.js';
+import { adapter } from '../../adapters/index.js';
 import { localize, format } from '../../lib/utils.js';
 
 import { bullRushStatue } from './bull-rush-statue.js';
@@ -24,7 +24,7 @@ async function setup (config = {}) {
         return { label, value: key };
     });
 
-    const chosenTrapKey = await dialog.buttonDialog({
+    const chosenTrapKey = await adapter.buttonDialog({
         title: localize('EMP.traps.setup.chooseTrapTitle'),
         buttons: buttons,
     }, {

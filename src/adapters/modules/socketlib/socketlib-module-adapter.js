@@ -39,8 +39,8 @@ export class SocketlibModuleAdapter extends BaseModuleAdapter {
      * @returns {Promise<void>}
      */
     async register() {
-        if (!globalThis.socketlib) return;
-        const socket = globalThis.socketlib.registerModule(MODULE_ID);
+        if (!socketlib) return;
+        const socket = socketlib.registerModule(MODULE_ID);
         const socketAPI = {
             doorSockets: this.doorSockets,
             tileSockets: this.tileSockets,

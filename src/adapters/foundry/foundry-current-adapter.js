@@ -55,7 +55,7 @@ export class FoundryCurrentAdapter extends BaseFoundryAdapter {
      */
     getCombatantsByToken(combat, token) {
         if (!combat) return [];
-        const tokenId = typeof token === 'string' ? token : (token?.id ?? token?.document?.id);
+        const tokenId = token?.id ?? token?.document?.id ?? token;
         if (!tokenId) return [];
 
         return combat.getCombatantsByToken?.(tokenId) ?? super.getCombatantsByToken(combat, token);
@@ -145,8 +145,8 @@ export class FoundryCurrentAdapter extends BaseFoundryAdapter {
         const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(template.shapes);
 
         if (isRegion) {
-            const shapes = doc.shapes?.contents ?? (Array.isArray(doc.shapes) ? doc.shapes : (Array.isArray(template.shapes) ? template.shapes : []));
-            const shape = shapes[0] ?? (typeof doc.toObject === 'function' ? doc.toObject()?.shapes?.[0] : null);
+            const shapes = doc.shapes?.contents ?? doc.shapes ?? template.shapes ?? [];
+            const shape = shapes[0] ?? doc.toObject?.()?.shapes?.[0] ?? null;
 
             const primary = {
                 x: shape?.x ?? doc.x ?? template.x ?? 0,
@@ -195,14 +195,13 @@ export class FoundryCurrentAdapter extends BaseFoundryAdapter {
             ?? canvas?.level
             ?? scene.levels?.get?.(scene.activeLevel)
             ?? scene.levels?.contents?.[0]
-            ?? (Array.isArray(scene.levels) ? scene.levels[0] : null)
-            ?? (scene.levels?.values ? Array.from(scene.levels.values())[0] : null)
+            ?? scene.levels?.[0]
             ?? null;
 
         if (activeLevel) {
             const levelBg = activeLevel.background ?? activeLevel.textures?.background ?? activeLevel.texture ?? null;
             if (levelBg) {
-                const src = levelBg.src ?? (typeof levelBg === 'string' ? levelBg : null);
+                const src = levelBg.src ?? levelBg;
                 const offsetX = levelBg.offsetX ?? activeLevel.offsetX ?? 0;
                 const offsetY = levelBg.offsetY ?? activeLevel.offsetY ?? 0;
                 return { src, offsetX, offsetY };

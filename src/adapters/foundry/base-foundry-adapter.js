@@ -31,7 +31,7 @@ export class BaseFoundryAdapter {
      * Reference to parent unified adapter singleton.
      */
     get adapter() {
-        return this._adapter ?? (typeof globalThis !== 'undefined' ? globalThis.adapter : null);
+        return this._adapter ?? null;
     }
 
     set adapter(inst) {
@@ -42,14 +42,14 @@ export class BaseFoundryAdapter {
      * Access the Mass Edit module adapter via parent adapter navigation, falling back to singleton.
      */
     get massEdit() {
-        return this.adapter?.massEdit ?? (this.adapter?.getModule ? this.adapter.getModule('multi-token-edit') : null) ?? massEditAdapter;
+        return this.adapter?.massEdit ?? massEditAdapter;
     }
 
     /**
      * Access the Token Attacher module adapter via parent adapter navigation, falling back to singleton.
      */
     get tokenAttacher() {
-        return this.adapter?.tokenAttacher ?? (this.adapter?.getModule ? this.adapter.getModule('token-attacher') : null) ?? tokenAttacherAdapter;
+        return this.adapter?.tokenAttacher ?? tokenAttacherAdapter;
     }
 
     /**
@@ -57,14 +57,8 @@ export class BaseFoundryAdapter {
      * @returns {number}
      */
     get generation() {
-        if (typeof game !== 'undefined' && game.release?.generation !== undefined) {
-            return game.release.generation;
-        }
-        if (typeof game !== 'undefined' && game.version) {
-            const major = parseInt(String(game.version).split('.')[0], 10);
-            if (!Number.isNaN(major)) return major;
-        }
-        return 12;
+        const major = parseInt(String(game.release?.generation ?? game.version ?? "").split('.')[0], 10);
+        return Number.isNaN(major) ? 12 : major;
     }
 
     /**
@@ -99,21 +93,21 @@ export class BaseFoundryAdapter {
      * The active ApplicationV2 constructor (introduced in v12 under foundry.applications.api).
      */
     get ApplicationV2() {
-        return typeof foundry !== 'undefined' ? (foundry.applications?.api?.ApplicationV2 ?? class {}) : class {};
+        return foundry.applications?.api?.ApplicationV2 ?? class {};
     }
 
     /**
      * The active HandlebarsApplicationMixin wrapper (introduced in v12 under foundry.applications.api).
      */
     get HandlebarsApplicationMixin() {
-        return typeof foundry !== 'undefined' ? (foundry.applications?.api?.HandlebarsApplicationMixin ?? (Base => Base)) : (Base => class extends Base {});
+        return foundry.applications?.api?.HandlebarsApplicationMixin ?? (Base => Base);
     }
 
     /**
      * The active DialogV2 constructor (introduced in v12 under foundry.applications.api).
      */
     get DialogV2() {
-        return typeof foundry !== 'undefined' ? foundry.applications?.api?.DialogV2 : undefined;
+        return foundry.applications?.api?.DialogV2;
     }
 
     /**
@@ -304,7 +298,7 @@ export class BaseFoundryAdapter {
      */
     getCombatantsByToken(combat, token) {
         if (!combat) return [];
-        const tokenId = typeof token === 'string' ? token : (token?.id ?? token?.document?.id);
+        const tokenId = token?.id ?? token?.document?.id ?? token;
         if (!tokenId) return [];
 
         const single = combat.getCombatantByToken?.(tokenId);
@@ -319,7 +313,7 @@ export class BaseFoundryAdapter {
      */
     getCombatantByToken(combat, token) {
         if (!combat) return null;
-        const tokenId = typeof token === 'string' ? token : (token?.id ?? token?.document?.id);
+        const tokenId = token?.id ?? token?.document?.id ?? token;
         if (!tokenId) return null;
 
         return combat.getCombatantByToken?.(tokenId) ?? null;

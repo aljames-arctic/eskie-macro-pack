@@ -8,6 +8,10 @@ globalThis.Actor = class Actor {};
 globalThis.ChatMessage = class ChatMessage {};
 globalThis.Token = class Token {};
 globalThis.Tile = class Tile {};
+globalThis.tokenAttacher = undefined;
+globalThis.MassEdit = undefined;
+globalThis.socketlib = undefined;
+globalThis.adapter = undefined;
 
 globalThis.ContextMenu = class ContextMenu {
     constructor(element, selector, menuItems, options = {}) {

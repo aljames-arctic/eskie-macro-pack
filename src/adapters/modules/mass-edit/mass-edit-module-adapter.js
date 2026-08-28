@@ -17,7 +17,7 @@ export class MassEditModuleAdapter extends BaseModuleAdapter {
      * Access the active MassEdit Linker API instance.
      */
     get linker() {
-        return globalThis.MassEdit?.linker;
+        return MassEdit?.linker;
     }
 
     /**

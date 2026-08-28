@@ -5,7 +5,6 @@ import { BaseSystemAdapter } from '../../src/world-scripts/adapters/system/base.
 import { Dnd5eAdapter } from '../../src/world-scripts/adapters/system/dnd5e.js';
 import { Pf2eAdapter } from '../../src/world-scripts/adapters/system/pf2e.js';
 import { GenericAdapter } from '../../src/world-scripts/adapters/system/generic.js';
-import { midiQolAdapter } from '../../src/world-scripts/adapters/module/midiQol.js';
 import { parseAndNormalizeAbility, BASE_ABILITY_MAP } from '../../src/world-scripts/adapters/helper.js';
 
 test('world-scripts adapters re-export classes and functions cleanly', () => {
@@ -13,7 +12,6 @@ test('world-scripts adapters re-export classes and functions cleanly', () => {
     assert.ok(Dnd5eAdapter);
     assert.ok(Pf2eAdapter);
     assert.ok(GenericAdapter);
-    assert.ok(midiQolAdapter);
     assert.ok(parseAndNormalizeAbility);
     assert.ok(BASE_ABILITY_MAP);
 

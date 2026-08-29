@@ -5,6 +5,26 @@ import { localize } from "../../../lib/utils.js";
 import { BlfxAutorecUpdateFormApplication, generateBlfxAutorecUpdate } from "../../../ui/blfx/updateMenu.js";
 
 /**
+ * Checks whether the current Foundry environment is generation 14 or newer.
+ * @returns {boolean}
+ */
+export function isFoundryV14Plus() {
+    if (typeof game === 'undefined') return false;
+    const generation = game.release?.generation ?? parseInt(String(game.version ?? "0").split('.')[0], 10);
+    return Boolean(generation >= 14);
+}
+
+/**
+ * Checks whether Boss Loot FX Custom Auto-Recognition is supported and available.
+ * Requires Foundry v14+ AND the Patreon module ('boss-loot-assets-premium') to be active.
+ * Free module ('boss-loot-assets-free') does not support Custom Auto-Recognition.
+ * @returns {boolean}
+ */
+export function isBlfxAutorecAvailable() {
+    return isFoundryV14Plus() && Boolean(game?.modules?.get('boss-loot-assets-premium')?.active);
+}
+
+/**
  * Internal registry storing Boss Loot FX auto-recognition entries grouped by system -> item -> activity -> trigger.
  */
 export const EMP_BLFX_Registry = {};
@@ -373,15 +393,8 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
 
         if (!shouldUpdate) return;
 
-        const isBlfxActive = Boolean(
-            game?.modules?.get('boss-loot-assets-premium')?.active ||
-            game?.modules?.get('boss-loot-assets-free')?.active ||
-            game?.modules?.get('blfx')?.active ||
-            Hooks?.events?.['blfx.register.CustomAutoRec']
-        );
-
-        if (!isBlfxActive) {
-            log.debug("EMP | Boss Loot FX (BLFX) integration skipped: module not active.");
+        if (!this.isAutorecSupported()) {
+            log.debug("EMP | Boss Loot FX Custom Auto-Rec skipped: requires Foundry v14+ and the Patreon BLFX module (boss-loot-assets-premium).");
             return;
         }
 
@@ -393,6 +406,14 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
         } else {
             log.info(localize("EMP.blfxUpdateMenu.nothing", "All Eskie Macro Pack animations are up to date in Boss Loot FX!"));
         }
+    }
+
+    /**
+     * Checks whether Boss Loot FX Custom Auto-Recognition is available in the current environment.
+     * @returns {boolean}
+     */
+    isAutorecSupported() {
+        return isBlfxAutorecAvailable();
     }
 
     _getDevelopmentVersion() {
@@ -415,5 +436,7 @@ export const blfx = {
     buildBlfxPayload: () => blfxAdapter.buildPayload(),
     mergeBlfxCustomAutoRec: (existingData, empRegistry) => mergeBlfxCustomAutoRec(existingData, empRegistry ?? blfxAdapter.registry),
     submit: (force = false) => blfxAdapter.submit(force),
+    isAutorecAvailable: isBlfxAutorecAvailable,
+    isFoundryV14Plus,
     registry: EMP_BLFX_Registry
 };

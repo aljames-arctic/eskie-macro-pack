@@ -2,7 +2,7 @@ import { MODULE_ID } from "../../../lib/constants.js";
 import { log } from '../../../lib/logger.js';
 import { localize, format } from "../../../lib/utils.js";
 import { autoanimationsAdapter } from "../autoanimations/autoanimations-module-adapter.js";
-import { blfxAdapter } from "../blfx/blfx-module-adapter.js";
+import { blfxAdapter, isBlfxAutorecAvailable } from "../blfx/blfx-module-adapter.js";
 import { ManageAutorecApp } from "../../../ui/autorec/manageAutorecMenu.js";
 
 /**
@@ -83,7 +83,11 @@ export class AutorecManager {
                 break;
 
             case 'blfx':
-                await this.blfx.submit(options.force ?? false);
+                if (isBlfxAutorecAvailable()) {
+                    await this.blfx.submit(options.force ?? false);
+                } else {
+                    log.debug("EMP | BLFX autorec target configured but requires Foundry v14+ and Patreon module (boss-loot-assets-premium).");
+                }
                 break;
 
             case 'none':
@@ -93,15 +97,10 @@ export class AutorecManager {
             case 'ask':
             default: {
                 const isAaActive = Boolean(game.modules?.get('autoanimations')?.active);
-                const isBlfxActive = Boolean(
-                    game.modules?.get('boss-loot-assets-premium')?.active ||
-                    game.modules?.get('boss-loot-assets-free')?.active ||
-                    game.modules?.get('blfx')?.active ||
-                    Hooks?.events?.['blfx.register.CustomAutoRec']
-                );
+                const isBlfxActive = isBlfxAutorecAvailable();
 
                 if (!isAaActive && !isBlfxActive) {
-                    log.debug("EMP | Neither Automated Animations nor Boss Loot FX is active. Skipping autorec destination prompt.");
+                    log.debug("EMP | Neither Automated Animations nor Boss Loot FX (v14+ Patreon) is active. Skipping autorec destination prompt.");
                     return;
                 }
 

@@ -4,7 +4,7 @@ import {
     WorldScriptsFormApplication,
     ManageAutorecFormApplication
 } from "./ui/index.js";
-import { blfx } from "./adapters/modules/blfx/blfx.js";
+import { blfx, isBlfxAutorecAvailable } from "./adapters/modules/blfx/blfx.js";
 import { updateMacroCompendiums } from "./lib/standalone-macros.js";
 import { log } from './lib/logger.js';
 import { adapter } from "./adapters/index.js";
@@ -138,13 +138,7 @@ Hooks.on('renderSettingsConfig', function(app, html, data) {
     if (!root) return;
 
     const isAaActive = Boolean(game.modules?.get("autoanimations")?.active);
-    const isBlfxActive = Boolean(
-        game.modules?.get('boss-loot-assets-premium')?.active ||
-        game.modules?.get('boss-loot-assets-free')?.active ||
-        game.modules?.get('blfx')?.active ||
-        Hooks.events?.['blfx.register.CustomAutoRec']
-    );
-
+    const isBlfxActive = isBlfxAutorecAvailable();
     const hasActiveAutorec = isAaActive || isBlfxActive;
 
     if (!hasActiveAutorec) {

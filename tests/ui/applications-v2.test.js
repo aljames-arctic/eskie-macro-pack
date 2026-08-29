@@ -67,9 +67,11 @@ test('ManageAutorecApp inherits from ApplicationV2 with HandlebarsApplicationMix
     assert.ok(dialog);
     assert.equal(ManageAutorecApp.DEFAULT_OPTIONS.id, 'empManageAutorecMenu');
 
-    // Case 1: No modules active
+    // Case 1: No modules active on v14
+    game.release = { generation: 14 };
     game.modules.set('autoanimations', { active: false });
-    game.modules.set('blfx', { active: false });
+    game.modules.set('boss-loot-assets-premium', { active: false });
+    game.modules.set('boss-loot-assets-free', { active: false });
     let context = await dialog._prepareContext();
     assert.equal(context.isAaActive, false);
     assert.equal(context.isBlfxActive, false);
@@ -78,25 +80,40 @@ test('ManageAutorecApp inherits from ApplicationV2 with HandlebarsApplicationMix
 
     // Case 2: Only Automated Animations active (1 active)
     game.modules.set('autoanimations', { active: true });
-    game.modules.set('blfx', { active: false });
+    game.modules.set('boss-loot-assets-premium', { active: false });
     context = await dialog._prepareContext();
     assert.equal(context.isAaActive, true);
     assert.equal(context.isBlfxActive, false);
     assert.equal(context.hasActiveAutorec, true);
     assert.equal(context.hasMultipleAutorec, false);
 
-    // Case 3: Only BLFX active (1 active)
+    // Case 3: Free BLFX module active on v14 -> does NOT have autorec
     game.modules.set('autoanimations', { active: false });
-    game.modules.set('blfx', { active: true });
+    game.modules.set('boss-loot-assets-free', { active: true });
+    game.modules.set('boss-loot-assets-premium', { active: false });
+    context = await dialog._prepareContext();
+    assert.equal(context.isBlfxActive, false);
+    assert.equal(context.hasActiveAutorec, false);
+
+    // Case 4: Patreon BLFX module active but on Foundry v12 -> does NOT have autorec
+    game.release = { generation: 12 };
+    game.modules.set('boss-loot-assets-premium', { active: true });
+    context = await dialog._prepareContext();
+    assert.equal(context.isBlfxActive, false);
+    assert.equal(context.hasActiveAutorec, false);
+
+    // Case 5: Patreon BLFX module active on Foundry v14+ -> IS active
+    game.release = { generation: 14 };
+    game.modules.set('boss-loot-assets-premium', { active: true });
     context = await dialog._prepareContext();
     assert.equal(context.isAaActive, false);
     assert.equal(context.isBlfxActive, true);
     assert.equal(context.hasActiveAutorec, true);
     assert.equal(context.hasMultipleAutorec, false);
 
-    // Case 4: Both active (at least 2 active)
+    // Case 6: Both AA and Patreon BLFX active on v14 -> Both active (>= 2)
     game.modules.set('autoanimations', { active: true });
-    game.modules.set('blfx', { active: true });
+    game.modules.set('boss-loot-assets-premium', { active: true });
     context = await dialog._prepareContext();
     assert.equal(context.isAaActive, true);
     assert.equal(context.isBlfxActive, true);
@@ -127,23 +144,39 @@ test('renderSettingsConfig conditionally hides manageAutorec button when no modu
         };
     };
 
-    // Case 1: Neither active -> removed
+    // Case 1: Neither active on v14 -> removed
+    game.release = { generation: 14 };
     game.modules.set('autoanimations', { active: false });
-    game.modules.set('blfx', { active: false });
+    game.modules.set('boss-loot-assets-premium', { active: false });
+    game.modules.set('boss-loot-assets-free', { active: false });
     const html1 = createMockHtml();
     renderHook({}, html1, {});
     assert.equal(html1.formGroup.removed, true);
 
-    // Case 2: AA active -> kept
+    // Case 2: Only free BLFX on v14 -> removed (free has no autorec)
+    game.modules.set('boss-loot-assets-free', { active: true });
+    const htmlFree = createMockHtml();
+    renderHook({}, htmlFree, {});
+    assert.equal(htmlFree.formGroup.removed, true);
+
+    // Case 3: Patreon BLFX on v12 -> removed (requires v14+)
+    game.release = { generation: 12 };
+    game.modules.set('boss-loot-assets-premium', { active: true });
+    const htmlV12 = createMockHtml();
+    renderHook({}, htmlV12, {});
+    assert.equal(htmlV12.formGroup.removed, true);
+
+    // Case 4: AA active on v12 -> kept
     game.modules.set('autoanimations', { active: true });
-    game.modules.set('blfx', { active: false });
+    game.modules.set('boss-loot-assets-premium', { active: false });
     const html2 = createMockHtml();
     renderHook({}, html2, {});
     assert.equal(html2.formGroup.removed, false);
 
-    // Case 3: BLFX active -> kept
+    // Case 5: Patreon BLFX active on v14 -> kept
+    game.release = { generation: 14 };
     game.modules.set('autoanimations', { active: false });
-    game.modules.set('blfx', { active: true });
+    game.modules.set('boss-loot-assets-premium', { active: true });
     const html3 = createMockHtml();
     renderHook({}, html3, {});
     assert.equal(html3.formGroup.removed, false);

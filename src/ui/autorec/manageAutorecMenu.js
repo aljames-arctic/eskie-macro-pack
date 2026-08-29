@@ -3,6 +3,7 @@ import { log } from '../../lib/logger.js';
 import { BaseFoundryAdapter } from "../../adapters/foundry/index.js";
 import { autorecUpdateFormApplication } from "../autoanimations/updateMenu.js";
 import { BlfxAutorecUpdateFormApplication } from "../blfx/updateMenu.js";
+import { isBlfxAutorecAvailable } from "../../adapters/modules/blfx/blfx-module-adapter.js";
 
 const foundryPlatform = new BaseFoundryAdapter();
 
@@ -43,12 +44,7 @@ export class ManageAutorecApp extends foundryPlatform.HandlebarsApplicationMixin
 
     async _prepareContext(options) {
         const isAaActive = Boolean(game.modules?.get('autoanimations')?.active);
-        const isBlfxActive = Boolean(
-            game.modules?.get('boss-loot-assets-premium')?.active ||
-            game.modules?.get('boss-loot-assets-free')?.active ||
-            game.modules?.get('blfx')?.active ||
-            Hooks.events?.['blfx.register.CustomAutoRec']
-        );
+        const isBlfxActive = isBlfxAutorecAvailable();
 
         const activeCount = (isAaActive ? 1 : 0) + (isBlfxActive ? 1 : 0);
         const hasActiveAutorec = activeCount >= 1;

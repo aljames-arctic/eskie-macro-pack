@@ -8,11 +8,13 @@
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: `gate`,
     destination: "Menu Prompt",
+    sound: { ...DEFAULT_SOUND_CONFIG },
     destinationList: [
         { label: 'First World', value: 'First World' },
         { label: 'Astral Plane', value: 'Astral Plane' },
@@ -117,16 +119,13 @@ function _getPlaneConfig(destination) {
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     mConfig.id = `${token.id} - ${mConfig.id}`;
-    const { id, destination, destinationList, template } = mConfig;
+    const { id, destination, destinationList, template, sound } = mConfig;
 
-    const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
-    const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
-
-    const cfg = {
-        radius: 10,
-        max: 60,
-        icon: portalPath,
-        label: 'Gate'
+    const cfg = { 
+        radius: 1,
+        max: 500,
+        icon: closest("jb2a.portals.vertical.vortex.purple"), 
+        label: 'Gate Destination',
     };
     let [position, _] = await templatelib.getPosition(template, cfg);
     if (!position) { return; }
@@ -159,7 +158,9 @@ async function create(token, config = {}) {
     //     canvas.scene.update({ "filters": { [filter.type]: filter.options } });
     // }
 
-    let seq = new Sequence()
+    let seq = new Sequence();
+    applySound(seq, sound);
+    seq = seq
         .effect()
         .name(id)
         .file(closest(`jb2a.magic_signs.circle.02.conjuration.loop.${circleColor}`))

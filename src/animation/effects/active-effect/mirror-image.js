@@ -7,9 +7,11 @@ import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'mirrorImage',
     imageNumber: 3, // Default number of mirror images
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 /**
@@ -20,10 +22,12 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The created Sequence object.
  */
 async function createMirrorImage(token, config = {}) {
-    const { id, imageNumber } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id, imageNumber, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
 
-    const sequence = new Sequence()
+    const sequence = new Sequence();
+    applySound(sequence, sound);
+    sequence
         .effect()
             .file(closest("jb2a.shimmer.01.purple"))
             .opacity(0.5)
@@ -193,7 +197,7 @@ async function playMirrorImage(token, config = {}) {
  * @param {object} config Configuration options.
  */
 async function stopMirrorImage(token, config = {}) {
-    const { id, imageNumber } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id, imageNumber, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}*`;
 
     Sequencer.EffectManager.endEffects({ name: label });

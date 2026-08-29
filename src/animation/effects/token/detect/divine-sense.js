@@ -1,5 +1,6 @@
 import { detectUtil } from './detectUtil.js';
 import { adapter } from '../../../../adapters/index.js';
+import { DEFAULT_SOUND_CONFIG } from '../../../utils/sound.js';
 
 const defaultDetectionConfig = {
     celestial: 'jb2a.condition.curse.01.002.blue',
@@ -21,6 +22,7 @@ const DEFAULT_CONFIG = {
     },
     detection: defaultDetectionConfig,
     validator: defaultValidator,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, config = {}) {

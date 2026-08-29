@@ -4,6 +4,7 @@
 import { closest } from '../../../lib/filemanager.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'MistyStep',
     size: 1, // Default size for crosshair, will be updated by token.document.width
@@ -14,11 +15,12 @@ const DEFAULT_CONFIG = {
     drawOutline: true,
     interval: -1, // Default, will be updated by token.document.width
     rememberControlled: true,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, size, icon, label, tag, drawIcon, drawOutline, interval, rememberControlled } = mConfig;
+    const { id, size, icon, label, tag, drawIcon, drawOutline, interval, rememberControlled, sound } = mConfig;
 
     const crosshairConfig = {
         size: token.document.width,
@@ -34,7 +36,9 @@ async function create(token, config = {}) {
     let position = await Sequencer.Crosshair.show(crosshairConfig);
 
     if (!position.cancelled) {
-        let sequence = new Sequence()
+        let sequence = new Sequence();
+        applySound(sequence, sound);
+        sequence = sequence
             .animation()
                 .delay(800)
                 .on(token)

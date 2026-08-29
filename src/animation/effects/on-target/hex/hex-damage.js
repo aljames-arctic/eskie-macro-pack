@@ -2,11 +2,17 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from "../../../../lib/filemanager.js";
+import { adapter } from "../../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../../utils/sound.js';
 
-const DEFAULT_CONFIG = {};
+const DEFAULT_CONFIG = {
+    sound: { ...DEFAULT_SOUND_CONFIG }
+};
 
 async function create(token, target, config = {}) {
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const sequence = new Sequence();
+    applySound(sequence, mConfig.sound);
 
     sequence.effect()
         .file(closest(`jb2a.particles.outward.purple.01.03`))

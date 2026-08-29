@@ -15,6 +15,7 @@ const DEFAULT_CONFIG = {
     hybridForm: 'https://files.d20.io/images/390116904/V1XE3gOTz6-hHEg-_jQt3g/original.png',
     // Path to the wolf form token image.
     wolfForm: 'https://files.d20.io/images/390116931/NRBle2scKhQmU-q0EHskPw/original.png',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 /**
@@ -50,6 +51,7 @@ async function createShapechange(token, config = {}) {
     const targetForm = choice === 'hybrid' ? hybridForm : wolfForm;
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
 
     // Dark outflow vortex beneath the token — builds atmosphere.
     sequence
@@ -223,6 +225,7 @@ async function createRevert(token, config = {}) {
     const currentForm = token.document.texture.src;
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
 
     // Wide outflow vortex — larger than the forward transform to signal unwinding.
     sequence

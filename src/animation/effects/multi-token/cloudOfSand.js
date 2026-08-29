@@ -2,11 +2,13 @@
 // Updater: @bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     persist: false,
     color: "white",
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 /**
@@ -54,7 +56,7 @@ function _createCloudEffect(position, file, { size, opacity, rotate, zIndex, rot
  */
 async function create(position, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { persist, color } = mConfig;
+    const { persist, color, sound } = mConfig;
 
     if (!position) {
         let configWarpgate = {
@@ -72,7 +74,9 @@ async function create(position, config = {}) {
         position = await Sequencer.Crosshair.show(configWarpgate);
     }
 
-    let sequence = new Sequence()
+    let sequence = new Sequence();
+    applySound(sequence, sound);
+    sequence = sequence
         .effect()
         .name("Cloud of Sand")
         .file(closest("jb2a.extras.tmfx.outflow.circle.04"))

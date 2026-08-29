@@ -9,13 +9,15 @@ import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
 
 import { adapter } from "../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
     fadeTime: 10000,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { fadeTime } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { fadeTime, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Retrieve water spray origin tiles from flags, falling back to tag search for backward compatibility
     const originIds = tile.document.getFlag(MODULE_ID, 'trap.floodingRoomSplashOrigins') || [];
@@ -26,7 +28,9 @@ async function create(tile, targets, config = {}) {
         splashOrigins = taggedOrigins.map(t => t.object || t).filter(t => t);
     }
 
-    let seq = new Sequence()
+    let seq = new Sequence();
+    applySound(seq, sound);
+    seq = seq
         .canvasPan()
         .shake({ duration: 500, strength: 2, rotation: false })
         .wait(500);

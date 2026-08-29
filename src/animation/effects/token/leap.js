@@ -6,9 +6,11 @@
 import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'leap',
     position: undefined,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 /**
@@ -21,7 +23,7 @@ const DEFAULT_CONFIG = {
  */
 async function createLeap(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    let { id, position } = mConfig;
+    let { id, position, sound } = mConfig;
 
     // UI/Interaction Logic
     if (!position) {
@@ -39,6 +41,7 @@ async function createLeap(token, config = {}) {
     }
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
     sequence
         .animation()
         .on(token)

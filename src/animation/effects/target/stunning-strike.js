@@ -6,8 +6,10 @@
 import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'stunningStrike',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 /**
@@ -20,9 +22,10 @@ const DEFAULT_CONFIG = {
  */
 async function createStunningStrike(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
 
     const middle = {
         x: (target.center.x - token.center.x) * 0.25,
@@ -175,7 +178,7 @@ async function playStunningStrike(token, target, config = {}) {
  */
 function stopStunningStrike(target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `StunningStrike - DizzyStars - ${id} - ${target.uuid}` });
 }
 

@@ -4,14 +4,17 @@
 import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'Control Undead',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
     const sequence = new Sequence();
+    applySound(sequence, sound);
 
     sequence.effect()
         .attachTo(token)
@@ -176,7 +179,7 @@ async function play(token, target, config = {}) {
 
 function stop(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `${id} ${token.document.name}` });
 }
 

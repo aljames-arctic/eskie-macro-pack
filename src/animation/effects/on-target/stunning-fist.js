@@ -3,15 +3,17 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'stunningFist',
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
     const middleposition = {
         x: (target.center.x - token.center.x)* 0.25,
@@ -19,6 +21,7 @@ async function create(token, target, config = {}) {
     };
 
     let seq = new Sequence();
+    applySound(seq, sound);
 
     seq.animation()
         .delay(250)

@@ -7,8 +7,10 @@ import { closest } from "../../../lib/filemanager.js";
 import { log } from "../../../lib/logger.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'shockingGrasp',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 /**
@@ -21,9 +23,10 @@ const DEFAULT_CONFIG = {
  */
 async function createShockingGrasp(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
 
     sequence
         .effect()

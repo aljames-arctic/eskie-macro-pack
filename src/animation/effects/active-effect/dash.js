@@ -4,15 +4,20 @@ import { closest } from '../../../lib/filemanager.js';
 import { matt } from '../../utils/matt-tiles.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 export const DEFAULT_CONFIG = {
     id: 'Cunning Action'
+    sound: { ...DEFAULT_SOUND_CONFIG },
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function create(token, config = {}) {
-    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
 
-    const sequenceOn = new Sequence()
+    const sequenceOn = new Sequence();
+    applySound(sequenceOn, sound);
+    sequenceOn
         .effect()
             .name(label)
             .file(closest("eskie.smoke.03.black"))
@@ -55,7 +60,7 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
     matt.movement.stop(token, label);
     Sequencer.EffectManager.endEffects({ name: label, object: token });

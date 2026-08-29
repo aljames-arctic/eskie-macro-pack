@@ -4,10 +4,12 @@
 import { closest } from "../../../../lib/filemanager.js";
 
 import { adapter } from "../../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'eskie.effect.incorporeal.main',
     color: 'teal',
     changeLight: true,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function getTintColor(color) {
@@ -22,10 +24,11 @@ function getTintColor(color) {
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, color, changeLight } = mConfig;
+    const { id, color, changeLight, sound } = mConfig;
     const tintColor = getTintColor(color);
 
     let seq = new Sequence();
+    applySound(seq, sound);
 
     seq.animation()
         .on(token)

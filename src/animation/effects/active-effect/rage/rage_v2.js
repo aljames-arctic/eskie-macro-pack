@@ -8,12 +8,15 @@ import { closest } from '../../../../lib/filemanager.js';
 import { util } from './rage-util.js';
 
 import { adapter } from "../../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../../utils/sound.js";
 export const DEFAULT_CONFIG = {
     id: 'RageV2',
     color: 'red',
     effect: {
         ground: { enabled: true, persist: true },
     }
+    sound: { ...DEFAULT_SOUND_CONFIG },
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function create(token, config = {}) {
@@ -22,6 +25,7 @@ function create(token, config = {}) {
     const label = `${id} - ${token.id}`;
 
     let seq = new Sequence();
+    applySound(seq, sound);
     seq = seq
         .effect()
         .name(label)

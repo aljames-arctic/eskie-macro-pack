@@ -5,17 +5,23 @@ import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'bless',
     color: 'yellow',
+    sound: {
+        cast: { ...DEFAULT_SOUND_CONFIG },
+        target: { ...DEFAULT_SOUND_CONFIG }
+    },
 };
 
 function createCaster(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { color } = mConfig;
+    const { color, sound } = mConfig;
     let hue = -20;
 
     const sequence = new Sequence();
+    applySound(sequence, sound?.cast ?? sound);
         // Effect on the caster
         sequence.effect()
             .file(closest(`jb2a.bless.200px.intro.${color}`))
@@ -102,10 +108,11 @@ async function playCaster(token, config = {}) {
 
 function createTarget(target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, color } = mConfig;
+    const { id, color, sound } = mConfig;
     let hue = -20;
 
     const sequence = new Sequence();
+    applySound(sequence, sound?.target ?? sound);
             // Effects on the targets
             sequence.effect()
                 .copySprite(target)

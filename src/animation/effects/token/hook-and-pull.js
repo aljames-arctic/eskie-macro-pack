@@ -6,6 +6,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     isHit: false,
     timingAdjust: -50,
@@ -13,6 +14,7 @@ const DEFAULT_CONFIG = {
         miss: 'eskie.objects.meat_hook.ranged.01.physical.normal.iron',
         hit: 'eskie.objects.meat_hook.ranged.01.physical.latch.iron'
     }
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 /**
@@ -36,6 +38,7 @@ async function create(token, target, config = {}) {
     const grappleEffect = isHit ? effect.hit : effect.miss;
 
     const sequence = new Sequence();
+    applySound(sequence, mConfig.sound);
 
     // Effect if missed
     sequence.effect()

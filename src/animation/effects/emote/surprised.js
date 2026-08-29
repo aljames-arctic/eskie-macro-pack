@@ -1,6 +1,7 @@
 import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 /* **
    Originally Published: 4/14/2023
    Author: EskieMoh#2969 
@@ -18,7 +19,8 @@ const DEFAULT_CONFIG = {
             x: -0.8,
             y: 0.5
         }
-    ]
+    ],
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 /**
@@ -38,11 +40,13 @@ const DEFAULT_CONFIG = {
  */
 async function create(token, config = {}) {
     // TODO(bakanabaka): Utilizes old mergeObject
-    let { id, duration, effect } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    let { id, duration, effect , sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const tokenWidth = token.document.width;
 
-    let surprisedEffect = new Sequence()
+    let surprisedEffect = new Sequence();
+    applySound(surprisedEffect, sound);
+    surprisedEffect = surprisedEffect
         .effect()
         .name(id)
         .file(closest(effect[0].img))

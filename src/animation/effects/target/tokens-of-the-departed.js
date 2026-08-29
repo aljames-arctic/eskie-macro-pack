@@ -5,19 +5,25 @@ import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'tokensOfTheDeparted',
     color: 'teal',
     changeLight: true
+    sound: {
+        harvest: { ...DEFAULT_SOUND_CONFIG },
+        use: { ...DEFAULT_SOUND_CONFIG }
+    },
 };
 
 async function createHarvest(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
     if (!token || !target) return;
 
     const seq = new Sequence();
+    applySound(seq, sound?.harvest ?? sound);
 
     seq.effect()
         .delay(50)
@@ -135,12 +141,13 @@ async function playHarvest(token, target, config = {}) {
 
 async function createUse(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
     if (!token || !target) return;
 
     const label = `${id}Use - ${target.id}`;
     const seq = new Sequence();
+    applySound(seq, sound?.use ?? sound);
 
     seq.effect()
         .file(closest('jb2a.extras.tmfx.border.circle.outpulse.01.fast'))

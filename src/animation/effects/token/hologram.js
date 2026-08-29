@@ -1,4 +1,5 @@
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
@@ -10,15 +11,19 @@ const EFFECT_NAME = 'Holo';
 export const DEFAULT_CONFIG = {
     id: 'Hologram',
     tint: '#cd2997',
+    sound: { ...DEFAULT_SOUND_CONFIG },
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { tint } = mConfig;
+    const { tint, sound } = mConfig;
 
     const tokenRotation = token.document.rotation || 0;
 
-    const seq = new Sequence()
+    const seq = new Sequence();
+    applySound(seq, sound);
+    seq
         .effect()
         .name(EFFECT_NAME)
         .copySprite(token)

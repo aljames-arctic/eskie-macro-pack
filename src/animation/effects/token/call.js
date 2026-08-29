@@ -4,6 +4,7 @@
 import { closest } from '../../../lib/filemanager.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const CALL_TAG = 'Calling';
 const EFFECT_NAME = 'Call';
 const EFFECT_NAME_TEXT = 'CallText';
@@ -36,13 +37,16 @@ const UNICODE_CHARS = [
 
 export const DEFAULT_CONFIG = {
     id: 'Call',
+    sound: { ...DEFAULT_SOUND_CONFIG },
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
     const seq = new Sequence();
+    applySound(seq, sound);
 
     // Phone icon badge attached to the top-right corner of the token
     seq.effect()

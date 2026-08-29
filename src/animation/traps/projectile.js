@@ -13,6 +13,7 @@ const DEFAULT_CONFIG = {
     repeats: 10,
     repeatDelay: 50,
     splashScale: 1.5,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(tile, targets, config = {}) {
@@ -35,6 +36,7 @@ async function create(tile, targets, config = {}) {
     const targetLoc = targetTilePlaceable?.center || (targetList.length ? (targetList[0].object?.center || targetList[0]) : null);
 
     let seq = new Sequence();
+    applySound(seq, sound);
     if (projectileType === 'javelin') {
         seq = seq.wait(500);
     }

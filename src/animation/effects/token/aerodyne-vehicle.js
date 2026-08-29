@@ -4,22 +4,27 @@
 import { closest } from '../../../lib/filemanager.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const FLYING_TAG = 'Flying';
 const EFFECT_NAME = 'Fly';
 
 export const DEFAULT_CONFIG = {
     id: 'AerodyneVehicle',
+    sound: { ...DEFAULT_SOUND_CONFIG },
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
     const tokenRotation = token.document.rotation || 0;
     const w = token.w;
     const h = token.h;
 
-    const seq = new Sequence()
+    const seq = new Sequence();
+    applySound(seq, sound);
+    seq
         .effect()
         .file(closest('eskie.smoke.07.white'))
         .atLocation(token)

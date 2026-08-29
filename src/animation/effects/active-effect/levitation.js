@@ -6,9 +6,11 @@ import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'levitation',
     tint: '#00b3ff',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function create(token, config = {}) {
@@ -16,7 +18,9 @@ function create(token, config = {}) {
     const { id, tint } = mConfig;
     const label = `${id} - ${token.id}`;
 
-    const sequence = new Sequence()
+    const sequence = new Sequence();
+    applySound(sequence, sound);
+    sequence
     .animation()
         .delay(75)
         .on(token)
@@ -90,7 +94,7 @@ async function play(token, config = {}) {
 
 async function stop(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
     const label = `${id} - ${token.id}`;
 
     new Sequence()

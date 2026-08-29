@@ -5,16 +5,22 @@ import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'goodberry',
     color: 'green'
+    sound: {
+        cast: { ...DEFAULT_SOUND_CONFIG },
+        use: { ...DEFAULT_SOUND_CONFIG }
+    },
 };
 
 async function createCast(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, color } = mConfig;
+    const { id, color, sound } = mConfig;
 
     const seq = new Sequence();
+    applySound(seq, sound?.cast ?? sound);
 
     seq.effect()
         .name(`${id} - ${token.id}`)
@@ -49,9 +55,10 @@ async function playCast(token, config = {}) {
 
 async function createUse(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, color } = mConfig;
+    const { id, color, sound } = mConfig;
 
     const seq = new Sequence();
+    applySound(seq, sound?.use ?? sound);
 
     seq.effect()
         .name(`${id}Use - ${token.id}`)

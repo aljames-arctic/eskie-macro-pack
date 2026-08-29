@@ -4,13 +4,16 @@
 import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     position: undefined,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(targets, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const sequence = new Sequence();
+    applySound(sequence, mConfig.sound);
 
     // AOE effects
     sequence.effect()

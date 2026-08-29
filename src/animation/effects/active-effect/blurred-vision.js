@@ -1,4 +1,5 @@
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 import { blur } from "../../scene-overlays/status-blur.js";
 import { autorec } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { log } from '../../../lib/logger.js';
@@ -24,6 +25,7 @@ const DEFAULT_CONFIG = {
 function create(token, config = {}) {
     const { overlay, configs } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const seq = new Sequence();
+    applySound(seq, sound);
     const owners = adapter.getTokenOwners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
 
     const SEQUENCER_DEFAULT_OPACITY = 50;
@@ -54,6 +56,7 @@ export const blurredVision = {
     play,
     stop,
     default_config: DEFAULT_CONFIG,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 autorec.register("blurredVision", "effect", "eskie.effect.blurredVision", DEFAULT_CONFIG, "0.0.0", "Blurred Vision");

@@ -5,18 +5,22 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'draining-kiss',
     duration: 10000,
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 function create(token, target, config = {}) {
-    const { id, duration } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id, duration, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id} - ${target.id}`;
 
-    let seq = new Sequence()
+    let seq = new Sequence();
+    applySound(seq, sound);
+    seq = seq
         .effect()
             .file(closest("jb2a.icon.heart.pink"))
             .atLocation(token)

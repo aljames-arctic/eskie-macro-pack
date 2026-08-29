@@ -1,6 +1,7 @@
 import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 /* **
    Originally Published: 4/14/2023
    Author: EskieMoh#2969 
@@ -18,7 +19,8 @@ const DEFAULT_CONFIG = {
             y: -0.25,
             scale: 0.7
         }
-    ]
+    ],
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 /**
@@ -40,13 +42,15 @@ const DEFAULT_CONFIG = {
  */
 async function create(token, config = {}) {
     // TODO(bakanabaka): Utilizes old mergeObject
-    let { id, duration, effect, facing } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    let { id, duration, effect, facing , sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const tokenWidth = token.document.width;
     const mirrorFace = facing === 'right';
     const facingFactor = mirrorFace ? -1 : 1;
 
-    let soulSuckedEffect = new Sequence()
+    let soulSuckedEffect = new Sequence();
+    applySound(soulSuckedEffect, sound);
+    soulSuckedEffect = soulSuckedEffect
         .effect()
         .name(id)
         .file(closest(effect[0].img))

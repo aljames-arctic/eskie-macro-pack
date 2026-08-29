@@ -1,18 +1,22 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { matt } from '../../utils/matt-tiles.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 import { adapter } from "../../../adapters/index.js";
 export const DEFAULT_CONFIG = {
     id: 'Grapple Latch',
     follow: true,
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 function create(token, target, config = {}) {
-    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
 
-    const sequenceOn = new Sequence()
+    let sequenceOn = new Sequence();
+    applySound(sequenceOn, sound);
+    sequenceOn = sequenceOn
         .effect()
             .name(label)
             .file(closest("eskie.objects.biological.hand.spectral_hand.ranged.01.generic.latch.blue.05ft"))

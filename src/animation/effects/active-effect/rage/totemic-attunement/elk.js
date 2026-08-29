@@ -5,6 +5,7 @@ import { closest } from "../../../../../lib/filemanager.js";
 import { matt } from "../../../../utils/matt-tiles.js";
 
 import { adapter } from "../../../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'Elk Totemic Attunement',
     color: 'red',
@@ -79,7 +80,9 @@ function chargeCreate(token, config = {}) {
     const { id, color } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
 
-    const sequenceOn = new Sequence()
+    const sequenceOn = new Sequence();
+    applySound(sequenceOn, mConfig.sound);
+    sequenceOn
       .effect()
         .file(closest("eskie.smoke.03.tan"))
         .attachTo(token,{bindAlpha:false,bindRotation:false})

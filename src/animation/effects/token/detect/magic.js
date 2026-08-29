@@ -48,4 +48,5 @@ export const magic = {
     create,
     play,
     default_config: DEFAULT_CONFIG,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };

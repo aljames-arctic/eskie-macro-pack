@@ -5,10 +5,12 @@
 ** */
 
 import { closest } from '../../../lib/filemanager.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'PetrifyingGaze',
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 /**
@@ -23,10 +25,11 @@ const DEFAULT_CONFIG = {
 async function create(token, targetTokens, config = {}) {
     const targets = [targetTokens].flat().filter(Boolean);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
     const eyeAnimation = "jb2a.eyes.01.single.orangeyellow";
 
     let sequence = new Sequence();
+    applySound(sequence, sound);
     sequence
         .effect()
         .file(closest(eyeAnimation))

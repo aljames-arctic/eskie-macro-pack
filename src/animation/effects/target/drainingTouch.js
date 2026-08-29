@@ -4,14 +4,16 @@
 import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     color: "teal",
     changeLight: true,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { color, changeLight } = mConfig;
+    const { color, changeLight, sound } = mConfig;
     let tintColor;
     let hue;
 
@@ -37,7 +39,9 @@ async function create(token, target, config = {}) {
         y: (target.center.y - token.center.y) * 0.25,
     };
 
-    let sequence = new Sequence()
+    let sequence = new Sequence();
+    applySound(sequence, sound);
+    sequence = sequence
         .wait(100)
         .thenDo(function () {
             if (Tagger.hasTags(token, "Incorporeal")) {
@@ -160,7 +164,7 @@ async function play(token, target, config = {}) {
 
     if (Tagger.hasTags(token, "Incorporeal")) {
         const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-        const { color, changeLight } = mConfig;
+        const { color, changeLight, sound } = mConfig;
         let tintColor;
         if (color == "teal") { tintColor = '#6ff087' }
         else if (color == "green") { tintColor = '#6cde3b' }

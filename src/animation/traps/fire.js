@@ -9,13 +9,15 @@ import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
 
 import { adapter } from "../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
     size: 3.5,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { size } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { size, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const targetList = [targets].flat().filter(Boolean);
 
     const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') || [];
@@ -30,6 +32,7 @@ async function create(tile, targets, config = {}) {
     const targetLoc = targetTilePlaceable?.center || (targetList.length ? (targetList[0].object?.center || targetList[0]) : null);
 
     let seq = new Sequence();
+    applySound(seq, sound);
 
     if (targetLoc) {
         seq = seq

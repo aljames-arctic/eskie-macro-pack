@@ -8,15 +8,17 @@ import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
 
 import { adapter } from "../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
     reveal: true,
     smokeSize: 2,
     fallenScale: 0.3,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { reveal, smokeSize, fallenScale } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { reveal, smokeSize, fallenScale, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     if (!tile) return new Sequence();
 
@@ -43,7 +45,9 @@ async function create(tile, targets, config = {}) {
         return !(tMaxX <= tileMinX || tMinX >= tileMaxX || tMaxY <= tileMinY || tMinY >= tileMaxY);
     });
 
-    let seq = new Sequence()
+    let seq = new Sequence();
+    applySound(seq, sound);
+    seq = seq
         // Dust puff when trap opens
         .effect()
         .file(closest('jb2a.smoke.puff.ring.01.white.1'))
@@ -148,7 +152,9 @@ async function stop(tile, config = {}) {
         return !(tMaxX <= tileMinX || tMinX >= tileMaxX || tMaxY <= tileMinY || tMinY >= tileMaxY);
     });
 
-    let seq = new Sequence()
+    let seq = new Sequence();
+    applySound(seq, sound);
+    seq = seq
         // Reset/hide the pit tile
         .animation()
         .on(tile)

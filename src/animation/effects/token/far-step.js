@@ -6,15 +6,18 @@
 import { closest } from '../../../lib/filemanager.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'farStep',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, position, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
     let seq = new Sequence();
+    applySound(seq, sound);
     seq = seq
         .effect()
         .name(id)

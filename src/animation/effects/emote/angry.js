@@ -2,6 +2,7 @@ import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 /* **
    Originally Published: 4/14/2023
    Author: EskieMoh#2969 
@@ -12,15 +13,18 @@ const DEFAULT_CONFIG = {
     id: 'angry',
     duration: 0,
     scale: 0.85,
-    file: 'eskie.emote.angry.02'
+    file: 'eskie.emote.angry.02',
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(token, config = {}) {
-    const { id, duration, scale, file } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id, duration, scale, file , sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const tokenHeight = token.document.height;
     const tokenWidth = token.document.width;
 
-    let angryEffect = new Sequence()
+    let angryEffect = new Sequence();
+    applySound(angryEffect, sound);
+    angryEffect = angryEffect
         .effect()
             .name(id)
             .file(closest(file))

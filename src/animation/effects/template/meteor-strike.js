@@ -8,18 +8,20 @@
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { positions as posUtil } from '../../utils/positions.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     showMarkers: true,
     hideFromPlayers: true,
     markerNamePrefix: 'MeteorStrikeMarker',
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(source, config = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { showMarkers, markerNamePrefix } = mConfig;
+    const { showMarkers, markerNamePrefix, sound } = mConfig;
 
     let positions = config.positions;
 
@@ -30,6 +32,7 @@ async function create(source, config = {}) {
     if (!positions || positions.length === 0) return null;
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
 
     for (let i = 0; i < positions.length; i++) {
         const pos = positions[i];

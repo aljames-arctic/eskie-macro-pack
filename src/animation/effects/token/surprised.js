@@ -1,4 +1,5 @@
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 /* **
    Original Author: EskieMoh#2969
@@ -9,6 +10,7 @@ import { adapter } from "../../../adapters/index.js";
 
 const DEFAULT_CONFIG = {
     id: 'surprised',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 /**
@@ -21,9 +23,10 @@ const DEFAULT_CONFIG = {
  */
 async function createSurprised(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
 
     sequence
         .effect()
@@ -66,7 +69,7 @@ async function createSurprised(token, config = {}) {
  */
 async function playSurprised(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
     if (Tagger.hasTags(token, "Surprised")) {
         await stopSurprised(token, mConfig);
@@ -87,7 +90,7 @@ async function playSurprised(token, config = {}) {
  */
 async function stopSurprised(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
     if (Tagger.hasTags(token, "Surprised")) {
         await Tagger.removeTags(token, "Surprised");

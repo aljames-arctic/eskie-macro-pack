@@ -4,13 +4,16 @@
 import { closest } from "../../../../lib/filemanager.js";
 
 import { adapter } from "../../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'Armor of Agathys',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let sequence = new Sequence();
+    applySound(sequence, mConfig.sound);
 
     sequence = sequence.effect()
         .file(closest("jb2a.ward.rune.dark_purple.01"))

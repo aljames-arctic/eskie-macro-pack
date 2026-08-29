@@ -6,6 +6,7 @@ import { closest } from "../../../../lib/filemanager.js";
 import { util } from './rage-util.js';
 
 import { adapter } from "../../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../../utils/sound.js";
 export const DEFAULT_CONFIG = {
     id: 'Totem',
     color: 'red',
@@ -13,6 +14,8 @@ export const DEFAULT_CONFIG = {
     effect: {
         ground: { enabled: true, duration: -1 },
     },
+    sound: { ...DEFAULT_SOUND_CONFIG },
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function play(token, config = {}) {
@@ -43,7 +46,9 @@ function create(token, config = {}) {
     const { id, color, spirit, effect } = mConfig;
     const label = `${id} - ${token.id}`;
 
-    let seq = new Sequence()
+    let seq = new Sequence();
+    applySound(seq, sound);
+    seq = seq
       .effect()
         .copySprite(token)
         .spriteRotation(-token.document.rotation)

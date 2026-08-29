@@ -5,6 +5,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: "Strength Before Death",
     tintMap: true,      //Set Map Tint
@@ -36,7 +37,9 @@ function create(token, config = {}) {
     // Convert pixels -> grid units (squares). Sequencer uses gridUnits when gridUnits:true
     const radiusGU = maxPx / canvas.grid.size;
 
-    const seq = new Sequence()
+    const seq = new Sequence();
+    applySound(seq, sound);
+    seq
         .effect()
             .name(`${id} ${token.name}`)
             .atLocation(token)
@@ -291,6 +294,7 @@ export const strengthBeforeDeath = {
     play,
     stop,
     default_config: DEFAULT_CONFIG,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 autorec.register("strengthBeforeDeath", "effect", "eskie.effect.strengthBeforeDeath", DEFAULT_CONFIG, "0.0.0", "Strength Before Death");

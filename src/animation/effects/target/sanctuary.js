@@ -4,13 +4,18 @@
 import { closest } from '../../../lib/filemanager.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'Sanctuary',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    let seq = new Sequence()
+    const { sound } = mConfig;
+    let seq = new Sequence();
+    applySound(seq, sound);
+    seq = seq
         .effect()
             .atLocation(token)
             .file(closest(`jb2a.markers.light.complete.yellow`))
@@ -153,6 +158,7 @@ async function play(token, target, config = {}) {
 
 function stop(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { sound } = mConfig;
     const { id } = mConfig;
     return Sequencer.EffectManager.endEffects({ name: `${token.name} ${id}`, object: token });
 }

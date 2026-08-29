@@ -6,9 +6,11 @@
 import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'animateDead',
     choice: 'Skeleton' // Default to Skeleton if not specified
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 /**
@@ -21,9 +23,10 @@ const DEFAULT_CONFIG = {
  */
 async function createAnimateDead(undeadToken, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, choice } = mConfig;
+    const { id, choice, sound } = mConfig;
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
 
     sequence
         .thenDo(function () {

@@ -5,18 +5,22 @@
 
 import { closest } from '../../../../lib/filemanager.js';
 import { autorec } from '../../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../../utils/sound.js';
 
 import { adapter } from "../../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'hex',
-    duration: 10000
+    duration: 10000,
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, duration } = mConfig;
+    const { id, duration, sound } = mConfig;
 
-    let seq = new Sequence()
+    let seq = new Sequence();
+    applySound(seq, sound);
+    seq = seq
         .effect()
         .name(id)
         .file(closest(`jb2a.particles.outward.purple.01.03`))

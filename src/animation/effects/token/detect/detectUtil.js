@@ -1,6 +1,7 @@
 import { closest } from '../../../../lib/filemanager.js';
 
 import { adapter } from "../../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../../utils/sound.js";
 // Mapping of tag -> Sequencer file
 const defaultDetectionConfig = {};
 // Return true if any tag in tags is applied
@@ -22,6 +23,7 @@ const DEFAULT_CONFIG = {
 async function _createDetectionEffects(target, config = {}) {
     const tags = Object.keys(config.detection);
     let sequence = new Sequence();
+    applySound(sequence, mConfig.sound);
 
     let filteredTags = [];
     for (const tag of tags) {
@@ -97,6 +99,7 @@ async function create(token, config = {}) {
     });
 
     let sequence = new Sequence();
+    applySound(sequence, mConfig.sound);
     sequence
         .effect()
         .file(closest(mConfig.effect.pulse.img))

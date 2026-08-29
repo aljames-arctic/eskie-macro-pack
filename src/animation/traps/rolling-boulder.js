@@ -9,14 +9,16 @@ import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
 
 import { adapter } from "../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
     boulderSpeed: 2500,
     boulderSize: 4.25,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { boulderSpeed, boulderSize } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { boulderSpeed, boulderSize, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Retrieve end tile from flags, falling back to legacy/Tagger search for backward compatibility
     const targetTileIds = tile.document.getFlag(MODULE_ID, 'trap.trapTargetTileIds') || [];
@@ -34,7 +36,9 @@ async function create(tile, targets, config = {}) {
 
     if (!endTile) {
         ui.notifications.warn('EMP | Rolling Boulder Trap: No end tile found.');
-        return new Sequence();
+        let seq = new Sequence();
+    applySound(seq, sound);
+    return seq;
     }
 
     const tilePlaceable = tile.object || tile;
@@ -42,7 +46,9 @@ async function create(tile, targets, config = {}) {
     const startLoc = tilePlaceable.center || tilePlaceable;
     const endLoc = endTilePlaceable.center || endTilePlaceable;
 
-    return new Sequence()
+    let seq = new Sequence();
+    applySound(seq, sound);
+    return seq
         .canvasPan()
         .delay(500)
         .shake({ duration: 500, strength: 2, rotation: false })

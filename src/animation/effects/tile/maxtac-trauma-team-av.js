@@ -2,6 +2,7 @@
 // Modular Conversion: Antigravity
 
 import { closest } from '../../../lib/filemanager.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 import { adapter } from "../../../adapters/index.js";
 export const DEFAULT_CONFIG = {
@@ -9,11 +10,12 @@ export const DEFAULT_CONFIG = {
     flyingTag: 'Flying',
     effectNameFly: 'Fly',
     effectNameLanding: 'landing',
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(tile, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { effectNameFly, effectNameLanding } = mConfig;
+    const { effectNameFly, effectNameLanding, sound } = mConfig;
 
     const tileRotation = tile.document.rotation || 0;
     const w = tile.document.width;
@@ -32,6 +34,7 @@ async function create(tile, config = {}) {
     };
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
 
     // 1. Landing sequence
     sequence

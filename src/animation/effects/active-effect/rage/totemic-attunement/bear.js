@@ -5,6 +5,7 @@
 import { closest } from "../../../../../lib/filemanager.js";
 
 import { adapter } from "../../../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'Bear Totemic Attunement',
     color: 'red',
@@ -18,6 +19,7 @@ async function play(token, targets, config = {}) {
 function targetSequence(target, config = {}) {
     const { color } = config;
     let seq = new Sequence();
+    applySound(seq, mConfig.sound);
     seq = seq.effect()
         .copySprite(target)
         .attachTo(target)
@@ -57,6 +59,7 @@ function create(token, targets, config = {}) {
     const label = `${id} - ${token.id}`;
 
     let seq = new Sequence();
+    applySound(seq, mConfig.sound);
 
     seq = seq.effect()
         .name(label)
@@ -76,4 +79,5 @@ function create(token, targets, config = {}) {
 export const bearAttunement = {
     create,
     play,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };

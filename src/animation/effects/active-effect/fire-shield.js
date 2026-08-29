@@ -5,15 +5,18 @@ import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'FireShield',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, config = {}) {
-    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
     sequence.effect()
         .file(closest("jb2a.impact.ground_crack.orange.01"))
         .atLocation(token)
@@ -87,7 +90,7 @@ async function play(token, config = {}) {
 }
 
 function stop(token, config = {}) {
-    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
     Sequencer.EffectManager.endEffects({ name: label, object: token });
 }

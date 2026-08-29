@@ -9,9 +9,11 @@ import { matt } from '../utils/matt-tiles.js';
 import { MODULE_ID } from '../../lib/constants.js';
 
 import { adapter } from "../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
     label: 'Falling Rocks',
     dustBrightness: 0.8,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(tile, targets, config = {}) {
@@ -47,7 +49,9 @@ async function create(tile, targets, config = {}) {
     const mirrorX = Math.random() >= 0.5;
     const mirrorY = Math.random() >= 0.5;
 
-    let seq = new Sequence()
+    let seq = new Sequence();
+    applySound(seq, sound);
+    seq = seq
         .canvasPan()
         .shake({ duration: 250, strength: 2, rotation: false })
 

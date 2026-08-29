@@ -1,6 +1,7 @@
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 import { adapter } from "../../../adapters/index.js";
 //Last Updated: 4/30/2024
@@ -9,11 +10,12 @@ import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'hitTheDirt',
     label: 'Hit the Dirt',
-}
+    sound: { ...DEFAULT_SOUND_CONFIG }
+};
 
 async function create(token, config, options) {
     if (options?.type == 'aefx') return;
-    const { id, template } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id, template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const cfg = {
         radius: 1,
@@ -23,7 +25,9 @@ async function create(token, config, options) {
     let [position, _] = await templatelib.getPosition(template, cfg);
     if (!position) { return; }
 
-    let seq = new Sequence()
+    let seq = new Sequence();
+    applySound(seq, sound);
+    seq = seq
         .animation()
         .delay(100)
         .on(token)

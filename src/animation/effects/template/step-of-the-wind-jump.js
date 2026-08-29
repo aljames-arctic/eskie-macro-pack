@@ -4,14 +4,16 @@
 import { closest } from "../../../lib/filemanager.js";
 import { template as templatelib } from '../../../lib/templates.js';
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
-    id: 'step-of-the-wind-jump'
+    id: 'step-of-the-wind-jump',
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(token, config = {}) {
-    let { id, template } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    let { id, template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     //Determine Jump Timings
     let jumpTime = 750;
@@ -63,6 +65,7 @@ async function create(token, config = {}) {
     }
 
     let seq = new Sequence();
+    applySound(seq, sound);
     
     seq.wait(100)
 

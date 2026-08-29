@@ -4,15 +4,18 @@
 import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: "fly",
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
     let seq = new Sequence();
+    applySound(seq, sound);
     seq = seq.effect()
         .file(closest("jb2a.misty_step.01.blue"))
         .atLocation(token)
@@ -63,7 +66,7 @@ async function play(token, config = {}) {
 
 async function stop(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
     return Promise.all([
         Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}`, object: token }),

@@ -3,16 +3,21 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: "chromatic-orb",
     damageType: "fire",
+    sound: {
+        cast: { ...DEFAULT_SOUND_CONFIG },
+        impact: { ...DEFAULT_SOUND_CONFIG }
+    }
 };
 
 async function create(token, target, config = {}) {
     const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, damageType } = mergedConfig;
+    const { id, damageType, sound } = mergedConfig;
 
     const colorMapping = {
         acid: {color: "green", orb: "yellow", hue: 20, impact: "green"},
@@ -34,8 +39,10 @@ async function create(token, target, config = {}) {
     const effectOffsetX = Math.round((Math.random() - 0.5) * (canvas.grid.size/2));
     const effectOffsetY = Math.round((Math.random() - 0.5) * (canvas.grid.size/2));
 
-    let seq = new Sequence()
-
+    let seq = new Sequence();
+    applySound(seq, sound?.cast ?? sound);
+    applySound(seq, sound?.impact, effectDuration + 2000);
+    seq = seq
         .addNamedLocation("position", { x: target.center.x + effectOffsetX, y: target.center.y + effectOffsetY })
 
         .effect()

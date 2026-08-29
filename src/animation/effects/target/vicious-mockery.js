@@ -6,9 +6,14 @@
 import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'viciousMockery',
     word: "Haha!", // Default word if no user input
+    sound: {
+        cast: { ...DEFAULT_SOUND_CONFIG },
+        mock: { ...DEFAULT_SOUND_CONFIG }
+    },
 };
 
 /**
@@ -23,6 +28,7 @@ async function createViciousMockeryCast(token, config = {}) {
     // const { id } = mConfig; // Not directly used in this animation for naming persistent effects
 
     const sequence = new Sequence();
+    applySound(sequence, mConfig.sound?.cast ?? mConfig.sound);
 
     sequence
         .effect()

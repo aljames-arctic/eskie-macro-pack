@@ -9,6 +9,7 @@ import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
 
 import { adapter } from "../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
     reveal: true,
     smokeSize: 2,
@@ -16,6 +17,7 @@ const DEFAULT_CONFIG = {
     fallenScale: 0.3,
     randomDelay: 2000,
     color: 'orange',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(tile, targets, config = {}) {
@@ -80,6 +82,7 @@ async function create(tile, targets, config = {}) {
     if (finalTargets.length === 0 && targets && targets.length > 0) finalTargets = targets;
 
     let seq = new Sequence();
+    applySound(seq, sound);
 
     if (reveal) {
         seq = seq

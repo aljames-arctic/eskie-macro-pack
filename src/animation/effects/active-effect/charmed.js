@@ -7,8 +7,10 @@ import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'charmed',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function create(token, config = {}) {
@@ -17,6 +19,7 @@ function create(token, config = {}) {
     const label = `${id}-${token.id}`;
 
     let seq = new Sequence();
+    applySound(seq, sound);
     seq.effect()
         .file(closest("jb2a.template_circle.symbol.out_flow.heart.pink"))
         .scaleIn(0, 1000, { ease: "easeOutQuint" })

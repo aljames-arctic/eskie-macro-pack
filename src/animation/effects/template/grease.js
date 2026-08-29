@@ -5,15 +5,20 @@
 import { closest, absolutePath } from "../../../lib/filemanager.js";
 import { template as templatelib } from "../../../lib/templates.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: "grease",
+    sound: {
+        cast: { ...DEFAULT_SOUND_CONFIG },
+        splash: { ...DEFAULT_SOUND_CONFIG }
+    }
 };
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { template } = mConfig;
+    const { template, sound } = mConfig;
 
     const radius = 5 / canvas.grid.distance;
     const cfg = { 
@@ -29,6 +34,7 @@ async function create(token, config = {}) {
     
 
     const seq = new Sequence();
+    applySound(seq, sound.cast);
 
     seq.effect()
         .name(`Casting ${token.document.name}`)
@@ -86,6 +92,7 @@ async function create(token, config = {}) {
         .belowTokens();
 
     seq.wait(1000);
+    applySound(seq, sound.splash);
 
     seq.effect()
         .file(closest("jb2a.water_splash.circle.01.black"))

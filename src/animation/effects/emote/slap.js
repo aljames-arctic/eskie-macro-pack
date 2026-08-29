@@ -1,6 +1,7 @@
 import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 /* **
    Originally Published: 5/1/2023
    Author: EskieMoh#2969 
@@ -27,7 +28,8 @@ const DEFAULT_CONFIG = {
             scale: 0.55,
             rotation: -45
         }
-    ]
+    ],
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 /**
@@ -48,9 +50,11 @@ const DEFAULT_CONFIG = {
  */
 async function create(location, config = {}) {
     // TODO(bakanabaka): Utilizes old mergeObject
-    let { id, duration, effect } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    let { id, duration, effect , sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    let slapEffect = new Sequence()
+    let slapEffect = new Sequence();
+    applySound(slapEffect, sound);
+    slapEffect = slapEffect
         .effect()
         .name(id)
         .atLocation(location, { offset: { x: effect[0].x, y: effect[0].y }, gridUnits: true })

@@ -4,19 +4,26 @@
 import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
     id: "magicMissile",
     missileCount: 3,
+    sound: {
+        cast: { ...DEFAULT_SOUND_CONFIG },
+        launch: { ...DEFAULT_SOUND_CONFIG }
+    }
 };
 
 async function create(token, target, config = {}) {
-    const { id, missileCount, info } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id, missileCount, info, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     let mCount = missileCount;
     const spellLevel = adapter.getSpellLevel({aaHandler: info});
     if (spellLevel) mCount = spellLevel + 2;
 
     const seq = new Sequence();
+    applySound(seq, sound?.cast ?? sound);
+    applySound(seq, sound?.launch, 250);
 
     // Orbit tuning (grid units)
     const orbitRadius = 0.55;

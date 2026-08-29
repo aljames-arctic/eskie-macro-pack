@@ -8,15 +8,19 @@ import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'Petrified'
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
-    let sequence = new Sequence()
+    let sequence = new Sequence();
+    applySound(sequence, sound);
+    sequence = sequence
         .effect()
         .name(id)
         .copySprite(token)
@@ -56,8 +60,10 @@ async function play(token, config = {}) {
 
 async function stop(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
-    let sequence = new Sequence()
+    const { id, sound } = mConfig;
+    let sequence = new Sequence();
+    applySound(sequence, sound);
+    sequence = sequence
         .effect()
         .file(closest("jb2a.impact.earth.01.browngreen"))
         .atLocation(token)

@@ -6,6 +6,7 @@ import { text as textUtil } from '../../utils/text.js';
 import { cinemaBars } from '../../scene-overlays/cinema-bars.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'IaijutsuStrike',
     targetDeath: true,
@@ -28,6 +29,7 @@ const DEFAULT_CONFIG = {
         kerning: 1.7,
         verticalOffset: 0.75,
     }
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function dashEffect(source, target) {
@@ -37,6 +39,7 @@ function dashEffect(source, target) {
     const angleDeg = angleRad * 180 / Math.PI;
 
     let sequence = new Sequence();
+    applySound(sequence, mConfig.sound);
     sequence.effect()
         .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.redblack"))
         .atLocation(target)
@@ -50,6 +53,7 @@ function dashEffect(source, target) {
 
 function deathAnimation(target) {
     let sequence = new Sequence();
+    applySound(sequence, mConfig.sound);
     sequence.animation()
         .on(target)
         .opacity(0)
@@ -132,6 +136,7 @@ async function create(source, target, config = {}) {
     }
 
     let sequence = new Sequence();
+    applySound(sequence, mConfig.sound);
 
     if (cameraFocus.enable) {
         sequence.addSequence(cinemaBars.create({ dim: true }));

@@ -1,6 +1,7 @@
 import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 /* **
    Originally Published: 6/5/2023
    Author: EskieMoh#2969 
@@ -19,7 +20,8 @@ const DEFAULT_CONFIG = {
             scale: 0.9
         },
         {} // token shake
-    ]
+    ],
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 /**
@@ -41,13 +43,15 @@ const DEFAULT_CONFIG = {
  */
 async function create(token, config = {}) {
     // TODO(bakanabaka): Utilizes old [] -> {}
-    let { id, duration, effect, facing } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    let { id, duration, effect, facing , sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const tokenWidth = token.document.width;
     const mirrorFace = facing === 'right';
     const facingFactor = mirrorFace ? -1 : 1;
 
-    let laughEffect = new Sequence()
+    let laughEffect = new Sequence();
+    applySound(laughEffect, sound);
+    laughEffect = laughEffect
         .animation()
         .on(token)
         .opacity(0)

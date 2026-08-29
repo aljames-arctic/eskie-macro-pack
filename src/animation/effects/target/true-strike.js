@@ -7,8 +7,13 @@ import { closest } from "../../../lib/filemanager.js";
 import { log } from "../../../lib/logger.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'trueStrike',
+    sound: {
+        cast: { ...DEFAULT_SOUND_CONFIG },
+        attack: { ...DEFAULT_SOUND_CONFIG }
+    },
 };
 
 /**
@@ -21,9 +26,10 @@ const DEFAULT_CONFIG = {
  */
 async function createTrueStrikeCast(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
     const sequence = new Sequence();
+    applySound(sequence, sound?.cast ?? sound);
 
     sequence
         .effect()
@@ -127,6 +133,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
     // const { id } = mConfig; // Not directly used in this animation for naming persistent effects
 
     const sequence = new Sequence();
+    applySound(sequence, mConfig.sound?.attack ?? mConfig.sound);
 
     sequence
         .effect()

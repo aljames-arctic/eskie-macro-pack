@@ -3,20 +3,23 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'keeperOfSouls',
-    color: 'teal'
+    color: 'teal',
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(target, ally, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
     if (!target || !ally) return;
 
     const seq = new Sequence();
+    applySound(seq, sound);
 
     // Damage & soul release on dying target
     seq.effect()

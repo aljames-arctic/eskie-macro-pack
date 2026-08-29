@@ -1,6 +1,7 @@
 import { adapter } from '../../../adapters/index.js';
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG_MELEE = {
     id: "sneakAttackMelee",
@@ -11,11 +12,15 @@ const DEFAULT_CONFIG_MELEE = {
     },
     type: "slashing",
     weight: "medium",
-}
+    sound: {
+        attack: { ...DEFAULT_SOUND_CONFIG },
+        impact: { ...DEFAULT_SOUND_CONFIG }
+    }
+};
 
 async function createMelee(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_MELEE, config);
-    const { id, color, type, weight } = mConfig;
+    const { id, color, type, weight, sound } = mConfig;
 
     //Determine Attack Size
     const weightIndex = { light: 0, medium: 1, heavy: 2 }[weight];
@@ -26,7 +31,10 @@ async function createMelee(token, target, config = {}) {
     //Determine nearest targetSquare
     let targetSquare = adapter.getNearestSquareCenter(token, target);
 
-    let seq = new Sequence()
+    let seq = new Sequence();
+    applySound(seq, sound?.attack ?? sound);
+    applySound(seq, sound?.impact, 150);
+    seq = seq
 
         .effect()
         .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color.attack}.slow`))
@@ -87,14 +95,21 @@ const DEFAULT_CONFIG_RANGED = {
         attack: "red",
         impact: "red",
         damage: "red",
+    },
+    sound: {
+        attack: { ...DEFAULT_SOUND_CONFIG },
+        impact: { ...DEFAULT_SOUND_CONFIG }
     }
 };
 
 function createRanged(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_RANGED, config);
-    const { id, color } = mConfig;
+    const { id, color, sound } = mConfig;
 
-    let seq = new Sequence()
+    let seq = new Sequence();
+    applySound(seq, sound?.attack ?? sound);
+    applySound(seq, sound?.impact, 150);
+    seq = seq
         .effect()
         .file(closest(`eskie.slice.01_ranged.black.${color.attack}`))
         .atLocation(token)

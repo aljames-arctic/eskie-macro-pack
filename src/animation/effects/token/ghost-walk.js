@@ -5,20 +5,23 @@ import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'ghostWalk',
     changeLight: true,
     color: '#58feb0',
     padding: 1
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, changeLight, color, padding } = mConfig;
+    const { id, changeLight, color, padding, sound } = mConfig;
 
     const label = `${id} - ${token.id}`;
 
     const seq = new Sequence();
+    applySound(seq, sound);
 
     seq.animation()
         .on(token)

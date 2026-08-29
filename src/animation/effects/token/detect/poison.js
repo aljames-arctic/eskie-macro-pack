@@ -38,4 +38,5 @@ export const poison = {
     create,
     play,
     default_config: DEFAULT_CONFIG,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };

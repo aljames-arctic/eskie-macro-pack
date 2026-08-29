@@ -4,7 +4,9 @@
 import { closest } from '../../../lib/filemanager.js';
 
 import { adapter } from "../../../adapters/index.js";
-const DEFAULT_CONFIG = {};
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
+const DEFAULT_CONFIG = {    sound: { ...DEFAULT_SOUND_CONFIG },
+};
 
 /**
  * Creates the Frightful Moan animation sequence.
@@ -15,6 +17,7 @@ const DEFAULT_CONFIG = {};
 async function create(token, config = {}) {
     config = adapter.mergeObject(DEFAULT_CONFIG, config);
     const sequence = new Sequence();
+    applySound(sequence, config.sound);
 
     sequence
         .effect()

@@ -8,6 +8,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { beam as beamEffect } from './beam/beam.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'disintegrate',
     targetDeath: true,
@@ -31,6 +32,7 @@ const DEFAULT_CONFIG = {
             { img: `jb2a.disintegrate.green` },
         ],
     }
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 /**
@@ -235,6 +237,7 @@ async function create(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     let disintegrateEffect = beam(token, target, mConfig);
+    applySound(disintegrateEffect, mConfig.sound);
     if (mConfig.targetDeath) // Chain the death animation if the target is dead
         disintegrateEffect = disintegrateEffect.addSequence(death(target, mConfig));
 

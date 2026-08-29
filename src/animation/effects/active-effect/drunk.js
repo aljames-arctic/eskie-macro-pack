@@ -1,5 +1,6 @@
 import { closest } from "../../../lib/filemanager.js";
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 import { blur } from "../../scene-overlays/status-blur.js";
 import { autorec } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { log } from '../../../lib/logger.js';
@@ -24,7 +25,9 @@ async function create(token, config = {}) {
     const tokenWidth = token.document.width;
     const label = `${id} - ${token.id}`;
 
-    let drunkEffect = new Sequence()
+    let drunkEffect = new Sequence();
+    applySound(drunkEffect, sound);
+    drunkEffect = drunkEffect
         // Drunk bubbles effect
         .effect()
         .file(closest('eskie.emote.drunk_bubbles.01'))
@@ -121,6 +124,7 @@ export const drunk = {
     play,
     stop,
     default_config: DEFAULT_CONFIG,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 autorec.register("drunk", "effect", "eskie.effect.emote.drunk", DEFAULT_CONFIG, "0.0.0", "Drunk");

@@ -7,9 +7,14 @@ import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'enlargeReduce',
     scaleFactor: 1, // Default scale factor for enlarge/reduce
+    sound: {
+        enlarge: { ...DEFAULT_SOUND_CONFIG },
+        reduce: { ...DEFAULT_SOUND_CONFIG }
+    },
 };
 
 /**
@@ -21,9 +26,10 @@ const DEFAULT_CONFIG = {
  */
 async function createEnlarge(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, scaleFactor } = mConfig;
+    const { id, scaleFactor, sound } = mConfig;
 
     const sequence = new Sequence();
+    applySound(sequence, sound?.enlarge ?? sound);
 
     sequence
         .effect()
@@ -150,9 +156,10 @@ async function playEnlarge(token, config = {}) {
  */
 async function createReduce(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, scaleFactor } = mConfig;
+    const { id, scaleFactor, sound } = mConfig;
 
     const sequence = new Sequence();
+    applySound(sequence, sound?.reduce ?? sound);
 
     sequence
         .effect()

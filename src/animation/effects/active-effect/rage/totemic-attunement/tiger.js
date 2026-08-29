@@ -4,12 +4,14 @@
 import { closest } from "../../../../../lib/filemanager.js";
 
 import { adapter } from "../../../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'Tiger Totemic Attunement',
     attack: {
         count: 2,
     },
     color: 'red',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function play(token, target, config = {}) {

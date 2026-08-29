@@ -4,9 +4,11 @@
 import { closest } from "../../../../lib/filemanager.js";
 
 import { adapter } from "../../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'eskie.effect.possession.main',
     color: 'teal',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function getTintColor(color) {
@@ -21,10 +23,11 @@ function getTintColor(color) {
 
 async function create(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, color } = mConfig;
+    const { id, color, sound } = mConfig;
     const tintColor = getTintColor(color);
 
     let seq = new Sequence();
+    applySound(seq, sound);
     seq.wait(100)
         .animation()
         .on(token)

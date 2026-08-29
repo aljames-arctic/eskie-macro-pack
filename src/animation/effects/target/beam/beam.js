@@ -4,6 +4,7 @@
 import { closest } from "../../../../lib/filemanager.js";
 
 import { adapter } from "../../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'beam',
     effects: [
@@ -12,13 +13,16 @@ const DEFAULT_CONFIG = {
         { img: `jb2a.extras.tmfx.border.circle.inpulse.01.fast` },
         { img: `jb2a.disintegrate.green` },
     ],
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function create(token, target, config = {}) {
     let mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let { id, effects } = mConfig;
 
-    let seq = new Sequence()
+    let seq = new Sequence();
+    applySound(seq, mConfig.sound);
+    seq = seq
         .effect()
         .name(id)
         .atLocation(token)

@@ -5,16 +5,18 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'firecracker',
     deleteTemplate: true,
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, template } = mConfig;
+    const { id, template, sound } = mConfig;
 
     let position;
     if (template) {
@@ -26,6 +28,7 @@ async function create(token, config = {}) {
     if (!position) { return; }
 
     let seq = new Sequence();
+    applySound(seq, sound);
     seq = seq
         .effect()
         .name(id)

@@ -10,13 +10,15 @@ import { matt } from '../utils/matt-tiles.js';
 import { log } from '../../lib/logger.js';
 
 import { adapter } from "../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
     pushDistance: 1,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { pushDistance } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { pushDistance, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const target = targets.length ? targets[0] : null;
     const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') || [];
@@ -46,6 +48,7 @@ async function create(tile, targets, config = {}) {
     }
 
     let seq = new Sequence();
+    applySound(seq, sound);
 
     if (targetLoc) {
         const distance = {

@@ -4,17 +4,19 @@
 import { closest } from '../../../../lib/filemanager.js';
 import { autorec } from '../../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { adapter } from '../../../../adapters/index.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'eyesOfTheGrave',
     radius: 60,
     path: null,
-    color: 'green'
+    color: 'green',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, radius, path } = mConfig;
+    const { id, radius, path, sound } = mConfig;
 
     const grid = canvas.scene.grid.distance ?? 5;
     const radiusGU = radius / grid;
@@ -29,6 +31,7 @@ async function create(token, config = {}) {
     });
 
     const seq = new Sequence();
+    applySound(seq, sound);
 
     // Eye symbol above caster
     seq.effect()

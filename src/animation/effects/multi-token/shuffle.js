@@ -1,4 +1,5 @@
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 /* **
    Original Author: Gornetron (nefin)
@@ -10,19 +11,21 @@ const DEFAULT_CONFIG = {
     delay: 1000,
     sendToCenter: false,
     destinationPoints: undefined,
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 function create(targets, config = {}) {
     const targetList = [targets].flat().filter(Boolean);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     mConfig.destinationPoints = targetList.map(t => ({ x: t.x, y: t.y }));
-    const { sendToCenter, destinationPoints } = mConfig;
+    const { sendToCenter, destinationPoints, sound } = mConfig;
 
     if (targetList.length !== destinationPoints.length)
         throw new Error(`User provided ${targetList.length} targets but ${destinationPoints.length} destination points. Can not shuffle.`);
 
     const shuffle = destinationPoints.sort(() => Math.random() - 0.5);
     const shuffleSeq = new Sequence();
+    applySound(shuffleSeq, sound);
 
     if (targetList.length === 0) return shuffleSeq;
 

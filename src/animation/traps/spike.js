@@ -8,13 +8,15 @@ import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
 
 import { adapter } from "../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
     delay: 500,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { delay } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { delay, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     if (!tile) return new Sequence();
 
@@ -42,7 +44,9 @@ async function create(tile, targets, config = {}) {
         return !(tMaxX <= tileMinX || tMinX >= tileMaxX || tMaxY <= tileMinY || tMinY >= tileMaxY);
     });
 
-    let seq = new Sequence()
+    let seq = new Sequence();
+    applySound(seq, sound);
+    seq = seq
         // Hidden/still frame base of the spike trap below tokens
         .effect()
         .file(closest('jb2a.spike_trap.10x10ft.top.base.still_frame.hidden'))

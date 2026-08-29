@@ -4,6 +4,7 @@
 import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: "romanCandle",
     position: undefined,
@@ -14,7 +15,7 @@ async function create(token, config = {}) {
     var items = Sequencer.Database.getPathsUnder('jb2a.bolt.fire');
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    let { shots, position } = mConfig;
+    let { shots, position, sound } = mConfig;
     if (!position) {
         const crosshairConfig = {
             size: 2,
@@ -24,12 +25,14 @@ async function create(token, config = {}) {
             drawOutline: true,
             interval: 0,
             rememberControlled: true
-        };
+            sound: { ...DEFAULT_SOUND_CONFIG },
+};
         position = await Sequencer.Crosshair.show(crosshairConfig);
         if (position.cancelled) return undefined;
     }
 
     let seq = new Sequence();
+    applySound(seq, sound);
     seq = seq.effect()
         .file(closest("jb2a.impact.005.white"))
         .scale(0.5)

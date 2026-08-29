@@ -4,6 +4,7 @@
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { template as templatelib } from '../../../lib/templates.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG_CAST = {
@@ -17,11 +18,15 @@ const DEFAULT_CONFIG_CAST = {
     interval: 2,
     rememberControlled: true,
     targets: [],
+    sound: {
+        cast: { ...DEFAULT_SOUND_CONFIG },
+        burn: { ...DEFAULT_SOUND_CONFIG }
+    }
 };
 
 async function createCast(source, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_CAST, config);
-    const { id, size, icon, label, tag, drawIcon, drawOutline, interval, rememberControlled } = mConfig;
+    const { id, size, icon, label, tag, drawIcon, drawOutline, interval, rememberControlled, sound } = mConfig;
 
     const crosshairConfig = {
         size: size,
@@ -46,7 +51,9 @@ async function createCast(source, config = {}) {
         position = await Sequencer.Crosshair.show(crosshairConfig);
         if (position.cancelled) return;
     }
-    let sequence = new Sequence()
+    let sequence = new Sequence();
+    applySound(sequence, sound?.cast ?? sound);
+    sequence = sequence
         .effect()
         .file(closest('jb2a.markers.bubble.02.complete.green'))
         .atLocation(source)
@@ -102,9 +109,10 @@ async function playCast(source, config = {}) {
 }
 
 async function createTarget(source, config = {}) {
-    let sequence = new Sequence();
-
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_CAST, config);
+    let sequence = new Sequence();
+    applySound(sequence, mConfig.sound?.burn ?? mConfig.sound);
+
     let targets = mConfig.targets?.length ? mConfig.targets : Array.from(game.user.targets);
 
     for (let target of targets) {

@@ -5,6 +5,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 
 import { adapter } from "../../../adapters/index.js";
@@ -12,10 +13,7 @@ const DEFAULT_CONFIG = {
     id: 'stormingDashStrikes',
     maxStrikes: 12,
     positions: undefined,
-    sound: {
-        enable: true,
-        volume: 0.5,
-    },
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function _crosshairImage(crosshairs, token) {
@@ -43,6 +41,7 @@ async function create(source, config = {}) {
     const { sound, positions: dashPositions = [] } = mConfig;
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
     if (!dashPositions || !dashPositions.length) return sequence;
 
     for (let e = 0; e < dashPositions.length; e++) {

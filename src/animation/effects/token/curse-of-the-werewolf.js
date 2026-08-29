@@ -7,10 +7,12 @@ import { closest } from '../../../lib/filemanager.js';
 
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'curse-of-the-werewolf',
     // Path or URL to the werewolf form token image.
     werewolfForm: 'https://files.d20.io/images/390116904/V1XE3gOTz6-hHEg-_jQt3g/original.png',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 /**
@@ -24,9 +26,11 @@ const DEFAULT_CONFIG = {
  */
 async function create(target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { werewolfForm } = mConfig;
+    const { werewolfForm, sound } = mConfig;
 
-    const sequence = new Sequence()
+    const sequence = new Sequence();
+    applySound(sequence, sound);
+    sequence
 
         // Red runic sign floats above the target's head.
         .effect()

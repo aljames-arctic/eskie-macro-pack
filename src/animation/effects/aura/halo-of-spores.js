@@ -3,18 +3,24 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'HaloOfSpores',
     opacity: 0.45,
+    sound: {
+        aura: { ...DEFAULT_SOUND_CONFIG },
+        damage: { ...DEFAULT_SOUND_CONFIG }
+    }
 };
 
 function createAura(token, config = {}, options = {}) {
-    const { id, opacity } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id, opacity, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
 
     const sequence = new Sequence();
+    applySound(sequence, sound?.aura ?? sound);
 
     sequence
         .effect()
@@ -53,7 +59,9 @@ async function playAura(token, config = {}, options = {}) {
 }
 
 function createDamageEffect(token, target, config = {}) {
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const sequence = new Sequence();
+    applySound(sequence, mConfig.sound?.damage ?? mConfig.sound);
     sequence
         .effect()
         .file(closest("jb2a.fireflies.many.02.red"))

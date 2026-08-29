@@ -7,17 +7,21 @@ import { closest } from '../../../../lib/filemanager.js';
 import { util } from './rage-util.js';
 
 import { adapter } from "../../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../../utils/sound.js";
 export const DEFAULT_CONFIG = {
     id: 'ElectricRage',
     color: 'purple',
+    sound: { ...DEFAULT_SOUND_CONFIG },
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, color } = mConfig;
+    const { id, color, sound } = mConfig;
     const label = `${id} - ${token.id}`;
 
     let seq = new Sequence();
+    applySound(seq, sound);
     seq = seq
         .effect()
         .name(label)

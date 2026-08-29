@@ -9,6 +9,7 @@ import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapte
 import { MODULE_ID } from "../../../lib/constants.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 function hslToHex(h, s, l) {
     l /= 100;
     const a = s * Math.min(l, 1 - l) / 100;
@@ -28,13 +29,16 @@ export const DEFAULT_CONFIG = {
     id: 'Sandevistan',
     msPerImage: 50,
     imageDuration: 2500,
+    sound: { ...DEFAULT_SOUND_CONFIG },
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function create(token, config = {}) {
-    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
     sequence.thenDo(async () => {
     if (typeof FXMASTER !== 'undefined')
         await FXMASTER.filters.switch("SandyfilterID", "color", {

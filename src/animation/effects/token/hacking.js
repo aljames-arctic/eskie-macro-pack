@@ -4,6 +4,7 @@
 import { closest } from '../../../lib/filemanager.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const HACK_TAG = 'Hacking';
 const EFFECT_NAME = 'Hack';
 
@@ -11,6 +12,8 @@ const UI_IMAGES = ['D2ROdgN', 'IMr77nW', 'LRr5crs'];
 
 export const DEFAULT_CONFIG = {
     id: 'Hacking',
+    sound: { ...DEFAULT_SOUND_CONFIG },
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function _randomUiImage() {
@@ -19,9 +22,10 @@ function _randomUiImage() {
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
     const seq = new Sequence();
+    applySound(seq, sound);
 
     // Left eye red glow (adjust offset to match token's eye position)
     seq.effect()

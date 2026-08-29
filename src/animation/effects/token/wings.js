@@ -6,6 +6,7 @@
 import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'wings',
     image: 'eskie.wings',
@@ -16,6 +17,7 @@ const DEFAULT_CONFIG = {
     swayMulti: 1,       // Token Sway Distance multiplier
     mirrorX: false,
     mirrorY: false,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 /**
@@ -27,9 +29,10 @@ const DEFAULT_CONFIG = {
  */
 async function createWings(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, image, offset, hue, wingSize, speedMulti, swayMulti, mirrorX, mirrorY } = mConfig;
+    const { id, image, offset, hue, wingSize, speedMulti, swayMulti, mirrorX, mirrorY, sound } = mConfig;
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
 
     sequence
         .animation()

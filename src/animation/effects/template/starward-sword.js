@@ -2,6 +2,7 @@ import { closest } from "../../../lib/filemanager.js";
 import { template as templatelib } from '../../../lib/templates.js';
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
     id: 'starwardSword',
@@ -9,12 +10,13 @@ const DEFAULT_CONFIG = {
     darkMap: true,
     cameraZoom: false,
     targets: [],
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function createStarwardSword(token, config = {}, options = {}) {
     if (options?.type == "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { size, darkMap, cameraZoom } = mConfig;
+    const { size, darkMap, cameraZoom, sound } = mConfig;
     let { targets } = mConfig;
 
     const cfg = {
@@ -82,6 +84,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
     //Opening
     const mainSequence = new Sequence();
+    applySound(mainSequence, sound);
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
         mainSequence

@@ -7,15 +7,20 @@ import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapte
 import { matt } from '../../utils/matt-tiles.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 export const DEFAULT_CONFIG = {
     id: 'step-of-the-wind'
+    sound: { ...DEFAULT_SOUND_CONFIG },
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function create(token, config = {}) {
-    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
 
-    const sequenceOn = new Sequence()
+    const sequenceOn = new Sequence();
+    applySound(sequenceOn, sound);
+    sequenceOn
 
     .effect()
         .name(label)
@@ -73,7 +78,7 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
     await matt.movement.stop(token, label);
     Sequencer.EffectManager.endEffects({ name: label, object: token });

@@ -5,6 +5,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: "Fighting Spirit",
 }
@@ -14,7 +15,9 @@ function create(token, config = {}) {
     const { id } = mConfig;
     const label = `${id} - ${token.name}`;
 
-    const seq =  new Sequence()
+    const seq = new Sequence();
+    applySound(seq, sound);
+    seq
         .effect()
             .name(label)
             .copySprite(token)
@@ -121,6 +124,7 @@ export const fightingSpirit = {
     play,
     stop,
     default_config: DEFAULT_CONFIG,
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 autorec.register("fightingSpirit", "effect", "eskie.effect.fightingSpirit", DEFAULT_CONFIG, "0.0.0", "Fighting Spirit");

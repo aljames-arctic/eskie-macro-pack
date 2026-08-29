@@ -17,7 +17,7 @@ const DEFAULT_CONFIG = {
 };
 
 function getVersion(config = {}) {
-    const { version, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { version } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Merge the DEFAULT_CONFIG with our possibly modified input config
     const map = [ 

@@ -141,13 +141,12 @@ test('applySound standardizes strictly on enable and ignores enabled alias', () 
     assert.equal(seq.sounds.length, 0);
 });
 
-test('Rage DEFAULT_CONFIG includes top-level sound configuration and passes to version configs', async () => {
+test('Rage sub-configs include version-specific sound configurations', async () => {
     const { rage } = await import('../../src/animation/effects/active-effect/rage/index.js');
-    assert.ok(rage.default_config.sound, 'Rage DEFAULT_CONFIG must have sound property');
-    assert.equal(typeof rage.default_config.sound, 'object');
-    assert.equal(rage.default_config.sound.enable, false);
-    assert.equal(rage.default_config.sound.file, '');
     assert.ok(rage.default_config.config_v1.sound, 'config_v1 must have sound property');
+    assert.equal(typeof rage.default_config.config_v1.sound, 'object');
+    assert.equal(rage.default_config.config_v1.sound.enable, false);
+    assert.equal(rage.default_config.config_v1.sound.file, '');
     assert.ok(rage.default_config.config_v2.sound, 'config_v2 must have sound property');
     assert.ok(rage.default_config.config_v3.sound, 'config_v3 must have sound property');
     assert.ok(rage.default_config.config_v4.sound, 'config_v4 must have sound property');

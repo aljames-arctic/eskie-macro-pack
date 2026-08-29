@@ -57,6 +57,8 @@ function bestFit(modulePrefix, ...categories) {
  * @returns {string} The resolved file path.
  */
 export function closest(path) {
+    if (typeof path !== 'string' || !path) return '';
+
     // Support http:// and https:// addresses
     // Support direct filepaths
     if (path.includes('/')) return path;

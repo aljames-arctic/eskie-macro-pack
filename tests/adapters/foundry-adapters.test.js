@@ -208,6 +208,54 @@ test('getSceneBackground: V12/V13 Scene#background vs V14+ Level#background and 
         offsetX: 0,
         offsetY: 0
     });
+
+    // V14+ nested TextureConfiguration object with null inner src (color/tint-only scene)
+    const v14SceneWithNullTexture = {
+        activeLevel: 'lvl-1',
+        levels: new Map([
+            ['lvl-1', {
+                background: {
+                    src: {
+                        alphThreshold: 0.76,
+                        color: 10066329,
+                        src: null,
+                        tint: 16777215
+                    },
+                    offsetX: 0,
+                    offsetY: 0
+                }
+            }]
+        ])
+    };
+    assert.deepEqual(v14.getSceneBackground(v14SceneWithNullTexture), {
+        src: null,
+        offsetX: 0,
+        offsetY: 0
+    });
+
+    // V14+ nested TextureConfiguration object with valid inner src
+    const v14SceneWithNestedSrc = {
+        activeLevel: 'lvl-1',
+        levels: new Map([
+            ['lvl-1', {
+                background: {
+                    src: {
+                        alphThreshold: 0.76,
+                        color: 10066329,
+                        src: 'maps/nested-v14.webp',
+                        tint: 16777215
+                    },
+                    offsetX: 5,
+                    offsetY: 10
+                }
+            }]
+        ])
+    };
+    assert.deepEqual(v14.getSceneBackground(v14SceneWithNestedSrc), {
+        src: 'maps/nested-v14.webp',
+        offsetX: 5,
+        offsetY: 10
+    });
 });
 
 test('DialogV2 and buttonDialog delegation on BaseFoundryAdapter', async () => {

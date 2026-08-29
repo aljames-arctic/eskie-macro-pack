@@ -181,7 +181,27 @@ export class FoundryCurrentAdapter extends BaseFoundryAdapter {
     /* -------------------------------------------- */
 
     /**
-     * Retrieve the background texture and offsets for a scene on Foundry V14+ (Level#background / Level#textures).
+     * Resolves the texture image filepath from a V14 background or texture structure.
+     * In V14, texture objects wrap the source string inside a TextureConfiguration object:
+     * e.g. entry.src = { src: string|null, color, tint, alphaThreshold, ... }
+     * @param {*} target The background or texture container
+     * @returns {string|null}
+     * @private
+     */
+    _extractTextureSource(target) {
+        if (!target) return null;
+        if (typeof target === 'string') return target;
+        if (typeof target.src === 'string') return target.src;
+        if (target.src && typeof target.src === 'object') {
+            if (typeof target.src.src === 'string') return target.src.src;
+            return null;
+        }
+        return null;
+    }
+
+    /**
+     * Retrieve the background image source and offset for a scene on modern V14+ Foundry.
+     * Evaluates active level textures or scene environment background.
      * Avoids accessing deprecated Scene#background.
      *
      * @param {Scene} [scene=canvas.scene] Target scene document
@@ -201,28 +221,30 @@ export class FoundryCurrentAdapter extends BaseFoundryAdapter {
         if (activeLevel) {
             const levelBg = activeLevel.background ?? activeLevel.textures?.background ?? activeLevel.texture ?? null;
             if (levelBg) {
-                const src = levelBg.src ?? levelBg;
-                const offsetX = levelBg.offsetX ?? activeLevel.offsetX ?? 0;
-                const offsetY = levelBg.offsetY ?? activeLevel.offsetY ?? 0;
+                const src = this._extractTextureSource(levelBg);
+                const offsetX = Number(levelBg.offsetX ?? activeLevel.offsetX ?? 0);
+                const offsetY = Number(levelBg.offsetY ?? activeLevel.offsetY ?? 0);
                 return { src, offsetX, offsetY };
             }
         }
 
         const envBg = scene.environment?.background ?? null;
         if (envBg) {
+            const src = this._extractTextureSource(envBg);
             return {
-                src: envBg.src ?? null,
-                offsetX: envBg.offsetX ?? 0,
-                offsetY: envBg.offsetY ?? 0
+                src,
+                offsetX: Number(envBg.offsetX ?? 0),
+                offsetY: Number(envBg.offsetY ?? 0)
             };
         }
 
         // Unmigrated legacy fallback if levels are not present
         const rawBg = scene.background;
+        const src = this._extractTextureSource(rawBg);
         return {
-            src: rawBg?.src ?? null,
-            offsetX: rawBg?.offsetX ?? 0,
-            offsetY: rawBg?.offsetY ?? 0
+            src,
+            offsetX: Number(rawBg?.offsetX ?? 0),
+            offsetY: Number(rawBg?.offsetY ?? 0)
         };
     }
 }

@@ -569,10 +569,11 @@ export class BaseFoundryAdapter {
     getSceneBackground(scene = canvas?.scene, _level = null) {
         if (!scene) return { src: null, offsetX: 0, offsetY: 0 };
         const bg = scene.background;
+        const src = typeof bg?.src === 'string' ? bg.src : (typeof bg === 'string' ? bg : null);
         return {
-            src: bg?.src ?? null,
-            offsetX: bg?.offsetX ?? 0,
-            offsetY: bg?.offsetY ?? 0
+            src,
+            offsetX: Number(bg?.offsetX ?? 0),
+            offsetY: Number(bg?.offsetY ?? 0)
         };
     }
 

@@ -96,12 +96,13 @@ if (effectFn?.play) {
     if (standardized === 'createTemplate') {
         return `// Eskie Macro Pack Autorec (Template)
 const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
-const template = typeof templateDocument !== 'undefined' ? templateDocument : null;
+const template = (typeof templateDocument !== 'undefined' && templateDocument) || (typeof template !== 'undefined' && template) || (typeof templateDoc !== 'undefined' && templateDoc) || (typeof workflow !== 'undefined' && workflow?.template) || null;
+const targets = (typeof targetTokens !== 'undefined' && targetTokens) || (typeof targets !== 'undefined' && targets) || (typeof workflow !== 'undefined' && (workflow?.targets?.first?.() ? Array.from(workflow.targets) : [])) || [];
 const config = ${serializedConfig};
 if (template) config.template = template;
-if (typeof targetTokens !== 'undefined' && targetTokens?.length) config.targets = targetTokens;
+if (targets?.length) config.targets = targets;
 const effect = foundry.utils.getProperty(globalThis, '${animation}');
-if (effect?.play && token) {
+if (effect?.play) {
     await effect.play(token, config);
 }`;
     }

@@ -239,7 +239,7 @@ export class BlfxAutorecUpdateApp extends foundryPlatform.HandlebarsApplicationM
             title: "EMP.blfxUpdateMenu.menuTitle"
         },
         position: {
-            width: 640,
+            width: 980,
             height: "auto"
         },
         form: {

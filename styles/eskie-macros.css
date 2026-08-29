@@ -668,8 +668,8 @@ input:checked + .eskie-slider:before {
 }
 
 .eskie-aa-chip-grid.blfx-grid {
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
     margin-top: 2px;
 }
 
@@ -677,9 +677,10 @@ input:checked + .eskie-slider:before {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 10px;
-    padding: 8px 12px;
-    min-height: 44px;
+    gap: 7px;
+    padding: 5px 8px;
+    min-height: 38px;
+    background: rgba(15, 15, 20, 0.6);
 }
 
 .eskie-blfx-chip-content {
@@ -692,22 +693,22 @@ input:checked + .eskie-slider:before {
 }
 
 .eskie-chip-item-name {
-    font-size: 0.88rem;
+    font-size: 0.80rem;
     font-weight: 600;
     color: #f8fafc;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: 1.25;
+    line-height: 1.2;
 }
 
 .eskie-chip-effect-name {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     color: #94a3b8;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: 1.2;
+    line-height: 1.15;
 }
 
 .eskie-aa-warning-box {

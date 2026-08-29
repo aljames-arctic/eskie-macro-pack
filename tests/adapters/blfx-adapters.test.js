@@ -260,3 +260,75 @@ test('BlfxModuleAdapter.submit scans first and only prompts when new animations 
     for (const k of Object.keys(blfxAdapter.registry)) delete blfxAdapter.registry[k];
     Object.assign(blfxAdapter.registry, origRegistry);
 });
+
+test('submit does not re-prompt on subsequent loads for a non-development release when updates were not applied', async () => {
+    const { blfxAdapter } = await import('../../src/adapters/modules/blfx/blfx.js');
+    const { MODULE_ID } = await import('../../src/lib/constants.js');
+
+    // Simulate non-development module version
+    game.modules.set(MODULE_ID, {
+        id: MODULE_ID,
+        version: '1.2.0',
+        active: true
+    });
+
+    let promptCount = 0;
+    const origPrompt = blfxAdapter.promptEnableBlfxUpdates;
+    blfxAdapter.promptEnableBlfxUpdates = async () => {
+        promptCount++;
+    };
+
+    const origIsAutorec = blfxAdapter.isAutorecSupported;
+    blfxAdapter.isAutorecSupported = () => true;
+
+    const origIsEnabled = blfxAdapter.isCustomAutoRecUpdatesEnabled;
+    blfxAdapter.isCustomAutoRecUpdatesEnabled = () => false;
+
+    // Populate registry with an unapplied animation
+    const origRegistry = { ...blfxAdapter.registry };
+    for (const k of Object.keys(blfxAdapter.registry)) delete blfxAdapter.registry[k];
+    blfxAdapter.registry['dnd5e'] = {
+        unappliedSpell: {
+            default: {
+                afterAttack: {
+                    animationName: 'Unapplied Spell',
+                    note: 'Eskie Macro Pack (1.2.0)',
+                    animationData: { command: '// test' }
+                }
+            }
+        }
+    };
+
+    // First load: should prompt once
+    let blfxVersionInSetting = '0.0.0';
+    const origGet = game.settings.get;
+    const origSet = game.settings.set;
+    game.settings.get = (mod, key) => {
+        if (key === 'blfxAutorecVersion') return blfxVersionInSetting;
+        return origGet(mod, key);
+    };
+    game.settings.set = async (mod, key, val) => {
+        if (key === 'blfxAutorecVersion') {
+            blfxVersionInSetting = val;
+            return val;
+        }
+        return origSet(mod, key, val);
+    };
+
+    await blfxAdapter.submit(false);
+    assert.equal(promptCount, 1, 'Should prompt on first load of version 1.2.0');
+    assert.equal(blfxVersionInSetting, '1.2.0', 'Setting should record version 1.2.0');
+
+    // Subsequent load with same version 1.2.0: should NOT prompt again
+    await blfxAdapter.submit(false);
+    assert.equal(promptCount, 1, 'Should NOT prompt again on next load of same version');
+
+    // Restore
+    game.settings.get = origGet;
+    game.settings.set = origSet;
+    blfxAdapter.promptEnableBlfxUpdates = origPrompt;
+    blfxAdapter.isAutorecSupported = origIsAutorec;
+    blfxAdapter.isCustomAutoRecUpdatesEnabled = origIsEnabled;
+    for (const k of Object.keys(blfxAdapter.registry)) delete blfxAdapter.registry[k];
+    Object.assign(blfxAdapter.registry, origRegistry);
+});

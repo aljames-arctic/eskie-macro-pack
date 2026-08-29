@@ -367,15 +367,25 @@ export class BlfxAutorecUpdateApp extends foundryPlatform.HandlebarsApplicationM
     _onRender(context, options) {
         super._onRender?.(context, options);
         const cancelBtn = this.element?.querySelector('button[name="cancel"]');
-        cancelBtn?.addEventListener('click', (event) => {
+        cancelBtn?.addEventListener('click', async (event) => {
             event.preventDefault();
+            const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
+            if (rawVersion !== "#{VERSION}#" && game.settings) {
+                await game.settings.set(MODULE_ID, "blfxAutorecVersion", rawVersion);
+            }
             this.close();
         });
     }
 
     static async _formHandler(event, form, formData) {
         const isCancel = event.submitter && event.submitter.name === "cancel";
-        if (isCancel) return;
+        if (isCancel) {
+            const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
+            if (rawVersion !== "#{VERSION}#" && game.settings) {
+                await game.settings.set(MODULE_ID, "blfxAutorecVersion", rawVersion);
+            }
+            return;
+        }
 
         log.group("Boss Loot FX Autorec Menu Update");
 
@@ -405,6 +415,10 @@ export class BlfxAutorecUpdateApp extends foundryPlatform.HandlebarsApplicationM
 
         if (!newPayload?.customAutoRecognition || Object.keys(newPayload.customAutoRecognition).length === 0) {
             log.debug("EMP | Nothing to update in Boss Loot FX!");
+            const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
+            if (rawVersion !== "#{VERSION}#" && game.settings) {
+                await game.settings.set(MODULE_ID, "blfxAutorecVersion", rawVersion);
+            }
             log.groupEnd();
             return;
         }

@@ -153,15 +153,25 @@ export class AutorecUpdateApp extends foundryPlatform.HandlebarsApplicationMixin
     _onRender(context, options) {
         super._onRender?.(context, options);
         const cancelBtn = this.element?.querySelector('button[name="cancel"]');
-        cancelBtn?.addEventListener('click', (event) => {
+        cancelBtn?.addEventListener('click', async (event) => {
             event.preventDefault();
+            const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
+            if (rawVersion !== "#{VERSION}#" && game.settings) {
+                await game.settings.set(MODULE_ID, "autorecVersion", rawVersion);
+            }
             this.close();
         });
     }
 
     static async _formHandler(event, form, formData) {
         const isCancel = event.submitter && event.submitter.name === "cancel";
-        if (isCancel) return;
+        if (isCancel) {
+            const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
+            if (rawVersion !== "#{VERSION}#" && game.settings) {
+                await game.settings.set(MODULE_ID, "autorecVersion", rawVersion);
+            }
+            return;
+        }
 
         log.group("Autorecognition Menu Update");
 
@@ -190,6 +200,10 @@ export class AutorecUpdateApp extends foundryPlatform.HandlebarsApplicationMixin
         const { newSettings } = appInstance?.settings ? await appInstance.settings(excludedIds) : await generateAutorecUpdate(EMP_AA_Menu, excludedIds);
         if (!newSettings || Object.keys(newSettings).length === 0) {
             log.debug("Nothing to update!");
+            const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
+            if (rawVersion !== "#{VERSION}#" && game.settings) {
+                await game.settings.set(MODULE_ID, "autorecVersion", rawVersion);
+            }
             log.groupEnd();
             return;
         }

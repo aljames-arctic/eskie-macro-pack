@@ -464,9 +464,7 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
 
         let lastUpdate = "0.0.0";
         try {
-            if (game?.settings?.settings?.has?.(`${MODULE_ID}.blfxAutorecVersion`)) {
-                lastUpdate = game.settings.get(MODULE_ID, "blfxAutorecVersion") ?? "0.0.0";
-            }
+            lastUpdate = game?.settings?.get?.(MODULE_ID, "blfxAutorecVersion") ?? "0.0.0";
         } catch {
             lastUpdate = "0.0.0";
         }
@@ -488,11 +486,15 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
             if (!this.isCustomAutoRecUpdatesEnabled()) {
                 log.warn("EMP | Boss Loot FX Custom Auto-Rec updates are disabled in game settings (boss-loot-assets-premium.blfxCustomAutoRecUpdates).");
                 await this.promptEnableBlfxUpdates();
-                return;
+            } else {
+                new BlfxAutorecUpdateFormApplication(this.registry).render(true);
             }
-            new BlfxAutorecUpdateFormApplication(this.registry).render(true);
         } else {
             log.info(localize("EMP.blfxUpdateMenu.nothing", "All Eskie Macro Pack animations are up to date in Boss Loot FX!"));
+        }
+
+        if (!isDevelopment && game.settings) {
+            await game.settings.set(MODULE_ID, "blfxAutorecVersion", rawVersion);
         }
     }
 

@@ -174,14 +174,15 @@ export function standardizeBlfxTrigger(trigger, customTrigger) {
  */
 export function buildBlfxMacroCommand(animation, trigger, config) {
     const standardized = standardizeBlfxTrigger(trigger);
-    const serializedConfig = JSON.stringify(config ?? {});
+    const serializedConfig = JSON.stringify(config ?? {}, null, 4);
 
     if (standardized === 'afterActiveEffects') {
         return `// Eskie Macro Pack Autorec (On Target or Token - AE)
+const config = ${serializedConfig};
+
 const source = (typeof sourceToken !== 'undefined' && sourceToken) || null;
 const target = (typeof targetTokens !== 'undefined' && (targetTokens[0] ?? targetTokens.first?.())) || null;
 const token = target || source || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
-const config = ${serializedConfig};
 if (typeof effect !== 'undefined' && effect) {
     config.activeEffect = effect;
 }
@@ -197,10 +198,11 @@ if (effectFn?.play) {
 
     if (standardized === 'createTemplate') {
         return `// Eskie Macro Pack Autorec (Template)
+const config = ${serializedConfig};
+
 const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
 const template = (typeof templateDocument !== 'undefined' && templateDocument) || (typeof template !== 'undefined' && template) || (typeof templateDoc !== 'undefined' && templateDoc) || (typeof workflow !== 'undefined' && workflow?.template) || null;
 const targets = (typeof targetTokens !== 'undefined' && targetTokens) || (typeof targets !== 'undefined' && targets) || (typeof workflow !== 'undefined' && (workflow?.targets?.first?.() ? Array.from(workflow.targets) : [])) || [];
-const config = ${serializedConfig};
 if (template) config.template = template;
 if (targets?.length) config.targets = targets;
 const effect = foundry.utils.getProperty(globalThis, '${animation}');
@@ -211,9 +213,10 @@ if (effect?.play) {
 
     if (standardized === 'afterSummon') {
         return `// Eskie Macro Pack Autorec (Summon)
+const config = ${serializedConfig};
+
 const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
 const targets = (typeof targetTokens !== 'undefined' && targetTokens?.length) ? targetTokens : [];
-const config = ${serializedConfig};
 if (targets.length) config.targets = targets;
 const effect = foundry.utils.getProperty(globalThis, '${animation}');
 if (effect?.play && token) {
@@ -223,9 +226,10 @@ if (effect?.play && token) {
 
     if (standardized === 'afterAttack' || standardized === 'afterDamage') {
         return `// Eskie Macro Pack Autorec (Targeted)
+const config = ${serializedConfig};
+
 const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
 const target = (typeof targetTokens !== 'undefined' && (targetTokens?.first?.() ?? Array.from(targetTokens ?? [])[0])) || (typeof workflow !== 'undefined' && (workflow?.targets?.first?.() ?? Array.from(workflow?.targets ?? [])[0])) || Array.from(game.user?.targets ?? [])[0] || null;
-const config = ${serializedConfig};
 const effect = foundry.utils.getProperty(globalThis, '${animation}');
 if (effect?.play) {
     if (target) {
@@ -233,12 +237,13 @@ if (effect?.play) {
     } else if (token) {
         await effect.play(token, config);
     }
-} `;
+}`;
     }
 
     return `// Eskie Macro Pack Autorec
-const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
 const config = ${serializedConfig};
+
+const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
 const effect = foundry.utils.getProperty(globalThis, '${animation}');
 if (effect?.play && token) {
     await effect.play(token, config);

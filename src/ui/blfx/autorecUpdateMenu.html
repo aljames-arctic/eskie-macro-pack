@@ -25,19 +25,28 @@
                     <div class="eskie-blfx-section-divider">
                         <span>{{triggerName}}</span>
                     </div>
-                    <div class="eskie-aa-chip-grid blfx-grid">
-                        {{#each entries}}
-                        <label class="eskie-aa-chip blfx-chip toggleable" title="{{itemName}}{{#if subtext}} - {{subtext}}{{/if}}">
-                            <input type="checkbox" name="missing_{{key}}" checked />
-                            <div class="eskie-blfx-chip-content">
-                                <span class="eskie-chip-item-name">{{itemName}}</span>
-                                {{#if subtext}}
-                                <span class="eskie-chip-effect-name">{{subtext}}</span>
-                                {{/if}}
-                            </div>
-                        </label>
-                        {{/each}}
+                    {{#each subsections}}
+                    <div class="eskie-blfx-subsection-group">
+                        {{#if subTriggerName}}
+                        <div class="eskie-blfx-subsection-divider">
+                            <span>{{subTriggerName}}</span>
+                        </div>
+                        {{/if}}
+                        <div class="eskie-aa-chip-grid blfx-grid">
+                            {{#each entries}}
+                            <label class="eskie-aa-chip blfx-chip toggleable" title="{{itemName}}{{#if subtext}} - {{subtext}}{{/if}}">
+                                <input type="checkbox" name="missing_{{key}}" checked />
+                                <div class="eskie-blfx-chip-content">
+                                    <span class="eskie-chip-item-name">{{itemName}}</span>
+                                    {{#if subtext}}
+                                    <span class="eskie-chip-effect-name">{{subtext}}</span>
+                                    {{/if}}
+                                </div>
+                            </label>
+                            {{/each}}
+                        </div>
                     </div>
+                    {{/each}}
                 </div>
                 {{/each}}
             </div>
@@ -55,18 +64,27 @@
                     <div class="eskie-blfx-section-divider">
                         <span>{{triggerName}}</span>
                     </div>
-                    <div class="eskie-aa-chip-grid blfx-grid">
-                        {{#each entries}}
-                        <div class="eskie-aa-chip blfx-chip" title="{{itemName}}{{#if subtext}} - {{subtext}}{{/if}}">
-                            <div class="eskie-blfx-chip-content">
-                                <span class="eskie-chip-item-name">{{itemName}}</span>
-                                {{#if subtext}}
-                                <span class="eskie-chip-effect-name">{{subtext}}</span>
-                                {{/if}}
-                            </div>
+                    {{#each subsections}}
+                    <div class="eskie-blfx-subsection-group">
+                        {{#if subTriggerName}}
+                        <div class="eskie-blfx-subsection-divider">
+                            <span>{{subTriggerName}}</span>
                         </div>
-                        {{/each}}
+                        {{/if}}
+                        <div class="eskie-aa-chip-grid blfx-grid">
+                            {{#each entries}}
+                            <div class="eskie-aa-chip blfx-chip" title="{{itemName}}{{#if subtext}} - {{subtext}}{{/if}}">
+                                <div class="eskie-blfx-chip-content">
+                                    <span class="eskie-chip-item-name">{{itemName}}</span>
+                                    {{#if subtext}}
+                                    <span class="eskie-chip-effect-name">{{subtext}}</span>
+                                    {{/if}}
+                                </div>
+                            </div>
+                            {{/each}}
+                        </div>
                     </div>
+                    {{/each}}
                 </div>
                 {{/each}}
             </div>
@@ -85,18 +103,27 @@
                     <div class="eskie-blfx-section-divider">
                         <span>{{triggerName}}</span>
                     </div>
-                    <div class="eskie-aa-chip-grid blfx-grid">
-                        {{#each entries}}
-                        <div class="eskie-aa-chip blfx-chip" title="{{itemName}}{{#if subtext}} - {{subtext}}{{/if}}">
-                            <div class="eskie-blfx-chip-content">
-                                <span class="eskie-chip-item-name">{{itemName}}</span>
-                                {{#if subtext}}
-                                <span class="eskie-chip-effect-name">{{subtext}}</span>
-                                {{/if}}
-                            </div>
+                    {{#each subsections}}
+                    <div class="eskie-blfx-subsection-group">
+                        {{#if subTriggerName}}
+                        <div class="eskie-blfx-subsection-divider">
+                            <span>{{subTriggerName}}</span>
                         </div>
-                        {{/each}}
+                        {{/if}}
+                        <div class="eskie-aa-chip-grid blfx-grid">
+                            {{#each entries}}
+                            <div class="eskie-aa-chip blfx-chip" title="{{itemName}}{{#if subtext}} - {{subtext}}{{/if}}">
+                                <div class="eskie-blfx-chip-content">
+                                    <span class="eskie-chip-item-name">{{itemName}}</span>
+                                    {{#if subtext}}
+                                    <span class="eskie-chip-effect-name">{{subtext}}</span>
+                                    {{/if}}
+                                </div>
+                            </div>
+                            {{/each}}
+                        </div>
                     </div>
+                    {{/each}}
                 </div>
                 {{/each}}
             </div>

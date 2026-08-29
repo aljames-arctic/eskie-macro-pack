@@ -639,17 +639,17 @@ input:checked + .eskie-slider:before {
 .eskie-blfx-trigger-group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-top: 4px;
+    gap: 8px;
+    margin-top: 6px;
 }
 
 .eskie-blfx-section-divider {
     display: flex;
     align-items: center;
     text-align: center;
-    margin: 8px 0 4px 0;
-    color: #94a3b8;
-    font-size: 0.76rem;
+    margin: 8px 0 2px 0;
+    color: #cbd5e1;
+    font-size: 0.78rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -659,12 +659,42 @@ input:checked + .eskie-slider:before {
 .eskie-blfx-section-divider::after {
     content: '';
     flex: 1;
-    border-bottom: 1px dashed rgba(167, 139, 250, 0.25);
+    border-bottom: 1px solid rgba(167, 139, 250, 0.4);
 }
 
 .eskie-blfx-section-divider span {
     padding: 0 10px;
-    color: #c084fc;
+    color: #e9d5ff;
+}
+
+.eskie-blfx-subsection-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.eskie-blfx-subsection-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 4px 0 2px 0;
+    color: #94a3b8;
+    font-size: 0.70rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.eskie-blfx-subsection-divider::before,
+.eskie-blfx-subsection-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px dashed rgba(167, 139, 250, 0.25);
+}
+
+.eskie-blfx-subsection-divider span {
+    padding: 0 8px;
+    color: #a78bfa;
 }
 
 .eskie-aa-chip-grid.blfx-grid {

@@ -65,19 +65,36 @@ test('groupBlfxEntriesByTrigger groups entries into preferred section and sub-se
     ];
 
     const sections = groupBlfxEntriesByTrigger(rawEntries);
-    assert.equal(sections.length, 8);
+    assert.equal(sections.length, 5);
     assert.equal(sections[0].triggerName, 'After Activity Use (Default)');
-    assert.equal(sections[1].triggerName, 'After Attack Roll (Melee)');
-    assert.equal(sections[2].triggerName, 'After Attack Roll (Ranged)');
-    assert.equal(sections[3].triggerName, 'After Attack Roll (On Token)');
-    assert.equal(sections[4].triggerName, 'After Damage Roll (Melee)');
-    assert.equal(sections[5].triggerName, 'After Damage Roll (Ranged)');
-    assert.equal(sections[6].triggerName, 'After Active Effects');
-    assert.equal(sections[7].triggerName, 'After Template Create');
+    assert.equal(sections[1].triggerName, 'After Attack Roll');
+    assert.equal(sections[2].triggerName, 'After Damage Roll');
+    assert.equal(sections[3].triggerName, 'After Active Effects');
+    assert.equal(sections[4].triggerName, 'After Template Create');
+
+    // Subsections within After Attack Roll
+    assert.equal(sections[1].subsections.length, 3);
+    assert.equal(sections[1].subsections[0].subTriggerName, 'Melee');
+    assert.equal(sections[1].subsections[0].entries[0].itemName, '(Melee) Dagger');
+    assert.equal(sections[1].subsections[1].subTriggerName, 'Ranged');
+    assert.equal(sections[1].subsections[1].entries[0].itemName, '(Ranged) Dagger');
+    assert.equal(sections[1].subsections[2].subTriggerName, 'On Token');
+    assert.equal(sections[1].subsections[2].entries[0].itemName, 'Shield');
+
+    // Subsections within After Damage Roll
+    assert.equal(sections[2].subsections.length, 2);
+    assert.equal(sections[2].subsections[0].subTriggerName, 'Melee');
+    assert.equal(sections[2].subsections[0].entries[0].itemName, '(Melee) Divine Strike');
+    assert.equal(sections[2].subsections[1].subTriggerName, 'Ranged');
+    assert.equal(sections[2].subsections[1].entries[0].itemName, '(Ranged) Divine Strike');
+
+    // Flat entries preservation
     assert.equal(sections[0].entries[0].itemName, 'Bless');
     assert.equal(sections[1].entries[0].itemName, '(Melee) Dagger');
-    assert.equal(sections[2].entries[0].itemName, '(Ranged) Dagger');
-    assert.equal(sections[3].entries[0].itemName, 'Shield');
+    assert.equal(sections[1].entries[1].itemName, '(Ranged) Dagger');
+    assert.equal(sections[1].entries[2].itemName, 'Shield');
+    assert.equal(sections[3].entries[0].itemName, 'Rage');
+    assert.equal(sections[4].entries[0].itemName, 'Fireball');
 });
 
 test('buildBlfxPayload constructs valid resources payload with multi-package compatibility flags', () => {

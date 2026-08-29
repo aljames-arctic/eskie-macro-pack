@@ -53,63 +53,114 @@ function extractVersionFromNote(note) {
  * @returns {Array<{triggerName: string, triggerMode: string, entries: Array<object>}>}
  */
 export function groupBlfxEntriesByTrigger(entries = []) {
-    const preferredOrder = [
+    const preferredSectionOrder = [
         "After Activity Use (Default)",
-        "After Attack Roll (Melee)",
-        "After Attack Roll (Ranged)",
-        "After Attack Roll (On Token)",
-        "After Damage Roll (Melee)",
-        "After Damage Roll (Ranged)",
-        "After Damage Roll (On Token)",
+        "After Attack Roll",
+        "After Damage Roll",
         "After Active Effects",
         "After Summon",
         "After Template Create"
     ];
 
-    const groups = {};
+    const preferredSubOrder = [
+        "Melee",
+        "Ranged",
+        "On Token"
+    ];
+
+    const sections = {};
+
     for (const item of entries) {
         const triggerMode = item.triggerMode ?? item.entry?.animationData?.eventType ?? '';
         const rawTriggerName = item.triggerName ?? item.triggerMode ?? '';
         const macroType = item.macroType ?? item.entry?.animationData?.macroType ?? '';
         const itemName = item.itemName ?? item.label ?? '';
 
-        let triggerHeader = rawTriggerName;
+        let mainSection = "After Activity Use (Default)";
+        let subSection = item.subTriggerName ?? "";
 
         if (triggerMode === 'afterAttack' || rawTriggerName.includes('After Attack Roll') || rawTriggerName.includes('afterAttack')) {
-            if (macroType.includes('Melee') || itemName.startsWith('(Melee)')) {
-                triggerHeader = 'After Attack Roll (Melee)';
-            } else if (macroType.includes('Ranged') || itemName.startsWith('(Ranged)')) {
-                triggerHeader = 'After Attack Roll (Ranged)';
-            } else {
-                triggerHeader = 'After Attack Roll (On Token)';
+            mainSection = "After Attack Roll";
+            if (!subSection) {
+                if (macroType.includes('Melee') || itemName.startsWith('(Melee)') || rawTriggerName.includes('Melee')) {
+                    subSection = "Melee";
+                } else if (macroType.includes('Ranged') || itemName.startsWith('(Ranged)') || rawTriggerName.includes('Ranged')) {
+                    subSection = "Ranged";
+                } else {
+                    subSection = "On Token";
+                }
             }
         } else if (triggerMode === 'afterDamage' || rawTriggerName.includes('After Damage Roll') || rawTriggerName.includes('afterDamage')) {
-            if (macroType.includes('Melee') || itemName.startsWith('(Melee)')) {
-                triggerHeader = 'After Damage Roll (Melee)';
-            } else if (macroType.includes('Ranged') || itemName.startsWith('(Ranged)')) {
-                triggerHeader = 'After Damage Roll (Ranged)';
-            } else {
-                triggerHeader = 'After Damage Roll (On Token)';
+            mainSection = "After Damage Roll";
+            if (!subSection) {
+                if (macroType.includes('Melee') || itemName.startsWith('(Melee)') || rawTriggerName.includes('Melee')) {
+                    subSection = "Melee";
+                } else if (macroType.includes('Ranged') || itemName.startsWith('(Ranged)') || rawTriggerName.includes('Ranged')) {
+                    subSection = "Ranged";
+                } else {
+                    subSection = "On Token";
+                }
             }
+        } else if (triggerMode === 'afterActiveEffects' || rawTriggerName.includes('Active Effect')) {
+            mainSection = "After Active Effects";
+        } else if (triggerMode === 'afterSummon' || rawTriggerName.includes('Summon')) {
+            mainSection = "After Summon";
+        } else if (triggerMode === 'createTemplate' || rawTriggerName.includes('Template')) {
+            mainSection = "After Template Create";
+        } else if (rawTriggerName) {
+            mainSection = rawTriggerName;
         }
 
-        if (!groups[triggerHeader]) {
-            groups[triggerHeader] = {
-                triggerName: triggerHeader,
-                triggerMode: item.triggerMode,
-                entries: []
+        if (!sections[mainSection]) {
+            sections[mainSection] = {
+                triggerName: mainSection,
+                triggerMode: triggerMode,
+                subsectionsMap: {}
             };
         }
-        groups[triggerHeader].entries.push(item);
+
+        if (!sections[mainSection].subsectionsMap[subSection]) {
+            sections[mainSection].subsectionsMap[subSection] = [];
+        }
+
+        sections[mainSection].subsectionsMap[subSection].push(item);
     }
 
-    for (const group of Object.values(groups)) {
-        group.entries.sort((a, b) => (a.itemName || a.label || "").localeCompare(b.itemName || b.label || ""));
+    const result = [];
+    for (const [secName, secData] of Object.entries(sections)) {
+        const sortedSubsections = [];
+        for (const [subName, subEntries] of Object.entries(secData.subsectionsMap)) {
+            subEntries.sort((a, b) => (a.itemName ?? a.label ?? "").localeCompare(b.itemName ?? b.label ?? ""));
+            sortedSubsections.push({
+                subTriggerName: subName,
+                hasSubTriggerName: Boolean(subName),
+                entries: subEntries
+            });
+        }
+
+        sortedSubsections.sort((a, b) => {
+            const idxA = preferredSubOrder.indexOf(a.subTriggerName);
+            const idxB = preferredSubOrder.indexOf(b.subTriggerName);
+            if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+            if (idxA !== -1) return -1;
+            if (idxB !== -1) return 1;
+            return (a.subTriggerName ?? "").localeCompare(b.subTriggerName ?? "");
+        });
+
+        const flatEntries = sortedSubsections.flatMap(s => s.entries);
+
+        result.push({
+            triggerName: secName,
+            triggerMode: secData.triggerMode,
+            hasSubsections: sortedSubsections.some(s => Boolean(s.subTriggerName)),
+            subsections: sortedSubsections,
+            entries: flatEntries
+        });
     }
 
-    return Object.values(groups).sort((a, b) => {
-        const idxA = preferredOrder.indexOf(a.triggerName);
-        const idxB = preferredOrder.indexOf(b.triggerName);
+    return result.sort((a, b) => {
+        const idxA = preferredSectionOrder.indexOf(a.triggerName);
+        const idxB = preferredSectionOrder.indexOf(b.triggerName);
         if (idxA !== -1 && idxB !== -1) return idxA - idxB;
         if (idxA !== -1) return -1;
         if (idxB !== -1) return 1;
@@ -156,10 +207,10 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
                     if (!newEntry || typeof newEntry !== 'object') continue;
 
                     const entryKey = `${systemId}___${itemSlug}___${activitySlug}___${triggerMode}`;
-                    const itemName = newEntry.itemName || itemSlug;
-                    const effectName = newEntry.animationName || itemName;
-                    const activityName = newEntry.activityName || activitySlug;
-                    const triggerName = newEntry.triggerName || triggerMode;
+                    const itemName = newEntry.itemName ?? itemSlug;
+                    const effectName = newEntry.animationName ?? itemName;
+                    const activityName = newEntry.activityName ?? activitySlug;
+                    const triggerName = newEntry.triggerName ?? triggerMode;
                     const subtext = (newEntry.animationName && newEntry.animationName !== itemName)
                         ? newEntry.animationName
                         : (activityName && activityName !== 'Default' ? activityName : '');
@@ -244,9 +295,9 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
 
     return {
         newPayload,
-        missingEntries: missingEntries.sort((a, b) => (a.label || "").localeCompare(b.label || "")),
-        updatedEntries: updatedEntries.sort((a, b) => (a.label || "").localeCompare(b.label || "")),
-        customEntries: customEntries.sort((a, b) => (a.label || "").localeCompare(b.label || "")),
+        missingEntries: missingEntries.sort((a, b) => (a.label ?? "").localeCompare(b.label ?? "")),
+        updatedEntries: updatedEntries.sort((a, b) => (a.label ?? "").localeCompare(b.label ?? "")),
+        customEntries: customEntries.sort((a, b) => (a.label ?? "").localeCompare(b.label ?? "")),
         sameEntries
     };
 }

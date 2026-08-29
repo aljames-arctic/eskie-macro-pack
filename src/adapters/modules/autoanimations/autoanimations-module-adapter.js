@@ -68,11 +68,15 @@ function JSONformatObject(obj, depth = 1) {
     if (type === 'function') return obj.toString();
     if (Array.isArray(obj)) return JSON.stringify(obj);
 
+    const keys = Object.keys(obj);
+    if (keys.length === 0) return '{}';
+
     const ret = [];
-    for (const prop in obj) {
+    for (const prop of keys) {
         ret.push(`\n` + ' '.repeat(depth * 2) + `${prop}: ${JSONformatObject(obj[prop], depth + 1)}`);
     }
-    return `{${ret.join(',')}\n}`;
+    const closeIndent = ' '.repeat((depth - 1) * 2);
+    return `{${ret.join(',')}\n${closeIndent}}`;
 }
 
 /**

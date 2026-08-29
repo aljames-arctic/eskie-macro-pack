@@ -72,4 +72,4 @@ export const rage = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("rage", "effect", "eskie.effect.rage", DEFAULT_CONFIG, '1.0.1', "Rage");
+autorec.register("rage", "effect", "eskie.effect.rage", DEFAULT_CONFIG, '1.0.2', "Rage");

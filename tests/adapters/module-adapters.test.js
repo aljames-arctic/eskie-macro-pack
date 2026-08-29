@@ -92,6 +92,15 @@ test('AutoanimationsModuleAdapter standardizes triggers and generates compliant 
     assert.equal(aa.standardizeTrigger('effect'), 'aefx');
     assert.equal(aa.standardizeTrigger('aura'), 'aura');
 
+    const nestedEntry = aa.createAutorecEntry('test', 'token', 'eskie.effect.test', {
+        level1: {
+            level2: {
+                flag: true
+            }
+        }
+    }, '1.0.0', 'Test');
+    assert.ok(nestedEntry.macro.args.includes('      flag: true\n    }\n  }'));
+
     const entry = aa.createAutorecEntry('magicMissile', 'range', 'eskie.effect.magicMissile', { speed: 2 }, '1.0.0', 'Magic Missile');
     assert.ok(entry);
     assert.equal(entry.label, 'Magic Missile');

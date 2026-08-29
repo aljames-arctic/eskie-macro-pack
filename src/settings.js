@@ -4,7 +4,7 @@ import {
     WorldScriptsFormApplication,
     ConfigureAutorecFormApplication
 } from "./ui/index.js";
-import { blfx, isBlfxAutorecAvailable } from "./adapters/modules/blfx/index.js";
+import { blfx, isBlfxAutorecAvailable } from "./adapters/modules/blfx/blfx-module-adapter.js";
 import { updateMacroCompendiums } from "./lib/standalone-macros.js";
 import { log } from './lib/logger.js';
 import { adapter } from "./adapters/index.js";

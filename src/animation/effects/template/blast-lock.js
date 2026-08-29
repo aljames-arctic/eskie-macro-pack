@@ -6,9 +6,9 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
-import { socket } from '../../../adapters/modules/socketlib/index.js';
+import { socket } from '../../../adapters/modules/socketlib/socketlib-module-adapter.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/index.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 
 const DEFAULT_CONFIG = {

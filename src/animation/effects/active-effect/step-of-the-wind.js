@@ -2,8 +2,8 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js'
-import { socket } from '../../../adapters/modules/socketlib/index.js';
-import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/index.js';
+import { socket } from '../../../adapters/modules/socketlib/socketlib-module-adapter.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { matt } from '../../utils/matt-tiles.js';
 
 export const DEFAULT_CONFIG = {

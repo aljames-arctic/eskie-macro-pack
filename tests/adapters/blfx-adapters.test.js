@@ -1,7 +1,7 @@
 import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { blfx, EMP_BLFX_Registry, buildBlfxPayload, mergeBlfxCustomAutoRec } from '../../src/adapters/modules/blfx/index.js';
+import { blfx, EMP_BLFX_Registry, buildBlfxPayload, mergeBlfxCustomAutoRec } from '../../src/adapters/modules/blfx/blfx-module-adapter.js';
 import { generateBlfxAutorecUpdate, readExistingBlfxData, groupBlfxEntriesByTrigger, BlfxAutorecUpdateApp } from '../../src/ui/blfx/updateMenu.js';
 
 test('blfx.register creates robustly keyed entries in EMP_BLFX_Registry', () => {
@@ -170,7 +170,7 @@ test('generateBlfxAutorecUpdate and readExistingBlfxData handle settings seamles
 });
 
 test('isBlfxCustomAutoRecUpdatesEnabled detects boss-loot-assets-premium.blfxCustomAutoRecUpdates setting', async () => {
-    const { isBlfxCustomAutoRecUpdatesEnabled, promptEnableBlfxUpdates } = await import('../../src/adapters/modules/blfx/index.js');
+    const { isBlfxCustomAutoRecUpdatesEnabled, promptEnableBlfxUpdates } = await import('../../src/adapters/modules/blfx/blfx-module-adapter.js');
 
     // When unset
     assert.equal(isBlfxCustomAutoRecUpdatesEnabled(), false);
@@ -201,7 +201,7 @@ test('isBlfxCustomAutoRecUpdatesEnabled detects boss-loot-assets-premium.blfxCus
 });
 
 test('BlfxEnableUpdatesDialog inherits from ApplicationV2 and promptEnableBlfxUpdates renders it', async () => {
-    const { BlfxEnableUpdatesDialog, promptEnableBlfxUpdates } = await import('../../src/adapters/modules/blfx/index.js');
+    const { BlfxEnableUpdatesDialog, promptEnableBlfxUpdates } = await import('../../src/adapters/modules/blfx/blfx-module-adapter.js');
     const dialog = new BlfxEnableUpdatesDialog();
     assert.ok(dialog);
     assert.equal(BlfxEnableUpdatesDialog.DEFAULT_OPTIONS.id, 'empBlfxEnableUpdatesDialog');
@@ -214,7 +214,7 @@ test('BlfxEnableUpdatesDialog inherits from ApplicationV2 and promptEnableBlfxUp
 });
 
 test('BlfxModuleAdapter.submit scans first and only prompts when new animations exist and updates are disabled', async () => {
-    const { blfxAdapter } = await import('../../src/adapters/modules/blfx/index.js');
+    const { blfxAdapter } = await import('../../src/adapters/modules/blfx/blfx-module-adapter.js');
 
     let promptCalled = false;
     const origPrompt = blfxAdapter.promptEnableBlfxUpdates;
@@ -262,7 +262,7 @@ test('BlfxModuleAdapter.submit scans first and only prompts when new animations 
 });
 
 test('submit does not re-prompt on subsequent loads for a non-development release when updates were not applied', async () => {
-    const { blfxAdapter } = await import('../../src/adapters/modules/blfx/index.js');
+    const { blfxAdapter } = await import('../../src/adapters/modules/blfx/blfx-module-adapter.js');
     const { MODULE_ID } = await import('../../src/lib/constants.js');
 
     // Simulate non-development module version

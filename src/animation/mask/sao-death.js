@@ -1,7 +1,7 @@
 import { shatterMask } from './shatter-mask.js';
 import { settingsOverride } from "../../lib/settings.js";
 import { closest } from "../../lib/filemanager.js";
-import { socket } from "../../adapters/modules/socketlib/index.js";
+import { socket } from "../../adapters/modules/socketlib/socketlib-module-adapter.js";
 import { log } from "../../lib/logger.js";
 import { adapter } from "../../adapters/index.js";
 

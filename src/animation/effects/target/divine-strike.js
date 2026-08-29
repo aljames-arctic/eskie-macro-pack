@@ -2,7 +2,7 @@
 // Modularized: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/index.js';
+import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { adapter } from '../../../adapters/index.js';
 
 const DEFAULT_CONFIG = {

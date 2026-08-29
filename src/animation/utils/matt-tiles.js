@@ -1,6 +1,6 @@
 import { time } from '../../lib/time.js';
 import { dependency } from '../../lib/dependency.js';
-import { socket } from '../../adapters/modules/socketlib/index.js';
+import { socket } from '../../adapters/modules/socketlib/socketlib-module-adapter.js';
 import { SECONDS, MODULE_ID } from '../../lib/constants.js';
 import { adapter } from '../../adapters/index.js';
 

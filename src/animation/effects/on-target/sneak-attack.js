@@ -1,6 +1,6 @@
 import { adapter } from '../../../adapters/index.js';
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/index.js';
+import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 const DEFAULT_CONFIG_MELEE = {
     id: "sneakAttackMelee",

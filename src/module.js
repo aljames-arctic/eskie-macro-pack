@@ -1,8 +1,8 @@
 import { animation } from './animation/index.js';
-import { autorec } from './adapters/modules/autorec/index.js';
-import { autoanimations } from './adapters/modules/autoanimations/index.js';
-import { blfx } from './adapters/modules/blfx/index.js';
-import { socketlibapi, socket } from './adapters/modules/socketlib/index.js';
+import { autorec } from './adapters/modules/autorec/autorec-module-adapter.js';
+import { autoanimations } from './adapters/modules/autoanimations/autoanimations-module-adapter.js';
+import { blfx } from './adapters/modules/blfx/blfx-module-adapter.js';
+import { socketlibapi, socket } from './adapters/modules/socketlib/socketlib-module-adapter.js';
 import { loadWorldScripts } from './world-scripts/loader.js';
 import { MODULE_ID } from './lib/constants.js';
 import { crosshair } from './lib/crosshairs.js';

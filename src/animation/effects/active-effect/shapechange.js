@@ -6,6 +6,7 @@
 import { closest } from '../../../lib/filemanager.js';
 import { adapter } from '../../../adapters/index.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'shapechange',
@@ -28,7 +29,7 @@ const DEFAULT_CONFIG = {
  */
 async function createShapechange(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    let { baseForm, hybridForm, wolfForm } = mConfig;
+    let { baseForm, hybridForm, wolfForm, sound } = mConfig;
     let shapechangeData = token.document.getFlag('eskie-macros', 'shapechange');
     if (!shapechangeData) {
         shapechangeData = { baseForm: baseForm ?? token.document.texture.src };
@@ -220,6 +221,7 @@ async function createShapechange(token, config = {}) {
  */
 async function createRevert(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { sound } = mConfig;
     const { baseForm } = token.document.getFlag('eskie-macros', 'shapechange');
 
     const currentForm = token.document.texture.src;

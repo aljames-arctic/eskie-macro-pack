@@ -1,7 +1,7 @@
 import { detectUtil } from './detectUtil.js';
 import { dependency } from '../../../../lib/dependency.js';
-
 import { adapter } from "../../../../adapters/index.js";
+import { DEFAULT_SOUND_CONFIG } from '../../../utils/sound.js';
 /*
     Originally Published: 8/21/2023
     Original Author: EskieMoh#2969 for Divine Sense
@@ -32,7 +32,8 @@ const DEFAULT_CONFIG = {
     },
     detection: defaultDetectionConfig,
     validator: defaultValidator,
-}
+    sound: { ...DEFAULT_SOUND_CONFIG },
+};
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
@@ -48,5 +49,4 @@ export const magic = {
     create,
     play,
     default_config: DEFAULT_CONFIG,
-    sound: { ...DEFAULT_SOUND_CONFIG },
 };

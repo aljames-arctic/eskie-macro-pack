@@ -8,6 +8,7 @@ import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
 import { adapter } from '../../adapters/index.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     repeats: 10,
@@ -18,10 +19,12 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { sound, repeats, repeatDelay, splashScale } = mConfig;
     const targetList = [targets].flat().filter(Boolean);
 
     // Retrieve projectile type from flags, defaulting to arrow
-    const projectileType = tile.document?.getFlag(MODULE_ID, 'trap.projectileType') || config.projectileType || 'arrow';
+    const projectileType = tile.document?.getFlag(MODULE_ID, 'trap.projectileType') ?? mConfig.projectileType ?? 'arrow';
 
     // Retrieve target/landing tile from flags, falling back to legacy trigger lookup
     const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') || [];

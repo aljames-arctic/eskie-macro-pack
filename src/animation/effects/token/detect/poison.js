@@ -1,6 +1,6 @@
 import { detectUtil } from './detectUtil.js';
-
 import { adapter } from "../../../../adapters/index.js";
+import { DEFAULT_SOUND_CONFIG } from '../../../utils/sound.js';
 const defaultDetectionConfig = {
     poisoned: 'jb2a.magic_signs.rune.abjuration.complete.red',
     diseased: 'jb2a.magic_signs.rune.conjuration.complete.pink',
@@ -22,7 +22,8 @@ const DEFAULT_CONFIG = {
     },
     detection: defaultDetectionConfig,
     validator: defaultValidator,
-}
+    sound: { ...DEFAULT_SOUND_CONFIG },
+};
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
@@ -38,5 +39,4 @@ export const poison = {
     create,
     play,
     default_config: DEFAULT_CONFIG,
-    sound: { ...DEFAULT_SOUND_CONFIG },
 };

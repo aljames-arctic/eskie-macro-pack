@@ -18,12 +18,13 @@ const DEFAULT_CONFIG = {
     },
     detection: defaultDetectionConfig,
     validator: defaultValidator,
-}
+    sound: { ...DEFAULT_SOUND_CONFIG },
+};
 
 async function _createDetectionEffects(target, config = {}) {
     const tags = Object.keys(config.detection);
     let sequence = new Sequence();
-    applySound(sequence, mConfig.sound);
+    applySound(sequence, config.sound);
 
     let filteredTags = [];
     for (const tag of tags) {

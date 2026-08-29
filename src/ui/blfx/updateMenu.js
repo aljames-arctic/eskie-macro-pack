@@ -54,12 +54,12 @@ function extractVersionFromNote(note) {
  */
 export function groupBlfxEntriesByTrigger(entries = []) {
     const preferredOrder = [
-        "After Template Create",
-        "After Active Effects",
+        "After Activity Use (Default)",
         "After Attack Roll",
         "After Damage Roll",
+        "After Active Effects",
         "After Summon",
-        "After Activity Use (Default)"
+        "After Template Create"
     ];
 
     const groups = {};

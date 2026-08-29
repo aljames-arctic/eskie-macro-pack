@@ -51,11 +51,12 @@ test('groupBlfxEntriesByTrigger groups entries into preferred section order', ()
 
     const sections = groupBlfxEntriesByTrigger(rawEntries);
     assert.equal(sections.length, 4);
-    assert.equal(sections[0].triggerName, 'After Template Create');
-    assert.equal(sections[1].triggerName, 'After Active Effects');
-    assert.equal(sections[2].triggerName, 'After Attack Roll');
-    assert.equal(sections[3].triggerName, 'After Activity Use (Default)');
-    assert.equal(sections[0].entries[0].itemName, 'Fireball');
+    assert.equal(sections[0].triggerName, 'After Activity Use (Default)');
+    assert.equal(sections[1].triggerName, 'After Attack Roll');
+    assert.equal(sections[2].triggerName, 'After Active Effects');
+    assert.equal(sections[3].triggerName, 'After Template Create');
+    assert.equal(sections[0].entries[0].itemName, 'Bless');
+    assert.equal(sections[3].entries[0].itemName, 'Fireball');
 });
 
 test('buildBlfxPayload constructs valid resources payload with multi-package compatibility flags', () => {

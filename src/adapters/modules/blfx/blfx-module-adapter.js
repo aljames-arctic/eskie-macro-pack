@@ -422,8 +422,16 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
                         ? (['melee', 'melee-target'].includes(trigger) ? "Attack Melee" : "Attack Ranged")
                         : (triggerMode === "afterSummon"
                             ? "Summon"
-                            : "Macro")))
+                            : "Macro"))));
+        const animDataOverrides = options.animationData ?? {};
+        const activityType = options.activityType ?? animDataOverrides.activityType ?? (
+            activityName.toLowerCase() === 'cast' || options.itemType === 'spell'
+                ? 'cast'
+                : 'utility'
         );
+        const primaryAnimation = options.primaryAnimation ?? animDataOverrides.primaryAnimation ?? {};
+        const secondaryAnimation = options.secondaryAnimation ?? animDataOverrides.secondaryAnimation ?? {};
+        const thirdAnimation = options.thirdAnimation ?? animDataOverrides.thirdAnimation ?? {};
 
         const entry = {
             animationName: localizedLabel,
@@ -432,13 +440,19 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
             triggerName: triggerName,
             note: `Eskie Macro Pack (${version})`,
             animationData: {
-                eventType: triggerName,
-                macroType: macroType,
-                command: command,
-                autoRec: {
+                ...animDataOverrides,
+                eventType: animDataOverrides.eventType ?? triggerName,
+                macroType: animDataOverrides.macroType ?? macroType,
+                primaryAnimation,
+                secondaryAnimation,
+                thirdAnimation,
+                command: animDataOverrides.command ?? command,
+                autoRec: animDataOverrides.autoRec ?? {
                     enabled: true
                 },
-                version: 2
+                activityName: animDataOverrides.activityName ?? activityName,
+                activityType,
+                version: animDataOverrides.version ?? 2
             }
         };
 

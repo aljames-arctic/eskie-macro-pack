@@ -22,6 +22,11 @@ test('blfx.register creates robustly keyed entries in EMP_BLFX_Registry', () => 
     assert.equal(entry.triggerName, 'After Template Create');
     assert.equal(entry.note, 'Eskie Macro Pack (1.0.0)');
     assert.equal(entry.animationData.macroType, 'Template');
+    assert.equal(entry.animationData.activityName, 'Cast');
+    assert.equal(entry.animationData.activityType, 'cast');
+    assert.deepEqual(entry.animationData.primaryAnimation, {});
+    assert.deepEqual(entry.animationData.secondaryAnimation, {});
+    assert.deepEqual(entry.animationData.thirdAnimation, {});
     assert.ok(entry.animationData.command.includes('eskie.effect.fireball'));
     assert.ok(entry.animationData.command.includes('templateDocument'));
 });
@@ -50,6 +55,34 @@ test('blfx.register allows configuring multiple activities for a single item whe
 
     assert.ok(EMP_BLFX_Registry['dnd5e']['dagger']['thrown-attack']['afterAttack']);
     assert.equal(EMP_BLFX_Registry['dnd5e']['dagger']['thrown-attack']['afterAttack'].animationData.macroType, 'Attack Ranged');
+});
+
+test('blfx.register populates activityName, activityType, and animation slots with custom options support', () => {
+    blfx.register('teleport', 'token', 'eskie.effect.teleport', {}, '1.0.0', 'Teleport', {
+        activityName: 'Misty Step',
+        activityType: 'cast',
+        primaryAnimation: {
+            enabled: true,
+            fileName: 'blfx.spell.cast.circles1.energy1.blue',
+            scale: 1.5
+        },
+        secondaryAnimation: {},
+        thirdAnimation: {
+            enabled: true,
+            fileName: 'blfx.spell.cast.circles2.energy1.smoke.orange',
+            scale: 1.6
+        }
+    });
+
+    const entry = EMP_BLFX_Registry['dnd5e']['teleport']['misty-step']['afterItemUse'];
+    assert.ok(entry);
+    assert.equal(entry.animationData.activityName, 'Misty Step');
+    assert.equal(entry.animationData.activityType, 'cast');
+    assert.equal(entry.animationData.primaryAnimation.enabled, true);
+    assert.equal(entry.animationData.primaryAnimation.fileName, 'blfx.spell.cast.circles1.energy1.blue');
+    assert.deepEqual(entry.animationData.secondaryAnimation, {});
+    assert.equal(entry.animationData.thirdAnimation.enabled, true);
+    assert.equal(entry.animationData.thirdAnimation.fileName, 'blfx.spell.cast.circles2.energy1.smoke.orange');
 });
 
 test('groupBlfxEntriesByTrigger groups entries into preferred section and sub-section order', () => {

@@ -31,7 +31,7 @@ const DEFAULT_CONFIG = {
 async function createMaskTiles(object, config = {}) {
     const widthAdjustment = adapter.isDocumentOfType(object, 'Token') ? canvas.grid.size : 1;
 
-    const { revealOverlay, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { revealOverlay, rotation } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const revealOverlayPath = absolutePath(revealOverlay);
     const scaleXY = object.document.texture.scaleX;
     
@@ -111,7 +111,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
     ]);
 
     const { id, deleteObject, revealOverlay, tokenOverlay, rotation, tint, callback } =
-        foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+        adapter.mergeObject(DEFAULT_CONFIG, config);
 
     let tokenOverlayPath = config.tokenOverlayPath;
     if (!tokenOverlayPath) {
@@ -289,7 +289,7 @@ async function create(object, config = {}) {
  * Coordinated play function that broadcasts local playback to all clients.
  */
 async function playSocketed(object, config = {}) {
-    const { id, deleteObject, revealOverlay, tokenOverlay, rotation, tint } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, deleteObject, revealOverlay, tokenOverlay, rotation, tint } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Pre-resolve paths
     const tokenOverlayPath = absolutePath(tokenOverlay);
@@ -378,7 +378,7 @@ async function playLocal(object, tileIds, animationId, config = {}) {
  * Internal entry point to execute the local stop/cleanup sequence.
  */
 async function stopLocal(object, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${object.id}`;
 
     return Promise.all([

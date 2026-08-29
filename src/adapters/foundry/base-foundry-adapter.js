@@ -202,7 +202,8 @@ export class BaseFoundryAdapter {
      * @returns {Object}
      */
     mergeObject(original, other = {}, options = {}) {
-        return foundry.utils.mergeObject(original, other, options);
+        const mergedOptions = { inplace: false, ...options };
+        return foundry.utils.mergeObject(original, other, mergedOptions);
     }
 
     /**

@@ -41,7 +41,7 @@ function getNearestSquareCenter(token, target) {
 }
 
 async function createMelee(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { darkMap, sound } = mConfig;
 
     const sequence = new Sequence();
@@ -150,7 +150,7 @@ async function playMelee(token, target, config = {}) {
 }
 
 async function createRanged(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { darkMap, sound } = mConfig;
 
     const sequence = new Sequence();
@@ -247,7 +247,7 @@ async function playRanged(token, target, config = {}) {
 }
 
 async function createTwilightMelee(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { darkMap, type, weight, isCrit, sound } = mConfig;
 
     if (!token || !target) return;
@@ -352,7 +352,7 @@ async function playTwilightMelee(token, target, config = {}) {
 }
 
 async function createTwilightRanged(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { darkMap, isCrit, sound } = mConfig;
 
     if (!token || !target) return;

@@ -46,7 +46,7 @@ function ydelta(p1, p2) {
 }
 
 async function create(token, targets = [], config = {}) {
-    const { impact, screen, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { impact, screen, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { pos1, pos2 } = await getPositions(token);
     const mirrorY = pos1.x > pos2.x;
 

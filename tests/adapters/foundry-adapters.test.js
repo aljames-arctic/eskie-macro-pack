@@ -399,5 +399,22 @@ test('getTokenOwners and placeable attachment contracts on BaseFoundryAdapter', 
     assert.deepEqual(tileDetach, { mockUnlinked: true, targetId: 'tile-target' });
 });
 
+test('BaseFoundryAdapter mergeObject defaults to non-inplace safe merge', () => {
+    const adapter = new BaseFoundryAdapter();
+    const original = { a: 1, nested: { b: 2, c: 3 } };
+    const source = { nested: { c: 99, d: 4 }, extra: 'test' };
+
+    const merged = adapter.mergeObject(original, source);
+    assert.deepEqual(merged, { a: 1, nested: { b: 2, c: 99, d: 4 }, extra: 'test' });
+    // Verify original object was not mutated
+    assert.equal(original.nested.c, 3);
+    assert.equal(original.extra, undefined);
+
+    // Verify explicit options pass through
+    const inplaceTarget = { x: 10 };
+    adapter.mergeObject(inplaceTarget, { y: 20 }, { inplace: true });
+    assert.equal(inplaceTarget.y, 20);
+});
+
 
 

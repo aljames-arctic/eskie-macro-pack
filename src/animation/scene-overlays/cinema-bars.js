@@ -7,7 +7,7 @@ const DEFAULT_CONFIG = {
 };
 
 function create(config = {}) {
-    const { id, dim } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, dim } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     let sequence = new Sequence();
     sequence.effect()
@@ -40,7 +40,7 @@ async function play(config = {}) {
 }
 
 async function stop(config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     return Sequencer.EffectManager.endEffects({ name: id });
 }
 

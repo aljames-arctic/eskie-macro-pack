@@ -25,7 +25,7 @@ const DEFAULT_CONFIG = {
 async function create(object, config = {}) {
     config = settingsOverride(config);
     const { id, tintColor, duration, shatterColor, deleteObject, sound } =
-        foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+        adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id}-${object.id}`;
 
     let sequence = new Sequence();
@@ -163,7 +163,7 @@ async function play(object, config = {}) {
 
 async function stop(object, config = {}) {
     const { id, shatterColor, deleteObject } =
-        foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+        adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id}-${object.id}`;
 
     return Promise.all([

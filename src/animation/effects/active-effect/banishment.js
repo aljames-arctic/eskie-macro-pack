@@ -136,7 +136,7 @@ function modifyPortal(portal, target) {
 
 async function createBanish(target, config = {}) {
     config = settingsOverride(config);
-    const { sound, portal } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { sound, portal } = adapter.mergeObject(DEFAULT_CONFIG, config);
     modifyPortal(portal, target);
 
     const RUNE_DATA = {
@@ -340,7 +340,7 @@ async function playBanish(target, config = {}) {
 
 async function createReturn(target, config = {}) {
     config = settingsOverride(config);
-    const { color, sound, portal } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { color, sound, portal } = adapter.mergeObject(DEFAULT_CONFIG, config);
     modifyPortal(portal, target);
 
     const sequence = new Sequence();

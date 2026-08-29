@@ -37,7 +37,7 @@ const DEFAULT_CONFIG = {
  */
 function create(token, targetTokens, config = {}) {
     config = settingsOverride(config);
-    config = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    config = adapter.mergeObject(DEFAULT_CONFIG, config);
     if (!targetTokens || targetTokens.length === 0) {
         log.warn("Chain Lightning called with no targets.");
         return null;

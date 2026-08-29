@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
 };
 
 function createUserBlur(user, bg, config = {}) {
-    const { id, opacity, blur, sway, durationX, durationY } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, opacity, blur, sway, durationX, durationY } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const x = (canvas?.scene?.dimensions?.width ?? canvas?.dimensions?.width ?? 0) / 2;
     const y = (canvas?.scene?.dimensions?.height ?? canvas?.dimensions?.height ?? 0) / 2;
@@ -73,7 +73,7 @@ async function playDrunkBlur(users = []) {
 }
 
 async function stop(users = [], config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     return Promise.all(users.map(user => Sequencer.EffectManager.endEffects({ name: `${id} - ${user.name}` })));
 }
 

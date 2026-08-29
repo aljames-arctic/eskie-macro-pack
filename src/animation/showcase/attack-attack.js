@@ -62,7 +62,7 @@ async function play(token1, token2, config = {}) {
 }
 
 function create(red, blue, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     let seq = new Sequence();
     seq.addSequence(movement1create(red, blue, mConfig));

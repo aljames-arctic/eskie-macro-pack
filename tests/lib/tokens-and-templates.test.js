@@ -107,6 +107,10 @@ test('entangle template and entangled active effect exports and contracts', asyn
     assert.equal(typeof entangle.play, 'function');
     assert.equal(typeof entangle.stop, 'function');
     assert.equal(entangle.entangled, entangled);
+    assert.equal(entangle.effect, entangled);
+    assert.equal(typeof entangle.template.create, 'function');
+    assert.equal(typeof entangle.template.play, 'function');
+    assert.equal(typeof entangle.template.stop, 'function');
     assert.equal(effect.entangled, entangled);
     assert.equal(effect.entangle, entangle);
 

@@ -115,10 +115,18 @@ export const entangle = {
     create,
     play,
     stop,
+    template: {
+        create,
+        play,
+        stop,
+        default_config: DEFAULT_CONFIG
+    },
+    effect: entangled,
     entangled,
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('entangle', 'template', 'eskie.effect.entangle', DEFAULT_CONFIG, '0.0.2', 'Entangle');
-autorec.register(CONCENTRATING('entangle', 'Entangle'), 'effect', 'eskie.effect.entangle', DEFAULT_CONFIG, '0.0.2');
+autorec.register('entangle', 'template', 'eskie.effect.entangle', DEFAULT_CONFIG, '0.0.3', 'Entangle');
+autorec.register('entangle', 'effect', 'eskie.effect.entangle.effect', DEFAULT_CONFIG, '0.0.3', 'Entangle');
+autorec.register(CONCENTRATING('entangle', 'Entangle'), 'effect', 'eskie.effect.entangle', DEFAULT_CONFIG, '0.0.3');
 

@@ -1,6 +1,6 @@
 import { adapter } from '../../../adapters/index.js';
 import { closest } from '../../../lib/filemanager.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG_MELEE = {
     id: "sneakAttackMelee",
@@ -156,5 +156,5 @@ export const sneakAttack = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("sneakAttack", "ranged-target", "eskie.effect.sneakAttack", DEFAULT_CONFIG, "0.0.0", "Sneak Attack");
-autoanimations.register("sneakAttack", "melee-target", "eskie.effect.sneakAttack", DEFAULT_CONFIG, "0.0.0", "Sneak Attack");
+autorec.register(autorec.MELEE("sneakAttack", "Sneak Attack"), "melee-target", "eskie.effect.sneakAttack.melee", DEFAULT_CONFIG_MELEE, "1.0.0", "(Melee) Sneak Attack");
+autorec.register(autorec.RANGED("sneakAttack", "Sneak Attack"), "ranged-target", "eskie.effect.sneakAttack.ranged", DEFAULT_CONFIG_RANGED, "1.0.0", "(Ranged) Sneak Attack");

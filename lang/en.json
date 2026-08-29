@@ -134,7 +134,7 @@
                     "description": "Automatically triggers EMP spell and item animations when actions, rolls, or attacks are performed in supported game systems."
                 },
                 "bossLootFx": {
-                    "name": "Boss Loot FX (Patreon)",
+                    "name": "BLFX Animation Editor Premium",
                     "description": "Automatically triggers EMP spell and attack animations in Foundry v14+ using Boss Loot FX Custom Auto-Recognition."
                 }
             }
@@ -212,7 +212,7 @@
             "syncSectionTitle": "Integration Submenus & Preset Sync",
             "aaTitle": "Automated Animations",
             "aaDescription": "Review and synchronize Eskie Macro Pack's custom animation presets with Automated Animations.",
-            "blfxTitle": "Boss Loot FX (Patreon)",
+            "blfxTitle": "BLFX Animation Editor Premium",
             "blfxDescription": "Review and synchronize Eskie Macro Pack's custom auto-recognition presets with Boss Loot FX on Foundry v14+.",
             "syncAaButton": "Sync to Auto Animations",
             "syncBlfxButton": "Sync to Boss Loot FX",
@@ -226,7 +226,7 @@
             "syncSectionTitle": "Integration Submenus & Preset Sync",
             "aaTitle": "Automated Animations",
             "aaDescription": "Review and synchronize Eskie Macro Pack's custom animation presets with Automated Animations.",
-            "blfxTitle": "Boss Loot FX (Patreon)",
+            "blfxTitle": "BLFX Animation Editor Premium",
             "blfxDescription": "Review and synchronize Eskie Macro Pack's custom auto-recognition presets with Boss Loot FX on Foundry v14+.",
             "syncButton": "Sync Presets",
             "syncAaButton": "Sync to Auto Animations",

@@ -21,7 +21,10 @@ export function isFoundryV14Plus() {
  * @returns {boolean}
  */
 export function isBlfxAutorecAvailable() {
-    return isFoundryV14Plus() && Boolean(game?.modules?.get('boss-loot-assets-premium')?.active);
+    return isFoundryV14Plus() && Boolean(
+        game?.modules?.get('boss-loot-assets-premium')?.active ||
+        game?.modules?.get('blfx-animation-editor-premium')?.active
+    );
 }
 
 /**

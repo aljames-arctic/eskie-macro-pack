@@ -118,6 +118,7 @@ export const RECOMMENDED_CATEGORIES = [
             {
                 id: "boss-loot-assets-premium",
                 name: "EMP.recommendedModules.modules.bossLootFx.name",
+                altIds: ["blfx-animation-editor-premium", "blfx"],
                 description: "EMP.recommendedModules.modules.bossLootFx.description",
                 icon: "fa-solid fa-dragon"
             }

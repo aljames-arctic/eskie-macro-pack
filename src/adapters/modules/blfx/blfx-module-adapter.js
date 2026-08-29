@@ -10,8 +10,49 @@ import { BlfxAutorecUpdateFormApplication, generateBlfxAutorecUpdate } from "../
 export const EMP_BLFX_Registry = {};
 
 /**
+ * Standard trigger key mapping for BLFX Custom Auto-Recognition.
+ */
+export const BLFX_TRIGGER_MAP = {
+    melee: "afterAttack",
+    "melee-target": "afterAttack",
+    range: "afterAttack",
+    "ranged-target": "afterAttack",
+    attack: "afterAttack",
+    afterattack: "afterAttack",
+    damage: "afterDamage",
+    afterdamage: "afterDamage",
+    template: "createTemplate",
+    templatefx: "createTemplate",
+    createtemplate: "createTemplate",
+    summon: "afterSummon",
+    aftersummon: "afterSummon",
+    effect: "afterActiveEffects",
+    aefx: "afterActiveEffects",
+    "active-effect": "afterActiveEffects",
+    ae: "afterActiveEffects",
+    afteractiveeffects: "afterActiveEffects",
+    token: "afterItemUse",
+    ontoken: "afterItemUse",
+    aura: "afterItemUse",
+    preset: "afterItemUse",
+    afteritemuse: "afterItemUse"
+};
+
+/**
+ * Standard display names for BLFX trigger categories.
+ */
+export const BLFX_TRIGGER_NAMES = {
+    afterItemUse: "After Activity Use (Default)",
+    afterAttack: "After Attack Roll",
+    afterDamage: "After Damage Roll",
+    afterActiveEffects: "After Active Effects",
+    afterSummon: "After Summon",
+    createTemplate: "After Template Create"
+};
+
+/**
  * Standardize trigger mode for BLFX.
- * Supported BLFX trigger modes: 'afterItemUse', 'afterAttack', 'afterDamage', 'templatePlaced', etc.
+ * Supported BLFX trigger modes: 'afterItemUse', 'afterAttack', 'afterDamage', 'afterActiveEffects', 'createTemplate', 'afterSummon'.
  * @param {string} trigger AA-style trigger name
  * @param {string} [customTrigger] Optional explicit BLFX trigger override
  * @returns {string} Standardized BLFX trigger name
@@ -19,23 +60,7 @@ export const EMP_BLFX_Registry = {};
 export function standardizeBlfxTrigger(trigger, customTrigger) {
     if (customTrigger) return customTrigger;
     const cleanTrigger = (trigger ?? '').toLowerCase();
-    switch (cleanTrigger) {
-        case "melee":
-        case "melee-target":
-        case "range":
-        case "ranged-target":
-            return "afterAttack";
-        case "template":
-        case "templatefx":
-        case "aura":
-        case "token":
-        case "ontoken":
-        case "effect":
-        case "aefx":
-        case "preset":
-        default:
-            return "afterItemUse";
-    }
+    return BLFX_TRIGGER_MAP[cleanTrigger] ?? "afterItemUse";
 }
 
 /**
@@ -46,14 +71,40 @@ export function standardizeBlfxTrigger(trigger, customTrigger) {
  * @returns {string} Generated JavaScript snippet
  */
 export function buildBlfxMacroCommand(animation, trigger, config) {
-    const isTargeted = ['melee', 'range', 'melee-target', 'ranged-target'].includes(trigger);
+    const standardized = standardizeBlfxTrigger(trigger);
     const serializedConfig = JSON.stringify(config ?? {});
 
-    if (isTargeted) {
+    if (standardized === 'afterActiveEffects') {
+        return `// Eskie Macro Pack Autorec (On Target or Token - AE)
+const token = (typeof targetTokens !== 'undefined' && (targetTokens?.first?.() ?? Array.from(targetTokens ?? [])[0])) || (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
+const config = ${serializedConfig};
+const effectFn = foundry.utils.getProperty(globalThis, '${animation}');
+if (effectFn && token) {
+    if (typeof effect !== 'undefined' && effect) {
+        config.activeEffect = effect;
+    }
+    if (effectFn.play) {
+        await effectFn.play(token, config);
+    }
+}`;
+    }
+
+    if (standardized === 'createTemplate') {
+        return `// Eskie Macro Pack Autorec (Template)
+const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
+const template = typeof templateDocument !== 'undefined' ? templateDocument : null;
+const config = ${serializedConfig};
+if (template) config.template = template;
+const effect = foundry.utils.getProperty(globalThis, '${animation}');
+if (effect?.play && token) {
+    await effect.play(token, config);
+}`;
+    }
+
+    if (standardized === 'afterAttack' || standardized === 'afterDamage') {
         return `// Eskie Macro Pack Autorec (Targeted)
-const speakerActor = typeof speaker !== 'undefined' && speaker ? ChatMessage?.getSpeakerActor?.(speaker) : null;
-const token = (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || speakerActor?.getActiveTokens?.()?.[0] || null;
-const target = (typeof workflow !== 'undefined' && (workflow?.targets?.first?.() ?? Array.from(workflow?.targets ?? [])[0])) || (typeof targets !== 'undefined' && (targets?.first?.() ?? Array.from(targets ?? [])[0])) || Array.from(game.user?.targets ?? [])[0] || null;
+const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
+const target = (typeof targetTokens !== 'undefined' && (targetTokens?.first?.() ?? Array.from(targetTokens ?? [])[0])) || (typeof workflow !== 'undefined' && (workflow?.targets?.first?.() ?? Array.from(workflow?.targets ?? [])[0])) || Array.from(game.user?.targets ?? [])[0] || null;
 const config = ${serializedConfig};
 const effect = foundry.utils.getProperty(globalThis, '${animation}');
 if (effect?.play) {
@@ -66,8 +117,7 @@ if (effect?.play) {
     }
 
     return `// Eskie Macro Pack Autorec
-const speakerActor = typeof speaker !== 'undefined' && speaker ? ChatMessage?.getSpeakerActor?.(speaker) : null;
-const token = (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || speakerActor?.getActiveTokens?.()?.[0] || null;
+const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
 const config = ${serializedConfig};
 const effect = foundry.utils.getProperty(globalThis, '${animation}');
 if (effect?.play && token) {
@@ -236,16 +286,30 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
         const rawActivitySlug = options.activitySlug ?? (activityName ? (foundry.utils?.slugify ? foundry.utils.slugify(slugAct) : slugAct.toLowerCase().replace(/[^a-z0-9]/g, '-')) : "default");
         const activitySlug = rawActivitySlug ? rawActivitySlug : 'default';
         const triggerMode = this.standardizeTrigger(trigger, options.blfxTrigger);
+        const triggerName = options.triggerName ?? BLFX_TRIGGER_NAMES[triggerMode] ?? triggerMode;
         const command = options.command ?? this.buildMacroCommand(animation, trigger, config);
+        const macroType = triggerMode === "afterActiveEffects"
+            ? "On Target or Token (AE)"
+            : (triggerMode === "createTemplate"
+                ? "Template"
+                : (triggerMode === "afterAttack"
+                    ? "Attack Ranged"
+                    : "Macro"));
 
         const entry = {
             animationName: localizedLabel,
             itemName: itemName,
             activityName: activityName,
-            triggerName: triggerMode,
+            triggerName: triggerName,
             note: `Eskie Macro Pack (${version})`,
             animationData: {
-                command: command
+                eventType: triggerName,
+                macroType: macroType,
+                command: command,
+                autoRec: {
+                    enabled: true
+                },
+                version: 2
             }
         };
 

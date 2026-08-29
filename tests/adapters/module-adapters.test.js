@@ -120,12 +120,18 @@ test('AutoanimationsModuleAdapter standardizes triggers and generates compliant 
 test('BlfxModuleAdapter standardizes triggers and generates compliant macro commands', () => {
     const blfx = new BlfxModuleAdapter();
     assert.equal(blfx.standardizeTrigger('melee-target'), 'afterAttack');
-    assert.equal(blfx.standardizeTrigger('template'), 'afterItemUse');
+    assert.equal(blfx.standardizeTrigger('template'), 'createTemplate');
+    assert.equal(blfx.standardizeTrigger('effect'), 'afterActiveEffects');
+    assert.equal(blfx.standardizeTrigger('token'), 'afterItemUse');
     assert.equal(blfx.standardizeTrigger('template', 'templatePlaced'), 'templatePlaced');
 
     const commandTargeted = blfx.buildMacroCommand('eskie.effect.sneakAttack', 'melee-target', { damage: '2d6' });
     assert.ok(commandTargeted.includes('Eskie Macro Pack Autorec (Targeted)'));
     assert.ok(commandTargeted.includes('eskie.effect.sneakAttack'));
+
+    const commandAe = blfx.buildMacroCommand('eskie.effect.rage', 'effect', { color: 'red' });
+    assert.ok(commandAe.includes('Eskie Macro Pack Autorec (On Target or Token - AE)'));
+    assert.ok(commandAe.includes('activeEffect'));
 
     const commandSelf = blfx.buildMacroCommand('eskie.effect.shield', 'token', {});
     assert.ok(commandSelf.includes('Eskie Macro Pack Autorec'));
@@ -159,8 +165,8 @@ test('AutorecManager coordinates registration across AA and BLFX adapters', () =
 
     assert.equal(customAA.menu.templatefx.length, 1);
     assert.equal(customAA.menu.templatefx[0].label, 'Fireball');
-    assert.ok(customBLFX.registry.dnd5e.fireball.default.afterItemUse);
-    assert.equal(customBLFX.registry.dnd5e.fireball.default.afterItemUse.itemName, 'Fireball');
+    assert.ok(customBLFX.registry.dnd5e.fireball.default.createTemplate);
+    assert.equal(customBLFX.registry.dnd5e.fireball.default.createTemplate.itemName, 'Fireball');
 });
 
 test('MassEditModuleAdapter delegates link and removeLinks to MassEdit.linker', async () => {

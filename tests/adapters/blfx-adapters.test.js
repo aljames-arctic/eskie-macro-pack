@@ -14,13 +14,31 @@ test('blfx.register creates robustly keyed entries in EMP_BLFX_Registry', () => 
     assert.ok(EMP_BLFX_Registry['dnd5e']);
     assert.ok(EMP_BLFX_Registry['dnd5e']['fireball']);
     assert.ok(EMP_BLFX_Registry['dnd5e']['fireball']['cast']);
-    assert.ok(EMP_BLFX_Registry['dnd5e']['fireball']['cast']['afterItemUse']);
+    assert.ok(EMP_BLFX_Registry['dnd5e']['fireball']['cast']['createTemplate']);
 
-    const entry = EMP_BLFX_Registry['dnd5e']['fireball']['cast']['afterItemUse'];
+    const entry = EMP_BLFX_Registry['dnd5e']['fireball']['cast']['createTemplate'];
     assert.equal(entry.itemName, 'Fireball');
     assert.equal(entry.activityName, 'Cast');
+    assert.equal(entry.triggerName, 'After Template Create');
     assert.equal(entry.note, 'Eskie Macro Pack (1.0.0)');
+    assert.equal(entry.animationData.macroType, 'Template');
     assert.ok(entry.animationData.command.includes('eskie.effect.fireball'));
+    assert.ok(entry.animationData.command.includes('templateDocument'));
+});
+
+test('blfx.register maps active effects to afterActiveEffects and On Target or Token (AE)', () => {
+    blfx.register('rage', 'effect', 'eskie.effect.rage', { color: 'red' }, '1.0.0', 'Rage', {
+        systemId: 'dnd5e',
+        itemName: 'Rage',
+        activityName: 'Rage',
+    });
+
+    assert.ok(EMP_BLFX_Registry['dnd5e']['rage']['rage']['afterActiveEffects']);
+    const entry = EMP_BLFX_Registry['dnd5e']['rage']['rage']['afterActiveEffects'];
+    assert.equal(entry.triggerName, 'After Active Effects');
+    assert.equal(entry.animationData.macroType, 'On Target or Token (AE)');
+    assert.ok(entry.animationData.command.includes('eskie.effect.rage'));
+    assert.ok(entry.animationData.command.includes('activeEffect'));
 });
 
 test('buildBlfxPayload constructs valid resources payload with multi-package compatibility flags', () => {

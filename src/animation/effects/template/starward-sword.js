@@ -10,7 +10,12 @@ const DEFAULT_CONFIG = {
     darkMap: true,
     cameraZoom: false,
     targets: [],
-    sound: { ...DEFAULT_SOUND_CONFIG }
+    sound: {
+        cast: { ...DEFAULT_SOUND_CONFIG },
+        slash: { ...DEFAULT_SOUND_CONFIG },
+        impact: { ...DEFAULT_SOUND_CONFIG },
+        finisher: { ...DEFAULT_SOUND_CONFIG }
+    }
 };
 
 async function createStarwardSword(token, config = {}, options = {}) {
@@ -18,6 +23,10 @@ async function createStarwardSword(token, config = {}, options = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { size, darkMap, cameraZoom, sound } = mConfig;
     let { targets } = mConfig;
+    const castSound = sound?.cast ?? sound;
+    const slashSound = sound?.slash ?? sound;
+    const impactSound = sound?.impact;
+    const finisherSound = sound?.finisher ?? sound?.slash ?? sound;
 
     const cfg = {
         radius: size * canvas.grid.size,
@@ -84,7 +93,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
     //Opening
     const mainSequence = new Sequence();
-    applySound(mainSequence, sound);
+    applySound(mainSequence, castSound);
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
         mainSequence
@@ -171,10 +180,11 @@ async function createStarwardSword(token, config = {}, options = {}) {
         if (e == 0) {
             for (let u = 0; u < 5; u++) {
                 if (u === 4) {
+                    const slashSeq = new Sequence();
+                    slashSeq.wait(200 * (u + 1) - 199);
+                    applySound(slashSeq, slashSound);
 
-                    mainSequence.addSequence(new Sequence()
-
-                        .wait(200 * (u + 1) - 199)
+                    mainSequence.addSequence(slashSeq
 
                         .effect()
                         .file(closest("jb2a.impact.002.pinkpurple"))
@@ -229,7 +239,9 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
                         .thenDo(function () {
                             targets.forEach(target => {
-                                new Sequence()
+                                const targetSeq = new Sequence();
+                                if (impactSound?.enable) applySound(targetSeq, impactSound);
+                                targetSeq
 
                                     .animation()
                                     .on(target)
@@ -278,10 +290,11 @@ async function createStarwardSword(token, config = {}, options = {}) {
                         .wait(50));
 
                 } else {
+                    const slashSeq = new Sequence();
+                    slashSeq.wait(200 * (u + 1) - 199);
+                    applySound(slashSeq, slashSound);
 
-                    mainSequence.addSequence(new Sequence()
-
-                        .wait(200 * (u + 1) - 199)
+                    mainSequence.addSequence(slashSeq
 
                         .effect()
                         .file(closest("jb2a.impact.002.pinkpurple"))
@@ -335,7 +348,9 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
                         .thenDo(function () {
                             targets.forEach(target => {
-                                new Sequence()
+                                const targetSeq = new Sequence();
+                                if (impactSound?.enable) applySound(targetSeq, impactSound);
+                                targetSeq
 
                                     .effect()
                                     .copySprite(target)
@@ -363,7 +378,9 @@ async function createStarwardSword(token, config = {}, options = {}) {
                 }
             }
         } else if (e === 9) {
-            mainSequence.addSequence(new Sequence()
+            const finalSeq = new Sequence();
+            applySound(finalSeq, finisherSound);
+            mainSequence.addSequence(finalSeq
 
                 .effect()
                 .name(`location`)
@@ -375,7 +392,9 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
                 .thenDo(function () {
                     targets.forEach(target => {
-                        new Sequence()
+                        const targetSeq = new Sequence();
+                        if (impactSound?.enable) applySound(targetSeq, impactSound);
+                        targetSeq
 
                             .effect()
                             .copySprite(target)
@@ -475,7 +494,9 @@ async function createStarwardSword(token, config = {}, options = {}) {
             ); // End addSequence
 
         } else {
-            mainSequence.addSequence(new Sequence()
+            const slashSeq = new Sequence();
+            applySound(slashSeq, slashSound);
+            mainSequence.addSequence(slashSeq
 
                 .effect()
                 .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.purpleblack"))
@@ -498,7 +519,9 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
                 .thenDo(function () {
                     targets.forEach(target => {
-                        new Sequence()
+                        const targetSeq = new Sequence();
+                        if (impactSound?.enable) applySound(targetSeq, impactSound);
+                        targetSeq
 
                             .effect()
                             .copySprite(target)
@@ -551,4 +574,4 @@ export const starwardSword = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("starwardSword", "template", "eskie.effect.starwardSword", DEFAULT_CONFIG, "0.0.1", "Starward Sword");
+autorec.register("starwardSword", "template", "eskie.effect.starwardSword", DEFAULT_CONFIG, "0.0.2", "Starward Sword");

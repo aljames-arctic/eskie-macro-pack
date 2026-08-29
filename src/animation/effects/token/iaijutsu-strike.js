@@ -28,18 +28,18 @@ const DEFAULT_CONFIG = {
         },
         kerning: 1.7,
         verticalOffset: 0.75,
-    }
+    },
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-function dashEffect(source, target) {
+function dashEffect(source, target, sound) {
     const deltaX = target.x - source.x;
     const deltaY = source.y - target.y;
     const angleRad = Math.atan2(deltaY, deltaX);
     const angleDeg = angleRad * 180 / Math.PI;
 
     let sequence = new Sequence();
-    applySound(sequence, mConfig.sound);
+    if (sound) applySound(sequence, sound);
     sequence.effect()
         .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.redblack"))
         .atLocation(target)
@@ -51,9 +51,9 @@ function dashEffect(source, target) {
     return sequence;
 }
 
-function deathAnimation(target) {
+function deathAnimation(target, sound) {
     let sequence = new Sequence();
-    applySound(sequence, mConfig.sound);
+    if (sound) applySound(sequence, sound);
     sequence.animation()
         .on(target)
         .opacity(0)
@@ -155,7 +155,7 @@ async function create(source, target, config = {}) {
 
     sequence.wait(500)
 
-    sequence.addSequence(dashEffect(source, target));
+    sequence.addSequence(dashEffect(source, target, mConfig.sound));
 
     if (teleport == true) {
         sequence.animation()
@@ -169,7 +169,7 @@ async function create(source, target, config = {}) {
     sequence.addSequence(await textUtil.create(target, "居合術", text));
 
     if (targetDeath === true) {
-        sequence.addSequence(deathAnimation(target));
+        sequence.addSequence(deathAnimation(target, mConfig.sound));
     }
 
     sequence.wait(500)

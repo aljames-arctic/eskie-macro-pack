@@ -1,0 +1,427 @@
+{
+  "name": "BLFX Custom Auto-Rec",
+  "flags": {
+    "boss-loot-assets-premium": {
+      "customAutoRecognition": true,
+      "version": "3.4.12"
+    }
+  },
+  "customAutoRecognition": {
+    "dnd5e": {
+      "multiattack": {
+        "expend-use": {
+          "afterItemUse": {
+            "animationName": "after-activity-use-VIA-teleport-target-tokens",
+            "itemName": "Multiattack",
+            "activityName": "Expend Use",
+            "triggerName": "After Activity Use (Default)",
+            "note": "",
+            "animationData": {
+              "eventType": "After Activity Use (Default)",
+              "macroType": "Teleport Target Token(s)",
+              "primaryAnimation": {
+                "soundEnabled": true,
+                "soundFileName": "blfx.sound.spell.cast.buff.1",
+                "delaySound": 0,
+                "startTimeSound": 0,
+                "waitUntilFinishedSoundEnabled": false,
+                "waitUntilFinishedSound": 0,
+                "enabled": true,
+                "fileName": "blfx.spell.cast.circles1.energy1.blue",
+                "scale": 1.5,
+                "opacity": 0.9,
+                "colorMatrixHue": 0,
+                "waitUntilFinishedEnabled": true,
+                "waitUntilFinished": -600
+              },
+              "thirdAnimation": {
+                "soundEnabled": true,
+                "soundFileName": "blfx.sound.spell.cast.buff.1",
+                "delaySound": 0,
+                "startTimeSound": 0,
+                "waitUntilFinishedSoundEnabled": false,
+                "waitUntilFinishedSound": 0,
+                "enabled": true,
+                "fileName": "blfx.spell.cast.circles2.energy1.smoke.orange",
+                "scale": 1.6,
+                "fadeIn": 500,
+                "opacity": 0.9,
+                "colorMatrixHue": 0,
+                "waitUntilFinishedEnabled": true,
+                "waitUntilFinished": -900
+              },
+              "command": "/**\n * Teleport Target Token(s)\n * BLFX\n * v1.0.0\n */\n\n// ------------------------------------------------\n// C U S T O M I Z E    T H E    A N I M A T I O N\n// ------------------------------------------------\n//\nconst ANIMATION1 = 'blfx.spell.cast.circles1.energy1.blue';\nconst SCALE1 = 1.5; // Size of the animation. Default value: 1.5\nconst OPACITY1 = 0.9;\nconst COLORMATRIX_HUE1 = 0;\nconst WAIT_UNTIL_FINISHED1 = -600; // Default value: -600\nconst WAIT_UNTIL_FINISHED_ENABLED1 = true;\nconst ENABLED1 = true;\nconst SOUND_ENABLED1 = true;\nconst SOUND1 = 'blfx.sound.spell.cast.buff.1';\nconst DELAY_SOUND1 = 0; // Default value: 0\nconst START_TIME_SOUND1 = 0; // Default value: 0\nconst WAIT_UNTIL_FINISHED_SOUND_ENABLED1 = false;\nconst WAIT_UNTIL_FINISHED_SOUND1 = 0;\n\nconst ANIMATION3 = 'blfx.spell.cast.circles2.energy1.smoke.orange';\nconst SCALE3 = 1.6; // Size of the animation. Default value: 1.5\nconst FADEIN3 = 500;\nconst OPACITY3 = 0.9;\nconst COLORMATRIX_HUE3 = 0;\nconst WAIT_UNTIL_FINISHED3 = -900; // Default value: -900\nconst WAIT_UNTIL_FINISHED_ENABLED3 = true;\nconst ENABLED3 = true;\nconst SOUND_ENABLED3 = true;\nconst SOUND3 = 'blfx.sound.spell.cast.buff.1';\nconst DELAY_SOUND3 = 0; // Default value: 0\nconst START_TIME_SOUND3 = 0; // Default value: 0\nconst WAIT_UNTIL_FINISHED_SOUND_ENABLED3 = false;\nconst WAIT_UNTIL_FINISHED_SOUND3 = 0;\n\nconst ONLY_FRIENDLY3 = true;\nconst ONLY_5FT_TARGET3 = true;\n//\n// ------------------------------------------------\n\nif (typeof sourceToken === 'undefined' || sourceToken === null) return;\n\nif (targetTokens.length === 0) {\n  ui.notifications.warn('Please select a target first!');\n  return;\n}\n\nconst crosshairTexture = targetTokens.length === 1 ? targetTokens[0].document.texture?.src : 'icons/svg/target.svg';\nconst crosshairScale = targetTokens.length === 1 ? targetTokens[0].document.texture?.scaleX : 1;\nconst targetDest = await blfx.helpers.customCrosshair({ sourceToken, customImg: crosshairTexture, customImgScale: crosshairScale });\n\nfor (let i = 0; i < targetTokens.length; i++) {\n  const targetToken = targetTokens[i];\n  if (ONLY_FRIENDLY3 && targetToken.document.disposition !== CONST.TOKEN_DISPOSITIONS.FRIENDLY) {\n    ui.notifications.warn('Only friendly targets can be teleported.');\n    continue;\n  }\n  if (ONLY_5FT_TARGET3 && !blfx.helpers.edgesIntersect(sourceToken, targetToken)) {\n    ui.notifications.warn('The target must be within 5 feet of you.');\n    continue;\n  }\n\n  new Sequence()\n\n    // ON SOURCE TOKEN\n    .sound()\n    .playIf(SOUND_ENABLED1)\n    .file(SOUND1)\n    .delay(DELAY_SOUND1)\n    .startTime(START_TIME_SOUND1)\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_SOUND_ENABLED1, WAIT_UNTIL_FINISHED_SOUND1])\n\n    .effect()\n    .playIf(ENABLED1)\n    .file(ANIMATION1)\n    .opacity(OPACITY1)\n    .filter('ColorMatrix', { hue: COLORMATRIX_HUE1 })\n    .atLocation(sourceToken)\n    .scaleToObject(SCALE1)\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_ENABLED1, WAIT_UNTIL_FINISHED1])\n\n    // FADE-OUT\n    .animation()\n    .on(targetToken)\n    .opacity(0)\n    .fadeOut(500)\n    .waitUntilFinished()\n\n    // TELEPORT\n    .animation()\n    .on(targetToken)\n    .teleportTo(targetDest.center)\n    .closestSquare(i > 0)\n    .snapToGrid()\n    .waitUntilFinished()\n\n    // ON TARGET\n    .sound()\n    .playIf(SOUND_ENABLED3)\n    .file(SOUND3)\n    .delay(DELAY_SOUND3)\n    .startTime(START_TIME_SOUND3)\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_SOUND_ENABLED3, WAIT_UNTIL_FINISHED_SOUND3])\n\n    .effect()\n    .playIf(ENABLED3)\n    .file(ANIMATION3)\n    .opacity(OPACITY3)\n    .filter('ColorMatrix', { hue: COLORMATRIX_HUE3 })\n    .atLocation(targetDest.center)\n    .scaleToObject(SCALE3)\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_ENABLED3, WAIT_UNTIL_FINISHED3])\n\n    // FADE-IN\n    .animation()\n    .on(targetToken)\n    .opacity(1)\n    .fadeIn(FADEIN3)\n    .waitUntilFinished()\n\n    .play();\n}",
+              "autoRec": {
+                "enabled": true
+              },
+              "activityName": "Expend Use",
+              "activityType": "utility",
+              "version": 2,
+              "secondaryAnimation": {}
+            }
+          },
+          "afterAttack": {
+            "animationName": "after-attack-roll-VIA-attack-ranged",
+            "itemName": "Multiattack",
+            "activityName": "Expend Use",
+            "triggerName": "After Attack Roll",
+            "note": "",
+            "animationData": {
+              "eventType": "After Attack Roll",
+              "macroType": "Attack Ranged",
+              "primaryAnimation": {
+                "soundEnabled": true,
+                "soundFileName": "blfx.sound.weapon.range.bow.attack1",
+                "delaySound": 900,
+                "startTimeSound": 0,
+                "waitUntilFinishedSoundEnabled": false,
+                "waitUntilFinishedSound": 0,
+                "enabled": true,
+                "fileName": "blfx.weapon.range.bow3.attack1.color1",
+                "scale": 1.5,
+                "offset": 0,
+                "fadeIn": 0,
+                "fadeOut": 0,
+                "opacity": 1,
+                "colorMatrixHue": 0,
+                "waitUntilFinishedEnabled": false,
+                "waitUntilFinished": -500
+              },
+              "secondaryAnimation": {
+                "soundEnabled": true,
+                "soundFileName": "blfx.sound.weapon.range.arrow.hit.attack2",
+                "delaySound": 0,
+                "startTimeSound": 0,
+                "waitUntilFinishedSoundEnabled": false,
+                "waitUntilFinishedSound": 0,
+                "enabled": true,
+                "fileName": "blfx.weapon.range.arrow1.physical1.impact1.color1",
+                "opacity": 0.9,
+                "colorMatrixHue": 0,
+                "waitUntilFinishedEnabled": false,
+                "waitUntilFinished": -500,
+                "missAnimation": true,
+                "belowTokens": false
+              },
+              "thirdAnimation": {
+                "soundEnabled": true,
+                "soundFileName": "blfx.sound.spell.cast.entangle.roots.1",
+                "delaySound": 0,
+                "startTimeSound": 0,
+                "playSoundIf": "always",
+                "waitUntilFinishedSoundEnabled": false,
+                "waitUntilFinishedSound": 0,
+                "enabled": true,
+                "fileName": "blfx.spell.template.circle.crack2.ground1.orange",
+                "scale": 2,
+                "offset": 0,
+                "fadeIn": 0,
+                "fadeOut": 0,
+                "opacity": 1,
+                "colorMatrixHue": 0,
+                "playAnimationIf": "always",
+                "waitUntilFinishedEnabled": false,
+                "waitUntilFinished": 0,
+                "belowTokens": false,
+                "shakeEnabled": true,
+                "shakeDuration": 400,
+                "shakeIntensity": 0.08,
+                "playShakeIf": "always"
+              },
+              "command": "/**\n *\n * Attack Ranged\n *\n */\n\n// ------------------------------------------------\n// C U S T O M I Z E    T H E    A N I M A T I O N\n// ------------------------------------------------\n//\nconst ANIMATION1 = 'blfx.weapon.range.bow3.attack1.color1';\nconst SCALE1 = 1.5; // Default value: 1.5\nconst OFFSET1 = 0; // Default value: 0\nconst FADEIN1 = 0;\nconst FADEOUT1 = 0;\nconst OPACITY1 = 1;\nconst COLORMATRIX_HUE1 = 0;\nconst WAIT_UNTIL_FINISHED1 = -500; // Default value: -500\nconst WAIT_UNTIL_FINISHED_ENABLED1 = false;\nconst ENABLED1 = true;\nconst SOUND_ENABLED1 = true;\nconst SOUND1 = 'blfx.sound.weapon.range.bow.attack1';\nconst DELAY_SOUND1 = 900; // Default value: 900\nconst START_TIME_SOUND1 = 0; // Default value: 0\nconst WAIT_UNTIL_FINISHED_SOUND_ENABLED1 = false;\nconst WAIT_UNTIL_FINISHED_SOUND1 = 0;\n\nconst ANIMATION2 = 'blfx.weapon.range.arrow1.physical1.impact1.color1';\nconst OPACITY2 = 0.9;\nconst COLORMATRIX_HUE2 = 0;\nconst WAIT_UNTIL_FINISHED2 = -500; // Default value: -500\nconst WAIT_UNTIL_FINISHED_ENABLED2 = false;\nconst BELOW_TOKENS2 = false;\nconst MISS_ANIMATION2 = true;\nconst ENABLED2 = true;\nconst SOUND_ENABLED2 = true;\nconst SOUND2 = 'blfx.sound.weapon.range.arrow.hit.attack2';\nconst DELAY_SOUND2 = 0; // Default value: 0\nconst START_TIME_SOUND2 = 0; // Default value: 0\nconst WAIT_UNTIL_FINISHED_SOUND_ENABLED2 = false;\nconst WAIT_UNTIL_FINISHED_SOUND2 = 0;\n\nconst ANIMATION3 = 'blfx.spell.template.circle.crack2.ground1.orange';\nconst SCALE3 = 2; // Size of the animation. Default value: 2\nconst OFFSET3 = 0; // Default value: 0\nconst FADEIN3 = 0;\nconst FADEOUT3 = 0;\nconst OPACITY3 = 1;\nconst COLORMATRIX_HUE3 = 0;\nconst BELOW_TOKENS3 = false;\nconst PLAY_ANIMATION_IF3 = 'always'; // Possible values: 'always', 'hit', 'critical hit', 'miss', 'critical miss'\nconst WAIT_UNTIL_FINISHED3 = 0; // Default value: 0\nconst WAIT_UNTIL_FINISHED_ENABLED3 = false;\nconst ENABLED3 = true;\nconst SOUND_ENABLED3 = true;\nconst SOUND3 = 'blfx.sound.spell.cast.entangle.roots.1';\nconst DELAY_SOUND3 = 0; // Default value: 0\nconst START_TIME_SOUND3 = 0; // Default value: 0\nconst PLAY_SOUND_IF3 = 'always'; // Possible values: 'always', 'hit', 'critical hit', 'miss', 'critical miss'\nconst WAIT_UNTIL_FINISHED_SOUND_ENABLED3 = false;\nconst WAIT_UNTIL_FINISHED_SOUND3 = 0;\nconst SHAKE_ENABLED3 = true;\nconst SHAKE_DURATION3 = 400;\nconst SHAKE_INTENSITY3 = 0.08;\nconst PLAY_SHAKE_IF3 = 'always'; // Possible values: 'always', 'hit', 'critical hit', 'miss', 'critical miss'\n//\n// ------------------------------------------------\n\nconst offset1 = OFFSET1 * sourceToken.document.width;\n\nfor (let targetToken of targetTokens) {\n  const playAnimationIf3 = blfx.helpers.getPlayIfValue(PLAY_ANIMATION_IF3, roll, targetToken);\n  const playSoundIf3 = blfx.helpers.getPlayIfValue(PLAY_SOUND_IF3, roll, targetToken);\n  const playShakeIf3 = blfx.helpers.getPlayIfValue(PLAY_SHAKE_IF3, roll, targetToken);\n  const isHit = blfx.helpers.isTargetHit(roll, targetToken);\n  const angle3 = blfx.helpers.calculateAngle(sourceToken.center, targetToken.center);\n  const offset3 = targetToken.document.width * OFFSET3;\n  const isTargetFlipped = blfx.helpers.isTokenFlipped(targetToken);\n\n  let impactPoint = targetToken.center;\n  if (!isHit && MISS_ANIMATION2) {\n    impactPoint = blfx.helpers.getTokenCorner(sourceToken, targetToken);\n  }\n\n  await new Sequence()\n\n    // ON SOURCE TOKEN\n    .sound()\n    .playIf(SOUND_ENABLED1)\n    .file(SOUND1)\n    .delay(DELAY_SOUND1)\n    .startTime(START_TIME_SOUND1)\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_SOUND_ENABLED1, WAIT_UNTIL_FINISHED_SOUND1])\n\n    .effect()\n    .playIf(ENABLED1)\n    .file(ANIMATION1)\n    .atLocation(sourceToken)\n    .rotateTowards(impactPoint)\n    .scaleToObject(SCALE1)\n    .fadeIn(FADEIN1)\n    .fadeOut(FADEOUT1)\n    .opacity(OPACITY1)\n    .filter('ColorMatrix', { hue: COLORMATRIX_HUE1 })\n    .center()\n    .spriteOffset({ x: offset1 }, { gridUnits: true })\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_ENABLED1, WAIT_UNTIL_FINISHED1])\n\n    // FROM SOURCE TO TARGET\n    .sound()\n    .playIf(SOUND_ENABLED2)\n    .file(SOUND2)\n    .delay(DELAY_SOUND2)\n    .startTime(START_TIME_SOUND2)\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_SOUND_ENABLED2, WAIT_UNTIL_FINISHED_SOUND2])\n\n    .effect()\n    .playIf(ENABLED2)\n    .file(ANIMATION2)\n    .opacity(OPACITY2)\n    .filter('ColorMatrix', { hue: COLORMATRIX_HUE2 })\n    .zIndex(100)\n    .atLocation(sourceToken)\n    .stretchTo(impactPoint)\n    .belowTokens(BELOW_TOKENS2)\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_ENABLED2, WAIT_UNTIL_FINISHED2])\n\n    // ON TARGET\n    .sound()\n    .playIf(SOUND_ENABLED3 && playSoundIf3)\n    .file(SOUND3)\n    .delay(DELAY_SOUND3)\n    .startTime(START_TIME_SOUND3)\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_SOUND_ENABLED3, WAIT_UNTIL_FINISHED_SOUND3])\n\n    .effect()\n    .playIf(ENABLED3 && playAnimationIf3)\n    .file(ANIMATION3)\n    .zIndex(50)\n    .atLocation(targetToken)\n    .rotateTowards(targetToken, { rotationOffset: angle3, gridUnits: true })\n    .center()\n    .spriteOffset({ x: offset3 }, { gridUnits: true })\n    .belowTokens(BELOW_TOKENS3)\n    .scaleToObject(SCALE3)\n    .fadeIn(FADEIN3)\n    .fadeOut(FADEOUT3)\n    .opacity(OPACITY3)\n    .filter('ColorMatrix', { hue: COLORMATRIX_HUE3 })\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_ENABLED3, WAIT_UNTIL_FINISHED3])\n\n    // SHAKE\n    .effect()\n    .playIf(SHAKE_ENABLED3 && playShakeIf3)\n    .copySprite(targetToken)\n    .mirrorY(isTargetFlipped)\n    .zIndex(0)\n    .attachTo(targetToken)\n    .rotate(targetToken.angle)\n    .loopProperty('sprite', 'position.x', {\n      from: -SHAKE_INTENSITY3,\n      to: SHAKE_INTENSITY3,\n      duration: 60,\n      pingPong: true,\n      delay: 0,\n      gridUnits: true,\n    })\n    .loopProperty('sprite', 'position.y', {\n      from: -SHAKE_INTENSITY3,\n      to: SHAKE_INTENSITY3,\n      duration: 15,\n      pingPong: true,\n      delay: 0,\n      gridUnits: true,\n    })\n    .scaleToObject(1, { considerTokenScale: true })\n    .duration(SHAKE_DURATION3)\n\n    .play();\n}",
+              "autoRec": {
+                "enabled": true
+              },
+              "activityName": "Expend Use",
+              "activityType": "utility",
+              "version": 2
+            }
+          },
+          "afterDamage": {
+            "animationName": "after-damage-roll-VIA-after-ranged",
+            "itemName": "Multiattack",
+            "activityName": "Expend Use",
+            "triggerName": "After Damage Roll",
+            "note": "",
+            "animationData": {
+              "eventType": "After Damage Roll",
+              "macroType": "Attack Ranged",
+              "primaryAnimation": {
+                "soundEnabled": true,
+                "soundFileName": "blfx.sound.weapon.range.bow.attack1",
+                "delaySound": 900,
+                "startTimeSound": 0,
+                "waitUntilFinishedSoundEnabled": false,
+                "waitUntilFinishedSound": 0,
+                "enabled": true,
+                "fileName": "blfx.weapon.range.bow3.attack1.color1",
+                "scale": 1.5,
+                "offset": 0,
+                "fadeIn": 0,
+                "fadeOut": 0,
+                "opacity": 1,
+                "colorMatrixHue": 0,
+                "waitUntilFinishedEnabled": false,
+                "waitUntilFinished": -500
+              },
+              "secondaryAnimation": {
+                "soundEnabled": true,
+                "soundFileName": "blfx.sound.weapon.range.arrow.hit.attack2",
+                "delaySound": 0,
+                "startTimeSound": 0,
+                "waitUntilFinishedSoundEnabled": false,
+                "waitUntilFinishedSound": 0,
+                "enabled": true,
+                "fileName": "blfx.weapon.range.arrow1.physical1.impact1.color1",
+                "opacity": 1,
+                "colorMatrixHue": 0,
+                "waitUntilFinishedEnabled": false,
+                "waitUntilFinished": -500,
+                "missAnimation": true,
+                "belowTokens": false
+              },
+              "thirdAnimation": {
+                "soundEnabled": true,
+                "soundFileName": "blfx.sound.spell.cast.entangle.roots.1",
+                "delaySound": 0,
+                "startTimeSound": 0,
+                "playSoundIf": "always",
+                "waitUntilFinishedSoundEnabled": false,
+                "waitUntilFinishedSound": 0,
+                "enabled": true,
+                "fileName": "blfx.spell.template.circle.crack2.ground1.orange",
+                "scale": 2,
+                "offset": 0,
+                "fadeIn": 0,
+                "fadeOut": 0,
+                "opacity": 1,
+                "colorMatrixHue": 0,
+                "playAnimationIf": "always",
+                "waitUntilFinishedEnabled": false,
+                "waitUntilFinished": 0,
+                "belowTokens": false,
+                "shakeEnabled": true,
+                "shakeDuration": 400,
+                "shakeIntensity": 0.08,
+                "playShakeIf": "always"
+              },
+              "command": "/**\n *\n * Attack Ranged\n *\n */\n\n// ------------------------------------------------\n// C U S T O M I Z E    T H E    A N I M A T I O N\n// ------------------------------------------------\n//\nconst ANIMATION1 = 'blfx.weapon.range.bow3.attack1.color1';\nconst SCALE1 = 1.5; // Default value: 1.5\nconst OFFSET1 = 0; // Default value: 0\nconst FADEIN1 = 0;\nconst FADEOUT1 = 0;\nconst OPACITY1 = 1;\nconst COLORMATRIX_HUE1 = 0;\nconst WAIT_UNTIL_FINISHED1 = -500; // Default value: -500\nconst WAIT_UNTIL_FINISHED_ENABLED1 = false;\nconst ENABLED1 = true;\nconst SOUND_ENABLED1 = true;\nconst SOUND1 = 'blfx.sound.weapon.range.bow.attack1';\nconst DELAY_SOUND1 = 900; // Default value: 900\nconst START_TIME_SOUND1 = 0; // Default value: 0\nconst WAIT_UNTIL_FINISHED_SOUND_ENABLED1 = false;\nconst WAIT_UNTIL_FINISHED_SOUND1 = 0;\n\nconst ANIMATION2 = 'blfx.weapon.range.arrow1.physical1.impact1.color1';\nconst OPACITY2 = 1;\nconst COLORMATRIX_HUE2 = 0;\nconst WAIT_UNTIL_FINISHED2 = -500; // Default value: -500\nconst WAIT_UNTIL_FINISHED_ENABLED2 = false;\nconst BELOW_TOKENS2 = false;\nconst MISS_ANIMATION2 = true;\nconst ENABLED2 = true;\nconst SOUND_ENABLED2 = true;\nconst SOUND2 = 'blfx.sound.weapon.range.arrow.hit.attack2';\nconst DELAY_SOUND2 = 0; // Default value: 0\nconst START_TIME_SOUND2 = 0; // Default value: 0\nconst WAIT_UNTIL_FINISHED_SOUND_ENABLED2 = false;\nconst WAIT_UNTIL_FINISHED_SOUND2 = 0;\n\nconst ANIMATION3 = 'blfx.spell.template.circle.crack2.ground1.orange';\nconst SCALE3 = 2; // Size of the animation. Default value: 2\nconst OFFSET3 = 0; // Default value: 0\nconst FADEIN3 = 0;\nconst FADEOUT3 = 0;\nconst OPACITY3 = 1;\nconst COLORMATRIX_HUE3 = 0;\nconst BELOW_TOKENS3 = false;\nconst PLAY_ANIMATION_IF3 = 'always'; // Possible values: 'always', 'hit', 'critical hit', 'miss', 'critical miss'\nconst WAIT_UNTIL_FINISHED3 = 0; // Default value: 0\nconst WAIT_UNTIL_FINISHED_ENABLED3 = false;\nconst ENABLED3 = true;\nconst SOUND_ENABLED3 = true;\nconst SOUND3 = 'blfx.sound.spell.cast.entangle.roots.1';\nconst DELAY_SOUND3 = 0; // Default value: 0\nconst START_TIME_SOUND3 = 0; // Default value: 0\nconst PLAY_SOUND_IF3 = 'always'; // Possible values: 'always', 'hit', 'critical hit', 'miss', 'critical miss'\nconst WAIT_UNTIL_FINISHED_SOUND_ENABLED3 = false;\nconst WAIT_UNTIL_FINISHED_SOUND3 = 0;\nconst SHAKE_ENABLED3 = true;\nconst SHAKE_DURATION3 = 400;\nconst SHAKE_INTENSITY3 = 0.08;\nconst PLAY_SHAKE_IF3 = 'always'; // Possible values: 'always', 'hit', 'critical hit', 'miss', 'critical miss'\n//\n// ------------------------------------------------\n\nconst offset1 = OFFSET1 * sourceToken.document.width;\n\nfor (let targetToken of targetTokens) {\n  const playAnimationIf3 = blfx.helpers.getPlayIfValue(PLAY_ANIMATION_IF3, roll, targetToken);\n  const playSoundIf3 = blfx.helpers.getPlayIfValue(PLAY_SOUND_IF3, roll, targetToken);\n  const playShakeIf3 = blfx.helpers.getPlayIfValue(PLAY_SHAKE_IF3, roll, targetToken);\n  const isHit = blfx.helpers.isTargetHit(roll, targetToken);\n  const angle3 = blfx.helpers.calculateAngle(sourceToken.center, targetToken.center);\n  const offset3 = targetToken.document.width * OFFSET3;\n  const isTargetFlipped = blfx.helpers.isTokenFlipped(targetToken);\n\n  let impactPoint = targetToken.center;\n  if (!isHit && MISS_ANIMATION2) {\n    impactPoint = blfx.helpers.getTokenCorner(sourceToken, targetToken);\n  }\n\n  await new Sequence()\n\n    // ON SOURCE TOKEN\n    .sound()\n    .playIf(SOUND_ENABLED1)\n    .file(SOUND1)\n    .delay(DELAY_SOUND1)\n    .startTime(START_TIME_SOUND1)\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_SOUND_ENABLED1, WAIT_UNTIL_FINISHED_SOUND1])\n\n    .effect()\n    .playIf(ENABLED1)\n    .file(ANIMATION1)\n    .atLocation(sourceToken)\n    .rotateTowards(impactPoint)\n    .scaleToObject(SCALE1)\n    .fadeIn(FADEIN1)\n    .fadeOut(FADEOUT1)\n    .opacity(OPACITY1)\n    .filter('ColorMatrix', { hue: COLORMATRIX_HUE1 })\n    .center()\n    .spriteOffset({ x: offset1 }, { gridUnits: true })\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_ENABLED1, WAIT_UNTIL_FINISHED1])\n\n    // FROM SOURCE TO TARGET\n    .sound()\n    .playIf(SOUND_ENABLED2)\n    .file(SOUND2)\n    .delay(DELAY_SOUND2)\n    .startTime(START_TIME_SOUND2)\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_SOUND_ENABLED2, WAIT_UNTIL_FINISHED_SOUND2])\n\n    .effect()\n    .playIf(ENABLED2)\n    .file(ANIMATION2)\n    .opacity(OPACITY2)\n    .filter('ColorMatrix', { hue: COLORMATRIX_HUE2 })\n    .zIndex(100)\n    .atLocation(sourceToken)\n    .stretchTo(impactPoint)\n    .belowTokens(BELOW_TOKENS2)\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_ENABLED2, WAIT_UNTIL_FINISHED2])\n\n    // ON TARGET\n    .sound()\n    .playIf(SOUND_ENABLED3 && playSoundIf3)\n    .file(SOUND3)\n    .delay(DELAY_SOUND3)\n    .startTime(START_TIME_SOUND3)\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_SOUND_ENABLED3, WAIT_UNTIL_FINISHED_SOUND3])\n\n    .effect()\n    .playIf(ENABLED3 && playAnimationIf3)\n    .file(ANIMATION3)\n    .zIndex(50)\n    .atLocation(targetToken)\n    .rotateTowards(targetToken, { rotationOffset: angle3, gridUnits: true })\n    .center()\n    .spriteOffset({ x: offset3 }, { gridUnits: true })\n    .belowTokens(BELOW_TOKENS3)\n    .scaleToObject(SCALE3)\n    .fadeIn(FADEIN3)\n    .fadeOut(FADEOUT3)\n    .opacity(OPACITY3)\n    .filter('ColorMatrix', { hue: COLORMATRIX_HUE3 })\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_ENABLED3, WAIT_UNTIL_FINISHED3])\n\n    // SHAKE\n    .effect()\n    .playIf(SHAKE_ENABLED3 && playShakeIf3)\n    .copySprite(targetToken)\n    .mirrorY(isTargetFlipped)\n    .zIndex(0)\n    .attachTo(targetToken)\n    .rotate(targetToken.angle)\n    .loopProperty('sprite', 'position.x', {\n      from: -SHAKE_INTENSITY3,\n      to: SHAKE_INTENSITY3,\n      duration: 60,\n      pingPong: true,\n      delay: 0,\n      gridUnits: true,\n    })\n    .loopProperty('sprite', 'position.y', {\n      from: -SHAKE_INTENSITY3,\n      to: SHAKE_INTENSITY3,\n      duration: 15,\n      pingPong: true,\n      delay: 0,\n      gridUnits: true,\n    })\n    .scaleToObject(1, { considerTokenScale: true })\n    .duration(SHAKE_DURATION3)\n\n    .play();\n}",
+              "autoRec": {
+                "enabled": true
+              },
+              "activityName": "Expend Use",
+              "activityType": "utility",
+              "version": 2
+            }
+          },
+          "afterActiveEffects": {
+            "animationName": "after-active-effects-VIA-on-target-or-token-ae",
+            "itemName": "Multiattack",
+            "activityName": "Expend Use",
+            "triggerName": "After Active Effects",
+            "note": "",
+            "animationData": {
+              "eventType": "After Active Effects",
+              "macroType": "On Target or Token (AE)",
+              "primaryAnimation": {
+                "soundEnabled": true,
+                "soundFileName": "blfx.sound.spell.cast.heal.1",
+                "delaySound": 0,
+                "startTimeSound": 0,
+                "waitUntilFinishedSoundEnabled": false,
+                "waitUntilFinishedSound": 0,
+                "enabled": true,
+                "fileName": "blfx.spell.cast.circles1.energy1.blue",
+                "scale": 2,
+                "fadeIn": 0,
+                "fadeOut": 0,
+                "opacity": 1,
+                "colorMatrixHue": 0,
+                "waitUntilFinishedEnabled": true,
+                "waitUntilFinished": -200,
+                "belowTokens": false,
+                "persist": false
+              },
+              "secondaryAnimation": {
+                "soundEnabled": true,
+                "soundFileName": "blfx.sound.spell.cast.generic.1",
+                "delaySound": 0,
+                "startTimeSound": 0,
+                "waitUntilFinishedSoundEnabled": false,
+                "waitUntilFinishedSound": 0,
+                "enabled": true,
+                "fileName": "blfx.spell.range.ray.beam1.sinusoidal.intro.orange",
+                "opacity": 1,
+                "colorMatrixHue": 0,
+                "waitUntilFinishedEnabled": false,
+                "waitUntilFinished": -500,
+                "belowTokens": false,
+                "persist": false
+              },
+              "thirdAnimation": {
+                "soundEnabled": true,
+                "soundFileName": "blfx.sound.spell.cast.charm_person.3",
+                "delaySound": 0,
+                "startTimeSound": 0,
+                "enabled": true,
+                "fileName": "blfx.spell.misc.shield2.arcane2.mage-armor.loop.blue",
+                "scale": 1.85,
+                "fadeIn": 0,
+                "fadeOut": 0,
+                "opacity": 1,
+                "colorMatrixHue": 0,
+                "delayAnimation": 0,
+                "belowTokens": false,
+                "persist": true
+              },
+              "command": "/**\n *\n * On Target or Token (AE)\n *\n */\n\n// ------------------------------------------------\n// C U S T O M I Z E    T H E    A N I M A T I O N\n// ------------------------------------------------\n//\nconst ANIMATION1 = 'blfx.spell.cast.circles1.energy1.blue';\nconst SCALE1 = 2; // Size of the animation. Default value: 2\nconst FADEIN1 = 0;\nconst FADEOUT1 = 0;\nconst OPACITY1 = 1;\nconst COLORMATRIX_HUE1 = 0;\nconst WAIT_UNTIL_FINISHED1 = -200; // Default value: -300\nconst WAIT_UNTIL_FINISHED_ENABLED1 = true;\nconst PERSIST1 = false;\nconst BELOW_TOKENS1 = false;\nconst ENABLED1 = true;\nconst SOUND_ENABLED1 = true;\nconst SOUND1 = 'blfx.sound.spell.cast.heal.1';\nconst DELAY_SOUND1 = 0; // Default value: 0\nconst START_TIME_SOUND1 = 0; // Default value: 0\nconst WAIT_UNTIL_FINISHED_SOUND_ENABLED1 = false;\nconst WAIT_UNTIL_FINISHED_SOUND1 = 0;\n\nconst ANIMATION2 = 'blfx.spell.range.ray.beam1.sinusoidal.intro.orange';\nconst OPACITY2 = 1;\nconst COLORMATRIX_HUE2 = 0;\nconst WAIT_UNTIL_FINISHED2 = -500; // Default value: -100\nconst WAIT_UNTIL_FINISHED_ENABLED2 = false;\nconst PERSIST2 = false;\nconst BELOW_TOKENS2 = false;\nconst ENABLED2 = true;\nconst SOUND_ENABLED2 = true;\nconst SOUND2 = 'blfx.sound.spell.cast.generic.1';\nconst DELAY_SOUND2 = 0; // Default value: 0\nconst START_TIME_SOUND2 = 0; // Default value: 0\nconst WAIT_UNTIL_FINISHED_SOUND_ENABLED2 = false;\nconst WAIT_UNTIL_FINISHED_SOUND2 = 0;\n\nconst ANIMATION3 = 'blfx.spell.misc.shield2.arcane2.mage-armor.loop.blue';\nconst SCALE3 = 1.85; // Size of the animation. Default value: 2\nconst FADEIN3 = 0;\nconst FADEOUT3 = 0;\nconst OPACITY3 = 1;\nconst COLORMATRIX_HUE3 = 0;\nconst DELAY_ANIMATION3 = 0; // Default value: 0\nconst BELOW_TOKENS3 = false;\nconst PERSIST3 = true;\nconst ENABLED3 = true;\nconst SOUND_ENABLED3 = true;\nconst SOUND3 = 'blfx.sound.spell.cast.charm_person.3';\nconst DELAY_SOUND3 = 0; // Default value: 0\nconst START_TIME_SOUND3 = 0; // Default value: 0\n//\n// ------------------------------------------------\n\nif (typeof sourceToken === 'undefined' || sourceToken === null) return;\nif (typeof targetTokens === 'undefined' || targetTokens === null || targetTokens.length === 0) return; // there have to be a target\n\nconst [targetToken] = targetTokens;\nconst playAnimation2 = sourceToken.id === targetToken.id ? false : true;\n\n// ON SOURCE TOKEN\nawait new Sequence()\n  .sound()\n  .playIf(SOUND_ENABLED1)\n  .file(SOUND1)\n  .delay(DELAY_SOUND1)\n  .startTime(START_TIME_SOUND1)\n  .preset('conditionalWait', [WAIT_UNTIL_FINISHED_SOUND_ENABLED1, WAIT_UNTIL_FINISHED_SOUND1])\n\n  .effect()\n  .playIf(ENABLED1)\n  .file(ANIMATION1)\n  .name(`${effect.name}-${effect.id}`)\n  .atLocation(sourceToken)\n  .scaleToObject(SCALE1)\n  .fadeIn(FADEIN1)\n  .fadeOut(FADEOUT1)\n  .opacity(OPACITY1)\n  .filter('ColorMatrix', { hue: COLORMATRIX_HUE1 })\n  .belowTokens(BELOW_TOKENS1)\n  .tieToDocuments(effect)\n  .attachTo(sourceToken)\n  .preset('conditionalWait', [WAIT_UNTIL_FINISHED_ENABLED1, WAIT_UNTIL_FINISHED1])\n  .persist(PERSIST1)\n  .play();\n\n// FROM SOURCE TO TARGET\nawait new Sequence()\n  .sound()\n  .playIf(SOUND_ENABLED2)\n  .file(SOUND2)\n  .delay(DELAY_SOUND2)\n  .startTime(START_TIME_SOUND2)\n  .preset('conditionalWait', [WAIT_UNTIL_FINISHED_SOUND_ENABLED2, WAIT_UNTIL_FINISHED_SOUND2])\n\n  .effect()\n  .playIf(ENABLED2 && playAnimation2)\n  .file(ANIMATION2)\n  .name(`${effect.name}-${effect.id}`)\n  .opacity(OPACITY2)\n  .filter('ColorMatrix', { hue: COLORMATRIX_HUE2 })\n  .belowTokens(BELOW_TOKENS2)\n  .atLocation(sourceToken)\n  .stretchTo(targetToken, { attachTo: true })\n  .tieToDocuments(effect)\n  .attachTo(sourceToken)\n  .preset('conditionalWait', [WAIT_UNTIL_FINISHED_ENABLED2, WAIT_UNTIL_FINISHED2])\n  .persist(PERSIST2)\n  .play();\n\n// ON TARGET\nawait new Sequence()\n  .sound()\n  .playIf(SOUND_ENABLED3)\n  .file(SOUND3)\n  .delay(DELAY_SOUND3)\n  .startTime(START_TIME_SOUND3)\n\n  .effect()\n  .playIf(ENABLED3)\n  .file(ANIMATION3)\n  .delay(DELAY_ANIMATION3)\n  .name(`${effect.name}-${effect.id}`)\n  .atLocation(targetToken)\n  .scaleToObject(SCALE3)\n  .fadeIn(FADEIN3)\n  .fadeOut(FADEOUT3)\n  .opacity(OPACITY3)\n  .filter('ColorMatrix', { hue: COLORMATRIX_HUE3 })\n  .belowTokens(BELOW_TOKENS3)\n  .tieToDocuments(effect)\n  .attachTo(targetToken)\n  .persist(PERSIST3, { persistTokenPrototype: PERSIST3 })\n  .play();",
+              "autoRec": {
+                "enabled": true
+              },
+              "activityName": "Expend Use",
+              "activityType": "utility",
+              "version": 2
+            }
+          },
+          "afterSummon": {
+            "animationName": "after-summon-VIA-summon",
+            "itemName": "Multiattack",
+            "activityName": "Expend Use",
+            "triggerName": "After Summon",
+            "note": "",
+            "animationData": {
+              "eventType": "After Summon",
+              "macroType": "Summon",
+              "primaryAnimation": {
+                "soundEnabled": true,
+                "soundFileName": "blfx.sound.spell.cast.burning_hands.2",
+                "delaySound": 0,
+                "startTimeSound": 0,
+                "waitUntilFinishedSoundEnabled": false,
+                "waitUntilFinishedSound": 0,
+                "enabled": true,
+                "fileName": "blfx.spell.cast.swirl1.fire1.orange",
+                "scale": 2,
+                "opacity": 1,
+                "colorMatrixHue": 0,
+                "waitUntilFinishedEnabled": true,
+                "waitUntilFinished": -700,
+                "belowTokens": false
+              },
+              "secondaryAnimation": {
+                "soundEnabled": true,
+                "soundFileName": "blfx.sound.spell.cast.burning_hands.1",
+                "delaySound": 0,
+                "startTimeSound": 0,
+                "waitUntilFinishedSoundEnabled": false,
+                "waitUntilFinishedSound": 0,
+                "enabled": true,
+                "fileName": "blfx.spell.range.ray.scorching_ray.impact1.intro.yellow",
+                "opacity": 1,
+                "colorMatrixHue": 0,
+                "waitUntilFinishedEnabled": true,
+                "waitUntilFinished": -1000
+              },
+              "thirdAnimation": {
+                "soundEnabled": true,
+                "soundFileName": "blfx.sound.spell.cast.fireball.1",
+                "delaySound": 0,
+                "startTimeSound": 0,
+                "waitUntilFinishedSoundEnabled": false,
+                "waitUntilFinishedSound": 0,
+                "enabled": true,
+                "fileName": "blfx.misc.spell.bubble1.explosion1.fire.above.orange",
+                "scale": 2,
+                "opacity": 1,
+                "colorMatrixHue": 0,
+                "waitUntilFinishedEnabled": true,
+                "waitUntilFinished": -1000,
+                "belowTokens": false,
+                "persist": false,
+                "hiddenTarget": true,
+                "shakeEnabled": true,
+                "shakeDuration": 400,
+                "shakeIntensity": 0.08
+              },
+              "command": "/**\n * Summon\n * BLFX\n * v1.0.0\n */\n// ------------------------------------------------\n// C U S T O M I Z E    T H E    A N I M A T I O N\n// ------------------------------------------------\n//\nconst ANIMATION1 = 'blfx.spell.cast.swirl1.fire1.orange';\nconst SCALE1 = 2; // Size of the animation. Default value: 2\nconst OPACITY1 = 1;\nconst COLORMATRIX_HUE1 = 0;\nconst WAIT_UNTIL_FINISHED1 = -700; // Default value: -700\nconst WAIT_UNTIL_FINISHED_ENABLED1 = true;\nconst BELOW_TOKENS1 = false;\nconst ENABLED1 = true;\nconst SOUND_ENABLED1 = true;\nconst SOUND1 = 'blfx.sound.spell.cast.burning_hands.2';\nconst DELAY_SOUND1 = 0; // Default value: 0\nconst START_TIME_SOUND1 = 0; // Default value: 0\nconst WAIT_UNTIL_FINISHED_SOUND_ENABLED1 = false;\nconst WAIT_UNTIL_FINISHED_SOUND1 = 0;\n\nconst ANIMATION2 = 'blfx.spell.range.ray.scorching_ray.impact1.intro.yellow';\nconst OPACITY2 = 1;\nconst COLORMATRIX_HUE2 = 0;\nconst WAIT_UNTIL_FINISHED2 = -1000; // Default value: -100\nconst WAIT_UNTIL_FINISHED_ENABLED2 = true;\nconst ENABLED2 = true;\nconst SOUND_ENABLED2 = true;\nconst SOUND2 = 'blfx.sound.spell.cast.burning_hands.1';\nconst DELAY_SOUND2 = 0; // Default value: 0\nconst START_TIME_SOUND2 = 0; // Default value: 0\nconst WAIT_UNTIL_FINISHED_SOUND_ENABLED2 = false;\nconst WAIT_UNTIL_FINISHED_SOUND2 = 0;\n\nconst ANIMATION3 = 'blfx.misc.spell.bubble1.explosion1.fire.above.orange';\nconst SCALE3 = 2; // Size of the animation. Default value: 2\nconst OPACITY3 = 1;\nconst COLORMATRIX_HUE3 = 0;\nconst BELOW_TOKENS3 = false;\nconst WAIT_UNTIL_FINISHED3 = -1000; // Default value: -700\nconst WAIT_UNTIL_FINISHED_ENABLED3 = true;\nconst HIDDEN_TARGET3 = true;\nconst PERSIST3 = false;\nconst ENABLED3 = true;\nconst SOUND_ENABLED3 = true;\nconst SOUND3 = 'blfx.sound.spell.cast.fireball.1';\nconst DELAY_SOUND3 = 0; // Default value: 0\nconst START_TIME_SOUND3 = 0; // Default value: 0\nconst WAIT_UNTIL_FINISHED_SOUND_ENABLED3 = false;\nconst WAIT_UNTIL_FINISHED_SOUND3 = 0;\nconst SHAKE_ENABLED3 = true;\nconst SHAKE_DURATION3 = 400;\nconst SHAKE_INTENSITY3 = 0.08;\n//\n// ------------------------------------------------\n// Ensure targetTokens is defined\nif (typeof targetTokens === 'undefined' || targetTokens === null) return;\n\nfor (let targetToken of targetTokens) {\n  // FADE OUT TOKEN\n  await new Sequence().animation().playIf(HIDDEN_TARGET3).on(targetToken).fadeOut(0).play();\n}\n\nfor (let targetToken of targetTokens) {\n  const scaleX = targetToken.document?.texture?.scaleX ?? 1;\n  const isTargetFlipped = blfx.helpers.isTokenFlipped(targetToken);\n\n  // ON SOURCE TOKEN\n  await new Sequence()\n    .sound()\n    .playIf(SOUND_ENABLED1)\n    .file(SOUND1)\n    .delay(DELAY_SOUND1)\n    .startTime(START_TIME_SOUND1)\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_SOUND_ENABLED1, WAIT_UNTIL_FINISHED_SOUND1])\n\n    .effect()\n    .playIf(ENABLED1)\n    .file(ANIMATION1)\n    .atLocation(sourceToken)\n    .scaleToObject(SCALE1)\n    .opacity(OPACITY1)\n    .filter('ColorMatrix', { hue: COLORMATRIX_HUE1 })\n    .belowTokens(BELOW_TOKENS1)\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_ENABLED1, WAIT_UNTIL_FINISHED1])\n    .play();\n\n  // FROM SOURCE TO TARGET\n  await new Sequence()\n    .sound()\n    .playIf(SOUND_ENABLED2)\n    .file(SOUND2)\n    .delay(DELAY_SOUND2)\n    .startTime(START_TIME_SOUND2)\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_SOUND_ENABLED2, WAIT_UNTIL_FINISHED_SOUND2])\n\n    .effect()\n    .playIf(ENABLED2)\n    .file(ANIMATION2)\n    .opacity(OPACITY2)\n    .filter('ColorMatrix', { hue: COLORMATRIX_HUE2 })\n    .zIndex(100)\n    .atLocation(sourceToken)\n    .stretchTo(targetToken)\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_ENABLED2, WAIT_UNTIL_FINISHED2])\n\n    // ON TARGET\n    .sound()\n    .playIf(SOUND_ENABLED3)\n    .file(SOUND3)\n    .delay(DELAY_SOUND3)\n    .startTime(START_TIME_SOUND3)\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_SOUND_ENABLED3, WAIT_UNTIL_FINISHED_SOUND3])\n\n    .effect()\n    .playIf(ENABLED3)\n    .file(ANIMATION3)\n    .zIndex(50)\n    .atLocation(targetToken)\n    .scaleToObject(SCALE3)\n    .opacity(OPACITY3)\n    .filter('ColorMatrix', { hue: COLORMATRIX_HUE3 })\n    .belowTokens(BELOW_TOKENS3)\n    .attachTo(targetToken, { bindAlpha: PERSIST3 })\n    .persist(PERSIST3, { persistTokenPrototype: PERSIST3 })\n    .preset('conditionalWait', [WAIT_UNTIL_FINISHED_ENABLED3, WAIT_UNTIL_FINISHED3])\n\n    // FADE IN TOKEN\n    .animation()\n    .on(targetToken)\n    .fadeIn(1000)\n\n    // SHAKE\n    .effect()\n    .playIf(SHAKE_ENABLED3)\n    .copySprite(targetToken)\n    .rotate(targetToken.angle)\n    .mirrorY(isTargetFlipped)\n    .zIndex(0)\n    .loopProperty('sprite', 'position.x', {\n      from: -SHAKE_INTENSITY3,\n      to: SHAKE_INTENSITY3,\n      duration: 60,\n      pingPong: true,\n      delay: 0,\n      gridUnits: true,\n    })\n    .loopProperty('sprite', 'position.y', {\n      from: -SHAKE_INTENSITY3,\n      to: SHAKE_INTENSITY3,\n      duration: 15,\n      pingPong: true,\n      delay: 0,\n      gridUnits: true,\n    })\n    .scaleToObject(scaleX)\n    .duration(SHAKE_DURATION3)\n    .play();\n}",
+              "autoRec": {
+                "enabled": true
+              },
+              "activityName": "Expend Use",
+              "activityType": "utility",
+              "version": 2
+            }
+          },
+          "createTemplate": {
+            "animationName": "after-template-create-VIA-template-square",
+            "itemName": "Multiattack",
+            "activityName": "Expend Use",
+            "triggerName": "After Template Create",
+            "note": "",
+            "animationData": {
+              "eventType": "After Template Create",
+              "macroType": "Template Square",
+              "primaryAnimation": {
+                "soundEnabled": true,
+                "soundFileName": "blfx.sound.spell.cast.generic.1",
+                "delaySound": 0,
+                "startTimeSound": 0,
+                "waitUntilFinishedSoundEnabled": false,
+                "waitUntilFinishedSound": 0,
+                "enabled": true,
+                "fileName": "blfx.spell.cast.swirl1.fire1.orange",
+                "scale": 1.5,
+                "fadeIn": 0,
+                "fadeOut": 0,
+                "opacity": 1,
+                "colorMatrixHue": 0,
+                "waitUntilFinishedEnabled": true,
+                "waitUntilFinished": -1000
+              },
+              "secondaryAnimation": {
+                "soundEnabled": true,
+                "soundFileName": "blfx.sound.spell.cast.fire_bolt.1",
+                "delaySound": 0,
+                "startTimeSound": 0,
+                "waitUntilFinishedSoundEnabled": false,
+                "waitUntilFinishedSound": 0,
+                "enabled": true,
+                "fileName": "blfx.spell.range.ray.burst4.fire.impact1.intro.yellow",
+                "opacity": 1,
+                "colorMatrixHue": 0,
+                "waitUntilFinishedEnabled": true,
+                "waitUntilFinished": -1300
+              },
+              "thirdAnimation": {
+                "soundEnabled": true,
+                "soundFileName": "blfx.sound.spell.cast.fireball.1",
+                "delaySound": 0,
+                "startTimeSound": 0,
+                "waitUntilFinishedSoundEnabled": false,
+                "waitUntilFinishedSound": 0,
+                "enabled": true,
+                "fileName": "blfx.spell.template.square.fire1.loop.orange",
+                "scale": 1,
+                "fadeIn": 0,
+                "fadeOut": 0,
+                "opacity": 1,
+                "colorMatrixHue": 0,
+                "belowTokens": false,
+                "deleteTemplate": false,
+                "persist": false,
+                "hiddenTemplate": true
+              },
+              "command": "/**\n * Template Square\n * BLFX\n * v1.0.0\n */\n\n// ------------------------------------------------\n// C U S T O M I Z E    T H E    A N I M A T I O N\n// ------------------------------------------------\n//\nconst ANIMATION1 = 'blfx.spell.cast.swirl1.fire1.orange';\nconst SCALE1 = 1.5; // Size of the animation. Default value: 1.5\nconst FADEIN1 = 0;\nconst FADEOUT1 = 0;\nconst OPACITY1 = 1;\nconst COLORMATRIX_HUE1 = 0;\nconst WAIT_UNTIL_FINISHED1 = -1000; // Default value: -1000\nconst WAIT_UNTIL_FINISHED_ENABLED1 = true;\nconst ENABLED1 = true;\nconst SOUND_ENABLED1 = true;\nconst SOUND1 = 'blfx.sound.spell.cast.generic.1';\nconst DELAY_SOUND1 = 0; // Default value: 0\nconst START_TIME_SOUND1 = 0; // Default value: 0\nconst WAIT_UNTIL_FINISHED_SOUND_ENABLED1 = false;\nconst WAIT_UNTIL_FINISHED_SOUND1 = 0;\n\nconst ANIMATION2 = 'blfx.spell.range.ray.burst4.fire.impact1.intro.yellow';\nconst OPACITY2 = 1;\nconst COLORMATRIX_HUE2 = 0;\nconst WAIT_UNTIL_FINISHED2 = -1300; // Default value: -1300\nconst WAIT_UNTIL_FINISHED_ENABLED2 = true;\nconst ENABLED2 = true;\nconst SOUND_ENABLED2 = true;\nconst SOUND2 = 'blfx.sound.spell.cast.fire_bolt.1';\nconst DELAY_SOUND2 = 0; // Default value: 0\nconst START_TIME_SOUND2 = 0; // Default value: 0\nconst WAIT_UNTIL_FINISHED_SOUND_ENABLED2 = false;\nconst WAIT_UNTIL_FINISHED_SOUND2 = 0;\n\nconst ANIMATION3 = 'blfx.spell.template.square.fire1.loop.orange';\nconst SCALE3 = 1; // Size of the animation. Default value: 1\nconst FADEIN3 = 0;\nconst FADEOUT3 = 0;\nconst OPACITY3 = 1;\nconst COLORMATRIX_HUE3 = 0;\nconst BELOW_TOKENS3 = false;\nconst HIDDEN_TEMPLATE3 = true;\nconst DELETE_TEMPLATE3 = false;\nconst PERSIST3 = false;\nconst ENABLED3 = true;\nconst SOUND_ENABLED3 = true;\nconst SOUND3 = 'blfx.sound.spell.cast.fireball.1';\nconst DELAY_SOUND3 = 0; // Default value: 0\nconst START_TIME_SOUND3 = 0; // Default value: 0\nconst WAIT_UNTIL_FINISHED_SOUND_ENABLED3 = false;\nconst WAIT_UNTIL_FINISHED_SOUND3 = 0;\n//\n// ------------------------------------------------\n\nawait blfx.helpers.wait(200);\n\nif (typeof templateDocument === 'undefined' || templateDocument === null) return;\n\nif (HIDDEN_TEMPLATE3) {\n  await blfx.helpers.setDocumentVisibility(templateDocument);\n}\n\nconst templateElevation = blfx.helpers.getCombinedDocElevation(sourceToken, templateDocument);\nawait blfx.helpers.setRegionLevelFromToken(templateDocument, sourceToken);\n\nawait new Sequence()\n\n  // ON SOURCE TOKEN\n  .sound()\n  .playIf(SOUND_ENABLED1)\n  .file(SOUND1)\n  .delay(DELAY_SOUND1)\n  .startTime(START_TIME_SOUND1)\n  .preset('conditionalWait', [WAIT_UNTIL_FINISHED_SOUND_ENABLED1, WAIT_UNTIL_FINISHED_SOUND1])\n\n  .effect()\n  .playIf(ENABLED1)\n  .atLocation(sourceToken)\n  .file(ANIMATION1)\n  .scaleToObject(SCALE1)\n  .fadeIn(FADEIN1)\n  .fadeOut(FADEOUT1)\n  .opacity(OPACITY1)\n  .filter('ColorMatrix', { hue: COLORMATRIX_HUE1 })\n  .center()\n  .rotateTowards(templateDocument)\n  .preset('conditionalWait', [WAIT_UNTIL_FINISHED_ENABLED1, WAIT_UNTIL_FINISHED1])\n\n  // FROM SOURCE TO TARGET\n  .sound()\n  .playIf(SOUND_ENABLED2)\n  .file(SOUND2)\n  .delay(DELAY_SOUND2)\n  .startTime(START_TIME_SOUND2)\n  .preset('conditionalWait', [WAIT_UNTIL_FINISHED_SOUND_ENABLED2, WAIT_UNTIL_FINISHED_SOUND2])\n\n  .effect()\n  .playIf(ENABLED2)\n  .file(ANIMATION2)\n  .opacity(OPACITY2)\n  .filter('ColorMatrix', { hue: COLORMATRIX_HUE2 })\n  .atLocation(sourceToken)\n  .stretchTo(templateDocument)\n  .preset('conditionalWait', [WAIT_UNTIL_FINISHED_ENABLED2, WAIT_UNTIL_FINISHED2])\n\n  // ON TARGET\n  .sound()\n  .playIf(SOUND_ENABLED3)\n  .file(SOUND3)\n  .delay(DELAY_SOUND3)\n  .startTime(START_TIME_SOUND3)\n  .preset('conditionalWait', [WAIT_UNTIL_FINISHED_SOUND_ENABLED3, WAIT_UNTIL_FINISHED_SOUND3])\n\n  .effect()\n  .playIf(ENABLED3)\n  .file(ANIMATION3)\n  .atLocation(templateDocument)\n  .elevation(templateElevation)\n  .scaleToObject(SCALE3)\n  .fadeIn(FADEIN3)\n  .fadeOut(FADEOUT3)\n  .opacity(OPACITY3)\n  .filter('ColorMatrix', { hue: COLORMATRIX_HUE3 })\n  .belowTokens(BELOW_TOKENS3)\n  .tieToDocuments(templateDocument)\n  .attachTo(templateDocument, { bindVisibility: false, bindScale: false })\n  .waitUntilFinished()\n  .persist(PERSIST3)\n  .play();\n\nif (ENABLED3 && DELETE_TEMPLATE3) {\n  await templateDocument?.delete();\n}",
+              "autoRec": {
+                "enabled": true
+              },
+              "activityName": "Expend Use",
+              "activityType": "utility",
+              "version": 2
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -127,4 +127,4 @@ export const drunk = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-autorec.register("drunk", "effect", "eskie.effect.emote.drunk", DEFAULT_CONFIG, "0.0.0", "Drunk");
+autorec.register("drunk", "effect", "eskie.effect.emote.drunk", DEFAULT_CONFIG, "0.0.1", "Drunk");

@@ -188,4 +188,4 @@ export const spikeGrowth = {
 };
 
 autorec.register("spikeGrowth", "template", "eskie.effect.spikeGrowth", DEFAULT_CONFIG, "0.0.1", "Spike Growth");
-autorec.register(CONCENTRATING("spikeGrowth", "Spike Growth"), "effect", "eskie.effect.spikeGrowth", DEFAULT_CONFIG);
+autorec.register(CONCENTRATING("spikeGrowth", "Spike Growth"), "effect", "eskie.effect.spikeGrowth", DEFAULT_CONFIG, "0.0.1");

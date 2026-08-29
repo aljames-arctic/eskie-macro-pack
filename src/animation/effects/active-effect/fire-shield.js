@@ -102,4 +102,4 @@ export const fireShield = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("fireShield", "effect", "eskie.effect.fireShield", DEFAULT_CONFIG, "0.0.0", "Fire Shield");
+autorec.register("fireShield", "effect", "eskie.effect.fireShield", DEFAULT_CONFIG, "0.0.1", "Fire Shield");

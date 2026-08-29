@@ -113,5 +113,5 @@ export const hitTheDirt = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("hitTheDirt", 'template', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, "0.0.0", "Hit the Dirt");
-autorec.register("hitTheDirt", 'effect', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, "0.0.0", "Hit the Dirt");
+autorec.register("hitTheDirt", 'template', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, "0.0.1", "Hit the Dirt");
+autorec.register("hitTheDirt", 'effect', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, "0.0.1", "Hit the Dirt");

@@ -551,4 +551,4 @@ export const starwardSword = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("starwardSword", "template", "eskie.effect.starwardSword", DEFAULT_CONFIG, "0.0.0", "Starward Sword");
+autorec.register("starwardSword", "template", "eskie.effect.starwardSword", DEFAULT_CONFIG, "0.0.1", "Starward Sword");

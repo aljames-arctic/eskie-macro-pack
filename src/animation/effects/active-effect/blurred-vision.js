@@ -59,4 +59,4 @@ export const blurredVision = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-autorec.register("blurredVision", "effect", "eskie.effect.blurredVision", DEFAULT_CONFIG, "0.0.0", "Blurred Vision");
+autorec.register("blurredVision", "effect", "eskie.effect.blurredVision", DEFAULT_CONFIG, "0.0.1", "Blurred Vision");

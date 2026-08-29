@@ -89,4 +89,4 @@ export const hide = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("hide", "effect", "eskie.effect.hide", DEFAULT_CONFIG, "0.0.0", "Hide");
+autorec.register("hide", "effect", "eskie.effect.hide", DEFAULT_CONFIG, "0.0.1", "Hide");

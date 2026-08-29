@@ -127,4 +127,4 @@ export const fightingSpirit = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-autorec.register("fightingSpirit", "effect", "eskie.effect.fightingSpirit", DEFAULT_CONFIG, "0.0.0", "Fighting Spirit");
+autorec.register("fightingSpirit", "effect", "eskie.effect.fightingSpirit", DEFAULT_CONFIG, "0.0.1", "Fighting Spirit");

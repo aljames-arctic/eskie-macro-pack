@@ -96,4 +96,4 @@ export const hexCast = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("hexed", "effect", "eskie.effect.hex.cast", DEFAULT_CONFIG, "0.0.0", "Hexed");
+autorec.register("hexed", "effect", "eskie.effect.hex.cast", DEFAULT_CONFIG, "0.0.1", "Hexed");

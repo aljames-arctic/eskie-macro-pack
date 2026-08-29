@@ -202,4 +202,4 @@ export const stunningFist = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("stunningFist", "melee-target", "eskie.effect.stunningFist", DEFAULT_CONFIG, "0.0.0", "Stunning Fist")
+autorec.register("stunningFist", "melee-target", "eskie.effect.stunningFist", DEFAULT_CONFIG, "0.0.1", "Stunning Fist");

@@ -218,4 +218,4 @@ export const mirrorImage = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("mirrorImage", "effect", "eskie.effect.mirrorImage", DEFAULT_CONFIG, "0.0.0", "Mirror Image");
+autorec.register("mirrorImage", "effect", "eskie.effect.mirrorImage", DEFAULT_CONFIG, "0.0.1", "Mirror Image");

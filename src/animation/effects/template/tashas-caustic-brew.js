@@ -281,4 +281,4 @@ export const tashasCausticBrew = {
     default_config: DEFAULT_CONFIG_CAST,
 };
 
-autorec.register("tashasCausticBrew", "template", "eskie.effect.tashasCausticBrew", DEFAULT_CONFIG_CAST, '0.1.0', "Tasha's Caustic Brew");
+autorec.register("tashasCausticBrew", "template", "eskie.effect.tashasCausticBrew", DEFAULT_CONFIG_CAST, '0.1.1', "Tasha's Caustic Brew");

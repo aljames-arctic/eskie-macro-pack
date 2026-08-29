@@ -137,5 +137,5 @@ export const entangle = {
 };
 
 autorec.register('entangle', 'template', 'eskie.effect.entangle', DEFAULT_CONFIG, '0.0.1', 'Entangle');
-autorec.register(CONCENTRATING('entangle', 'Entangle'), 'effect', 'eskie.effect.entangle', DEFAULT_CONFIG);
+autorec.register(CONCENTRATING('entangle', 'Entangle'), 'effect', 'eskie.effect.entangle', DEFAULT_CONFIG, "0.0.1");
 

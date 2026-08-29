@@ -129,4 +129,4 @@ export const twilightSanctuary = {
 
 autorec.register('twilightSanctuary', 'aura', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG, '0.0.1', 'Twilight Sanctuary');
 autorec.register('channelDivinityTwilightSanctuary', 'aura', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG, '0.0.1', 'Channel Divinity: Twilight Sanctuary');
-autorec.register(CONCENTRATING('twilightSanctuary', 'Twilight Sanctuary'), 'effect', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG);
+autorec.register(CONCENTRATING('twilightSanctuary', 'Twilight Sanctuary'), 'effect', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG, "0.0.1");

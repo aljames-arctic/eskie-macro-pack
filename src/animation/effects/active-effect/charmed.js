@@ -91,4 +91,4 @@ export const charmed = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("charmed", "effect", "eskie.effect.charmed", DEFAULT_CONFIG, "0.0.0", "Charmed");
+autorec.register("charmed", "effect", "eskie.effect.charmed", DEFAULT_CONFIG, "0.0.1", "Charmed");

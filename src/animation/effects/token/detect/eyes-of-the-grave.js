@@ -123,5 +123,5 @@ export const eyesOfTheGrave = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('eyesOfTheGrave', 'token', 'eskie.effect.detect.eyesOfTheGrave', DEFAULT_CONFIG, '0.0.0', 'Eyes of the Grave');
+autorec.register('eyesOfTheGrave', 'token', 'eskie.effect.detect.eyesOfTheGrave', DEFAULT_CONFIG, '0.0.1', 'Eyes of the Grave');
 

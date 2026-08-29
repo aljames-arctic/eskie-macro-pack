@@ -155,4 +155,4 @@ export const silence = {
 };
 
 autorec.register("silence", "template", "eskie.effect.silence", DEFAULT_CONFIG, "0.0.1", "Silence");
-autorec.register(CONCENTRATING("silence", "Silence"), "effect", "eskie.effect.silence", DEFAULT_CONFIG);
+autorec.register(CONCENTRATING("silence", "Silence"), "effect", "eskie.effect.silence", DEFAULT_CONFIG, "0.0.1");

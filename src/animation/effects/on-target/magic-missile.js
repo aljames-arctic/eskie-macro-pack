@@ -118,4 +118,4 @@ export const magicMissile = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("magicMissile", "ranged-target", "eskie.effect.magicMissile", DEFAULT_CONFIG, "0.0.0", "Magic Missile");
+autorec.register("magicMissile", "ranged-target", "eskie.effect.magicMissile", DEFAULT_CONFIG, "0.0.1", "Magic Missile");

@@ -259,5 +259,5 @@ export const gate = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("gate", "template", "eskie.effect.gate", DEFAULT_CONFIG, "0.0.0", "Gate");
-autorec.register(CONCENTRATING("gate", "Gate"), "effect", "eskie.effect.gate", DEFAULT_CONFIG);
+autorec.register("gate", "template", "eskie.effect.gate", DEFAULT_CONFIG, "0.0.1", "Gate");
+autorec.register(CONCENTRATING("gate", "Gate"), "effect", "eskie.effect.gate", DEFAULT_CONFIG, "0.0.1");

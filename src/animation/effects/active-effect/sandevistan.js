@@ -169,4 +169,4 @@ export const sandevistan = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("sandevistan", "effect", "eskie.effect.sandevistan", DEFAULT_CONFIG, "0.0.0", "Sandevistan");
+autorec.register("sandevistan", "effect", "eskie.effect.sandevistan", DEFAULT_CONFIG, "0.0.1", "Sandevistan");

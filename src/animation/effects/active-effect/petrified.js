@@ -84,4 +84,4 @@ export const petrified = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("petrified", "effect", "eskie.effect.petrified", DEFAULT_CONFIG, "0.0.0", "Petrified");
+autorec.register("petrified", "effect", "eskie.effect.petrified", DEFAULT_CONFIG, "0.0.1", "Petrified");

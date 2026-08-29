@@ -116,4 +116,4 @@ export const levitation = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("levitating", "effect", "eskie.effect.levitation", DEFAULT_CONFIG, "0.0.0", "Levitating");
+autorec.register("levitating", "effect", "eskie.effect.levitation", DEFAULT_CONFIG, "0.0.1", "Levitating");

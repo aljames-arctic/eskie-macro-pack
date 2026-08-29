@@ -148,4 +148,4 @@ export const stepOfTheWindMove = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("stepOfTheWind", "effect", "eskie.effect.stepOfTheWind.move", DEFAULT_CONFIG, "0.0.0", "Step of the Wind");
+autorec.register("stepOfTheWind", "effect", "eskie.effect.stepOfTheWind.move", DEFAULT_CONFIG, "0.0.1", "Step of the Wind");

@@ -178,5 +178,5 @@ export const keeperOfSouls = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('keeperOfSouls', 'ranged-target', 'eskie.effect.keeperOfSouls', DEFAULT_CONFIG, '0.0.0', 'Keeper of Souls');
+autorec.register('keeperOfSouls', 'ranged-target', 'eskie.effect.keeperOfSouls', DEFAULT_CONFIG, '0.0.1', 'Keeper of Souls');
 

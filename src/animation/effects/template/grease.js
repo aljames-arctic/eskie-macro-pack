@@ -134,4 +134,4 @@ export const grease = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("grease", "template", "eskie.effect.grease", DEFAULT_CONFIG, "0.0.0", "Grease");
+autorec.register("grease", "template", "eskie.effect.grease", DEFAULT_CONFIG, "0.0.1", "Grease");

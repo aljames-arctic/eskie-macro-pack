@@ -322,4 +322,4 @@ export const shapechange = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("shapechange", 'effect', 'eskie.effect.shapechange', DEFAULT_CONFIG, '0.1.0', "Shapechange");
+autorec.register("shapechange", 'effect', 'eskie.effect.shapechange', DEFAULT_CONFIG, '0.1.1', "Shapechange");

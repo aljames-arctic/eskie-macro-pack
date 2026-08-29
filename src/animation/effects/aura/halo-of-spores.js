@@ -168,5 +168,5 @@ export const haloOfSpores = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("haloOfSpores", "aura", "eskie.effect.haloOfSpores.aura", DEFAULT_CONFIG, "0.0.0", "Halo of Spores");
-autorec.register(CONCENTRATING("haloOfSpores", "Halo of Spores"), "effect", "eskie.effect.haloOfSpores.aura", DEFAULT_CONFIG);
+autorec.register("haloOfSpores", "aura", "eskie.effect.haloOfSpores.aura", DEFAULT_CONFIG, "0.0.1", "Halo of Spores");
+autorec.register(CONCENTRATING("haloOfSpores", "Halo of Spores"), "effect", "eskie.effect.haloOfSpores.aura", DEFAULT_CONFIG, "0.0.1");

@@ -206,4 +206,4 @@ export const stepOfTheWindJump = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("stepOfTheWindJump", "template", "eskie.effect.stepOfTheWind.jump", DEFAULT_CONFIG, "0.0.0", "Step of the Wind Jump");
+autorec.register("stepOfTheWindJump", "template", "eskie.effect.stepOfTheWind.jump", DEFAULT_CONFIG, "0.0.1", "Step of the Wind Jump");

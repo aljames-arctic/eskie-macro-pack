@@ -291,5 +291,5 @@ export const enlargeReduce = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("enlarged", "effect", "eskie.effect.enlargeReduce.enlarge", DEFAULT_CONFIG, "0.0.0", "Enlarged");
-autorec.register("reduced", "effect", "eskie.effect.enlargeReduce.reduce", DEFAULT_CONFIG, "0.0.0", "Reduced");
+autorec.register("enlarged", "effect", "eskie.effect.enlargeReduce.enlarge", DEFAULT_CONFIG, "0.0.1", "Enlarged");
+autorec.register("reduced", "effect", "eskie.effect.enlargeReduce.reduce", DEFAULT_CONFIG, "0.0.1", "Reduced");

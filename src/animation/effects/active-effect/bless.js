@@ -181,5 +181,5 @@ export const bless = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("bless", "token", "eskie.effect.bless.cast", DEFAULT_CONFIG, "0.0.0", "Bless");
-autorec.register("bless", "effect", "eskie.effect.bless.effect", DEFAULT_CONFIG, "0.0.0", "Bless");
+autorec.register("bless", "token", "eskie.effect.bless.cast", DEFAULT_CONFIG, "0.0.1", "Bless");
+autorec.register("bless", "effect", "eskie.effect.bless.effect", DEFAULT_CONFIG, "0.0.1", "Bless");

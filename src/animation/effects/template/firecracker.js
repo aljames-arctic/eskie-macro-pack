@@ -86,4 +86,4 @@ export const firecracker = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("firecracker", "template", "eskie.effect.firecracker", DEFAULT_CONFIG, "0.0.0", "Firecracker");
+autorec.register("firecracker", "template", "eskie.effect.firecracker", DEFAULT_CONFIG, "0.0.1", "Firecracker");

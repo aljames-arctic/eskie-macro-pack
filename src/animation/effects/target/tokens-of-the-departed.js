@@ -245,6 +245,6 @@ export const tokensOfTheDeparted = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('tokensOfTheDeparted', 'ranged-target', 'eskie.effect.tokensOfTheDeparted.harvest', DEFAULT_CONFIG, '0.0.0', 'Tokens of the Departed');
-autorec.register('tokensOfTheDepartedUse', 'ranged-target', 'eskie.effect.tokensOfTheDeparted.use', DEFAULT_CONFIG, '0.0.0', 'Tokens of the Departed (Use)');
+autorec.register('tokensOfTheDeparted', 'ranged-target', 'eskie.effect.tokensOfTheDeparted.harvest', DEFAULT_CONFIG, '0.0.1', 'Tokens of the Departed');
+autorec.register('tokensOfTheDepartedUse', 'ranged-target', 'eskie.effect.tokensOfTheDeparted.use', DEFAULT_CONFIG, '0.0.1', 'Tokens of the Departed (Use)');
 

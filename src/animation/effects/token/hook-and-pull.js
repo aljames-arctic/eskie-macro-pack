@@ -102,4 +102,4 @@ export const hookAndPull = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("hookAndPull", "ranged-target", "eskie.effect.hookAndPull", DEFAULT_CONFIG, "0.0.0", "Hook and Pull");
+autorec.register("hookAndPull", "ranged-target", "eskie.effect.hookAndPull", DEFAULT_CONFIG, "0.0.1", "Hook and Pull");

@@ -128,4 +128,4 @@ export const dash = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("dash", "effect", "eskie.effect.dash", DEFAULT_CONFIG, "0.0.0", "Dash");
+autorec.register("dash", "effect", "eskie.effect.dash", DEFAULT_CONFIG, "0.0.1", "Dash");

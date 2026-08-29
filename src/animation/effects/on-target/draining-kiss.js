@@ -159,4 +159,4 @@ export const drainingKiss = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("drainingKiss", "melee-target", "eskie.effect.drainingKiss", DEFAULT_CONFIG, "0.0.0", "Draining Kiss");
+autorec.register("drainingKiss", "melee-target", "eskie.effect.drainingKiss", DEFAULT_CONFIG, "0.0.1", "Draining Kiss");

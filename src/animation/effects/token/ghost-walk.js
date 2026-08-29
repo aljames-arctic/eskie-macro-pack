@@ -120,6 +120,6 @@ export const ghostWalk = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('ghostWalk', 'token', 'eskie.effect.ghostWalk', DEFAULT_CONFIG, '0.0.0', 'Ghost Walk');
-autorec.register('ghostWalk', 'effect', 'eskie.effect.ghostWalk', DEFAULT_CONFIG, '0.0.0', 'Ghost Walk');
+autorec.register('ghostWalk', 'token', 'eskie.effect.ghostWalk', DEFAULT_CONFIG, '0.0.1', 'Ghost Walk');
+autorec.register('ghostWalk', 'effect', 'eskie.effect.ghostWalk', DEFAULT_CONFIG, '0.0.1', 'Ghost Walk');
 

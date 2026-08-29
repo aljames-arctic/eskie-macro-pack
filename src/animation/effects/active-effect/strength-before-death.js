@@ -297,4 +297,4 @@ export const strengthBeforeDeath = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-autorec.register("strengthBeforeDeath", "effect", "eskie.effect.strengthBeforeDeath", DEFAULT_CONFIG, "0.0.0", "Strength Before Death");
+autorec.register("strengthBeforeDeath", "effect", "eskie.effect.strengthBeforeDeath", DEFAULT_CONFIG, "0.0.1", "Strength Before Death");

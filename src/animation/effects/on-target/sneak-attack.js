@@ -171,5 +171,5 @@ export const sneakAttack = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register(autorec.MELEE("sneakAttack", "Sneak Attack"), "melee-target", "eskie.effect.sneakAttack.melee", DEFAULT_CONFIG_MELEE, "1.0.0", "(Melee) Sneak Attack");
-autorec.register(autorec.RANGED("sneakAttack", "Sneak Attack"), "ranged-target", "eskie.effect.sneakAttack.ranged", DEFAULT_CONFIG_RANGED, "1.0.0", "(Ranged) Sneak Attack");
+autorec.register(autorec.MELEE("sneakAttack", "Sneak Attack"), "melee-target", "eskie.effect.sneakAttack.melee", DEFAULT_CONFIG_MELEE, "1.0.1", "(Melee) Sneak Attack");
+autorec.register(autorec.RANGED("sneakAttack", "Sneak Attack"), "ranged-target", "eskie.effect.sneakAttack.ranged", DEFAULT_CONFIG_RANGED, "1.0.1", "(Ranged) Sneak Attack");

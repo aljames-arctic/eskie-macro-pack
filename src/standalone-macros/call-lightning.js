@@ -158,26 +158,49 @@ const isCloudActive = activeEffects.length > 0;
 
 if (isCloudActive) {
     // If active, ask whether to call down another lightning strike or stop/dismiss the storm cloud
-    const action = await new Promise((resolve) => {
-        new Dialog({
-            title: "Call Lightning Active",
+    let action = "cancel";
+    const dialogCls = foundry.applications?.api?.DialogV2;
+    if (dialogCls?.wait) {
+        action = await dialogCls.wait({
+            window: { title: "Call Lightning Active" },
             content: "<p>A Call Lightning storm cloud vortex is active overhead. What would you like to do?</p>",
-            buttons: {
-                strike: {
-                    icon: '<i class="fas fa-bolt"></i>',
+            buttons: [
+                {
+                    action: "strike",
                     label: "Call Down Lightning Strike",
-                    callback: () => resolve("strike")
+                    icon: "fa-solid fa-bolt",
+                    default: true
                 },
-                stop: {
-                    icon: '<i class="fas fa-times-circle"></i>',
+                {
+                    action: "stop",
                     label: "Dismiss Storm Cloud (Stop)",
-                    callback: () => resolve("stop")
+                    icon: "fa-solid fa-circle-xmark"
                 }
-            },
-            default: "strike",
-            close: () => resolve("cancel")
-        }).render(true);
-    });
+            ],
+            rejectClose: false
+        }) ?? "cancel";
+    } else {
+        action = await new Promise((resolve) => {
+            new Dialog({
+                title: "Call Lightning Active",
+                content: "<p>A Call Lightning storm cloud vortex is active overhead. What would you like to do?</p>",
+                buttons: {
+                    strike: {
+                        icon: '<i class="fas fa-bolt"></i>',
+                        label: "Call Down Lightning Strike",
+                        callback: () => resolve("strike")
+                    },
+                    stop: {
+                        icon: '<i class="fas fa-times-circle"></i>',
+                        label: "Dismiss Storm Cloud (Stop)",
+                        callback: () => resolve("stop")
+                    }
+                },
+                default: "strike",
+                close: () => resolve("cancel")
+            }).render(true);
+        });
+    }
 
     if (action === "stop") {
         stopStormCloud();

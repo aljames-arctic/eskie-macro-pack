@@ -54,61 +54,56 @@ export function isBlfxCustomAutoRecUpdatesEnabled() {
 }
 
 /**
- * Prompts the user with an instructional dialog to enable custom auto-recognition updates in BLFX settings.
- * @returns {Promise<void>}
+ * Modern ApplicationV2 dialog instructing the user to enable custom auto-recognition updates in BLFX settings.
  */
-export async function promptEnableBlfxUpdates() {
-    const title = game.i18n?.localize("EMP.blfxPrompt.enableUpdatesTitle") ?? "Boss Loot FX — Enable Custom Auto-Rec Updates";
-    const heading = game.i18n?.localize("EMP.blfxPrompt.enableUpdatesHeading") ?? "External Custom Auto-Recognition updates are disabled in Boss Loot FX.";
-    const message = game.i18n?.localize("EMP.blfxPrompt.enableUpdatesMessage") ?? "Before Eskie Macro Pack can synchronize custom animation presets, external module updates must be enabled in Boss Loot FX settings.";
-    const instructions = game.i18n?.localize("EMP.blfxPrompt.instructions") ?? "Please go to Game Settings → Configure Settings → Boss Loot FX and enable 'Allow Custom Auto-Rec Updates' (blfxCustomAutoRecUpdates).";
+export class BlfxEnableUpdatesDialog extends foundryPlatform.HandlebarsApplicationMixin(foundryPlatform.ApplicationV2) {
+    static DEFAULT_OPTIONS = {
+        id: "empBlfxEnableUpdatesDialog",
+        classes: ["eskie-world-scripts-form", "eskie-dialog-v2", "eskie-blfx-prompt"],
+        tag: "div",
+        window: {
+            title: "EMP.blfxPrompt.enableUpdatesTitle",
+            icon: "fa-solid fa-dragon"
+        },
+        position: {
+            width: 500,
+            height: "auto"
+        }
+    };
 
-    const dialogCls = foundryPlatform.DialogV2;
-    if (dialogCls?.wait) {
-        const content = `
-            <div style="display: flex; gap: 14px; align-items: flex-start; padding: 6px 0;">
-                <div style="font-size: 2rem; color: #a78bfa; line-height: 1;">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                </div>
-                <div>
-                    <p style="margin: 0 0 8px 0; font-weight: 600; color: #f1f5f9; font-size: 0.95rem;">
-                        ${heading}
-                    </p>
-                    <p style="margin: 0 0 8px 0; font-size: 0.88rem; color: #cbd5e1; line-height: 1.4;">
-                        ${message}
-                    </p>
-                    <p style="margin: 0; font-size: 0.82rem; color: #94a3b8; line-height: 1.35;">
-                        ${instructions}
-                    </p>
-                </div>
-            </div>
-        `;
-
-        return dialogCls.wait({
-            window: { title, icon: "fa-solid fa-dragon" },
-            content,
-            buttons: [
-                {
-                    action: "openSettings",
-                    label: game.i18n?.localize("EMP.blfxPrompt.openSettings") ?? "Open Settings",
-                    icon: "fa-solid fa-gear",
-                    callback: () => {
-                        if (game.settings?.sheet) {
-                            game.settings.sheet.render(true);
-                        }
-                    }
-                },
-                {
-                    action: "dismiss",
-                    label: game.i18n?.localize("EMP.blfxPrompt.dismiss") ?? "Dismiss",
-                    icon: "fa-solid fa-xmark",
-                    default: true
-                }
-            ]
-        });
+    static get PARTS() {
+        return {
+            content: {
+                template: `modules/${MODULE_ID}/src/ui/blfx/enableUpdatesPrompt.html`
+            }
+        };
     }
 
-    ui.notifications?.warn?.(`${heading} ${instructions}`);
+    _onRender(context, options) {
+        super._onRender?.(context, options);
+
+        this.element?.querySelector('button[name="openSettings"]')?.addEventListener("click", (event) => {
+            event.preventDefault();
+            if (game.settings?.sheet) {
+                game.settings.sheet.render(true);
+            }
+            this.close();
+        });
+
+        this.element?.querySelector('button[name="dismiss"]')?.addEventListener("click", (event) => {
+            event.preventDefault();
+            this.close();
+        });
+    }
+}
+
+/**
+ * Prompts the user with an instructional ApplicationV2 dialog to enable custom auto-recognition updates in BLFX settings.
+ * @returns {Promise<BlfxEnableUpdatesDialog>}
+ */
+export async function promptEnableBlfxUpdates() {
+    const dialog = new BlfxEnableUpdatesDialog();
+    return dialog.render(true);
 }
 
 /**

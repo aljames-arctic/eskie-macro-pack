@@ -36,18 +36,36 @@ const DEFAULT_CONFIG = {
 };
 
 async function _getDestination(destinations) {
-    return new Promise((resolve) => {
-        let content = `
-            <div class="form-group">
-                <label>Destination:</label>
-                <select id="destination-select">`;
-        for (const dest of destinations) {
-            content += `<option value="${dest.value}">${dest.label}</option>`;
-        }
-        content += `
-                </select>
-            </div>`;
+    let content = `
+        <div class="form-group" style="padding: 4px 0;">
+            <label style="font-weight: 600; display: block; margin-bottom: 6px;">Destination:</label>
+            <select id="destination-select" style="width: 100%; padding: 4px 8px;">`;
+    for (const dest of destinations) {
+        content += `<option value="${dest.value}">${dest.label}</option>`;
+    }
+    content += `
+            </select>
+        </div>`;
 
+    const dialogCls = foundry.applications?.api?.DialogV2;
+    if (dialogCls?.prompt) {
+        return dialogCls.prompt({
+            window: { title: 'Select a Destination' },
+            content,
+            ok: {
+                label: 'OK',
+                icon: 'fa-solid fa-check',
+                callback: (event, button, dialog) => {
+                    return button.form?.elements?.['destination-select']?.value
+                        ?? button.form?.querySelector?.('#destination-select')?.value
+                        ?? destinations[0]?.value;
+                }
+            },
+            rejectClose: false
+        });
+    }
+
+    return new Promise((resolve) => {
         new Dialog({
             title: 'Select a Destination',
             content: content,

@@ -44,10 +44,9 @@ const savedAnchor = token.document?.getFlag("world", "teleportRecallAnchor");
 
 // Helper dialog for Wizard Teleportation Circle & Recall options
 async function showTeleportDialog() {
-    return new Promise((resolve) => {
-        const hasAnchor = Boolean(savedAnchor?.x && savedAnchor?.y);
-        const targetedCount = game.user.targets.size;
-        const groupDefault = targetedCount > 0 ? "party" : "solo";
+    const hasAnchor = Boolean(savedAnchor?.x && savedAnchor?.y);
+    const targetedCount = game.user.targets.size;
+    const groupDefault = targetedCount > 0 ? "party" : "solo";
 
         const content = `
             <form style="padding: 5px;">
@@ -75,6 +74,28 @@ async function showTeleportDialog() {
             </form>
         `;
 
+    const dialogCls = foundry.applications?.api?.DialogV2;
+    if (dialogCls?.prompt) {
+        return dialogCls.prompt({
+            window: { title: "Wizard Teleportation Circle & Group Recall" },
+            content,
+            ok: {
+                label: "Cast Spell",
+                icon: "fa-solid fa-wand-magic-sparkles",
+                callback: (event, button, dialog) => {
+                    const form = button.form;
+                    return {
+                        mode: form?.elements?.['teleport-mode']?.value ?? form?.querySelector?.('#teleport-mode')?.value ?? "teleport",
+                        scope: form?.elements?.['teleport-scope']?.value ?? form?.querySelector?.('#teleport-scope')?.value ?? groupDefault,
+                        saveAnchor: Boolean(form?.querySelector?.('#save-anchor')?.checked)
+                    };
+                }
+            },
+            rejectClose: false
+        });
+    }
+
+    return new Promise((resolve) => {
         new Dialog({
             title: "Wizard Teleportation Circle & Group Recall",
             content: content,

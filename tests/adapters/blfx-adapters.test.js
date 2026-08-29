@@ -200,18 +200,15 @@ test('isBlfxCustomAutoRecUpdatesEnabled detects boss-loot-assets-premium.blfxCus
     game.settings.get = origGet;
 });
 
-test('promptEnableBlfxUpdates renders instructional DialogV2', async () => {
-    const { promptEnableBlfxUpdates } = await import('../../src/adapters/modules/blfx/blfx.js');
-    let dialogCalled = false;
-    const origWait = foundry.applications.api.DialogV2.wait;
-    foundry.applications.api.DialogV2.wait = async (options) => {
-        dialogCalled = true;
-        assert.ok(options.content.includes('blfxCustomAutoRecUpdates') || options.content.includes('EMP.blfxPrompt'));
-        assert.ok(options.buttons.some(b => b.action === 'openSettings'));
-        return 'dismiss';
-    };
+test('BlfxEnableUpdatesDialog inherits from ApplicationV2 and promptEnableBlfxUpdates renders it', async () => {
+    const { BlfxEnableUpdatesDialog, promptEnableBlfxUpdates } = await import('../../src/adapters/modules/blfx/blfx.js');
+    const dialog = new BlfxEnableUpdatesDialog();
+    assert.ok(dialog);
+    assert.equal(BlfxEnableUpdatesDialog.DEFAULT_OPTIONS.id, 'empBlfxEnableUpdatesDialog');
+    assert.ok(BlfxEnableUpdatesDialog.PARTS.content.template.includes('enableUpdatesPrompt.html'));
 
-    await promptEnableBlfxUpdates();
-    assert.equal(dialogCalled, true);
-    foundry.applications.api.DialogV2.wait = origWait;
+    const rendered = await promptEnableBlfxUpdates();
+    assert.ok(rendered);
+    assert.equal(rendered.rendered, true);
+    await rendered.close();
 });

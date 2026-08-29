@@ -76,14 +76,18 @@ export function buildBlfxMacroCommand(animation, trigger, config) {
 
     if (standardized === 'afterActiveEffects') {
         return `// Eskie Macro Pack Autorec (On Target or Token - AE)
-const token = (typeof targetTokens !== 'undefined' && (targetTokens?.first?.() ?? Array.from(targetTokens ?? [])[0])) || (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
+const source = (typeof sourceToken !== 'undefined' && sourceToken) || null;
+const target = (typeof targetTokens !== 'undefined' && (targetTokens[0] ?? targetTokens.first?.())) || null;
+const token = target || source || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
 const config = ${serializedConfig};
+if (typeof effect !== 'undefined' && effect) {
+    config.activeEffect = effect;
+}
 const effectFn = foundry.utils.getProperty(globalThis, '${animation}');
-if (effectFn && token) {
-    if (typeof effect !== 'undefined' && effect) {
-        config.activeEffect = effect;
-    }
-    if (effectFn.play) {
+if (effectFn?.play) {
+    if (source && target && source.id !== target.id) {
+        await effectFn.play(source, target, config);
+    } else if (token) {
         await effectFn.play(token, config);
     }
 }`;
@@ -95,6 +99,19 @@ const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof wor
 const template = typeof templateDocument !== 'undefined' ? templateDocument : null;
 const config = ${serializedConfig};
 if (template) config.template = template;
+if (typeof targetTokens !== 'undefined' && targetTokens?.length) config.targets = targetTokens;
+const effect = foundry.utils.getProperty(globalThis, '${animation}');
+if (effect?.play && token) {
+    await effect.play(token, config);
+}`;
+    }
+
+    if (standardized === 'afterSummon') {
+        return `// Eskie Macro Pack Autorec (Summon)
+const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
+const targets = (typeof targetTokens !== 'undefined' && targetTokens?.length) ? targetTokens : [];
+const config = ${serializedConfig};
+if (targets.length) config.targets = targets;
 const effect = foundry.utils.getProperty(globalThis, '${animation}');
 if (effect?.play && token) {
     await effect.play(token, config);
@@ -113,7 +130,7 @@ if (effect?.play) {
     } else if (token) {
         await effect.play(token, config);
     }
-}`;
+} `;
     }
 
     return `// Eskie Macro Pack Autorec

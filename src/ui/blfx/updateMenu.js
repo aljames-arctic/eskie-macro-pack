@@ -48,6 +48,48 @@ function extractVersionFromNote(note) {
 }
 
 /**
+ * Groups BLFX entries by trigger category in a preferred order.
+ * @param {Array<object>} entries Formatted entries list
+ * @returns {Array<{triggerName: string, triggerMode: string, entries: Array<object>}>}
+ */
+export function groupBlfxEntriesByTrigger(entries = []) {
+    const preferredOrder = [
+        "After Template Create",
+        "After Active Effects",
+        "After Attack Roll",
+        "After Damage Roll",
+        "After Summon",
+        "After Activity Use (Default)"
+    ];
+
+    const groups = {};
+    for (const item of entries) {
+        const triggerHeader = item.triggerName || item.triggerMode;
+        if (!groups[triggerHeader]) {
+            groups[triggerHeader] = {
+                triggerName: triggerHeader,
+                triggerMode: item.triggerMode,
+                entries: []
+            };
+        }
+        groups[triggerHeader].entries.push(item);
+    }
+
+    for (const group of Object.values(groups)) {
+        group.entries.sort((a, b) => (a.itemName || a.label || "").localeCompare(b.itemName || b.label || ""));
+    }
+
+    return Object.values(groups).sort((a, b) => {
+        const idxA = preferredOrder.indexOf(a.triggerName);
+        const idxB = preferredOrder.indexOf(b.triggerName);
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        if (idxA !== -1) return -1;
+        if (idxB !== -1) return 1;
+        return a.triggerName.localeCompare(b.triggerName);
+    });
+}
+
+/**
  * Generates a comparison between incoming EMP BLFX registry entries and existing BLFX world settings.
  * @param {object} [empRegistry=EMP_BLFX_Registry] The BLFX registry entries to compare
  * @param {Set<string>} [excludedKeys=new Set()] Set of entry keys to exclude from addition
@@ -86,14 +128,27 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
                     if (!newEntry || typeof newEntry !== 'object') continue;
 
                     const entryKey = `${systemId}___${itemSlug}___${activitySlug}___${triggerMode}`;
+                    const itemName = newEntry.itemName || itemSlug;
+                    const effectName = newEntry.animationName || itemName;
+                    const activityName = newEntry.activityName || activitySlug;
+                    const triggerName = newEntry.triggerName || triggerMode;
+                    const subtext = (newEntry.animationName && newEntry.animationName !== itemName)
+                        ? newEntry.animationName
+                        : (activityName && activityName !== 'Default' ? activityName : '');
+
                     const formatted = {
                         key: entryKey,
                         systemId,
                         itemSlug,
                         activitySlug,
                         triggerMode,
-                        label: newEntry.animationName || newEntry.itemName || itemSlug,
-                        menu: `${newEntry.activityName || activitySlug} (${newEntry.triggerName || triggerMode})`,
+                        itemName,
+                        effectName,
+                        activityName,
+                        triggerName,
+                        subtext,
+                        label: itemName,
+                        menu: triggerName,
                         entry: newEntry
                     };
 
@@ -212,12 +267,19 @@ export class BlfxAutorecUpdateApp extends foundryPlatform.HandlebarsApplicationM
             customEntries,
         } = await this.settings();
 
+        const missingSections = groupBlfxEntriesByTrigger(missingEntries);
+        const updatedSections = groupBlfxEntriesByTrigger(updatedEntries);
+        const customSections = groupBlfxEntriesByTrigger(customEntries);
+
         const hasChanges = Boolean(missingEntries.length || updatedEntries.length || customEntries.length);
 
         return {
             missingEntries,
             updatedEntries,
             customEntries,
+            missingSections,
+            updatedSections,
+            customSections,
             hasChanges
         };
     }

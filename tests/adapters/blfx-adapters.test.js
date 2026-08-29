@@ -2,7 +2,7 @@ import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { blfx, EMP_BLFX_Registry, buildBlfxPayload, mergeBlfxCustomAutoRec } from '../../src/adapters/modules/blfx/blfx.js';
-import { generateBlfxAutorecUpdate, readExistingBlfxData, BlfxAutorecUpdateApp } from '../../src/ui/blfx/updateMenu.js';
+import { generateBlfxAutorecUpdate, readExistingBlfxData, groupBlfxEntriesByTrigger, BlfxAutorecUpdateApp } from '../../src/ui/blfx/updateMenu.js';
 
 test('blfx.register creates robustly keyed entries in EMP_BLFX_Registry', () => {
     blfx.register('fireball', 'template', 'eskie.effect.fireball', { speed: 1 }, '1.0.0', 'Fireball', {
@@ -39,6 +39,23 @@ test('blfx.register maps active effects to afterActiveEffects and On Target or T
     assert.equal(entry.animationData.macroType, 'On Target or Token (AE)');
     assert.ok(entry.animationData.command.includes('eskie.effect.rage'));
     assert.ok(entry.animationData.command.includes('activeEffect'));
+});
+
+test('groupBlfxEntriesByTrigger groups entries into preferred section order', () => {
+    const rawEntries = [
+        { itemName: 'Shield', triggerName: 'After Attack Roll', triggerMode: 'afterAttack' },
+        { itemName: 'Fireball', triggerName: 'After Template Create', triggerMode: 'createTemplate' },
+        { itemName: 'Rage', triggerName: 'After Active Effects', triggerMode: 'afterActiveEffects' },
+        { itemName: 'Bless', triggerName: 'After Activity Use (Default)', triggerMode: 'afterItemUse' }
+    ];
+
+    const sections = groupBlfxEntriesByTrigger(rawEntries);
+    assert.equal(sections.length, 4);
+    assert.equal(sections[0].triggerName, 'After Template Create');
+    assert.equal(sections[1].triggerName, 'After Active Effects');
+    assert.equal(sections[2].triggerName, 'After Attack Roll');
+    assert.equal(sections[3].triggerName, 'After Activity Use (Default)');
+    assert.equal(sections[0].entries[0].itemName, 'Fireball');
 });
 
 test('buildBlfxPayload constructs valid resources payload with multi-package compatibility flags', () => {

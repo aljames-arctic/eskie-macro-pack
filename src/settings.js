@@ -2,7 +2,7 @@ import { MODULE_ID } from "./lib/constants.js";
 import {
     RecommendedModulesFormApplication,
     WorldScriptsFormApplication,
-    ManageAutorecFormApplication
+    ConfigureAutorecFormApplication
 } from "./ui/index.js";
 import { blfx, isBlfxAutorecAvailable } from "./adapters/modules/blfx/blfx.js";
 import { updateMacroCompendiums } from "./lib/standalone-macros.js";
@@ -24,13 +24,13 @@ Hooks.once('init', function() {
         restricted: false
     });
 
-    // Unified Auto-Recognition Management Menu
-    game.settings.registerMenu(MODULE_ID, 'manageAutorec', {
-        name: 'EMP.settings.manageAutorec.name',
-        label: 'EMP.settings.manageAutorec.label',
-        hint: 'EMP.settings.manageAutorec.hint',
+    // Configure Auto-Recognition Menu
+    game.settings.registerMenu(MODULE_ID, 'configureAutorec', {
+        name: 'EMP.settings.configureAutorec.name',
+        label: 'EMP.settings.configureAutorec.label',
+        hint: 'EMP.settings.configureAutorec.hint',
         icon: 'fa-solid fa-wand-magic-sparkles',
-        type: ManageAutorecFormApplication,
+        type: ConfigureAutorecFormApplication,
         restricted: true
     });
 
@@ -142,6 +142,7 @@ Hooks.on('renderSettingsConfig', function(app, html, data) {
     const hasActiveAutorec = isAaActive || isBlfxActive;
 
     if (!hasActiveAutorec) {
+        root.querySelector(`[data-key="${MODULE_ID}.configureAutorec"]`)?.closest('.form-group')?.remove();
         root.querySelector(`[data-key="${MODULE_ID}.manageAutorec"]`)?.closest('.form-group')?.remove();
     }
 });

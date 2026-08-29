@@ -10,6 +10,8 @@ import {
     WorldScriptsFormApplication,
     RecommendedModulesApp,
     RecommendedModulesFormApplication,
+    ConfigureAutorecApp,
+    ConfigureAutorecFormApplication,
     ManageAutorecApp,
     ManageAutorecFormApplication,
     AutorecDestinationDialog
@@ -61,11 +63,11 @@ test('RecommendedModulesApp inherits from ApplicationV2 with HandlebarsApplicati
     assert.ok(context.categories.some(c => c.id === 'assets'));
 });
 
-test('ManageAutorecApp inherits from ApplicationV2 with HandlebarsApplicationMixin and manages module visibility', async () => {
-    assert.equal(ManageAutorecApp, ManageAutorecFormApplication);
-    const dialog = new ManageAutorecApp();
+test('ConfigureAutorecApp inherits from ApplicationV2 with HandlebarsApplicationMixin and manages module visibility', async () => {
+    assert.equal(ConfigureAutorecApp, ConfigureAutorecFormApplication);
+    const dialog = new ConfigureAutorecApp();
     assert.ok(dialog);
-    assert.equal(ManageAutorecApp.DEFAULT_OPTIONS.id, 'empManageAutorecMenu');
+    assert.equal(ConfigureAutorecApp.DEFAULT_OPTIONS.id, 'empConfigureAutorecMenu');
 
     // Case 1: No modules active on v14
     game.release = { generation: 14 };
@@ -138,7 +140,7 @@ test('renderSettingsConfig conditionally hides manageAutorec button when no modu
         return {
             formGroup,
             querySelector(selector) {
-                if (selector.includes('manageAutorec')) return menuBtn;
+                if (selector.includes('configureAutorec') || selector.includes('manageAutorec')) return menuBtn;
                 return null;
             }
         };

@@ -868,3 +868,21 @@ input:checked + .eskie-slider:before {
     background: rgba(124, 58, 237, 0.4) !important;
     border-color: rgba(167, 139, 250, 0.5) !important;
 }
+
+.eskie-target-dropdown-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(30, 30, 36, 0.55);
+    border: 1px solid rgba(167, 139, 250, 0.18);
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-top: 6px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    transition: all 0.25s ease;
+}
+
+.eskie-target-dropdown-card:hover {
+    border-color: rgba(167, 139, 250, 0.35);
+    background: rgba(30, 30, 36, 0.75);
+}

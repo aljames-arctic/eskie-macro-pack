@@ -15,9 +15,14 @@
                 "label": "Update AA Autorec",
                 "hint": "Force an update of the Automated Animations Autorecognition."
             },
+            "configureAutorec": {
+                "name": "Configure Auto-Recognition",
+                "label": "Configure Autorec",
+                "hint": "Configure auto-recognition integration targets and synchronize animation presets for Automated Animations and Boss Loot FX."
+            },
             "manageAutorec": {
-                "name": "Manage Auto-Recognition",
-                "label": "Manage Auto-Recognition",
+                "name": "Configure Auto-Recognition",
+                "label": "Configure Autorec",
                 "hint": "Configure auto-recognition integration targets and synchronize animation presets for Automated Animations and Boss Loot FX."
             },
             "autorecDestinationMenu": {
@@ -193,17 +198,35 @@
                 }
             }
         },
-        "manageAutorec": {
-            "menuTitle": "Eskie Macro Pack — Manage Auto-Recognition",
-            "menuHint": "Manage auto-recognition integrations, sync animation presets, and configure automation targets for your active companion modules.",
-            "syncSectionTitle": "Module Presets Synchronization",
+        "configureAutorec": {
+            "menuTitle": "Configure Auto-Recognition",
+            "menuHint": "Configure your preferred auto-recognition target and synchronize animation presets for active companion modules.",
+            "targetSectionTitle": "Configure Autorec Target",
+            "targetSectionHint": "Both Automated Animations and Boss Loot FX (Patreon) are active on Foundry v14+. Select which automation system Eskie Macro Pack should register presets to by default.",
+            "targetLabel": "Autorec Target",
+            "targetDropdownSubtext": "Choose which active animation manager receives effect registrations.",
+            "syncSectionTitle": "Integration Submenus & Preset Sync",
             "aaTitle": "Automated Animations",
             "aaDescription": "Review and synchronize Eskie Macro Pack's custom animation presets with Automated Animations.",
-            "blfxTitle": "Boss Loot FX",
-            "blfxDescription": "Review and synchronize Eskie Macro Pack's custom auto-recognition presets with Boss Loot FX.",
+            "blfxTitle": "Boss Loot FX (Patreon)",
+            "blfxDescription": "Review and synchronize Eskie Macro Pack's custom auto-recognition presets with Boss Loot FX on Foundry v14+.",
+            "saveButton": "Save Target",
+            "closeButton": "Close",
+            "savedNotify": "Auto-recognition settings saved successfully."
+        },
+        "manageAutorec": {
+            "menuTitle": "Configure Auto-Recognition",
+            "menuHint": "Manage auto-recognition integrations, sync animation presets, and configure automation targets for your active companion modules.",
+            "syncSectionTitle": "Integration Submenus & Preset Sync",
+            "aaTitle": "Automated Animations",
+            "aaDescription": "Review and synchronize Eskie Macro Pack's custom animation presets with Automated Animations.",
+            "blfxTitle": "Boss Loot FX (Patreon)",
+            "blfxDescription": "Review and synchronize Eskie Macro Pack's custom auto-recognition presets with Boss Loot FX on Foundry v14+.",
             "syncButton": "Sync Presets",
-            "targetSectionTitle": "Auto-Recognition Target",
-            "targetSectionHint": "Both Automated Animations and Boss Loot FX are active. Choose which automation system Eskie Macro Pack should prioritize and register presets to by default.",
+            "targetSectionTitle": "Configure Autorec Target",
+            "targetSectionHint": "Both Automated Animations and Boss Loot FX (Patreon) are active on Foundry v14+. Choose which automation system Eskie Macro Pack should prioritize and register presets to by default.",
+            "targetLabel": "Autorec Target",
+            "targetDropdownSubtext": "Choose which active animation manager receives effect registrations.",
             "targets": {
                 "ask": {
                     "name": "Prompt on Startup",

@@ -8,28 +8,29 @@ import { isBlfxAutorecAvailable } from "../../adapters/modules/blfx/blfx-module-
 const foundryPlatform = new BaseFoundryAdapter();
 
 /**
- * Modern ApplicationV2 menu for managing Eskie Macro Pack auto-recognition integrations,
- * configuring targets across Automated Animations (AA) and Boss Loot FX (BLFX), and triggering preset syncs.
+ * Modern ApplicationV2 menu for configuring Eskie Macro Pack auto-recognition integrations,
+ * configuring target destinations via dropdown, and triggering preset sync submenus across
+ * Automated Animations (AA) and Boss Loot FX (BLFX).
  */
-export class ManageAutorecApp extends foundryPlatform.HandlebarsApplicationMixin(foundryPlatform.ApplicationV2) {
+export class ConfigureAutorecApp extends foundryPlatform.HandlebarsApplicationMixin(foundryPlatform.ApplicationV2) {
     constructor(options = {}) {
         super(options);
         this.onSelectedCallback = options.onSelectedCallback ?? null;
     }
 
     static DEFAULT_OPTIONS = {
-        id: "empManageAutorecMenu",
+        id: "empConfigureAutorecMenu",
         classes: ["eskie-world-scripts-form", "eskie-autorec-destination-app", "eskie-manage-autorec-app"],
         tag: "form",
         window: {
-            title: "EMP.manageAutorec.menuTitle"
+            title: "EMP.configureAutorec.menuTitle"
         },
         position: {
-            width: 620,
+            width: 600,
             height: "auto"
         },
         form: {
-            handler: ManageAutorecApp._formHandler,
+            handler: ConfigureAutorecApp._formHandler,
             closeOnSubmit: true
         }
     };
@@ -69,22 +70,14 @@ export class ManageAutorecApp extends foundryPlatform.HandlebarsApplicationMixin
     _onRender(context, options) {
         super._onRender?.(context, options);
 
-        // Highlight selected target card visually
-        this.element?.querySelectorAll?.('input[name="autorecTarget"]').forEach(input => {
-            input.addEventListener('change', (event) => {
-                this.element?.querySelectorAll('.eskie-autorec-target-section .eskie-script-card').forEach(card => card.classList.remove('active'));
-                event.currentTarget.closest('.eskie-script-card')?.classList.add('active');
-            });
-        });
-
-        // Sync AA button handler
+        // Sync AA submenu button handler
         const syncAaBtn = this.element?.querySelector('button[name="syncAa"]');
         syncAaBtn?.addEventListener('click', (event) => {
             event.preventDefault();
             new autorecUpdateFormApplication().render(true);
         });
 
-        // Sync BLFX button handler
+        // Sync BLFX submenu button handler
         const syncBlfxBtn = this.element?.querySelector('button[name="syncBlfx"]');
         syncBlfxBtn?.addEventListener('click', (event) => {
             event.preventDefault();
@@ -104,12 +97,14 @@ export class ManageAutorecApp extends foundryPlatform.HandlebarsApplicationMixin
         if (isCancel) return;
 
         const rawData = formData.object ?? formData;
-        const target = rawData?.autorecTarget ?? form?.querySelector?.('input[name="autorecTarget"]:checked')?.value;
+        const target = rawData?.autorecTarget
+            ?? form?.querySelector?.('select[name="autorecTarget"]')?.value
+            ?? form?.querySelector?.('input[name="autorecTarget"]:checked')?.value;
 
         if (target && game.settings) {
             await game.settings.set(MODULE_ID, 'autorecTarget', target);
             log.info(`EMP | Autorec integration destination updated: "${target}"`);
-            const msg = game.i18n?.localize?.("EMP.manageAutorec.savedNotify") ?? "Auto-recognition settings saved.";
+            const msg = game.i18n?.localize?.("EMP.configureAutorec.savedNotify") ?? "Auto-recognition settings saved.";
             ui.notifications?.info?.(msg);
         }
 
@@ -121,8 +116,11 @@ export class ManageAutorecApp extends foundryPlatform.HandlebarsApplicationMixin
 }
 
 export {
-    ManageAutorecApp as ManageAutorecFormApplication,
-    ManageAutorecApp as ManageAutorecDialog,
-    ManageAutorecApp as AutorecDestinationDialog,
-    ManageAutorecApp as destinationDialog
+    ConfigureAutorecApp as ConfigureAutorecFormApplication,
+    ConfigureAutorecApp as ConfigureAutorecDialog,
+    ConfigureAutorecApp as ManageAutorecApp,
+    ConfigureAutorecApp as ManageAutorecFormApplication,
+    ConfigureAutorecApp as ManageAutorecDialog,
+    ConfigureAutorecApp as AutorecDestinationDialog,
+    ConfigureAutorecApp as destinationDialog
 };

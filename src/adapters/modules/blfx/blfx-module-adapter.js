@@ -298,20 +298,29 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
         const slugName = typeof itemName === 'string' ? itemName : String(itemName);
         const rawItemSlug = options.itemSlug ?? (foundry.utils?.slugify ? foundry.utils.slugify(slugName) : slugName.toLowerCase().replace(/[^a-z0-9]/g, '-'));
         const itemSlug = rawItemSlug ? rawItemSlug : 'default-item';
-        const activityName = options.activityName ?? "Default";
+        const defaultActivityName = ['melee', 'melee-target'].includes(trigger)
+            ? "Melee Attack"
+            : (['range', 'ranged-target'].includes(trigger)
+                ? "Ranged Attack"
+                : "Default");
+        const activityName = options.activityName ?? defaultActivityName;
         const slugAct = typeof activityName === 'string' ? activityName : String(activityName);
         const rawActivitySlug = options.activitySlug ?? (activityName ? (foundry.utils?.slugify ? foundry.utils.slugify(slugAct) : slugAct.toLowerCase().replace(/[^a-z0-9]/g, '-')) : "default");
         const activitySlug = rawActivitySlug ? rawActivitySlug : 'default';
         const triggerMode = this.standardizeTrigger(trigger, options.blfxTrigger);
         const triggerName = options.triggerName ?? BLFX_TRIGGER_NAMES[triggerMode] ?? triggerMode;
         const command = options.command ?? this.buildMacroCommand(animation, trigger, config);
-        const macroType = triggerMode === "afterActiveEffects"
-            ? "On Target or Token (AE)"
-            : (triggerMode === "createTemplate"
-                ? "Template"
-                : (triggerMode === "afterAttack"
-                    ? "Attack Ranged"
-                    : "Macro"));
+        const macroType = options.macroType ?? (
+            triggerMode === "afterActiveEffects"
+                ? "On Target or Token (AE)"
+                : (triggerMode === "createTemplate"
+                    ? "Template"
+                    : (triggerMode === "afterAttack"
+                        ? (['melee', 'melee-target'].includes(trigger) ? "Attack Melee" : "Attack Ranged")
+                        : (triggerMode === "afterSummon"
+                            ? "Summon"
+                            : "Macro")))
+        );
 
         const entry = {
             animationName: localizedLabel,

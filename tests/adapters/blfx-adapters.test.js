@@ -41,6 +41,17 @@ test('blfx.register maps active effects to afterActiveEffects and On Target or T
     assert.ok(entry.animationData.command.includes('activeEffect'));
 });
 
+test('blfx.register allows configuring both melee and ranged attack activities for a single item', () => {
+    blfx.register('dagger', 'melee-target', 'eskie.effect.daggerMelee', {}, '1.0.0', 'Dagger');
+    blfx.register('dagger', 'ranged-target', 'eskie.effect.daggerThrown', {}, '1.0.0', 'Dagger');
+
+    assert.ok(EMP_BLFX_Registry['dnd5e']['dagger']['melee-attack']['afterAttack']);
+    assert.equal(EMP_BLFX_Registry['dnd5e']['dagger']['melee-attack']['afterAttack'].animationData.macroType, 'Attack Melee');
+
+    assert.ok(EMP_BLFX_Registry['dnd5e']['dagger']['ranged-attack']['afterAttack']);
+    assert.equal(EMP_BLFX_Registry['dnd5e']['dagger']['ranged-attack']['afterAttack'].animationData.macroType, 'Attack Ranged');
+});
+
 test('groupBlfxEntriesByTrigger groups entries into preferred section order', () => {
     const rawEntries = [
         { itemName: 'Shield', triggerName: 'After Attack Roll', triggerMode: 'afterAttack' },

@@ -1,7 +1,7 @@
 import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { blfx, EMP_BLFX_Registry, buildBlfxPayload, mergeBlfxCustomAutoRec } from '../../src/adapters/modules/blfx/blfx-module-adapter.js';
+import { blfx, EMP_BLFX_Registry, buildBlfxPayload, mergeBlfxCustomAutoRec, VALID_BLFX_MACRO_TYPES, resolveBlfxMacroType } from '../../src/adapters/modules/blfx/blfx-module-adapter.js';
 import { generateBlfxAutorecUpdate, readExistingBlfxData, groupBlfxEntriesByTrigger } from '../../src/ui/blfx/updateMenu.js';
 
 test('blfx.register creates robustly keyed entries in EMP_BLFX_Registry', () => {
@@ -21,7 +21,7 @@ test('blfx.register creates robustly keyed entries in EMP_BLFX_Registry', () => 
     assert.equal(entry.activityName, 'Cast');
     assert.equal(entry.triggerName, 'After Template Create');
     assert.equal(entry.note, 'Eskie Macro Pack (1.0.0)');
-    assert.equal(entry.animationData.macroType, 'Template');
+    assert.equal(entry.animationData.macroType, 'Template Circle');
     assert.equal(entry.animationData.activityName, 'Cast');
     assert.equal(entry.animationData.activityType, 'cast');
     assert.deepEqual(entry.animationData.primaryAnimation, {});
@@ -99,6 +99,34 @@ test('divineStrike registers into BLFX under afterDamage with Attack Melee / Att
     assert.equal(rangedEntry.triggerName, 'After Damage Roll');
     assert.equal(rangedEntry.animationData.macroType, 'Attack Ranged');
     assert.equal(rangedEntry.note, 'Eskie Macro Pack (0.0.2)');
+});
+
+test('resolveBlfxMacroType strictly adheres to valid BLFX macroType contracts with zero generic fallbacks', () => {
+    // Guaranteed to never produce "Macro" or generic "Template"
+    assert.ok(!VALID_BLFX_MACRO_TYPES.includes('Macro'));
+    assert.ok(!VALID_BLFX_MACRO_TYPES.includes('Template'));
+
+    // afterItemUse defaults to On Target or Token, or Teleport variants
+    assert.equal(resolveBlfxMacroType('afterItemUse', 'token', 'bless'), 'On Target or Token');
+    assert.equal(resolveBlfxMacroType('afterItemUse', 'token', 'teleport'), 'Teleport Source Token');
+    assert.equal(resolveBlfxMacroType('afterItemUse', 'ranged-target', 'teleportTarget'), 'Teleport Target Token(s)');
+
+    // createTemplate maps to explicit geometry types
+    assert.equal(resolveBlfxMacroType('createTemplate', 'template', 'fireball'), 'Template Circle');
+    assert.equal(resolveBlfxMacroType('createTemplate', 'template', 'burningHandsCone'), 'Template Cone');
+    assert.equal(resolveBlfxMacroType('createTemplate', 'template', 'lightningBoltLine'), 'Template Line');
+    assert.equal(resolveBlfxMacroType('createTemplate', 'template', 'zoneSquare'), 'Template Square');
+
+    // afterAttack and afterDamage map to Attack Melee, Attack Ranged, or On Target or Token
+    assert.equal(resolveBlfxMacroType('afterAttack', 'melee-target', 'dagger'), 'Attack Melee');
+    assert.equal(resolveBlfxMacroType('afterAttack', 'ranged-target', 'bow'), 'Attack Ranged');
+    assert.equal(resolveBlfxMacroType('afterAttack', 'ontoken', 'shield'), 'On Target or Token');
+    assert.equal(resolveBlfxMacroType('afterDamage', 'melee-target', 'divineStrike'), 'Attack Melee');
+    assert.equal(resolveBlfxMacroType('afterDamage', 'ranged-target', 'divineStrike'), 'Attack Ranged');
+
+    // afterActiveEffects and afterSummon
+    assert.equal(resolveBlfxMacroType('afterActiveEffects', 'effect', 'rage'), 'On Target or Token (AE)');
+    assert.equal(resolveBlfxMacroType('afterSummon', 'summon', 'conjureAnimals'), 'Summon');
 });
 
 test('groupBlfxEntriesByTrigger groups entries into preferred section and sub-section order', () => {

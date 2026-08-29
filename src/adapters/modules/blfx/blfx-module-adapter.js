@@ -166,6 +166,74 @@ export function standardizeBlfxTrigger(trigger, customTrigger) {
 }
 
 /**
+ * Canonical macroType values understood natively by Boss Loot FX (BLFX).
+ * Guaranteed to contain zero generic or internal fallback strings.
+ */
+export const VALID_BLFX_MACRO_TYPES = Object.freeze([
+    "On Target or Token",
+    "On Target or Token (AE)",
+    "Teleport Source Token",
+    "Teleport Target Token(s)",
+    "Attack Melee",
+    "Attack Ranged",
+    "Summon",
+    "Template Circle",
+    "Template Cone",
+    "Template Line",
+    "Template Square"
+]);
+
+/**
+ * Resolves an explicit macroType strictly understood by BLFX.
+ * Eliminates generic fallbacks like "Macro" or "Template".
+ * @param {string} triggerMode BLFX trigger mode
+ * @param {string} trigger Original trigger identifier
+ * @param {string} [key=""] Item/effect key
+ * @param {object} [options={}] Additional configuration overrides
+ * @returns {string} One of the VALID_BLFX_MACRO_TYPES
+ */
+export function resolveBlfxMacroType(triggerMode, trigger, key = "", options = {}) {
+    if (options.macroType && VALID_BLFX_MACRO_TYPES.includes(options.macroType)) {
+        return options.macroType;
+    }
+
+    switch (triggerMode) {
+        case "afterActiveEffects":
+            return "On Target or Token (AE)";
+
+        case "afterSummon":
+            return "Summon";
+
+        case "createTemplate": {
+            const shape = (options.templateType ?? options.shape ?? '').toLowerCase();
+            const cleanKey = String(key ?? '').toLowerCase();
+            if (shape === 'cone' || cleanKey.includes('cone')) return "Template Cone";
+            if (shape === 'line' || shape === 'ray' || cleanKey.includes('line') || cleanKey.includes('ray')) return "Template Line";
+            if (shape === 'square' || shape === 'rect' || cleanKey.includes('square')) return "Template Square";
+            return "Template Circle";
+        }
+
+        case "afterAttack":
+        case "afterDamage": {
+            if (['melee', 'melee-target'].includes(trigger)) return "Attack Melee";
+            if (['token', 'ontoken'].includes(trigger)) return "On Target or Token";
+            return "Attack Ranged";
+        }
+
+        case "afterItemUse":
+        default: {
+            const cleanKey = String(key ?? '').toLowerCase();
+            if (cleanKey.includes('teleport')) {
+                return (cleanKey.includes('target') || trigger.includes('target'))
+                    ? "Teleport Target Token(s)"
+                    : "Teleport Source Token";
+            }
+            return "On Target or Token";
+        }
+    }
+}
+
+/**
  * Creates a JavaScript macro command string for BLFX to invoke an Eskie Macro Pack effect.
  * @param {string} animation Global function path (e.g. "eskie.effect.armsOfHadar")
  * @param {string} trigger Trigger type
@@ -392,6 +460,18 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
     }
 
     /**
+     * Resolves an explicit macroType strictly understood by BLFX.
+     * @param {string} triggerMode BLFX trigger mode
+     * @param {string} trigger Original trigger identifier
+     * @param {string} [key=""] Item/effect key
+     * @param {object} [options={}] Additional configuration overrides
+     * @returns {string} One of the VALID_BLFX_MACRO_TYPES
+     */
+    resolveMacroType(triggerMode, trigger, key = "", options = {}) {
+        return resolveBlfxMacroType(triggerMode, trigger, key, options);
+    }
+
+    /**
      * Register an animation entry into the internal BLFX registry.
      * @param {string} key Identifier key or localized name
      * @param {string} trigger Trigger category ('token', 'template', 'melee-target', etc.)
@@ -415,16 +495,7 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
         const triggerMode = this.standardizeTrigger(trigger, options.blfxTrigger);
         const triggerName = options.triggerName ?? BLFX_TRIGGER_NAMES[triggerMode] ?? triggerMode;
         const command = options.command ?? this.buildMacroCommand(animation, trigger, config);
-        const macroType = options.macroType ?? (
-            triggerMode === "afterActiveEffects"
-                ? "On Target or Token (AE)"
-                : (triggerMode === "createTemplate"
-                    ? "Template"
-                    : (triggerMode === "afterAttack" || triggerMode === "afterDamage"
-                        ? (['melee', 'melee-target'].includes(trigger) ? "Attack Melee" : "Attack Ranged")
-                        : (triggerMode === "afterSummon"
-                            ? "Summon"
-                            : "Macro"))));
+        const macroType = this.resolveMacroType(triggerMode, trigger, key, options);
         const animDataOverrides = options.animationData ?? {};
         const activityType = options.activityType ?? animDataOverrides.activityType ?? (
             activityName.toLowerCase() === 'cast' || options.itemType === 'spell'

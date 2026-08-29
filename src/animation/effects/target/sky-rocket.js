@@ -4,12 +4,13 @@
 import { closest } from "../../../lib/filemanager.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(position, config = {}) {
-    config = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    config = adapter.mergeObject(DEFAULT_CONFIG, config);
     let seq = new Sequence();
     applySound(seq, config.sound);
     seq = seq.effect()

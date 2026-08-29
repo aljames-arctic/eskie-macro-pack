@@ -9,6 +9,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: `gate`,
     destination: "Menu Prompt",
@@ -114,7 +115,7 @@ function _getPlaneConfig(destination) {
 
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     mConfig.id = `${token.id} - ${mConfig.id}`;
     const { id, destination, destinationList, template } = mConfig;
 
@@ -241,7 +242,7 @@ async function play(token, config = {}, options = {}) {
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config);
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     mConfig.id = `${token.id} - ${mConfig.id}`;
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: id });

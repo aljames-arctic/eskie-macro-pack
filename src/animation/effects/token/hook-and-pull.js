@@ -5,6 +5,7 @@ import { utils } from '../../utils/index.js';
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     isHit: false,
     timingAdjust: -50,
@@ -22,7 +23,7 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The created Sequence object.
  */
 async function create(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { hitTargets, timingAdjust, effect } = mConfig;
     const isHit = mConfig.isHit ?? hitTargets?.includes(target.document.id);
 

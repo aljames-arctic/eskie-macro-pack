@@ -6,6 +6,7 @@
 import { closest } from '../../../lib/filemanager.js';
 
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'curse-of-the-werewolf',
     // Path or URL to the werewolf form token image.
@@ -22,7 +23,7 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The created Sequence object.
  */
 async function create(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { werewolfForm } = mConfig;
 
     const sequence = new Sequence()

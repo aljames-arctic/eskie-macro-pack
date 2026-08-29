@@ -1,3 +1,5 @@
+import { adapter } from "../../adapters/index.js";
+
 
 const DEFAULT_CONFIG = {
     baseDuration: 100,
@@ -60,7 +62,7 @@ function getColorGradient(startColor, endColor, step, totalSteps) {
 }
 
 async function play(startNumber, endNumber, config = {}){
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { baseDuration, finalDuration } = mConfig;
 
     const step = startNumber <= endNumber ? 1 : -1;

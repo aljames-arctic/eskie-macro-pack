@@ -2,6 +2,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
+import { adapter } from "../../../adapters/index.js";
 //Last Updated: 4/30/2024
 //Author: EskieMoh#2969
 
@@ -12,7 +13,7 @@ const DEFAULT_CONFIG = {
 
 async function create(token, config, options) {
     if (options?.type == 'aefx') return;
-    const { id, template } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, template } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const cfg = {
         radius: 1,

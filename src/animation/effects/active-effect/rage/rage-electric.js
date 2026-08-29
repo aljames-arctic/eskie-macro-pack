@@ -6,13 +6,14 @@
 import { closest } from '../../../../lib/filemanager.js';
 import { util } from './rage-util.js';
 
+import { adapter } from "../../../../adapters/index.js";
 export const DEFAULT_CONFIG = {
     id: 'ElectricRage',
     color: 'purple',
 };
 
 function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color } = mConfig;
     const label = `${id} - ${token.id}`;
 
@@ -106,12 +107,12 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     return util.stop(token, mConfig);
 }
 
 async function clean(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     return util.clean(token, mConfig);
 }
 

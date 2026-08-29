@@ -5,12 +5,13 @@
 import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: "hide"
 };
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     let seq = new Sequence()

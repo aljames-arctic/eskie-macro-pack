@@ -3,13 +3,14 @@ import { template as templatelib } from '../../../lib/templates.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'Psychic Teleportation',
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(token, config = {}) {
-    const { id, template, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     
     const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
     const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);

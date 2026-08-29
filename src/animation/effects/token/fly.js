@@ -3,12 +3,13 @@
 
 import { closest } from "../../../lib/filemanager.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: "fly",
 };
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     let seq = new Sequence();
@@ -61,7 +62,7 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     return Promise.all([

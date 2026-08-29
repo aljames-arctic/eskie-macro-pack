@@ -1,3 +1,5 @@
+import { adapter } from "../../../adapters/index.js";
+
 /* **
    Original Author: Gornetron (nefin)
    Update Author: bakanabaka
@@ -12,7 +14,7 @@ const DEFAULT_CONFIG = {
 
 function create(targets, config = {}) {
     const targetList = [targets].flat().filter(Boolean);
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     mConfig.destinationPoints = targetList.map(t => ({ x: t.x, y: t.y }));
     const { sendToCenter, destinationPoints } = mConfig;
 
@@ -48,7 +50,7 @@ function create(targets, config = {}) {
 
 async function play(targets, config = {}) {
     const targetList = [targets].flat().filter(Boolean);
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     mConfig.destinationPoints = targetList.map(t => ({ x: t.x, y: t.y }));
     const { repeat, delay, sendToCenter, destinationPoints } = mConfig;
 

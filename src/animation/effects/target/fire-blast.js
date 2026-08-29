@@ -10,6 +10,7 @@ import { settingsOverride } from '../../../lib/settings.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     pushDistance: 80,
     knockbackDuration: 200,
@@ -49,7 +50,7 @@ const DEFAULT_CONFIG = {
 
 async function create(source, target, config = {}) {
     config = settingsOverride(config);
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { pushDistance, knockbackDuration, returnDuration, sound } = mConfig;
 
     const sequence = new Sequence();

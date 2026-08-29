@@ -8,13 +8,14 @@ import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
 
+import { adapter } from "../../adapters/index.js";
 const DEFAULT_CONFIG = {
     size: 3.5,
 };
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { size } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { size } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const targetList = [targets].flat().filter(Boolean);
 
     const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') || [];

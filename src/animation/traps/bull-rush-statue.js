@@ -9,13 +9,14 @@ import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
 import { log } from '../../lib/logger.js';
 
+import { adapter } from "../../adapters/index.js";
 const DEFAULT_CONFIG = {
     pushDistance: 1,
 };
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { pushDistance } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { pushDistance } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const target = targets.length ? targets[0] : null;
     const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') || [];

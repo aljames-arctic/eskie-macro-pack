@@ -5,12 +5,13 @@
 
 import { closest } from '../../../lib/filemanager.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'farStep',
 };
 
 async function create(token, position, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     let seq = new Sequence();

@@ -17,7 +17,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, darkMap, sound } = mConfig;
 
     let seq = new Sequence();
@@ -185,7 +185,7 @@ async function create(token, config = {}) {
 }
 
 async function play(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const {form} = mConfig;
 
     const seq = await create(token, config);
@@ -198,7 +198,7 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const {id, form} = mConfig;
 
     Sequencer.EffectManager.endEffects({ name: id, object: token });

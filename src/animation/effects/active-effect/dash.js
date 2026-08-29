@@ -3,12 +3,13 @@ import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapte
 import { closest } from '../../../lib/filemanager.js';
 import { matt } from '../../utils/matt-tiles.js';
 
+import { adapter } from "../../../adapters/index.js";
 export const DEFAULT_CONFIG = {
     id: 'Cunning Action'
 };
 
 function create(token, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
 
     const sequenceOn = new Sequence()
@@ -45,7 +46,7 @@ function create(token, config = {}) {
 }
 
 async function play(token, config = {}) {
-    const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const effectFunction = `eskie.effect.dash.macro.movement`;
     const code = `${effectFunction}(token.object, tile)`;
     await matt.movement.start(token, code, mergedConfig);
@@ -54,7 +55,7 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
     matt.movement.stop(token, label);
     Sequencer.EffectManager.endEffects({ name: label, object: token });
@@ -106,7 +107,7 @@ async function movement(token, tile, config = {}) {
         return SequenceMATT;
     }
 
-    const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const {rotation, travelTime, label} = await matt.movement.configure(token, tile, mergedConfig);
     return travelSequence({tile, rotation, travelTime, label}).play();
 }

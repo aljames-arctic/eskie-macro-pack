@@ -4,12 +4,13 @@
 import { closest } from "../../../../lib/filemanager.js";
 import { applySound } from "../../../utils/sound.js";
 
+import { adapter } from "../../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'TeleportIn',
 };
 
 function create(token, targets, config = {}) {
-    const { id, position } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id, position } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const maxDistance = Math.max(...targets.map(target => 3 * Math.max(Math.abs(target.x - token.x), Math.abs(target.y - token.y)) / canvas.dimensions.size + 1));
     const {x, y} = token.center;
 

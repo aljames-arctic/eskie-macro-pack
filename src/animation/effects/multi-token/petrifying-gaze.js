@@ -6,6 +6,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'PetrifyingGaze',
 };
@@ -21,7 +22,7 @@ const DEFAULT_CONFIG = {
  */
 async function create(token, targetTokens, config = {}) {
     const targets = [targetTokens].flat().filter(Boolean);
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     const eyeAnimation = "jb2a.eyes.01.single.orangeyellow";
 

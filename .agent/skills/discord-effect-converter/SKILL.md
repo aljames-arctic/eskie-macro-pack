@@ -41,8 +41,8 @@ When asked to update scripts in the `new-submissions` folder or to convert Disco
     *   This `DEFAULT_CONFIG` MUST be exported as `default_config` in the root export object of every animation module.
     *   **Exclusion**: Index or collection files (typically named `_*.js` or `index.js`) that only group and re-export other animations do NOT need to define or export a `default_config` of their own.
     *   If the export object contains nested API objects (e.g., `cast`, `target`), ensure `default_config` is present in those as well if they utilize it.
-    *   Inside `create`, `play`, and `stop`, use `foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false })` for safe configuration management.
-    *   Example: `const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });`
+    *   Inside `create`, `play`, and `stop`, use `adapter.mergeObject(DEFAULT_CONFIG, config)` (imported from `../../../adapters/index.js`) for safe, non-inplace configuration management.
+    *   Example: `const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);`
 *   **Helper Functions:** Extract complex sequences of effects into smaller, logically grouped helper functions (e.g., `_castSpellEffects(sequence, token)`).
 *   **Sound Configuration Pattern (Default Addition):**
     *   EVERY converted or new animation MUST include a `sound` section in `DEFAULT_CONFIG` by default (even if currently unconfigured), ready for user and GM audio customization.

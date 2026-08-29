@@ -6,6 +6,7 @@ import { settingsOverride } from '../../../lib/settings.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'wailsFromTheGrave',
     type: 'slashing', // 'slashing', 'piercing', 'bludgeoning'
@@ -68,7 +69,7 @@ function generateOffsets(target, count = 3) {
 }
 
 async function createDamageOnly(target, config = {}) {
-    let mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    let mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     mConfig = settingsOverride(mConfig);
     const { id, sound } = mConfig;
 
@@ -110,7 +111,7 @@ async function playDamageOnly(target, config = {}) {
 }
 
 async function createAttack(token, target1, target2, config = {}) {
-    let mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    let mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     mConfig = settingsOverride(mConfig);
     const { id, type, weight, sound } = mConfig;
 
@@ -239,7 +240,7 @@ async function playAttack(token, target1, target2, config = {}) {
 }
 
 async function stop(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     if (token) Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}` });
 }

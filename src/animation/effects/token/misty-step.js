@@ -3,6 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'MistyStep',
     size: 1, // Default size for crosshair, will be updated by token.document.width
@@ -16,7 +17,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, size, icon, label, tag, drawIcon, drawOutline, interval, rememberControlled } = mConfig;
 
     const crosshairConfig = {

@@ -6,6 +6,7 @@ import { template as templatelib } from '../../../lib/templates.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'DimensionDoor',
     sound: {
@@ -15,7 +16,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, config = {}) {
-    const { id, template, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const cfg = { 
         radius: 1,

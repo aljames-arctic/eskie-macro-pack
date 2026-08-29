@@ -6,6 +6,7 @@ import { superSaiyan as v3, DEFAULT_CONFIG as config_v3 } from "./rage-super-sai
 import { rageV2 as v4, DEFAULT_CONFIG as config_v4 } from "./rage_v2.js";
 import { rageTotem as v5, DEFAULT_CONFIG as config_v5 } from "./rage_totem.js";
 
+import { adapter } from "../../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     version: 4,
     config_v1,
@@ -16,15 +17,15 @@ const DEFAULT_CONFIG = {
 };
 
 function getVersion(config = {}) {
-    const { version } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { version } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Merge the DEFAULT_CONFIG with our possibly modified input config
     const map = [ 
-        {fn: v1, cfg: foundry.utils.mergeObject(config_v1, config.config_v1 ?? {}, {inplace:false})},
-        {fn: v2, cfg: foundry.utils.mergeObject(config_v2, config.config_v2 ?? {}, {inplace:false})},
-        {fn: v3, cfg: foundry.utils.mergeObject(config_v3, config.config_v3 ?? {}, {inplace:false})},
-        {fn: v4, cfg: foundry.utils.mergeObject(config_v4, config.config_v4 ?? {}, {inplace:false})},
-        {fn: v5, cfg: foundry.utils.mergeObject(config_v5, config.config_v5 ?? {}, {inplace:false})},
+        {fn: v1, cfg: adapter.mergeObject(config_v1, config.config_v1 ?? {})},
+        {fn: v2, cfg: adapter.mergeObject(config_v2, config.config_v2 ?? {})},
+        {fn: v3, cfg: adapter.mergeObject(config_v3, config.config_v3 ?? {})},
+        {fn: v4, cfg: adapter.mergeObject(config_v4, config.config_v4 ?? {})},
+        {fn: v5, cfg: adapter.mergeObject(config_v5, config.config_v5 ?? {})},
     ];
     
     if ( version > map.length || version <= 0 ) return;

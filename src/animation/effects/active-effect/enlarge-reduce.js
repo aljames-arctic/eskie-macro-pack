@@ -6,6 +6,7 @@
 import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'enlargeReduce',
     scaleFactor: 1, // Default scale factor for enlarge/reduce
@@ -19,7 +20,7 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The created Sequence object.
  */
 async function createEnlarge(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, scaleFactor } = mConfig;
 
     const sequence = new Sequence();
@@ -148,7 +149,7 @@ async function playEnlarge(token, config = {}) {
  * @returns {Sequence} The created Sequence object.
  */
 async function createReduce(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, scaleFactor } = mConfig;
 
     const sequence = new Sequence();

@@ -3,6 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
+import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -24,7 +25,7 @@ const DEFAULT_CONFIG = {
 
 async function create(token, config = {}) {
     config = settingsOverride(config);
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, size, icon, label, tag, drawIcon, drawOutline, interval, rememberControlled, sound } = mConfig;
 
     const crosshairConfig = {

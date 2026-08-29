@@ -4,6 +4,7 @@
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'tokensOfTheDeparted',
     color: 'teal',
@@ -11,7 +12,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function createHarvest(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     if (!token || !target) return;
@@ -133,7 +134,7 @@ async function playHarvest(token, target, config = {}) {
 }
 
 async function createUse(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     if (!token || !target) return;
@@ -210,7 +211,7 @@ async function playUse(token, target, config = {}) {
 }
 
 async function stop(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     if (target) {
         Sequencer.EffectManager.endEffects({ name: `${id}Use - ${target.id}`, object: target });

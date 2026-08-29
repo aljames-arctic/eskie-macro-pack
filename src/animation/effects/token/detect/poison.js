@@ -1,5 +1,6 @@
 import { detectUtil } from './detectUtil.js';
 
+import { adapter } from "../../../../adapters/index.js";
 const defaultDetectionConfig = {
     poisoned: 'jb2a.magic_signs.rune.abjuration.complete.red',
     diseased: 'jb2a.magic_signs.rune.conjuration.complete.pink',
@@ -24,7 +25,7 @@ const DEFAULT_CONFIG = {
 }
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     return detectUtil.create(token, mConfig);
 }
 

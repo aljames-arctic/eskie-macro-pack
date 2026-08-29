@@ -1,6 +1,7 @@
 import { detectUtil } from './detectUtil.js';
 import { dependency } from '../../../../lib/dependency.js';
 
+import { adapter } from "../../../../adapters/index.js";
 /*
     Originally Published: 8/21/2023
     Original Author: EskieMoh#2969 for Divine Sense
@@ -34,7 +35,7 @@ const DEFAULT_CONFIG = {
 }
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     return detectUtil.create(token, mConfig);
 }
 

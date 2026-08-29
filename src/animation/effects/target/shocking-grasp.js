@@ -6,6 +6,7 @@
 import { closest } from "../../../lib/filemanager.js";
 import { log } from "../../../lib/logger.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'shockingGrasp',
 };
@@ -19,7 +20,7 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The created Sequence object.
  */
 async function createShockingGrasp(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     const sequence = new Sequence();

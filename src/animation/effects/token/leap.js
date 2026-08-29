@@ -5,6 +5,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'leap',
     position: undefined,
@@ -19,7 +20,7 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The created Sequence object.
  */
 async function createLeap(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let { id, position } = mConfig;
 
     // UI/Interaction Logic
@@ -126,7 +127,7 @@ async function createLeap(token, config = {}) {
  * @returns {Promise<Sequence>} A promise that resolves when the sequence starts playing.
  */
 async function playLeap(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let { id } = mConfig;
 
     const sequence = await createLeap(token, config);

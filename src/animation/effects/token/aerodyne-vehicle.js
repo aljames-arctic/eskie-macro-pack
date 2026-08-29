@@ -3,6 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 
+import { adapter } from "../../../adapters/index.js";
 const FLYING_TAG = 'Flying';
 const EFFECT_NAME = 'Fly';
 
@@ -11,7 +12,7 @@ export const DEFAULT_CONFIG = {
 };
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     const tokenRotation = token.document.rotation || 0;

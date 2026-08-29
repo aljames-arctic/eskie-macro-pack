@@ -10,6 +10,7 @@ import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autore
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 import { log } from "../../../lib/logger.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'benignTransportation',
     animations: {
@@ -33,7 +34,7 @@ const DEFAULT_CONFIG = {
 
 async function create(token, targets, config = {}) {
     config = settingsOverride(config);
-    const { id, animations, sound, teleport } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id, animations, sound, teleport } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const targetList = [targets].flat().filter(target => target && target.id !== token.id);
     if (targetList.length === 0) return;
     

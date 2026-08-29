@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, target, config = {}) {
-    const { id, missileCount, info } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id, missileCount, info } = adapter.mergeObject(DEFAULT_CONFIG, config);
     let mCount = missileCount;
     const spellLevel = adapter.getSpellLevel({aaHandler: info});
     if (spellLevel) mCount = spellLevel + 2;

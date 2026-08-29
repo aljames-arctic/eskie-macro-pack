@@ -8,6 +8,7 @@ import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { text as textUtil } from '../utils/text.js';
 
+import { adapter } from "../../adapters/index.js";
 const DEFAULT_CONFIG = {
     duration: 10000,
     side: 'left',
@@ -26,7 +27,7 @@ const DEFAULT_CONFIG = {
 
 async function create(token, config = {}) {
     config = settingsOverride(config);
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let {
         duration,
         side,

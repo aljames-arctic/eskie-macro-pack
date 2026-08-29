@@ -6,13 +6,14 @@
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'draining-kiss',
     duration: 10000,
 };
 
 function create(token, target, config = {}) {
-    const { id, duration } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id, duration } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id} - ${target.id}`;
 
     let seq = new Sequence()
@@ -142,7 +143,7 @@ async function play(token, target, config = {}) {
 }
 
 async function stop(token, target, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id} - ${target.id}`;
     Sequencer.EffectManager.endEffects({ name: label });
 }

@@ -5,6 +5,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { templates } from '../../../lib/templates.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec.js';
 import { settingsOverride } from '../../../lib/settings.js';
+import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -19,7 +20,7 @@ const DEFAULT_CONFIG = {
 
 async function create(source, config = {}) {
     config = settingsOverride(config);
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     
     // 1. Template Position Extraction
     // Always prioritize the provided template position over Sequencer.Crosshair
@@ -71,7 +72,7 @@ async function play(source, config = {}) {
 
 async function stop(source, config = {}) {
     // If the template effect persists on targets, stop them here
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let targets = mConfig.targets?.length ? mConfig.targets : Array.from(game.user.targets);
     for (let target of targets) {
         Sequencer.EffectManager.endEffects({ name: `${target.document.name}TemplateEffectName`, object: target });

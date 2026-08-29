@@ -4,6 +4,7 @@
 
 import { closest } from "../../../../../lib/filemanager.js";
 
+import { adapter } from "../../../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'Bear Totemic Attunement',
     color: 'red',
@@ -51,7 +52,7 @@ function targetSequence(target, config = {}) {
 }
 
 function create(token, targets, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     const label = `${id} - ${token.id}`;
 

@@ -5,6 +5,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'animateDead',
     choice: 'Skeleton' // Default to Skeleton if not specified
@@ -19,7 +20,7 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The created Sequence object.
  */
 async function createAnimateDead(undeadToken, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, choice } = mConfig;
 
     const sequence = new Sequence();

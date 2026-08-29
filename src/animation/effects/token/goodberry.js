@@ -4,13 +4,14 @@
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'goodberry',
     color: 'green'
 };
 
 async function createCast(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color } = mConfig;
 
     const seq = new Sequence();
@@ -47,7 +48,7 @@ async function playCast(token, config = {}) {
 }
 
 async function createUse(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color } = mConfig;
 
     const seq = new Sequence();
@@ -107,7 +108,7 @@ async function playUse(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}` });
     Sequencer.EffectManager.endEffects({ name: `${id}Use - ${token.id}` });

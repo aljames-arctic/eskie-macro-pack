@@ -5,6 +5,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { template as templatelib } from '../../../lib/templates.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG_CAST = {
     id: 'tashasCausticBrewCast',
     size: 1,
@@ -19,7 +20,7 @@ const DEFAULT_CONFIG_CAST = {
 };
 
 async function createCast(source, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG_CAST, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG_CAST, config);
     const { id, size, icon, label, tag, drawIcon, drawOutline, interval, rememberControlled } = mConfig;
 
     const crosshairConfig = {
@@ -103,7 +104,7 @@ async function playCast(source, config = {}) {
 async function createTarget(source, config = {}) {
     let sequence = new Sequence();
 
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG_CAST, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG_CAST, config);
     let targets = mConfig.targets?.length ? mConfig.targets : Array.from(game.user.targets);
 
     for (let target of targets) {
@@ -233,7 +234,7 @@ async function playTarget(source, config = {}) {
 }
 
 async function stopTarget(source, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG_CAST, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG_CAST, config);
     let targets = mConfig.targets?.length ? mConfig.targets : Array.from(game.user.targets);
     for (let target of targets) {
         Sequencer.EffectManager.endEffects({ name: `${target.document.name}CausticBrew`, object: target });

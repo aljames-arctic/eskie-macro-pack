@@ -4,13 +4,14 @@
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'keeperOfSouls',
     color: 'teal'
 };
 
 async function create(target, ally, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     if (!target || !ally) return;
@@ -162,7 +163,7 @@ async function play(target, ally, config = {}) {
 }
 
 async function stop(target, ally, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     if (target) Sequencer.EffectManager.endEffects({ name: `${id} - ${target.id}` });
 }

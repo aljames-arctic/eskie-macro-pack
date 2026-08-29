@@ -8,6 +8,7 @@ import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
 
+import { adapter } from "../../adapters/index.js";
 const DEFAULT_CONFIG = {
     repeats: 5,
     repeatDelay: 300,
@@ -15,7 +16,7 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { repeats, repeatDelay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { repeats, repeatDelay } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     if (!tile) return new Sequence();
 

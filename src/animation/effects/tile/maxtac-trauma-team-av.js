@@ -3,6 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 
+import { adapter } from "../../../adapters/index.js";
 export const DEFAULT_CONFIG = {
     id: 'MaxTacTraumaTeamAV',
     flyingTag: 'Flying',
@@ -11,7 +12,7 @@ export const DEFAULT_CONFIG = {
 };
 
 async function create(tile, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { effectNameFly, effectNameLanding } = mConfig;
 
     const tileRotation = tile.document.rotation || 0;
@@ -245,7 +246,7 @@ async function create(tile, config = {}) {
 }
 
 async function play(tile, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { flyingTag } = mConfig;
 
     if (Tagger.hasTags(tile, flyingTag)) {
@@ -259,7 +260,7 @@ async function play(tile, config = {}) {
 }
 
 async function stop(tile, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { flyingTag, effectNameFly, effectNameLanding } = mConfig;
 
     const tileRotation = tile.document.rotation || 0;

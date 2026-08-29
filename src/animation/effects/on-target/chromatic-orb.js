@@ -4,13 +4,14 @@
 import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: "chromatic-orb",
     damageType: "fire",
 };
 
 async function create(token, target, config = {}) {
-    const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, damageType } = mergedConfig;
 
     const colorMapping = {

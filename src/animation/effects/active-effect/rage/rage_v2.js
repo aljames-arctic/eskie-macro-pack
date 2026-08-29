@@ -7,6 +7,7 @@ import { MODULE_ID } from '../../../../lib/constants.js';
 import { closest } from '../../../../lib/filemanager.js';
 import { util } from './rage-util.js';
 
+import { adapter } from "../../../../adapters/index.js";
 export const DEFAULT_CONFIG = {
     id: 'RageV2',
     color: 'red',
@@ -16,7 +17,7 @@ export const DEFAULT_CONFIG = {
 };
 
 function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, effect } = mConfig;
     const label = `${id} - ${token.id}`;
 
@@ -141,7 +142,7 @@ function create(token, config = {}) {
 }
 
 async function play(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { rageImg } = mConfig;
 
     if ( rageImg ) {
@@ -155,7 +156,7 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { rageImg } = mConfig;
 
     if ( rageImg ) {
@@ -171,7 +172,7 @@ async function stop(token, config = {}) {
 }
 
 async function clean(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     return util.clean(token, mConfig);
 }
 

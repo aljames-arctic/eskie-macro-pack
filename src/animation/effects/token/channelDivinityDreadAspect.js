@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
 
 async function create(token, targets, config = {}) {
     const targetList = [targets].flat().filter(Boolean);
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { darkMap, sound } = mConfig;
 
     const sequence = new Sequence();

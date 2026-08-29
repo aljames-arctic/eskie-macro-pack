@@ -439,7 +439,7 @@ const DEFAULT_CONFIG = {
 
 export const disintegrateMask = {
     async create(object, config = {}) {
-        const { id, deleteObject, color, speed } = foundry.utils.mergeObject(DEFAULT_CONFIG, config);
+        const { id, deleteObject, color, speed } = adapter.mergeObject(DEFAULT_CONFIG, config);
         const tokenOverlay = `eskie.disintegrate.token_overlay.${color}.${speed}`;
         const revealOverlay = `eskie.texture_mask.tile_base.disintegrate.${speed}`;
         

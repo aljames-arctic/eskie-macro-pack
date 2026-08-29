@@ -2,13 +2,14 @@
 import { closest } from '../../../lib/filemanager.js';
 import { matt } from '../../utils/matt-tiles.js';
 
+import { adapter } from "../../../adapters/index.js";
 export const DEFAULT_CONFIG = {
     id: 'Grapple Latch',
     follow: true,
 };
 
 function create(token, target, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
 
     const sequenceOn = new Sequence()
@@ -35,7 +36,7 @@ function create(token, target, config = {}) {
 
 async function play(token, target, config = {}) {
     const targetuuid = target.document.uuid;
-    const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const effectFunction = `eskie.effect.grapple.macro.movement`;
     const code = `${effectFunction}(token.object, "${targetuuid}", tile)`;
     await matt.movement.start(token, code, mergedConfig);
@@ -44,7 +45,7 @@ async function play(token, target, config = {}) {
 }
 
 async function stop(token, target, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
     await matt.movement.stop(token, label);
     Sequencer.EffectManager.endEffects({ name: label, object: token });
@@ -114,7 +115,7 @@ async function movement(token, targetuuid, tile, config = {}) {
         return SequenceMATT;
     }
 
-    const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const {rotation, travelTime, label, delta: {x: dx, y: dy}} = await matt.movement.configure(token, tile, mergedConfig);
     return travelSequence({tile, rotation, travelTime, label, delta: {x: dx, y: dy}, follow: config.follow}).play();
 }

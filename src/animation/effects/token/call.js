@@ -3,6 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 
+import { adapter } from "../../../adapters/index.js";
 const CALL_TAG = 'Calling';
 const EFFECT_NAME = 'Call';
 const EFFECT_NAME_TEXT = 'CallText';
@@ -38,7 +39,7 @@ export const DEFAULT_CONFIG = {
 };
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     const seq = new Sequence();

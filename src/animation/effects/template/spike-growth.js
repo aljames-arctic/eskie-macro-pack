@@ -8,6 +8,7 @@ import { template as templatelib } from '../../../lib/templates.js';
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'spikeGrowth',
     size: 8, // Default size for crosshairs and initial effect
@@ -24,7 +25,7 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The created Sequence object for the initial cast.
  */
 async function createInitialSpikeGrowth(position, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { size, sound } = mConfig;
 
     const sequence = new Sequence();
@@ -68,7 +69,7 @@ async function createInitialSpikeGrowth(position, config = {}) {
  * @returns {Array<Sequence>} An array of Sequence objects for the persistent spikes.
  */
 async function createPersistentSpikes(token, centralPosition, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, tint } = mConfig;
 
     const gridSize = canvas.grid.size;
@@ -136,7 +137,7 @@ async function createPersistentSpikes(token, centralPosition, config = {}) {
  */
 async function createSpikeGrowth(token, config = {}, options = {}) {
     if (options?.type == "aefx") return;
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, size, template } = mConfig;
 
     const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));

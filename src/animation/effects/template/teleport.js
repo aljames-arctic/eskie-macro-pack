@@ -8,6 +8,7 @@ import { teleportOut } from "./teleport/teleportOut.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'Teleportation',
     sound: {
@@ -17,7 +18,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, config = {}) {
-    const { id, template, targets } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id, template, targets } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const cfg = { 
         radius: 1,

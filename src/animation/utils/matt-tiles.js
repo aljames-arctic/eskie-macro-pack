@@ -21,7 +21,7 @@ async function start(token, code, config = {}) {
     dependency.required([{id: 'tagger', ref: "Tagger"},
                         {id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers"}]);
 
-    const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mergedConfig;
     const { info, ...nonInfoConfig } = mergedConfig;
     const label = getLabel(id, token);
@@ -40,7 +40,7 @@ async function start(token, code, config = {}) {
 
     const MATTtriggers = ["exit", "manual"];
     const MATTactions = [{
-        id: foundry.utils.randomID(),
+        id: adapter.randomID(),
         action: 'runcode',
         data: { code: code ?? `console.error(arguments)` },
     }];
@@ -59,7 +59,7 @@ async function start(token, code, config = {}) {
 }
 
 async function configure(token, tile, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = getLabel(id, token);
 
     if (!game.user.isGM || !tile) return;
@@ -200,7 +200,7 @@ if (!token) return;
 // Get the specific Eskie Trap Animation Function
 const animation = tile.getFlag('${MODULE_ID}', 'trap.animation');
 if (!animation) return;
-const trap = foundry.utils.getProperty(globalThis, animation);
+const trap = adapter.getProperty(globalThis, animation);
 if (!trap?.play) return;
 
 // Play the trap animation for the token(s)
@@ -220,7 +220,7 @@ originIds.forEach(id => {
             'flags.monks-active-tiles.active': true,
             'flags.monks-active-tiles.trigger': config.trigger ?? ['enter'],
             'flags.monks-active-tiles.actions': [{
-                id: foundry.utils.randomID(),
+                id: adapter.randomID(),
                 action: 'runcode',
                 data: { code },
             }],

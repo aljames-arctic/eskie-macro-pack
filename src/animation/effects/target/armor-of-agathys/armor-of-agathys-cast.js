@@ -3,12 +3,13 @@
 
 import { closest } from "../../../../lib/filemanager.js";
 
+import { adapter } from "../../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'Armor of Agathys',
 };
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let sequence = new Sequence();
 
     sequence = sequence.effect()
@@ -103,7 +104,7 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     let sequence = new Sequence()
         .effect()

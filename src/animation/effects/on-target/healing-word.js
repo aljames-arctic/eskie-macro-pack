@@ -7,6 +7,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'healing-word',
     color: 'green',
@@ -27,7 +28,7 @@ function getColor(color) {
 }
 
 async function create(token, targets, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, word, sound } = mConfig;
     const targetList = [targets].flat().filter(Boolean);
 
@@ -140,7 +141,7 @@ async function play(token, targets, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: id, object: token });
 }

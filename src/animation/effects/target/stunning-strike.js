@@ -5,6 +5,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'stunningStrike',
 };
@@ -18,7 +19,7 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The created Sequence object.
  */
 async function createStunningStrike(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     const sequence = new Sequence();
@@ -173,7 +174,7 @@ async function playStunningStrike(token, target, config = {}) {
  * @param {object} config Configuration options.
  */
 function stopStunningStrike(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `StunningStrike - DizzyStars - ${id} - ${target.uuid}` });
 }

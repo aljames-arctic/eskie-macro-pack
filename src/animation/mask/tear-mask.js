@@ -1,5 +1,6 @@
 import { tokenMaskEffect } from "./token-mask.js";
 
+import { adapter } from "../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'TearTokenMask',
     deleteObject: false,
@@ -8,7 +9,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(object, config = {}) {
-    const { id, deleteObject, color, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, deleteObject, color, rotation } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const tokenOverlay = `eskie.wounds.token_mask.tear.01.${color}.no_base`;
     const revealOverlay = `eskie.texture_mask.tile_base.tear.01`;
     return tokenMaskEffect.create(object, { id, deleteObject, tokenOverlay, revealOverlay, rotation });
@@ -20,7 +21,7 @@ async function play(object, config = {}) {
 }
 
 async function stop(object, config = {}) {
-    const { id, deleteObject, color, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, deleteObject, color, rotation } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const tokenOverlay = `eskie.wounds.token_mask.tear.01.${color}.no_base`;
     const revealOverlay = `eskie.texture_mask.tile_base.tear.01`;
     return tokenMaskEffect.stop(object, { id, deleteObject, tokenOverlay, revealOverlay, rotation });

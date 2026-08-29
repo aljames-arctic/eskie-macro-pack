@@ -4,6 +4,7 @@
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: "Strength Before Death",
     tintMap: true,      //Set Map Tint
@@ -11,7 +12,7 @@ const DEFAULT_CONFIG = {
 }
 
 function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, tintMap, cinemaBars } = mConfig;
 
     // Scene bounds in canvas coords (handles scenes that don't start at 0,0)
@@ -281,7 +282,7 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     Sequencer.EffectManager.endEffects({ name: `${id} ${token.name}` }); 
 }
 

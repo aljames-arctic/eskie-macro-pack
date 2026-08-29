@@ -3,6 +3,7 @@
 
 import { closest } from "../../../../../lib/filemanager.js";
 
+import { adapter } from "../../../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'Eagle Totemic Attunement',
     flight: {
@@ -19,7 +20,7 @@ async function play(token, config = {}) {
 }
 
 function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, flight } = mConfig;
     const { wingSize, flaps, sway } = flight;
     const label = `${id} - ${token.id}`;
@@ -129,7 +130,7 @@ function create(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
 
     await new Sequence().animation().on(token).opacity(1).play();

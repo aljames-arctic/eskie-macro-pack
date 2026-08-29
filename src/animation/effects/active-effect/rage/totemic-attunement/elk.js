@@ -4,6 +4,7 @@
 import { closest } from "../../../../../lib/filemanager.js";
 import { matt } from "../../../../utils/matt-tiles.js";
 
+import { adapter } from "../../../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'Elk Totemic Attunement',
     color: 'red',
@@ -15,7 +16,7 @@ async function pronePlay(token, target, config = {}) {
 }
 
 function proneCreate(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color } = mConfig;
     const label = `${id} - ${token.id}`;
 
@@ -75,7 +76,7 @@ function proneCreate(token, target, config = {}) {
 }
 
 function chargeCreate(token, config = {}) {
-    const { id, color } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id, color } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
 
     const sequenceOn = new Sequence()
@@ -101,7 +102,7 @@ function chargeCreate(token, config = {}) {
 }
 
 async function chargePlay(token, config = {}) {
-    const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const effectFunction = `eskie.effect.totemicAttunement.elk.charge.macro.movement`;
     const code = `${effectFunction}(token.object, tile)`;
     await matt.movement.start(token, code, mergedConfig);
@@ -110,7 +111,7 @@ async function chargePlay(token, config = {}) {
 }
 
 async function chargeStop(token, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
     await matt.movement.stop(token, label);
     Sequencer.EffectManager.endEffects({ name: label, object: token });
@@ -168,7 +169,7 @@ async function chargeMovement(token, tile, config = {}) {
         return SequenceMATT;
     }
 
-    const mergedConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const {rotation, travelTime, label} = await matt.movement.configure(token, tile, mergedConfig);
     return travelSequence({tile, rotation, travelTime, label}).play();
 }

@@ -7,13 +7,14 @@ import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
 
+import { adapter } from "../../adapters/index.js";
 const DEFAULT_CONFIG = {
     delay: 500,
 };
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { delay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { delay } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     if (!tile) return new Sequence();
 

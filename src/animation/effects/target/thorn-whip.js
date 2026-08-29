@@ -5,6 +5,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'thornWhip',
     color: 'green',
@@ -14,7 +15,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, timingAdjust, pull, sound } = mConfig;
 
     if (!token || !target) return;
@@ -110,7 +111,7 @@ async function play(token, target, config = {}) {
 }
 
 async function stop(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}` });
 }

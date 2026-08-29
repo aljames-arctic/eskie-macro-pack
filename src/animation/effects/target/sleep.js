@@ -3,12 +3,13 @@
 
 import { closest } from "../../../lib/filemanager.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     position: undefined,
 };
 
 async function create(targets, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const sequence = new Sequence();
 
     // AOE effects
@@ -62,7 +63,7 @@ async function create(targets, config = {}) {
 }
 
 async function play(targets, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { position } = mConfig;
     const crosshairConfig = {
         size: 5,
@@ -85,7 +86,7 @@ async function play(targets, config = {}) {
 }
 
 function stop(targets, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     targets.forEach(t => {
         Sequencer.EffectManager.endEffects({ name: `Sleep-${t.id}` });
     });

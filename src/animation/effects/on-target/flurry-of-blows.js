@@ -6,6 +6,7 @@ import { settingsOverride } from "../../../lib/settings.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'Flurry Of Blows',
     color: "yellow",
@@ -31,7 +32,7 @@ const DEFAULT_CONFIG = {
 
 async function create(token, target, config = {}) {
     config = settingsOverride(config);
-    const { color, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     let seq = new Sequence();
 
     applySound(seq, sound.punch1);

@@ -4,13 +4,14 @@
 import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'bless',
     color: 'yellow',
 };
 
 function createCaster(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { color } = mConfig;
     let hue = -20;
 
@@ -100,7 +101,7 @@ async function playCaster(token, config = {}) {
 }
 
 function createTarget(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color } = mConfig;
     let hue = -20;
 
@@ -137,7 +138,7 @@ async function playTarget(target, config = {}) {
     if (sequence) return sequence.play();
 }
 async function stopTarget(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     return Sequencer.EffectManager.endEffects({ name: `${id} - ${target.name}`, object: target });
 }

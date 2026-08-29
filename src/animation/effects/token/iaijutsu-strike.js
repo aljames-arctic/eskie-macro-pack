@@ -5,6 +5,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { text as textUtil } from '../../utils/text.js';
 import { cinemaBars } from '../../scene-overlays/cinema-bars.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'IaijutsuStrike',
     targetDeath: true,
@@ -110,7 +111,7 @@ function deathAnimation(target) {
 }
 
 async function create(source, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { targetDeath, teleport, cameraFocus, text } = mConfig;
 
     let position;

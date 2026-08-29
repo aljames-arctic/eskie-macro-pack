@@ -3,6 +3,7 @@
 
 import { closest } from "../../../../lib/filemanager.js";
 
+import { adapter } from "../../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'eskie.effect.incorporeal.main',
     color: 'teal',
@@ -20,7 +21,7 @@ function getTintColor(color) {
 }
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, changeLight } = mConfig;
     const tintColor = getTintColor(color);
 
@@ -83,7 +84,7 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     if (mConfig.changeLight) {
         await token.document.update({ light: { dim: 0, bright: 0 } });

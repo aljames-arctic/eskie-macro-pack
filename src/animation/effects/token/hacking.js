@@ -3,6 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 
+import { adapter } from "../../../adapters/index.js";
 const HACK_TAG = 'Hacking';
 const EFFECT_NAME = 'Hack';
 
@@ -17,7 +18,7 @@ function _randomUiImage() {
 }
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     const seq = new Sequence();

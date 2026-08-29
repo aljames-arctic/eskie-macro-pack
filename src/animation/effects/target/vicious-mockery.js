@@ -5,6 +5,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'viciousMockery',
     word: "Haha!", // Default word if no user input
@@ -18,7 +19,7 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The created Sequence object for the casting.
  */
 async function createViciousMockeryCast(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     // const { id } = mConfig; // Not directly used in this animation for naming persistent effects
 
     const sequence = new Sequence();
@@ -81,7 +82,7 @@ async function createViciousMockeryCast(token, config = {}) {
  * @returns {Sequence} The created Sequence object for the impact.
  */
 async function createViciousMockeryImpact(target, word, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     // const { id } = mConfig; // Not directly used in this animation for naming persistent effects
 
     const sequence = new Sequence();
@@ -196,7 +197,7 @@ async function createViciousMockeryImpact(target, word, config = {}) {
  * @returns {Promise<void>} A promise that resolves when the effect sequences finish playing.
  */
 async function playViciousMockery(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { word } = mConfig;
 
     // Play casting animation

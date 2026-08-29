@@ -14,7 +14,7 @@ const DEFAULT_CONFIG_MELEE = {
 }
 
 async function createMelee(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG_MELEE, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG_MELEE, config);
     const { id, color, type, weight } = mConfig;
 
     //Determine Attack Size
@@ -91,7 +91,7 @@ const DEFAULT_CONFIG_RANGED = {
 };
 
 function createRanged(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG_RANGED, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG_RANGED, config);
     const { id, color } = mConfig;
 
     let seq = new Sequence()

@@ -3,12 +3,13 @@
 
 import { closest } from "../../../lib/filemanager.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     position: undefined,
 };
 
 async function create(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let sequence = new Sequence();
 
     // Vortex out
@@ -71,7 +72,7 @@ async function create(target, config = {}) {
 }
 
 async function play(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { position } = mConfig;
     const crosshairConfig = {
         size: target.w / canvas.grid.size,

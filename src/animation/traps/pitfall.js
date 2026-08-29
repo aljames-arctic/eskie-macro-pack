@@ -7,6 +7,7 @@ import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
 
+import { adapter } from "../../adapters/index.js";
 const DEFAULT_CONFIG = {
     reveal: true,
     smokeSize: 2,
@@ -15,7 +16,7 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { reveal, smokeSize, fallenScale } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { reveal, smokeSize, fallenScale } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     if (!tile) return new Sequence();
 

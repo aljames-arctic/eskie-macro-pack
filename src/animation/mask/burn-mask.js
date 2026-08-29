@@ -1,5 +1,6 @@
 import { tokenMaskEffect } from "./token-mask.js";
 
+import { adapter } from "../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'BurningTokenMask',
     deleteObject: false,
@@ -9,7 +10,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(object, config = {}) {
-    const { id, deleteObject, speed, color, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, deleteObject, speed, color, rotation } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const tokenOverlay = `eskie.burn.token_mask.${color}.no_base.${speed}.01`;
     const revealOverlay = `eskie.texture_mask.tile_base.burn.01.${speed}`;
     return tokenMaskEffect.create(object, { id, deleteObject, tokenOverlay, revealOverlay, rotation });
@@ -21,7 +22,7 @@ async function play(object, config = {}) {
 }
 
 async function stop(object, config = {}) {
-    const { id, deleteObject, speed, color, rotation } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, deleteObject, speed, color, rotation } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const tokenOverlay = `eskie.burn.token_mask.${color}.no_base.${speed}.01`;
     const revealOverlay = `eskie.texture_mask.tile_base.burn.01.${speed}`;
     return tokenMaskEffect.stop(object, { id, deleteObject, tokenOverlay, revealOverlay, rotation });

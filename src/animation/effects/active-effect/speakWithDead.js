@@ -5,6 +5,7 @@ import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: "speakWithDead",
     sound: {
@@ -24,7 +25,7 @@ const DEFAULT_CONFIG = {
  */
 function create(token, config = {}) {
     config = settingsOverride(config);
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
     const label = `${id} - ${token.id}`;
 
@@ -275,7 +276,7 @@ async function play(token, config = {}) {
 }
 
 async function preload(config) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { sound } = mConfig;
 
     let files = [
@@ -303,7 +304,7 @@ async function preload(config) {
  * @param {string} config.id - A unique ID for the effect to manage persistence.
  */
 async function stop(token, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
     let opacity = new Sequence().animation().on(token).opacity(1);
     return Promise.all([

@@ -9,6 +9,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { positions as posUtil } from '../../utils/positions.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     showMarkers: true,
     hideFromPlayers: true,
@@ -17,7 +18,7 @@ const DEFAULT_CONFIG = {
 
 async function create(source, config = {}) {
     config = settingsOverride(config);
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { showMarkers, markerNamePrefix } = mConfig;
 
     let positions = config.positions;

@@ -4,13 +4,14 @@
 import { closest } from '../../../lib/filemanager.js';
 import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'HaloOfSpores',
     opacity: 0.45,
 };
 
 function createAura(token, config = {}, options = {}) {
-    const { id, opacity } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, opacity } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
 
     const sequence = new Sequence();
@@ -142,7 +143,7 @@ async function play(token, target, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const { id } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
     Sequencer.EffectManager.endEffects({ name: label, object: token });
 }

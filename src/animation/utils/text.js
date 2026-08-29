@@ -1,3 +1,5 @@
+import { adapter } from "../../adapters/index.js";
+
 /**
  * text.js
  * 
@@ -46,7 +48,7 @@ const DEFAULT_TYPING_CONFIG = {
  * @returns {Promise<Sequence>}
  */
 async function create(token, text, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_FLOATING_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_FLOATING_CONFIG, config);
     let { id, duration, delay, style, kerning, verticalOffset } = mConfig;
     
     duration = Math.max(duration, delay * text.length);
@@ -103,7 +105,7 @@ function _wrapText(text, maxCharsPerLine) {
  * @param {object} [config] Configuration for positioning, styling, and wrapping.
  */
 function createTyping(sequence, text, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_TYPING_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_TYPING_CONFIG, config);
     const {
         duration,
         delay,

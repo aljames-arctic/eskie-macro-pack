@@ -8,6 +8,7 @@ import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
 
+import { adapter } from "../../adapters/index.js";
 const DEFAULT_CONFIG = {
     boulderSpeed: 2500,
     boulderSize: 4.25,
@@ -15,7 +16,7 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { boulderSpeed, boulderSize } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { boulderSpeed, boulderSize } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Retrieve end tile from flags, falling back to legacy/Tagger search for backward compatibility
     const targetTileIds = tile.document.getFlag(MODULE_ID, 'trap.trapTargetTileIds') || [];

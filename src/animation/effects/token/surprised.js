@@ -1,3 +1,5 @@
+import { adapter } from "../../../adapters/index.js";
+
 /* **
    Original Author: EskieMoh#2969
    Update Author: bakanabaka
@@ -18,7 +20,7 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The created Sequence object.
  */
 async function createSurprised(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     const sequence = new Sequence();
@@ -63,7 +65,7 @@ async function createSurprised(token, config = {}) {
  * @returns {Promise<void>} A promise that resolves when the effect is played or stopped.
  */
 async function playSurprised(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     if (Tagger.hasTags(token, "Surprised")) {
@@ -84,7 +86,7 @@ async function playSurprised(token, config = {}) {
  * @param {object} config Configuration options.
  */
 async function stopSurprised(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     if (Tagger.hasTags(token, "Surprised")) {

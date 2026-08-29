@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
 
 async function createStarwardSword(token, config = {}, options = {}) {
     if (options?.type == "aefx") return;
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { size, darkMap, cameraZoom } = mConfig;
     let { targets } = mConfig;
 

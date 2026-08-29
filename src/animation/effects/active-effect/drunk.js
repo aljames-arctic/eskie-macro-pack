@@ -20,7 +20,7 @@ const DEFAULT_CONFIG = {
 }
 
 async function create(token, config = {}) {
-    const { id, duration } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, duration } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const tokenWidth = token.document.width;
     const label = `${id} - ${token.id}`;
 
@@ -83,7 +83,7 @@ async function create(token, config = {}) {
 }
 
 async function play(token, config = {}) {
-    const { overlay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { overlay } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const seq = await create(token, config);
     if (seq) await seq.play();
@@ -100,7 +100,7 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const { id, overlay } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, overlay } = adapter.mergeObject(DEFAULT_CONFIG, config);
     if (overlay.applyPC || overlay.applyGM) {
         const owners = adapter.getTokenOwners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
         blur.drunk.stop(owners)

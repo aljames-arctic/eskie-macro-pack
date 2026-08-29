@@ -22,7 +22,7 @@ const DEFAULT_CONFIG = {
 }
 
 function create(token, config = {}) {
-    const { overlay, configs } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { overlay, configs } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const seq = new Sequence();
     const owners = adapter.getTokenOwners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
 
@@ -44,7 +44,7 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const { id, overlay, configs } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, overlay, configs } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const owners = adapter.getTokenOwners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
     return Promise.all(configs.map(c => blur.stop(owners, c)));
 }

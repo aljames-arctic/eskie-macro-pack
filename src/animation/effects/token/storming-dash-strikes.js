@@ -7,6 +7,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
 
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'stormingDashStrikes',
     maxStrikes: 12,
@@ -38,7 +39,7 @@ async function _crosshairImage(crosshairs, token) {
 
 async function create(source, config = {}) {
     config = settingsOverride(config);
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { sound, positions: dashPositions = [] } = mConfig;
 
     const sequence = new Sequence();
@@ -228,7 +229,7 @@ async function create(source, config = {}) {
 
 async function play(source, config = {}) {
     config = settingsOverride(config);
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     let positions = mConfig.positions;
     if (!positions || !positions.length) {

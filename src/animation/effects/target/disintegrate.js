@@ -7,6 +7,7 @@
 import { closest } from '../../../lib/filemanager.js';
 import { beam as beamEffect } from './beam/beam.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'disintegrate',
     targetDeath: true,
@@ -141,7 +142,7 @@ function getDissolveConfig() {
 }
 
 function dissolveCreate(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     let seq = new Sequence();
@@ -175,7 +176,7 @@ async function dissolvePlay(target, config = {}) {
  * @returns {Sequence} A Sequencer sequence object representing the death animation.
  */
 function death(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, effect: { smoke: smokeEffect, spirit: spiritEffect } } = mConfig;
 
     let seq = new Sequence()
@@ -213,7 +214,7 @@ function death(target, config = {}) {
 }
 
 function beam(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, effect: { beam: beamEffects } } = mConfig;
     return beamEffect.create(token, target, { id, effects: beamEffects });
 }
@@ -231,7 +232,7 @@ function beam(token, target, config = {}) {
  */
 async function create(token, target, config = {}) {
     // Merge user config with default config
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     let disintegrateEffect = beam(token, target, mConfig);
     if (mConfig.targetDeath) // Chain the death animation if the target is dead
@@ -260,7 +261,7 @@ async function play(token, target, config = {}) {
  * @returns {Promise<void>}
  */
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     return Sequencer.EffectManager.endEffects({ name: id, object: token });
 }
@@ -272,7 +273,7 @@ async function stop(token, config = {}) {
  * @returns {Sequence} A Sequencer sequence object.
  */
 function reformCreate(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, duration } = mConfig;
     const reformSequence = new Sequence();
     const dissolveSections = getDissolveConfig();

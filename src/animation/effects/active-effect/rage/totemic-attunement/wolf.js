@@ -3,6 +3,7 @@
 
 import { closest } from "../../../../../lib/filemanager.js";
 
+import { adapter } from "../../../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'Wolf Totemic Attunement',
     color: 'red',
@@ -14,7 +15,7 @@ async function play(token, target, config = {}) {
 }
 
 function create(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color } = mConfig;
     const label = `${id} - ${token.id}`;
 

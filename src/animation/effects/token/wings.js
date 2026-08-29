@@ -5,6 +5,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'wings',
     image: 'eskie.wings',
@@ -25,7 +26,7 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The created Sequence object.
  */
 async function createWings(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, image, offset, hue, wingSize, speedMulti, swayMulti, mirrorX, mirrorY } = mConfig;
 
     const sequence = new Sequence();
@@ -102,7 +103,7 @@ async function playWings(token, config = {}) {
  * @param {object} config Configuration options for the animation.
  */
 function stopWings(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}` });

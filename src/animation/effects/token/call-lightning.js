@@ -4,6 +4,7 @@
 import { closest } from '../../../lib/filemanager.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     radius: 7.5,
     sound: { ...DEFAULT_SOUND_CONFIG }
@@ -16,7 +17,7 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The created Sequence object.
  */
 async function create(position, config = {}) {
-    config = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    config = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const sequence = new Sequence();
     applySound(sequence, config.sound);

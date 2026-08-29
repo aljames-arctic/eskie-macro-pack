@@ -1,5 +1,6 @@
 import { closest } from '../../../../lib/filemanager.js';
 
+import { adapter } from "../../../../adapters/index.js";
 // Mapping of tag -> Sequencer file
 const defaultDetectionConfig = {};
 // Return true if any tag in tags is applied
@@ -88,7 +89,7 @@ async function _createDetectionEffects(target, config = {}) {
  * @returns {Promise<Sequence>} A promise that resolves with the sequence.
  */
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const targets = canvas.tokens.placeables.filter((t) => {
         if (t.id === token.id) return false;
         const targetDistance = canvas.grid.measurePath([token, t]).euclidean ?? 0;

@@ -64,7 +64,7 @@ async function createMaskTiles(object, config = {}) {
         "height": widthAdjustment * object.document.height,
     };
 
-    const revealMaskUpdates = foundry.utils.deepClone(revealMaskUpdatesBase);
+    const revealMaskUpdates = adapter.deepClone(revealMaskUpdatesBase);
 
     // Create all tiles in database in parallel
     const [[objectRevealMask], [sceneRevealMask], [objectShapeMask]] = await Promise.all([
@@ -295,7 +295,7 @@ async function playSocketed(object, config = {}) {
     const tokenOverlayPath = absolutePath(tokenOverlay);
     const revealOverlayPath = absolutePath(revealOverlay);
 
-    const animationId = foundry.utils.randomID();
+    const animationId = adapter.randomID();
 
     // 1. Create the tiles in the database
     const tiles = await createMaskTiles(object, { revealOverlay, rotation });

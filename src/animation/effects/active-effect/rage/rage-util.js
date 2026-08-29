@@ -1,9 +1,11 @@
+import { adapter } from "../../../../adapters/index.js";
+
 const DEFAULT_CONFIG = {
     id : 'rage util',
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     const label = `${id} - ${token.id}`;
 
@@ -20,7 +22,7 @@ async function stop(token, config = {}) {
 }
 
 async function clean(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     const label = `${id} - ${token.id}`;
 

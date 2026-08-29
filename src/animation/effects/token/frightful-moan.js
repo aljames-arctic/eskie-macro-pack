@@ -3,6 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {};
 
 /**
@@ -12,7 +13,7 @@ const DEFAULT_CONFIG = {};
  * @returns {Sequence} The created Sequence object.
  */
 async function create(token, config = {}) {
-    config = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    config = adapter.mergeObject(DEFAULT_CONFIG, config);
     const sequence = new Sequence();
 
     sequence

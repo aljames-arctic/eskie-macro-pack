@@ -6,6 +6,7 @@ import { template as templatelib } from '../../../lib/templates.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'faerieFire',
     color: 'green', // 'blue', 'green', 'purple'
@@ -28,7 +29,7 @@ function getTintAndHue(color) {
 }
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const seq = await createCloud(token, mConfig);
     const { targets } = mConfig;
 
@@ -41,7 +42,7 @@ async function create(token, config = {}) {
 }
 
 async function createCloud(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, template, color, sound } = mConfig;
     const { tintColor, hue, hue2 } = getTintAndHue(color);
 
@@ -138,7 +139,7 @@ async function createCloud(token, config = {}) {
 }
 
 function createEffect(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, glow, sound } = mConfig;
     const { tintColor } = getTintAndHue(color);
 
@@ -188,13 +189,13 @@ async function playEffect(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     if (token) Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}`, object: token });
 }
 
 async function clean(config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `${id}` });
 }

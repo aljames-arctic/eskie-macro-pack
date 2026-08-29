@@ -8,6 +8,7 @@ import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
 import { MODULE_ID } from '../../lib/constants.js';
 
+import { adapter } from "../../adapters/index.js";
 const DEFAULT_CONFIG = {
     label: 'Falling Rocks',
     dustBrightness: 0.8,
@@ -15,7 +16,7 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { label, dustBrightness } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { label, dustBrightness } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     if (!tile) return new Sequence();
 
@@ -140,7 +141,7 @@ async function play(tile, targets, config = {}) {
 }
 
 async function stop(tile, config = {}) {
-    const { label } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { label } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const id = tile.id; // Or however you define the 'id' variable used in the flag key
     
     // 1. Retrieve the pinned IDs from the tile's flags (fallback to an empty array if none)
@@ -165,7 +166,7 @@ async function stop(tile, config = {}) {
 }
 
 async function cleanToken(token, config = {}) {
-    const { label } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { label } = adapter.mergeObject(DEFAULT_CONFIG, config);
     await Sequencer.EffectManager.endEffects({ name: `${label}-${token.name}-${token.id}` });
     // Restore token opacity
     return new Sequence()

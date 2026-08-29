@@ -26,7 +26,7 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence|null} The created Sequence, or null if the dialog was cancelled.
  */
 async function createShapechange(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let { baseForm, hybridForm, wolfForm } = mConfig;
     let shapechangeData = token.document.getFlag('eskie-macros', 'shapechange');
     if (!shapechangeData) {
@@ -217,7 +217,7 @@ async function createShapechange(token, config = {}) {
  * @returns {Sequence} The created Sequence object.
  */
 async function createRevert(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { baseForm } = token.document.getFlag('eskie-macros', 'shapechange');
 
     const currentForm = token.document.texture.src;

@@ -5,6 +5,7 @@ import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: "divineSmite",
     color: "yellowwhite",
@@ -12,7 +13,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, target, config = {}) {
-    const { id, color, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     let seq = new Sequence();
     applySound(seq, sound);

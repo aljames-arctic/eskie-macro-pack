@@ -1,3 +1,5 @@
+import { adapter } from "../../adapters/index.js";
+
 /**
  * Utility to prompt the user to select multiple locations on the canvas, 
  * optionally placing persistent numbered markers at each location.
@@ -21,7 +23,7 @@ const DEFAULT_POSITION_CONFIG = {
 };
 
 async function selectMultiple(config = {}) {
-    const mergedConfig = foundry.utils.mergeObject(DEFAULT_POSITION_CONFIG, config, { inplace: false });
+    const mergedConfig = adapter.mergeObject(DEFAULT_POSITION_CONFIG, config);
 
     const {
         markerFile,

@@ -1,5 +1,6 @@
 import { closest } from "../../../lib/filemanager.js";
 
+import { adapter } from "../../../adapters/index.js";
 /* **
    Originally Published: 5/1/2023
    Author: EskieMoh#2969 
@@ -47,7 +48,7 @@ const DEFAULT_CONFIG = {
  */
 async function create(location, config = {}) {
     // TODO(bakanabaka): Utilizes old mergeObject
-    let { id, duration, effect } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    let { id, duration, effect } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     let slapEffect = new Sequence()
         .effect()
@@ -107,7 +108,7 @@ async function play(config = {}, crosshairOptions = undefined) {
 }
 
 async function stop(config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     return Sequencer.EffectManager.endEffects({ name: mConfig.id });
 }
 

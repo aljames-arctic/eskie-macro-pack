@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, radius, path } = mConfig;
 
     const grid = canvas.scene.grid.distance ?? 5;
@@ -50,7 +50,7 @@ async function create(token, config = {}) {
         .belowTokens();
 
     for (const target of collectedTargets) {
-        const value = path ? foundry.utils.getProperty(target, path) : adapter.getCreatureType(target?.actor);
+        const value = path ? adapter.getProperty(target, path) : adapter.getCreatureType(target?.actor);
         const isUndead = String(value ?? '').toLowerCase().includes('undead');
 
         const distance = Math.hypot(target.x - token.x, target.y - token.y);
@@ -108,7 +108,7 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}` });
 }

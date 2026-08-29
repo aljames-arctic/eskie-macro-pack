@@ -3,6 +3,7 @@
 
 import { closest } from "../../../../lib/filemanager.js";
 
+import { adapter } from "../../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'beam',
     effects: [
@@ -14,7 +15,7 @@ const DEFAULT_CONFIG = {
 };
 
 function create(token, target, config = {}) {
-    let mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    let mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let { id, effects } = mConfig;
 
     let seq = new Sequence()
@@ -101,7 +102,7 @@ async function play(token, target, config = {}) {
 }
 
 async function stop(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     return Promise.all([
         Sequencer.EffectManager.endEffects({ name: id, object: token }),

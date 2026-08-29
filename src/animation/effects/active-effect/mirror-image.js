@@ -6,6 +6,7 @@
 import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'mirrorImage',
     imageNumber: 3, // Default number of mirror images
@@ -19,7 +20,7 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The created Sequence object.
  */
 async function createMirrorImage(token, config = {}) {
-    const { id, imageNumber } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, imageNumber } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
 
     const sequence = new Sequence()
@@ -150,7 +151,7 @@ async function createMirrorImage(token, config = {}) {
  * @returns {Promise<void>} A promise that resolves when the sequence starts playing.
  */
 async function playMirrorImage(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, imageNumber } = mConfig;
 
     // First check if a Mirror Image effect is already active for this token
@@ -192,7 +193,7 @@ async function playMirrorImage(token, config = {}) {
  * @param {object} config Configuration options.
  */
 async function stopMirrorImage(token, config = {}) {
-    const { id, imageNumber } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, imageNumber } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}*`;
 
     Sequencer.EffectManager.endEffects({ name: label });

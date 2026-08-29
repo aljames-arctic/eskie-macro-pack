@@ -6,6 +6,7 @@
 import { closest } from "../../../lib/filemanager.js";
 import { log } from "../../../lib/logger.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'trueStrike',
 };
@@ -19,7 +20,7 @@ const DEFAULT_CONFIG = {
  * @returns {Sequence} The created Sequence object.
  */
 async function createTrueStrikeCast(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     const sequence = new Sequence();
@@ -100,7 +101,7 @@ async function createTrueStrikeCast(token, config = {}) {
  * @returns {Promise<void>} A promise that resolves when the sequence starts playing.
  */
 async function playTrueStrikeCast(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Check if TrueStrike tag already exists, if so, remove it (toggle behavior)
     if (Tagger.hasTags(token, "TrueStrike")) {
@@ -122,7 +123,7 @@ async function playTrueStrikeCast(token, config = {}) {
  * @returns {Sequence} The created Sequence object.
  */
 async function createTrueStrikeAttack(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     // const { id } = mConfig; // Not directly used in this animation for naming persistent effects
 
     const sequence = new Sequence();
@@ -249,7 +250,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
  * @returns {Promise<void>} A promise that resolves when the sequence finishes playing.
  */
 async function playTrueStrikeAttack(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     if (!target) {
@@ -275,7 +276,7 @@ async function playTrueStrikeAttack(token, target, config = {}) {
  * @param {object} config Configuration options.
  */
 async function stopTrueStrike(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     if (Tagger.hasTags(token, "TrueStrike")) {

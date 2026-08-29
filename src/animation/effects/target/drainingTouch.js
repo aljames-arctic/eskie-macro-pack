@@ -3,13 +3,14 @@
 
 import { closest } from "../../../lib/filemanager.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     color: "teal",
     changeLight: true,
 };
 
 async function create(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { color, changeLight } = mConfig;
     let tintColor;
     let hue;
@@ -158,7 +159,7 @@ async function play(token, target, config = {}) {
     await Tagger.removeTags(token, "DrainingTouch");
 
     if (Tagger.hasTags(token, "Incorporeal")) {
-        const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+        const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
         const { color, changeLight } = mConfig;
         let tintColor;
         if (color == "teal") { tintColor = '#6ff087' }
@@ -237,7 +238,7 @@ async function play(token, target, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     return Sequencer.EffectManager.endEffects({ name: id, object: token });
 }

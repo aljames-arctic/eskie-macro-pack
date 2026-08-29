@@ -3,6 +3,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: "romanCandle",
     position: undefined,
@@ -11,7 +12,7 @@ const DEFAULT_CONFIG = {
 
 async function create(token, config = {}) {
     var items = Sequencer.Database.getPathsUnder('jb2a.bolt.fire');
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     let { shots, position } = mConfig;
     if (!position) {

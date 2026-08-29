@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, darkMap, sound } = mConfig;
 
     const recipient = target ?? token;
@@ -129,7 +129,7 @@ async function playEffect(token, config = {}) {
 }
 
 async function stop(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     const recipient = target ?? token;
     if (recipient) Sequencer.EffectManager.endEffects({ name: `${id} - ${recipient.id}`, object: recipient });

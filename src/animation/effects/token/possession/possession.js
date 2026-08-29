@@ -3,6 +3,7 @@
 
 import { closest } from "../../../../lib/filemanager.js";
 
+import { adapter } from "../../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'eskie.effect.possession.main',
     color: 'teal',
@@ -19,7 +20,7 @@ function getTintColor(color) {
 }
 
 async function create(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color } = mConfig;
     const tintColor = getTintColor(color);
 
@@ -107,7 +108,7 @@ async function play(token, target, config = {}) {
 }
 
 async function stop(token, target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     await Sequencer.EffectManager.endEffects({ name: `${id} - ${target.uuid}`, object: target });
     let sequence = new Sequence().animation().on(token).show(true);

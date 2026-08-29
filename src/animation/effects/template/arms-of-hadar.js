@@ -8,6 +8,7 @@ import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'armsOfHadar',
     excludeSelf: true,
@@ -26,7 +27,7 @@ const DEFAULT_CONFIG = {
  * @returns {Promise<Sequence>} A promise that resolves with the Sequence object.
  */
 async function create(token, config = {}) {
-    const { id, targets, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, targets, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     let sequence = new Sequence();
     applySound(sequence, sound);

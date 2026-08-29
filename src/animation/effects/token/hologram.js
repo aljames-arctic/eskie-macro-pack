@@ -1,3 +1,5 @@
+import { adapter } from "../../../adapters/index.js";
+
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
@@ -11,7 +13,7 @@ export const DEFAULT_CONFIG = {
 };
 
 async function create(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { tint } = mConfig;
 
     const tokenRotation = token.document.rotation || 0;

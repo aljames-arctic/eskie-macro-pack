@@ -1,5 +1,6 @@
 import { closest } from "../../../lib/filemanager.js";
 
+import { adapter } from "../../../adapters/index.js";
 /* **
    Originally Published: 4/14/2023
    Author: EskieMoh#2969 
@@ -41,7 +42,7 @@ const DEFAULT_CONFIG = {
  */
 async function create(token, config = {}) {
     // TODO(bakanabaka): Utilizes old mergeObject
-    let { id, duration, effect, facing } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    let { id, duration, effect, facing } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const tokenWidth = token.document.width;
     const mirrorFace = facing === 'right';
@@ -72,7 +73,7 @@ async function play(token, config = {}) {
 }
 
 async function stop(token, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     return Sequencer.EffectManager.endEffects({ name: mConfig.id, object: token });
 }
 

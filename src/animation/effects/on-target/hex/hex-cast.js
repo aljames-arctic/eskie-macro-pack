@@ -6,13 +6,14 @@
 import { closest } from '../../../../lib/filemanager.js';
 import { autorec } from '../../../../adapters/modules/autorec/autorec-module-adapter.js';
 
+import { adapter } from "../../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'hex',
     duration: 10000
 };
 
 async function create(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, duration } = mConfig;
 
     let seq = new Sequence()
@@ -79,7 +80,7 @@ async function play(target, config = {}) {
 }
 
 async function stop(target, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: id, object: target });
 }

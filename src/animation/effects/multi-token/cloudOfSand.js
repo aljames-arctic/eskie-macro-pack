@@ -3,6 +3,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     persist: false,
     color: "white",
@@ -52,7 +53,7 @@ function _createCloudEffect(position, file, { size, opacity, rotate, zIndex, rot
  * @returns {Sequence} The animation sequence.
  */
 async function create(position, config = {}) {
-    const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { persist, color } = mConfig;
 
     if (!position) {

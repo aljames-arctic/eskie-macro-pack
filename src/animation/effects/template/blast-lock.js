@@ -12,6 +12,7 @@ import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapte
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 
+import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'blastLock',
     radius: 3, // in grid units
@@ -60,7 +61,7 @@ function findLockedDoor(position, radius) {
  */
 async function create(token, config = {}) {
     config = settingsOverride(config);
-    const { id, template, crosshair, radius, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id, template, crosshair, radius, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Define Safe Elevation (Token height + 10)
     const safeElevation = (token.document.elevation || 0) + 10;

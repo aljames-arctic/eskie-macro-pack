@@ -3,11 +3,13 @@
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
     id: "speakWithDead",
     sound: {
-        enabled: false,
+        ...DEFAULT_SOUND_CONFIG,
+        enable: false,
         file: "psfx.magic-signs.circle.v1.necromancy.complete",
         volume: 0.5,
     }
@@ -27,9 +29,7 @@ function create(token, config = {}) {
     const label = `${id} - ${token.id}`;
 
     let sequence = new Sequence();
-    if (sound.enabled) {
-        sequence.sound().name(label).volume(sound.volume).file(closest(sound.file));
-    }
+    applySound(sequence, sound);
     sequence
         // Animation effects
         .addSequence(_addMagicCircleEffects(token, label))
@@ -291,7 +291,7 @@ async function preload(config) {
         closest("jb2a.flames.01.blue"),
         closest("eskie.smoke.05.black")
     ]
-    if (sound.enabled) files.push(closest(sound.file));
+    if (sound.enable) files.push(closest(sound.file));
 
     return Sequencer.Preloader.preloadForClients(files, false);
 }
@@ -320,4 +320,4 @@ export const speakWithDead = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("speakWithDead", "effect", "eskie.effect.speakWithDead", DEFAULT_CONFIG, "0.0.0", "Speak with Dead");
+autorec.register("speakWithDead", "effect", "eskie.effect.speakWithDead", DEFAULT_CONFIG, "0.0.1", "Speak with Dead");

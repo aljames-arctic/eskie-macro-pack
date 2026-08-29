@@ -8,14 +8,42 @@
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     pushDistance: 80,
     knockbackDuration: 200,
     returnDuration: 600,
     sound: {
-        enabled: true,
-        volume: 0.5,
+        charge: [
+            { ...DEFAULT_SOUND_CONFIG, enable: true, volume: 0.5, delay: 200, file: 'blfx.sound.misc.impact.fire1.4' },
+            { ...DEFAULT_SOUND_CONFIG, enable: true, volume: 0.5, delay: 500, file: 'blfx.sound.spell.elementalism1.1' },
+        ],
+        channel: [
+            { ...DEFAULT_SOUND_CONFIG, enable: true, volume: 0.5, fadeIn: 200, fadeOut: 500, file: 'blfx.sound.spell.loop_channel.fire_burning1.5' },
+            { ...DEFAULT_SOUND_CONFIG, enable: true, volume: 0.5, file: 'blfx.sound.ability.breath.1' },
+            { ...DEFAULT_SOUND_CONFIG, enable: true, volume: 0.5, delay: 400, file: 'blfx.sound.misc.shock_wave.2' },
+        ],
+        attack: {
+            ...DEFAULT_SOUND_CONFIG,
+            enable: true,
+            volume: 0.5,
+            file: 'blfx.sound.spell.cast.fire.1'
+        },
+        sacredFlame: {
+            ...DEFAULT_SOUND_CONFIG,
+            enable: true,
+            volume: 0.5,
+            file: 'blfx.sound.spell.sacred_flame1.impact.2'
+        },
+        burningHands: [
+            { ...DEFAULT_SOUND_CONFIG, enable: true, volume: 0.5, file: 'blfx.sound.spell.cast.burning_hands.2' },
+            { ...DEFAULT_SOUND_CONFIG, enable: true, volume: 0.5, file: 'blfx.sound.spell.cast.fireball.4' },
+        ],
+        fireball: [
+            { ...DEFAULT_SOUND_CONFIG, enable: true, volume: 0.5, file: 'blfx.sound.spell.cast.fireball.2' },
+            { ...DEFAULT_SOUND_CONFIG, enable: true, volume: 0.5, delay: 200, file: 'blfx.sound.misc.fire.throw.1' },
+        ]
     },
 };
 
@@ -39,16 +67,7 @@ async function create(source, target, config = {}) {
     const nyt = -ny;
 
     // --- Charging Phase ---
-    if (sound.enabled) {
-        sequence.sound()
-            .delay(200)
-            .file(closest('blfx.sound.misc.impact.fire1.4'))
-            .volume(sound.volume);
-
-        sequence.sound()
-            .file(closest('blfx.sound.spell.elementalism1.1'))
-            .volume(sound.volume * 0.8);
-    }
+    applySound(sequence, sound?.charge ?? sound);
 
     sequence.effect()
         .file(closest('jb2a.divine_smite.caster.standard.orange'))
@@ -83,23 +102,7 @@ async function create(source, target, config = {}) {
         .opacity(0.6)
         .belowTokens();
 
-    if (sound.enabled) {
-        sequence.sound()
-            .file(closest('blfx.sound.spell.loop_channel.fire_burning1.5'))
-            .fadeInAudio(200)
-            .fadeOutAudio(500)
-            .duration(2500)
-            .volume(sound.volume);
-
-        sequence.sound()
-            .file(closest('blfx.sound.ability.breath.1'))
-            .volume(sound.volume);
-
-        sequence.sound()
-            .delay(400)
-            .file(closest('blfx.sound.misc.shock_wave.2'))
-            .volume(sound.volume);
-    }
+    applySound(sequence, sound?.channel ?? sound);
 
     sequence.effect()
         .file(closest('blfx.spell.cast.swirl1.fire1.loop.orange'))
@@ -119,11 +122,7 @@ async function create(source, target, config = {}) {
         .randomRotation()
         .belowTokens();
 
-    if (sound.enabled) {
-        sequence.sound()
-            .file(closest('blfx.sound.spell.cast.fire.1'))
-            .volume(sound.volume);
-    }
+    applySound(sequence, sound?.attack ?? sound);
 
     sequence.effect()
         .file(closest('jb2a.ranged_helix.cast.001.orangeyellow'))
@@ -139,26 +138,14 @@ async function create(source, target, config = {}) {
         .on(source)
         .opacity(0);
 
-    if (sound.enabled) {
-        sequence.sound()
-            .file(closest('blfx.sound.spell.sacred_flame1.impact.2'))
-            .volume(sound.volume);
-    }
+    applySound(sequence, sound?.sacredFlame ?? sound);
 
     sequence.effect()
         .file(closest('jb2a.on_token_buff.001.003.orangeyellow'))
         .atLocation(source)
         .scaleToObject(0.5, { considerTokenScale: true });
 
-    if (sound.enabled) {
-        sequence.sound()
-            .file(closest('blfx.sound.spell.cast.burning_hands.2'))
-            .volume(sound.volume);
-
-        sequence.sound()
-            .file(closest('blfx.sound.spell.cast.fireball.4'))
-            .volume(sound.volume);
-    }
+    applySound(sequence, sound?.burningHands ?? sound);
 
     sequence.effect()
         .file(closest('jb2a.ranged_missile.cast.001.orangeyellow'))
@@ -217,16 +204,7 @@ async function create(source, target, config = {}) {
         .opacity(1)
         .waitUntilFinished(-1000);
 
-    if (sound.enabled) {
-        sequence.sound()
-            .file(closest('blfx.sound.spell.cast.fireball.2'))
-            .volume(sound.volume);
-
-        sequence.sound()
-            .delay(200)
-            .file(closest('blfx.sound.misc.fire.throw.1'))
-            .volume(sound.volume);
-    }
+    applySound(sequence, sound?.fireball ?? sound);
 
     // Impact
     sequence.effect()
@@ -300,4 +278,4 @@ export const fireBlast = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("fireBlast", 'ranged-target', 'eskie.effect.fireBlast', DEFAULT_CONFIG, '0.1.0', "Fire Blast");
+autorec.register("fireBlast", 'ranged-target', 'eskie.effect.fireBlast', DEFAULT_CONFIG, '0.1.1', "Fire Blast");

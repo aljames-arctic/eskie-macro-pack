@@ -8,14 +8,26 @@ import { template as templatelib } from '../../../lib/templates.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { adapter } from '../../../adapters/index.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'Lightning Bolt',
     template: true,
     tintMap: false,
     sound: {
-        enabled: true,
-        volume: 0.5
+        secondary: {
+            ...DEFAULT_SOUND_CONFIG,
+            enable: true,
+            volume: 0.5,
+            file: 'psfx.3rd-level-spells.call-lightning.v1.secondary'
+        },
+        primary: {
+            ...DEFAULT_SOUND_CONFIG,
+            enable: true,
+            volume: 0.5,
+            delay: 500,
+            file: 'psfx.3rd-level-spells.call-lightning.v1.primary'
+        }
     }
 };
 
@@ -41,16 +53,7 @@ async function create(token, config = {}) {
     }
 
     const sequence = new Sequence();
-
-    if (sound.enabled) {
-        sequence.sound()
-            .file(closest(`psfx.3rd-level-spells.call-lightning.v1.secondary`))
-            .volume(sound.volume);
-        sequence.sound()
-            .file(closest(`psfx.3rd-level-spells.call-lightning.v1.primary`))
-            .volume(sound.volume)
-            .delay(500);
-    }
+    applySound(sequence, sound);
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (bg?.src && tintMap){
@@ -138,4 +141,4 @@ export const lightningBolt = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("lightningBolt", "template", "eskie.effect.lightningBolt", DEFAULT_CONFIG, "0.0.0", "Lightning Bolt");
+autorec.register("lightningBolt", "template", "eskie.effect.lightningBolt", DEFAULT_CONFIG, "0.0.1", "Lightning Bolt");

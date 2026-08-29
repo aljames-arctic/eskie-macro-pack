@@ -134,3 +134,9 @@ test('applySound respects global enableSounds setting', () => {
 
     game.settings.get = originalGet;
 });
+
+test('applySound standardizes strictly on enable and ignores enabled alias', () => {
+    const seq = new MockSequence();
+    applySound(seq, { enabled: true, file: 'audio/legacy.mp3' });
+    assert.equal(seq.sounds.length, 0);
+});

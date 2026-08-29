@@ -32,7 +32,6 @@ export function applySound(sequence, soundConfig, defaultDelay = 0) {
 
     const isSingleSound = typeof soundConfig === 'object' && (
         soundConfig.enable !== undefined ||
-        soundConfig.enabled !== undefined ||
         typeof soundConfig.file === 'string' ||
         typeof soundConfig.path === 'string'
     );
@@ -46,7 +45,7 @@ export function applySound(sequence, soundConfig, defaultDelay = 0) {
     for (const s of sounds) {
         if (!s || typeof s !== 'object') continue;
 
-        const isEnabled = Boolean(s.enable ?? s.enabled);
+        const isEnabled = Boolean(s.enable);
         const filePath = s.file ?? s.path ?? '';
         if (!isEnabled || !filePath) continue;
 
@@ -73,6 +72,16 @@ export function applySound(sequence, soundConfig, defaultDelay = 0) {
             }
             if (s.endTime != null && s.endTime > 0) {
                 soundEffect.endTime(s.endTime);
+            }
+        }
+
+        if (s.repeats != null) {
+            if (Array.isArray(s.repeats)) {
+                soundEffect.repeats(...s.repeats);
+            } else if (s.repeatDelay != null) {
+                soundEffect.repeats(s.repeats, s.repeatDelay);
+            } else {
+                soundEffect.repeats(s.repeats);
             }
         }
     }

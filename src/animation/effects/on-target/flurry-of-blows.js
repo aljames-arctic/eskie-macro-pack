@@ -4,13 +4,28 @@
 import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
     id: 'Flurry Of Blows',
     color: "yellow",
     sound: {
-        enabled: true,
-        volume: 0.5
+        punch1: {
+            ...DEFAULT_SOUND_CONFIG,
+            enable: true,
+            volume: 0.5,
+            delay: 125,
+            file: 'psfx.impacts.bludgeoning',
+            repeats: [7, 250, 250],
+        },
+        punch2: {
+            ...DEFAULT_SOUND_CONFIG,
+            enable: true,
+            volume: 0.5,
+            delay: 250,
+            file: 'psfx.impacts.bludgeoning',
+            repeats: [7, 250, 250],
+        }
     }
 };
 
@@ -19,13 +34,7 @@ async function create(token, target, config = {}) {
     const { color, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     let seq = new Sequence();
 
-    if (sound.enabled) {
-        seq = seq.sound()
-            .file(closest(`psfx.impacts.bludgeoning`))
-            .volume(sound.volume)
-            .delay(125)
-            .repeats(7,250,250);
-    }
+    applySound(seq, sound?.punch1 ?? sound);
     seq = seq.effect()
         .delay(125)
         .file(closest(`jb2a.melee_generic.creature_attack.fist.001.${color}`))
@@ -37,13 +46,7 @@ async function create(token, target, config = {}) {
         .repeats(7,250,250)
         .zIndex(1);
 
-    if (sound.enabled) {
-        seq = seq.sound()
-            .file(closest(`psfx.impacts.bludgeoning`))
-            .volume(sound.volume)
-            .delay(250)
-            .repeats(7,250,250);
-    }
+    applySound(seq, sound?.punch2);
     seq = seq.effect()
         .delay(250)
         .file(closest(`jb2a.melee_generic.creature_attack.fist.001.${color}`))
@@ -90,5 +93,5 @@ export const flurryOfBlows = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("flurryOfBlows", "melee-target", "eskie.effect.flurryOfBlows", DEFAULT_CONFIG, "0.0.0", "Flurry Of Blows");
+autorec.register("flurryOfBlows", "melee-target", "eskie.effect.flurryOfBlows", DEFAULT_CONFIG, "0.0.1", "Flurry Of Blows");
 

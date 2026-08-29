@@ -12,7 +12,7 @@ const DEFAULT_CONFIG = {
     maxStrikes: 12,
     positions: undefined,
     sound: {
-        enabled: true,
+        enable: true,
         volume: 0.5,
     },
 };

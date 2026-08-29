@@ -2,6 +2,7 @@ import { adapter } from '../../../adapters/index.js';
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from "../../../lib/settings.js";
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: "Rapid Strike",
@@ -10,8 +11,10 @@ const DEFAULT_CONFIG = {
     color: "red",   //Set Attack Color
     attacks: 12,     //Set Attack Number
     sound: {
-        enabled: true,
-        volume: 0.5
+        ...DEFAULT_SOUND_CONFIG,
+        enable: true,
+        volume: 0.5,
+        file: 'psfx.impacts.slashing'
     }
 }
 
@@ -27,11 +30,7 @@ function create(token, target, config = {}) {
 
     function attackAnimation(token, target, config) {
         const seq = new Sequence();
-        if (sound.enabled) {
-            seq.sound()
-                .file(closest(`psfx.impacts.${type}`))
-                .volume(sound.volume);
-        }
+        applySound(seq, { ...sound, file: sound.file || `psfx.impacts.${type}` });
 
         seq.effect()
                 .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.slow`))
@@ -121,4 +120,4 @@ export const rapidStrike = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("rapidStrike", "melee-target", "eskie.effect.rapidStrike", DEFAULT_CONFIG, "0.0.0", "Rapid Strike");
+autorec.register("rapidStrike", "melee-target", "eskie.effect.rapidStrike", DEFAULT_CONFIG, "0.0.1", "Rapid Strike");

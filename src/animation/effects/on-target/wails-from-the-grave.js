@@ -4,14 +4,17 @@
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'wailsFromTheGrave',
     type: 'slashing', // 'slashing', 'piercing', 'bludgeoning'
     weight: 'medium', // 'light', 'medium', 'heavy'
     sound: {
-        enabled: true,
-        volume: 0.5
+        ...DEFAULT_SOUND_CONFIG,
+        enable: true,
+        volume: 0.5,
+        file: 'eskie.sound.roar.02'
     }
 };
 
@@ -83,12 +86,7 @@ async function createDamageOnly(target, config = {}) {
             .scaleToObject(0.6, { considerTokenScale: true })
             .zIndex(2);
 
-        if (sound?.enabled) {
-            seq.sound()
-                .delay(idx * 100)
-                .file(closest('eskie.sound.roar.02'))
-                .volume(sound.volume ?? 0.5);
-        }
+        applySound(seq, { ...sound, delay: idx * 100 });
     });
 
     seq.effect()
@@ -214,12 +212,7 @@ async function createAttack(token, target1, target2, config = {}) {
                 .scaleToObject(0.6, { considerTokenScale: true })
                 .zIndex(2);
 
-            if (sound?.enabled) {
-                damageSeq.sound()
-                    .delay(idx * 100)
-                    .file(closest('eskie.sound.roar.02'))
-                    .volume(sound.volume ?? 0.5);
-            }
+            applySound(damageSeq, { ...sound, delay: idx * 100 });
         });
 
         damageSeq.effect()
@@ -268,6 +261,6 @@ export const wailsFromTheGrave = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('wailsFromTheGrave', 'melee-target', 'eskie.effect.wailsFromTheGrave.attack', DEFAULT_CONFIG, '0.0.0', 'Wails from the Grave');
-autorec.register('wailsFromTheGraveDamage', 'ranged-target', 'eskie.effect.wailsFromTheGrave.damage', DEFAULT_CONFIG, '0.0.0', 'Wails from the Grave (Damage)');
+autorec.register('wailsFromTheGrave', 'melee-target', 'eskie.effect.wailsFromTheGrave.attack', DEFAULT_CONFIG, '0.0.1', 'Wails from the Grave');
+autorec.register('wailsFromTheGraveDamage', 'ranged-target', 'eskie.effect.wailsFromTheGrave.damage', DEFAULT_CONFIG, '0.0.1', 'Wails from the Grave (Damage)');
 

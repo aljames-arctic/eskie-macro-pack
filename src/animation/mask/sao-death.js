@@ -4,6 +4,7 @@ import { closest } from "../../lib/filemanager.js";
 import { socket } from "../../adapters/modules/socketlib/socketlib-module-adapter.js";
 import { log } from "../../lib/logger.js";
 import { adapter } from "../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from '../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'swordArtOnlineShatter',
@@ -12,8 +13,11 @@ const DEFAULT_CONFIG = {
     shatterColor: 'blue',
     deleteObject: false,
     sound: {
-        enabled: false,
+        ...DEFAULT_SOUND_CONFIG,
+        enable: false,
         volume: 0.2,
+        fadeIn: 50,
+        fadeOut: 500,
         file: "SAO/sfx/saoexplo.mp3",   // Replace this with a file in some asset library (PSFX, etc)
     }
 };
@@ -25,13 +29,7 @@ async function create(object, config = {}) {
     const label = `${id}-${object.id}`;
 
     let sequence = new Sequence();
-    if (sound.enabled) {
-        sequence = sequence.sound()
-            .file(closest(sound.file))
-            .volume(sound.volume)
-            .fadeInAudio(50)
-            .fadeOutAudio(500);
-    }
+    applySound(sequence, sound);
 
     const widthAdjustment = adapter.isDocumentOfType(object, 'Token') ? canvas.grid.size : 1;
     const [visibleTile] = await socket.tile.create({

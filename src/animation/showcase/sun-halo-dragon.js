@@ -1,6 +1,7 @@
 import { closest } from '../../lib/filemanager.js';
 import { deathEffect } from './sun-halo-dragon/death-effect.js';
 import { adapter } from '../../adapters/index.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../utils/sound.js';
 
 async function getPositions(token) {
     const pos1 = {x: token.x, y: token.y };
@@ -21,8 +22,18 @@ const DEFAULT_CONFIG = {
     impact: false,
     screen: true,
     sound: {
-        enabled: true,
-        volume: 0.5,
+        intro: {
+            ...DEFAULT_SOUND_CONFIG,
+            enable: true,
+            volume: 0.5,
+            file: "psfx.2nd-level-spells.misty-step.v1.intro.fire",
+        },
+        cast: {
+            ...DEFAULT_SOUND_CONFIG,
+            enable: true,
+            volume: 0.5,
+            file: "psfx.casting.fire-side.001",
+        }
     }
 };
 
@@ -65,10 +76,7 @@ async function create(token, targets = [], config = {}) {
             .fadeOut(250)
             .filter("Blur", { blurX: 15, blurY: 0 });
 
-        seq.sound()
-            .file(closest("psfx.2nd-level-spells.misty-step.v1.intro.fire"))
-            .volume(sound.volume)
-            .playIf(sound.enabled);
+        applySound(seq, sound?.intro ?? sound);
 
         seq.effect()
             .file(closest("eskie.screen_overlay.speed_lines.horizontal.02.orange"))
@@ -182,10 +190,7 @@ async function create(token, targets = [], config = {}) {
             .shake({ duration: 250, strength: 1.5, rotation: false, fadeOut: 250 })
 
         .wait(1000);
-        seq.sound()
-            .file(closest("psfx.casting.fire-side.001"))
-            .volume(sound.volume)
-            .playIf(sound.enabled);
+        applySound(seq, sound?.cast ?? sound);
         seq.wait(1000);
 
         seq.effect()

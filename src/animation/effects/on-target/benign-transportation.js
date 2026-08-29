@@ -7,10 +7,11 @@
 import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 import { log } from "../../../lib/logger.js";
 
 const DEFAULT_CONFIG = {
-    id: 'Benign Transportation',
+    id: 'benignTransportation',
     animations: {
         out: {
             file: 'jb2a.misty_step.01.blue',
@@ -22,7 +23,8 @@ const DEFAULT_CONFIG = {
         }
     },
     sound: {
-        enabled: true,
+        ...DEFAULT_SOUND_CONFIG,
+        enable: true,
         volume: 0.5,
         file: `psfx.2nd-level-spells.misty-step.v1.outro.fire`,
     },
@@ -42,11 +44,7 @@ async function create(token, targets, config = {}) {
     const BDest = { x: B.center.x, y: B.center.y };
 
     const seq = new Sequence();
-        if (sound.enabled) {
-            seq.sound()
-                .file(closest(sound.file))
-                .volume(sound.volume);
-        }
+    applySound(seq, sound);
         // 1. Play outro animations on both tokens
         seq.effect()
             .file(closest(animations.out.file))
@@ -102,4 +100,4 @@ export const benignTransportation = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("benignTransportation", "ranged-target", "eskie.effect.benignTransportation", DEFAULT_CONFIG, "0.0.0", "Benign Transportation");
+autorec.register("benignTransportation", "ranged-target", "eskie.effect.benignTransportation", DEFAULT_CONFIG, "0.0.1", "Benign Transportation");

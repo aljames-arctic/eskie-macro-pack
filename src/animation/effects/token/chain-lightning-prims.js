@@ -6,15 +6,25 @@ import { primMST } from "../../../lib/algorithms.js";
 import { settingsOverride } from "../../../lib/settings.js";
 import { log } from "../../../lib/logger.js";
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
     releaseDelay: 200,
     propagationDelay: 50,
     fudgeFactor: 0,
     sound: {
-        enabled: true,
-        littleBoltVolume: 0.5,
-        bigBoltVolume: 0.2
+        littleBolt: {
+            ...DEFAULT_SOUND_CONFIG,
+            enable: true,
+            volume: 0.5,
+            file: "psfx.weapon-swooshes.lightning"
+        },
+        bigBolt: {
+            ...DEFAULT_SOUND_CONFIG,
+            enable: true,
+            volume: 0.2,
+            file: "psfx.cantrips.thunderclap.v1"
+        }
     }
 };
 
@@ -103,11 +113,7 @@ function create(token, targetTokens, config = {}) {
             }
         }
 
-        if (sound.enabled) {
-            littleSeq.sound()
-                .file(closest("psfx.weapon-swooshes.lightning"))
-                .volume(sound.littleBoltVolume ?? 0.5);
-        }
+        applySound(littleSeq, sound?.littleBolt ?? sound);
 
         if (i < propagationLevels.length - 1) {
             littleSeq.wait(config.propagationDelay);
@@ -171,11 +177,7 @@ function create(token, targetTokens, config = {}) {
             }
         }
 
-        if (sound.enabled) {
-            bigSeq.sound()
-                .file(closest("psfx.cantrips.thunderclap.v1"))
-                .volume(sound.bigBoltVolume ?? 0.2);
-        }
+        applySound(bigSeq, sound?.bigBolt ?? sound);
 
         if (i < propagationLevels.length - 1) {
             const waitTime = isPrimary ? 800 : config.propagationDelay;

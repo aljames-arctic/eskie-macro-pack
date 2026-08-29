@@ -7,12 +7,35 @@ import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
     id: 'banish',
     sound: {
-        enabled: true,
-        volume: 0.5,
+        intro: {
+            ...DEFAULT_SOUND_CONFIG,
+            enable: true,
+            volume: 0.5,
+            file: 'psfx.magic-signs.circle.v1.abjuration.complete',
+        },
+        rune: {
+            ...DEFAULT_SOUND_CONFIG,
+            enable: true,
+            volume: 0.5,
+            file: 'psfx.casting.generic.001',
+        },
+        moonbeam: {
+            ...DEFAULT_SOUND_CONFIG,
+            enable: true,
+            volume: 0.5,
+            file: 'psfx.2nd-level-spells.moonbeam.intro',
+        },
+        return: {
+            ...DEFAULT_SOUND_CONFIG,
+            enable: true,
+            volume: 0.5,
+            file: 'psfx.2nd-level-spells.moonbeam.intro',
+        }
     },
     portal: {
         file: undefined,
@@ -130,11 +153,7 @@ async function createBanish(target, config = {}) {
     }
 
     const sequence = new Sequence();
-    if (sound.enabled) {
-        sequence.sound()
-            .file(closest('psfx.magic-signs.circle.v1.abjuration.complete'))
-            .volume(sound.volume)
-    }
+    applySound(sequence, sound?.intro ?? sound);
     sequence.effect()
         .file(closest(`jb2a.magic_signs.circle.02.conjuration.intro.${portal.color}`))
         .atLocation(target)
@@ -154,12 +173,7 @@ async function createBanish(target, config = {}) {
     let runeDelay = 0;
     let animationDelay = 4000;
     for (const rune of RUNE_DATA.runes) {
-        if (sound.enabled) {
-            sequence.sound()
-                .file(closest('psfx.casting.generic.001'))
-                .volume(sound.volume)
-                .delay(runeDelay + 750)
-        }
+        applySound(sequence, { ...(sound?.rune ?? sound), delay: runeDelay + 750 });
         sequence.effect()
             .file(closest(`jb2a.magic_signs.rune.conjuration.complete.${portal.color}`))
             .atLocation(target, { offset: rune.offset })
@@ -177,11 +191,7 @@ async function createBanish(target, config = {}) {
     }
 
     sequence.wait(3000);
-    if (sound.enabled) {
-        sequence.sound()
-            .file(closest('psfx.2nd-level-spells.moonbeam.intro'))
-            .volume(sound.volume)
-    }
+    applySound(sequence, sound?.moonbeam ?? sound);
 
     sequence.wait(1500);
     sequence.effect()
@@ -334,11 +344,7 @@ async function createReturn(target, config = {}) {
     modifyPortal(portal, target);
 
     const sequence = new Sequence();
-    if (sound.enabled) {
-        sequence.sound()
-            .file(closest('psfx.2nd-level-spells.moonbeam.intro'))
-            .volume(sound.volume)
-    }
+    applySound(sequence, sound?.return ?? sound);
     sequence.effect()
         .file(closest(`jb2a.explosion.01.${portal.color}`))
         .atLocation(target, { offset: { x: 5, y: -75 } })
@@ -406,4 +412,4 @@ export const banishment = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("banishment", "effect", "eskie.effect.banishment", DEFAULT_CONFIG, '2.0.1', "Banishment");
+autorec.register("banishment", "effect", "eskie.effect.banishment", DEFAULT_CONFIG, '2.0.2', "Banishment");

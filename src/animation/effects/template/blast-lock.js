@@ -9,13 +9,15 @@ import { template as templatelib } from '../../../lib/templates.js';
 import { socket } from '../../../adapters/modules/socketlib/socketlib-module-adapter.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 
 const DEFAULT_CONFIG = {
     id: 'blastLock',
     radius: 3, // in grid units
     sound: {
-        enabled: true,
+        ...DEFAULT_SOUND_CONFIG,
+        enable: true,
         volume: 0.5,
         file: `psfx.cantrips.thunderclap.v1`,
     },
@@ -106,11 +108,7 @@ async function create(token, config = {}) {
         .zIndex(11)
 
         // Weapon Shot
-        if (sound.enabled) {
-            seq.sound()
-                .file(closest(sound.file))
-                .volume(sound.volume);
-        }
+        applySound(seq, sound);
 
         seq.effect()
         .delay(225)
@@ -178,4 +176,4 @@ export const blastLock = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("blastLock", "template", "eskie.effect.blastLock", DEFAULT_CONFIG, "0.0.0", "Blast Lock");
+autorec.register("blastLock", "template", "eskie.effect.blastLock", DEFAULT_CONFIG, "0.0.1", "Blast Lock");

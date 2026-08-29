@@ -46,8 +46,10 @@ When a user asks to convert an effect from the `src/animation/` directory into a
      ```
 7. **Canonical Sequencer Options**:
    - Use `bindRotation: false` (not `followRotation: false`) inside `.attachTo()` or `.atLocation()` option objects.
-8. **Preserve Audio Sequences**:
-   - Do not omit `.sound(...)` sequences present in the modular effect source. Include sound volume/enable settings.
+8. **Preserve Audio Sequences & Sound Configuration**:
+   - Do not omit sound sequences present in the modular effect source.
+   - Standardize sound configuration strictly on `enable` (never `enabled`).
+   - Support `file`, `delay`, `volume`, `fadeIn`, `fadeOut`, `startTime`, `endTime`, and `timeRange`.
 9. **Set up Target/Source Variables**: 
    - In a module, `source`, `token`, or `target` are passed as arguments.
    - In a macro, define these at the top of the script using Foundry globals (e.g. `const token = canvas.tokens.controlled[0];` or `const target = game.user.targets.first();`).

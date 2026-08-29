@@ -6,13 +6,15 @@
 import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
 import { autorec } from "../../../adapters/modules/autorec/autorec.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
     id: 'banish',
     color: 'yellow',
     sound: {
-        enabled: true,
-        volume: 0.5,
+        ...DEFAULT_SOUND_CONFIG,
+        enable: false,
+        file: '',
     }
 };
 
@@ -23,6 +25,7 @@ async function createBanish(target, config = {}) {
     // ... animation logic omitted for brevity in template, see complete file ...
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
     // sequence construction...
 
     return sequence;
@@ -38,6 +41,7 @@ async function createReturn(target, config = {}) {
     const { color, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
     // sequence construction...
     return sequence;
 }

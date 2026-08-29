@@ -44,17 +44,37 @@ When asked to update scripts in the `new-submissions` folder or to convert Disco
     *   Inside `create`, `play`, and `stop`, use `foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false })` for safe configuration management.
     *   Example: `const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });`
 *   **Helper Functions:** Extract complex sequences of effects into smaller, logically grouped helper functions (e.g., `_castSpellEffects(sequence, token)`).
-*   **Sound Configuration Pattern:**
-    *   If an animation includes sound effects, you MUST include a `sound` object in the `DEFAULT_CONFIG`:
+*   **Sound Configuration Pattern (Default Addition):**
+    *   EVERY converted or new animation MUST include a `sound` section in `DEFAULT_CONFIG` by default (even if currently unconfigured), ready for user and GM audio customization.
+    *   Import `{ applySound, DEFAULT_SOUND_CONFIG }` from `'../../utils/sound.js'` (adjusting the relative path as necessary).
+    *   In `DEFAULT_CONFIG`, include a default sound section using `DEFAULT_SOUND_CONFIG`:
         ```javascript
         sound: {
-            enabled: true,
-            volume: 0.5,
+            ...DEFAULT_SOUND_CONFIG,
+            enable: false,
+            file: '',
         }
         ```
-    *   All `.sound()` calls MUST be wrapped in an `if (sound.enabled)` block.
-    *   The `.volume()` of every sound effect MUST be multiplied by `sound.volume` (e.g., `.volume(sound.volume)` or `.volume(sound.volume * 0.8)` if it needs a relative adjustment).
-    *   You MUST import `{ settingsOverride }` from `'../../../lib/settings.js'` (adjusting the relative path as necessary) and call `config = settingsOverride(config);` at the very beginning of the `create` (and `play`, if it merges config) function to ensure global sound settings are respected.
+    *   **Standard Sound Properties Contract**:
+        1. `enable` (boolean): Canonical boolean flag (`true`/`false`). Never use `enabled`.
+        2. `file` (string): Sequencer database key or audio file path.
+        3. `delay` (number): Start delay in ms.
+        4. `volume` (number): Playback volume (0.0 to 1.0, default 0.5).
+        5. `fadeIn` (number): Audio fade-in duration in ms.
+        6. `fadeOut` (number): Audio fade-out duration in ms.
+        7. `startTime` / `endTime` / `timeRange`: Audio timestamp clipping in ms.
+        8. `repeats`: Repeat count or `[count, delayMin, delayMax]`.
+    *   **Existing Sound Paths vs Unconfigured Animations**:
+        *   If the legacy script already had established sound effects, populate the `file` path, set `enable: true`, and preserve volume/delay. If multiple sounds are warranted (e.g. `intro` / `outro` or `charge` / `impact`), define named sub-objects or an array in `sound`.
+        *   If the legacy script did NOT have sound effects, do NOT recommend or invent specific sounds. Simply provide the default unconfigured sound section (`enable: false, file: ''`).
+    *   **Apply Sound via Sequence Helper**:
+        *   Pass the sequence and sound config directly into `applySound`:
+            ```javascript
+            applySound(sequence, sound);
+            ```
+        *   For multi-sound animations, pass the corresponding sound sub-object at the appropriate point in the sequence: `applySound(sequence, sound?.charge ?? sound);`.
+    *   **Settings Override**:
+        *   Import `{ settingsOverride }` from `'../../../lib/settings.js'` and call `config = settingsOverride(config);` at the start of `create` (and `play`, if it merges config) so global audio settings override disabled sounds.
 
 ## API Updates
 

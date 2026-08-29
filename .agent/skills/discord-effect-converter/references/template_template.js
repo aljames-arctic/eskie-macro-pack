@@ -4,13 +4,21 @@
 import { closest } from '../../../lib/filemanager.js';
 import { templates } from '../../../lib/templates.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec.js';
+import { settingsOverride } from '../../../lib/settings.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'TemplateEffectName',
     targets: [],
+    sound: {
+        ...DEFAULT_SOUND_CONFIG,
+        enable: false,
+        file: '',
+    },
 };
 
 async function create(source, config = {}) {
+    config = settingsOverride(config);
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     
     // 1. Template Position Extraction
@@ -25,6 +33,7 @@ async function create(source, config = {}) {
     }
 
     const sequence = new Sequence();
+    applySound(sequence, mConfig.sound);
 
     // 2. Base Cast / Template Animation
     const castSeq = new Sequence()

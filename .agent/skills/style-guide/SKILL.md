@@ -86,7 +86,30 @@ When writing or modifying code in the `eskie-macro-pack` repository, adhere stri
 *   **`scaleToObject` Convention:** Always use `.scaleToObject(scale, { considerTokenScale: true })`.
 *   **Zero Sequence Path Hallucinations:** Always verify database keys against standard JB2A / Sequencer naming conventions.
 
-## 9. Automated Linting
+## 9. Sound Configuration Standards (Default Addition)
+
+*   **Default Addition:** Every animation effect module MUST include a `sound` section in `DEFAULT_CONFIG` by default (using `DEFAULT_SOUND_CONFIG` from `src/animation/utils/sound.js`), hooked up via `applySound(sequence, sound)`.
+*   **Canonical Flag (`enable`):** Standardize strictly on `enable: boolean`. Never use `enabled`.
+*   **Standard Sound Properties:**
+    1. `enable` (boolean): `true`/`false`. Default is `false` if unconfigured.
+    2. `file` (string): Sequencer audio database path or URI (e.g. `'psfx.cantrips.thunderclap.v1'`).
+    3. `delay` (number): Audio delay in ms.
+    4. `volume` (number): Audio playback volume (0.0 to 1.0, default 0.5).
+    5. `fadeIn` (number): Audio fade-in duration in ms.
+    6. `fadeOut` (number): Audio fade-out duration in ms.
+    7. `startTime` / `endTime` / `timeRange`: Audio timestamp clipping in ms.
+    8. `repeats`: Repeat count or `[count, delayMin, delayMax]`.
+*   **Helper Integration:** Pass sequence and sound configuration directly to `applySound`:
+    ```javascript
+    import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
+    // in create():
+    applySound(sequence, sound);
+    ```
+*   **Multi-Sound Support:** When an animation features multiple distinct sound cues (e.g. `intro`, `impact`, `outro`), define named sub-objects or an array in `DEFAULT_CONFIG.sound` and invoke `applySound` at the respective cue in the sequence.
+*   **Zero Hallucinated Sounds:** For animations that do not have an existing audio effect, provide the unconfigured sound section (`enable: false, file: ''`); do not guess or recommend speculative audio paths.
+*   **Settings Override:** Always wrap incoming configs with `config = settingsOverride(config);` at the top of `create()` to respect global module audio settings.
+
+## 10. Automated Linting
 
 *   Before finalizing code changes, run the linter script on any modified JavaScript files:
     ```bash

@@ -61,6 +61,9 @@ test('RecommendedModulesApp inherits from ApplicationV2 with HandlebarsApplicati
     const context = await app._prepareContext();
     assert.ok(Array.isArray(context.categories));
     assert.ok(context.categories.some(c => c.id === 'assets'));
+    const autoCategory = context.categories.find(c => c.id === 'automation');
+    assert.ok(autoCategory);
+    assert.ok(autoCategory.modules.some(m => m.id === 'boss-loot-assets-premium'));
 });
 
 test('ConfigureAutorecApp inherits from ApplicationV2 with HandlebarsApplicationMixin and manages module visibility', async () => {

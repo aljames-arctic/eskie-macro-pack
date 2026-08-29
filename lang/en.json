@@ -132,6 +132,10 @@
                 "autoanimations": {
                     "name": "Automated Animations",
                     "description": "Automatically triggers EMP spell and item animations when actions, rolls, or attacks are performed in supported game systems."
+                },
+                "bossLootFx": {
+                    "name": "Boss Loot FX (Patreon)",
+                    "description": "Automatically triggers EMP spell and attack animations in Foundry v14+ using Boss Loot FX Custom Auto-Recognition."
                 }
             }
         },

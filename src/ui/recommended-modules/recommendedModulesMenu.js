@@ -114,6 +114,12 @@ export const RECOMMENDED_CATEGORIES = [
                 name: "EMP.recommendedModules.modules.autoanimations.name",
                 description: "EMP.recommendedModules.modules.autoanimations.description",
                 icon: "fa-solid fa-bolt"
+            },
+            {
+                id: "boss-loot-assets-premium",
+                name: "EMP.recommendedModules.modules.bossLootFx.name",
+                description: "EMP.recommendedModules.modules.bossLootFx.description",
+                icon: "fa-solid fa-dragon"
             }
         ]
     }

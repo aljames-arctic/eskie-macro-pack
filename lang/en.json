@@ -12,7 +12,7 @@
             },
             "autorecUpdate": {
                 "name": "Update Automated Animations Autorecognition",
-                "label": "Update AA Autorec",
+                "label": "Sync to Auto Animations",
                 "hint": "Force an update of the Automated Animations Autorecognition."
             },
             "configureAutorec": {
@@ -210,6 +210,8 @@
             "aaDescription": "Review and synchronize Eskie Macro Pack's custom animation presets with Automated Animations.",
             "blfxTitle": "Boss Loot FX (Patreon)",
             "blfxDescription": "Review and synchronize Eskie Macro Pack's custom auto-recognition presets with Boss Loot FX on Foundry v14+.",
+            "syncAaButton": "Sync to Auto Animations",
+            "syncBlfxButton": "Sync to Boss Loot FX",
             "saveButton": "Save Target",
             "closeButton": "Close",
             "savedNotify": "Auto-recognition settings saved successfully."
@@ -223,6 +225,8 @@
             "blfxTitle": "Boss Loot FX (Patreon)",
             "blfxDescription": "Review and synchronize Eskie Macro Pack's custom auto-recognition presets with Boss Loot FX on Foundry v14+.",
             "syncButton": "Sync Presets",
+            "syncAaButton": "Sync to Auto Animations",
+            "syncBlfxButton": "Sync to Boss Loot FX",
             "targetSectionTitle": "Configure Autorec Target",
             "targetSectionHint": "Both Automated Animations and Boss Loot FX (Patreon) are active on Foundry v14+. Choose which automation system Eskie Macro Pack should prioritize and register presets to by default.",
             "targetLabel": "Autorec Target",

@@ -21,10 +21,29 @@ test('AutorecUpdateApp inherits from ApplicationV2 with HandlebarsApplicationMix
     const app = new AutorecUpdateApp({});
     assert.ok(app);
     assert.equal(AutorecUpdateApp.DEFAULT_OPTIONS.id, 'empAutorecUpdateMenu');
+    assert.equal(AutorecUpdateApp.DEFAULT_OPTIONS.position.width, 980);
 
     const rendered = await app.render(true);
     assert.equal(rendered.rendered, true);
     await app.close();
+});
+
+test('groupAAEntriesBySection groups entries into 5-column compatible sections in preferred order', async () => {
+    const { groupAAEntriesBySection } = await import('../../src/ui/autoanimations/updateMenu.js');
+    const sections = groupAAEntriesBySection({
+        templatefx: [{ id: 't1', label: 'Teleport', metaData: { version: '1.0.0' } }],
+        melee: [{ id: 'm1', label: 'Dagger (Melee)', metaData: { version: '1.0.0' } }],
+        aura: [{ id: 'a1', label: 'Twilight Sanctuary', metaData: { version: '1.0.0' } }]
+    });
+
+    assert.equal(sections.length, 3);
+    assert.equal(sections[0].sectionId, 'melee');
+    assert.equal(sections[0].sectionName, 'Melee Attacks');
+    assert.equal(sections[1].sectionId, 'templatefx');
+    assert.equal(sections[1].sectionName, 'Templates');
+    assert.equal(sections[2].sectionId, 'aura');
+    assert.equal(sections[2].sectionName, 'Auras');
+    assert.equal(sections[1].entries[0].label, 'Teleport');
 });
 
 test('WorldScriptsApp inherits from ApplicationV2 with HandlebarsApplicationMixin', async () => {

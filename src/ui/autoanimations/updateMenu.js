@@ -72,6 +72,10 @@ export async function generateAutorecUpdate(autorec, excludedIds = new Set()) {
     const updatedEntriesList = Object.values(updatedEntries).flat().map(formatEntry).sort((a, b) => a.label.localeCompare(b.label));
     const customEntriesList = Object.values(custom).flat().map(formatEntry).sort((a, b) => a.label.localeCompare(b.label));
 
+    const missingSections = groupAAEntriesBySection(missingEntries);
+    const updatedSections = groupAAEntriesBySection(updatedEntries);
+    const customSections = groupAAEntriesBySection(custom);
+
     // Construct the new settings that will be saved (filtering out excluded missing entries)
     let newSettings = {};
     for (const key of menuKeys) {
@@ -102,7 +106,51 @@ export async function generateAutorecUpdate(autorec, excludedIds = new Set()) {
         missingEntriesList,
         updatedEntriesList,
         customEntriesList,
+        missingSections,
+        updatedSections,
+        customSections,
     };
+}
+
+/**
+ * Standard configuration for Automated Animations categories and display order.
+ */
+export const AA_SECTION_CONFIG = [
+    { id: "melee", name: "Melee Attacks", icon: "fa-solid fa-hand-fist" },
+    { id: "range", name: "Ranged Attacks", icon: "fa-solid fa-bullseye" },
+    { id: "ontoken", name: "On Token", icon: "fa-solid fa-user" },
+    { id: "templatefx", name: "Templates", icon: "fa-solid fa-shapes" },
+    { id: "aura", name: "Auras", icon: "fa-solid fa-sun" },
+    { id: "aefx", name: "Active Effects", icon: "fa-solid fa-wand-magic-sparkles" },
+    { id: "preset", name: "Presets", icon: "fa-solid fa-film" }
+];
+
+/**
+ * Groups AA entries into standardized visual sections matching the BLFX menu structure.
+ * @param {object} entriesByCategory Dictionary of arrays keyed by AA category
+ * @returns {Array<{sectionId: string, sectionName: string, icon: string, entries: Array<object>}>}
+ */
+export function groupAAEntriesBySection(entriesByCategory = {}) {
+    const sections = [];
+    for (const conf of AA_SECTION_CONFIG) {
+        const rawList = entriesByCategory[conf.id];
+        if (!rawList || !rawList.length) continue;
+
+        const entries = rawList.map(e => ({
+            id: e.id,
+            label: e.label,
+            menu: conf.id,
+            version: e.metaData?.version ?? "0.0.0"
+        })).sort((a, b) => a.label.localeCompare(b.label));
+
+        sections.push({
+            sectionId: conf.id,
+            sectionName: conf.name,
+            icon: conf.icon,
+            entries
+        });
+    }
+    return sections;
 }
 
 /**
@@ -122,7 +170,7 @@ export class AutorecUpdateApp extends foundryPlatform.HandlebarsApplicationMixin
             title: "EMP.updateMenu.menuTitle"
         },
         position: {
-            width: 640,
+            width: 980,
             height: "auto"
         },
         form: {
@@ -148,14 +196,20 @@ export class AutorecUpdateApp extends foundryPlatform.HandlebarsApplicationMixin
             missingEntriesList,
             updatedEntriesList,
             customEntriesList,
+            missingSections,
+            updatedSections,
+            customSections,
         } = await this.settings();
 
-        const hasChanges = Boolean(missingEntriesList.length || updatedEntriesList.length || customEntriesList.length);
+        const hasChanges = Boolean(missingEntriesList?.length || updatedEntriesList?.length || customEntriesList?.length);
 
         return {
             missingEntries: missingEntriesList,
             updatedEntries: updatedEntriesList,
             customEntries: customEntriesList,
+            missingSections: missingSections ?? [],
+            updatedSections: updatedSections ?? [],
+            customSections: customSections ?? [],
             hasChanges
         };
     }

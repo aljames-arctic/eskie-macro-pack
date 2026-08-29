@@ -13,56 +13,86 @@
 
     <div class="eskie-aa-update-scroll-area">
         {{#if hasChanges}}
-            {{#if missingEntries.length}}
+            {{#if missingSections.length}}
             <div class="eskie-aa-update-card added">
                 <div class="eskie-aa-card-header">
                     <i class="fa-solid fa-circle-plus"></i>
                     <h3>{{localize "EMP.updateMenu.added"}}</h3>
                 </div>
-                <div class="eskie-aa-chip-grid">
-                    {{#each missingEntries}}
-                    <label class="eskie-aa-chip toggleable">
-                        <input type="checkbox" name="missing_{{id}}" checked />
-                        <span class="eskie-chip-label">{{label}}</span>
-                        <span class="eskie-chip-menu">{{menu}}</span>
-                    </label>
-                    {{/each}}
+                
+                {{#each missingSections}}
+                <div class="eskie-blfx-trigger-group">
+                    <div class="eskie-blfx-section-divider">
+                        <span>{{sectionName}}</span>
+                    </div>
+                    <div class="eskie-aa-chip-grid blfx-grid">
+                        {{#each entries}}
+                        <label class="eskie-aa-chip blfx-chip toggleable" title="{{label}}">
+                            <input type="checkbox" name="missing_{{id}}" checked />
+                            <div class="eskie-blfx-chip-content">
+                                <span class="eskie-chip-item-name">{{label}}</span>
+                            </div>
+                        </label>
+                        {{/each}}
+                    </div>
                 </div>
+                {{/each}}
             </div>
             {{/if}}
 
-            {{#if updatedEntries.length}}
+            {{#if updatedSections.length}}
             <div class="eskie-aa-update-card updated">
                 <div class="eskie-aa-card-header">
                     <i class="fa-solid fa-arrows-rotate"></i>
                     <h3>{{localize "EMP.updateMenu.updated"}}</h3>
                 </div>
-                <div class="eskie-aa-chip-grid">
-                    {{#each updatedEntries}}
-                    <div class="eskie-aa-chip">
-                        <span class="eskie-chip-label">{{label}}</span>
-                        <span class="eskie-chip-menu">{{menu}}</span>
+                
+                {{#each updatedSections}}
+                <div class="eskie-blfx-trigger-group">
+                    <div class="eskie-blfx-section-divider">
+                        <span>{{sectionName}}</span>
                     </div>
-                    {{/each}}
+                    <div class="eskie-aa-chip-grid blfx-grid">
+                        {{#each entries}}
+                        <div class="eskie-aa-chip blfx-chip" title="{{label}}">
+                            <div class="eskie-blfx-chip-content">
+                                <span class="eskie-chip-item-name">{{label}}</span>
+                                {{#if version}}
+                                <span class="eskie-chip-effect-name">v{{version}}</span>
+                                {{/if}}
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
                 </div>
+                {{/each}}
             </div>
             {{/if}}
 
-            {{#if customEntries.length}}
+            {{#if customSections.length}}
             <div class="eskie-aa-update-card conflict">
                 <div class="eskie-aa-card-header">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                     <h3>{{localize "EMP.updateMenu.custom"}}</h3>
                 </div>
                 <p class="eskie-aa-card-hint">{{localize "EMP.updateMenu.customHint"}}</p>
-                <div class="eskie-aa-chip-grid">
-                    {{#each customEntries}}
-                    <div class="eskie-aa-chip">
-                        <span class="eskie-chip-label">{{label}}</span>
-                        <span class="eskie-chip-menu">{{menu}}</span>
+                
+                {{#each customSections}}
+                <div class="eskie-blfx-trigger-group">
+                    <div class="eskie-blfx-section-divider">
+                        <span>{{sectionName}}</span>
                     </div>
-                    {{/each}}
+                    <div class="eskie-aa-chip-grid blfx-grid">
+                        {{#each entries}}
+                        <div class="eskie-aa-chip blfx-chip" title="{{label}}">
+                            <div class="eskie-blfx-chip-content">
+                                <span class="eskie-chip-item-name">{{label}}</span>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
                 </div>
+                {{/each}}
             </div>
             {{/if}}
 

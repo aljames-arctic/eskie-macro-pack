@@ -85,20 +85,20 @@ test('blfx.register populates activityName, activityType, and animation slots wi
     assert.equal(entry.animationData.thirdAnimation.fileName, 'blfx.spell.cast.circles2.energy1.smoke.orange');
 });
 
-test('divineStrike registers into BLFX under afterDamage with Attack Melee / Attack Ranged macroType', async () => {
+test('divineStrike registers into BLFX under afterAttack with Attack Melee / Attack Ranged macroType', async () => {
     await import('../../src/animation/effects/target/divine-strike.js');
 
-    assert.ok(EMP_BLFX_Registry['dnd5e']['melee-divine-strike']['default']['afterDamage']);
-    const meleeEntry = EMP_BLFX_Registry['dnd5e']['melee-divine-strike']['default']['afterDamage'];
-    assert.equal(meleeEntry.triggerName, 'After Damage Roll');
+    assert.ok(EMP_BLFX_Registry['dnd5e']['melee-divine-strike']['default']['afterAttack']);
+    const meleeEntry = EMP_BLFX_Registry['dnd5e']['melee-divine-strike']['default']['afterAttack'];
+    assert.equal(meleeEntry.triggerName, 'After Attack Roll');
     assert.equal(meleeEntry.animationData.macroType, 'Attack Melee');
-    assert.equal(meleeEntry.note, 'Eskie Macro Pack (0.0.2)');
+    assert.equal(meleeEntry.note, 'Eskie Macro Pack (0.0.3)');
 
-    assert.ok(EMP_BLFX_Registry['dnd5e']['ranged-divine-strike']['default']['afterDamage']);
-    const rangedEntry = EMP_BLFX_Registry['dnd5e']['ranged-divine-strike']['default']['afterDamage'];
-    assert.equal(rangedEntry.triggerName, 'After Damage Roll');
+    assert.ok(EMP_BLFX_Registry['dnd5e']['ranged-divine-strike']['default']['afterAttack']);
+    const rangedEntry = EMP_BLFX_Registry['dnd5e']['ranged-divine-strike']['default']['afterAttack'];
+    assert.equal(rangedEntry.triggerName, 'After Attack Roll');
     assert.equal(rangedEntry.animationData.macroType, 'Attack Ranged');
-    assert.equal(rangedEntry.note, 'Eskie Macro Pack (0.0.2)');
+    assert.equal(rangedEntry.note, 'Eskie Macro Pack (0.0.3)');
 });
 
 test('resolveBlfxMacroType strictly adheres to valid BLFX macroType contracts with zero generic fallbacks', () => {

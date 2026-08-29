@@ -46,8 +46,8 @@
                 "hint": "Force synchronization of Eskie Macro Pack custom effects into Boss Loot FX Custom Auto-Rec."
             },
             "recommendedModules": {
-                "name": "Recommended Modules Guide",
-                "label": "View Recommended Modules",
+                "name": "Companion Modules Guide",
+                "label": "View Companion Modules",
                 "hint": "View companion modules that provide assets, audio, and functionality for Eskie Macro Pack."
             },
             "generateCompendiums": {
@@ -67,7 +67,7 @@
             }
         },
         "recommendedModules": {
-            "menuTitle": "Eskie Macro Pack - Recommended Companion Modules",
+            "menuTitle": "Eskie Macro Pack - Companion Modules",
             "menuHint": "The following modules enhance Eskie Macro Pack by supplying visual assets, audio effects, animations, or advanced automation.",
             "closeButton": "Close Guide",
             "status": {

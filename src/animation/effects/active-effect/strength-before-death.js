@@ -2,7 +2,7 @@
 //Author: .eskie
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/index.js';
 
 const DEFAULT_CONFIG = {
     id: "Strength Before Death",

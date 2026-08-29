@@ -6,7 +6,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/index.js";
 import { log } from "../../../lib/logger.js";
 
 const DEFAULT_CONFIG = {

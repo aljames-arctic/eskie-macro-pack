@@ -1,5 +1,5 @@
 import { MODULE_ID } from "../../lib/constants.js";
-import { EMP_BLFX_Registry } from "../../adapters/modules/blfx/blfx.js";
+import { EMP_BLFX_Registry } from "../../adapters/modules/blfx/index.js";
 import { log } from '../../lib/logger.js';
 import { BaseFoundryAdapter } from '../../adapters/foundry/index.js';
 

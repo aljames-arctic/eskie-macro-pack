@@ -1,5 +1,5 @@
 import { MODULE_ID } from "../../lib/constants.js";
-import { EMP_AA_Menu } from "../../adapters/modules/autoanimations/autoanimations.js";
+import { EMP_AA_Menu } from "../../adapters/modules/autoanimations/index.js";
 import { log } from '../../lib/logger.js';
 import { BaseFoundryAdapter } from '../../adapters/foundry/index.js';
 

@@ -1,7 +1,7 @@
 import { closest } from "../../../lib/filemanager.js";
 import { adapter } from "../../../adapters/index.js";
 import { blur } from "../../scene-overlays/status-blur.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/index.js";
 import { log } from '../../../lib/logger.js';
 
 /* **

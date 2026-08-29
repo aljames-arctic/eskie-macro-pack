@@ -1,4 +1,4 @@
-import { autorec, CONCENTRATING } from "../../../../adapters/modules/autorec/autorec.js";
+import { autorec, CONCENTRATING } from "../../../../adapters/modules/autorec/index.js";
 
 import { rageV1 as v1, DEFAULT_CONFIG as config_v1} from "./rage_v1.js";
 import { electric as v2, DEFAULT_CONFIG as config_v2} from "./rage-electric.js";

@@ -4,7 +4,7 @@
 import { time } from '../../lib/time.js';
 import { absolutePath } from '../../lib/filemanager.js';
 import { dependency } from '../../lib/dependency.js';
-import { socket, socketlib } from '../../adapters/modules/socketlib/socketlib.js';
+import { socket, socketlib } from '../../adapters/modules/socketlib/index.js';
 import { MODULE_ID } from '../../lib/constants.js';
 import { log } from '../../lib/logger.js';
 import { adapter } from '../../adapters/index.js';

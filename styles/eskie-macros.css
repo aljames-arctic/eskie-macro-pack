@@ -849,7 +849,22 @@ input:checked + .eskie-slider:before {
 }
 
 .eskie-manage-autorec-form .eskie-script-card {
-    cursor: pointer;
+    cursor: default;
+    align-items: stretch;
+}
+
+.eskie-manage-autorec-form .eskie-card-icon-wrapper {
+    align-self: center;
+}
+
+.eskie-manage-autorec-form .eskie-card-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 8px;
+    align-self: stretch;
+    flex-shrink: 0;
 }
 
 .eskie-card-actions {

@@ -21,11 +21,11 @@ function getVersion(config = {}) {
 
     // Merge the DEFAULT_CONFIG with our possibly modified input config
     const map = [ 
-        {fn: v1, cfg: adapter.mergeObject(config_v1, { sound, ...(config.config_v1 ?? {}) })},
-        {fn: v2, cfg: adapter.mergeObject(config_v2, { sound, ...(config.config_v2 ?? {}) })},
-        {fn: v3, cfg: adapter.mergeObject(config_v3, { sound, ...(config.config_v3 ?? {}) })},
-        {fn: v4, cfg: adapter.mergeObject(config_v4, { sound, ...(config.config_v4 ?? {}) })},
-        {fn: v5, cfg: adapter.mergeObject(config_v5, { sound, ...(config.config_v5 ?? {}) })},
+        {fn: v1, cfg: adapter.mergeObject(config_v1, (config.config_v1 ?? {}))},
+        {fn: v2, cfg: adapter.mergeObject(config_v2, (config.config_v2 ?? {}))},
+        {fn: v3, cfg: adapter.mergeObject(config_v3, (config.config_v3 ?? {}))},
+        {fn: v4, cfg: adapter.mergeObject(config_v4, (config.config_v4 ?? {}))},
+        {fn: v5, cfg: adapter.mergeObject(config_v5, (config.config_v5 ?? {}))},
     ];
     
     if ( version > map.length || version <= 0 ) return;

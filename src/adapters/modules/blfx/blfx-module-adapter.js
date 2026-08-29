@@ -479,16 +479,17 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
             return;
         }
 
-        if (!this.isCustomAutoRecUpdatesEnabled()) {
-            log.warn("EMP | Boss Loot FX Custom Auto-Rec updates are disabled in game settings (boss-loot-assets-premium.blfxCustomAutoRecUpdates).");
-            await this.promptEnableBlfxUpdates();
-            return;
-        }
-
         log.debug(`EMP | Checking Boss Loot FX Custom Auto-Rec (version: ${effectiveVersion})...`);
 
         const { missingEntries, updatedEntries, customEntries } = await generateBlfxAutorecUpdate(this.registry);
-        if (missingEntries.length || updatedEntries.length || customEntries.length) {
+        const hasChanges = Boolean(missingEntries.length || updatedEntries.length || customEntries.length);
+
+        if (hasChanges) {
+            if (!this.isCustomAutoRecUpdatesEnabled()) {
+                log.warn("EMP | Boss Loot FX Custom Auto-Rec updates are disabled in game settings (boss-loot-assets-premium.blfxCustomAutoRecUpdates).");
+                await this.promptEnableBlfxUpdates();
+                return;
+            }
             new BlfxAutorecUpdateFormApplication(this.registry).render(true);
         } else {
             log.info(localize("EMP.blfxUpdateMenu.nothing", "All Eskie Macro Pack animations are up to date in Boss Loot FX!"));

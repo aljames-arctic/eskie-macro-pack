@@ -212,3 +212,51 @@ test('BlfxEnableUpdatesDialog inherits from ApplicationV2 and promptEnableBlfxUp
     assert.equal(rendered.rendered, true);
     await rendered.close();
 });
+
+test('BlfxModuleAdapter.submit scans first and only prompts when new animations exist and updates are disabled', async () => {
+    const { blfxAdapter } = await import('../../src/adapters/modules/blfx/blfx.js');
+
+    let promptCalled = false;
+    const origPrompt = blfxAdapter.promptEnableBlfxUpdates;
+    blfxAdapter.promptEnableBlfxUpdates = async () => {
+        promptCalled = true;
+    };
+
+    // Ensure BLFX autorec is available
+    const origIsAutorec = blfxAdapter.isAutorecSupported;
+    blfxAdapter.isAutorecSupported = () => true;
+
+    // Simulate updates disabled
+    const origIsEnabled = blfxAdapter.isCustomAutoRecUpdatesEnabled;
+    blfxAdapter.isCustomAutoRecUpdatesEnabled = () => false;
+
+    // Case 1: Registry has NO changes compared to existing data
+    const origRegistry = { ...blfxAdapter.registry };
+    for (const k of Object.keys(blfxAdapter.registry)) delete blfxAdapter.registry[k];
+
+    await blfxAdapter.submit(true);
+    assert.equal(promptCalled, false, 'Should NOT prompt when there are no new animations');
+
+    // Case 2: Registry HAS new animations and updates are disabled
+    blfxAdapter.registry['dnd5e'] = {
+        newSpell: {
+            default: {
+                afterAttack: {
+                    animationName: 'New Spell',
+                    note: 'Eskie Macro Pack (9.9.9)',
+                    animationData: { command: '// test' }
+                }
+            }
+        }
+    };
+
+    await blfxAdapter.submit(true);
+    assert.equal(promptCalled, true, 'SHOULD prompt when new animations exist and updates are disabled');
+
+    // Restore
+    blfxAdapter.promptEnableBlfxUpdates = origPrompt;
+    blfxAdapter.isAutorecSupported = origIsAutorec;
+    blfxAdapter.isCustomAutoRecUpdatesEnabled = origIsEnabled;
+    for (const k of Object.keys(blfxAdapter.registry)) delete blfxAdapter.registry[k];
+    Object.assign(blfxAdapter.registry, origRegistry);
+});

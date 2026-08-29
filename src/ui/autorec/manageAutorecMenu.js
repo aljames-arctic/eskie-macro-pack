@@ -2,11 +2,12 @@ import { MODULE_ID } from "../../lib/constants.js";
 import { log } from '../../lib/logger.js';
 import { BaseFoundryAdapter } from "../../adapters/foundry/index.js";
 import { autorecUpdateFormApplication } from "../autoanimations/updateMenu.js";
-import { BlfxAutorecUpdateFormApplication } from "../blfx/updateMenu.js";
+import { BlfxAutorecUpdateFormApplication, generateBlfxAutorecUpdate } from "../blfx/updateMenu.js";
 import {
     isBlfxAutorecAvailable,
     isBlfxCustomAutoRecUpdatesEnabled,
-    promptEnableBlfxUpdates
+    promptEnableBlfxUpdates,
+    blfxAdapter
 } from "../../adapters/modules/blfx/blfx-module-adapter.js";
 
 const foundryPlatform = new BaseFoundryAdapter();
@@ -85,7 +86,9 @@ export class ConfigureAutorecApp extends foundryPlatform.HandlebarsApplicationMi
         const syncBlfxBtn = this.element?.querySelector('button[name="syncBlfx"]');
         syncBlfxBtn?.addEventListener('click', async (event) => {
             event.preventDefault();
-            if (!isBlfxCustomAutoRecUpdatesEnabled()) {
+            const { missingEntries, updatedEntries, customEntries } = await generateBlfxAutorecUpdate(blfxAdapter.registry);
+            const hasChanges = Boolean(missingEntries.length || updatedEntries.length || customEntries.length);
+            if (hasChanges && !isBlfxCustomAutoRecUpdatesEnabled()) {
                 await promptEnableBlfxUpdates();
                 return;
             }

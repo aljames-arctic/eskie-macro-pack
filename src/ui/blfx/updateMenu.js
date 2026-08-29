@@ -279,6 +279,7 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
     }
 
     const newPayload = {
+        name: "BLFX Custom Auto-Rec",
         flags: {
             "boss-loot-assets-premium": {
                 customAutoRecognition: true

@@ -257,6 +257,7 @@ if (effect?.play && token) {
  */
 export function buildBlfxPayload(registry = EMP_BLFX_Registry) {
     return {
+        name: "BLFX Custom Auto-Rec",
         flags: {
             "boss-loot-assets-premium": {
                 customAutoRecognition: true
@@ -332,6 +333,7 @@ export function mergeBlfxCustomAutoRec(existingData, empRegistry = EMP_BLFX_Regi
     }
 
     return {
+        name: "BLFX Custom Auto-Rec",
         flags: {
             "boss-loot-assets-premium": {
                 customAutoRecognition: true

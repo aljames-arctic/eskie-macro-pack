@@ -169,6 +169,29 @@ test('AutorecManager coordinates registration across AA and BLFX adapters', () =
     assert.equal(customBLFX.registry.dnd5e.fireball.default.createTemplate.itemName, 'Fireball');
 });
 
+test('AutorecManager MELEE and RANGED helpers format prefixed keys for dual attack registration', () => {
+    const customAA = new AutoanimationsModuleAdapter();
+    const customBLFX = new BlfxModuleAdapter();
+    const manager = new AutorecManager(customAA, customBLFX);
+
+    const meleeKey = manager.MELEE('dagger', 'Dagger');
+    const rangedKey = manager.RANGED('dagger', 'Dagger');
+
+    assert.equal(meleeKey, '(Melee) Dagger');
+    assert.equal(rangedKey, '(Ranged) Dagger');
+
+    manager.register(meleeKey, 'melee-target', 'eskie.effect.daggerMelee', {}, '1.0.0', meleeKey);
+    manager.register(rangedKey, 'ranged-target', 'eskie.effect.daggerThrown', {}, '1.0.0', rangedKey);
+
+    assert.equal(customAA.menu.melee.length, 1);
+    assert.equal(customAA.menu.melee[0].label, '(Melee) Dagger');
+    assert.equal(customAA.menu.range.length, 1);
+    assert.equal(customAA.menu.range[0].label, '(Ranged) Dagger');
+
+    assert.ok(customBLFX.registry.dnd5e['melee-dagger'].default.afterAttack);
+    assert.ok(customBLFX.registry.dnd5e['ranged-dagger'].default.afterAttack);
+});
+
 test('MassEditModuleAdapter delegates link and removeLinks to MassEdit.linker', async () => {
     const linked = [];
     const unlinked = [];

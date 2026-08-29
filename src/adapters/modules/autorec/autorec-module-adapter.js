@@ -43,6 +43,28 @@ export class AutorecManager {
     }
 
     /**
+     * Formats a key/name for melee attack variants.
+     * @param {string} key The effect key or item name
+     * @param {string} [fallback=key] Human-readable fallback label
+     * @returns {string} Formatted label with (Melee) prefix
+     */
+    MELEE(key, fallback = key) {
+        const localizedName = (typeof key === 'string' && (key.includes(":") || key.includes(" "))) ? key : localize(`EMP.effects.${key}`, fallback);
+        return format("EMP.effects.meleePrefix", { name: localizedName }, `(Melee) ${localizedName}`);
+    }
+
+    /**
+     * Formats a key/name for ranged attack variants.
+     * @param {string} key The effect key or item name
+     * @param {string} [fallback=key] Human-readable fallback label
+     * @returns {string} Formatted label with (Ranged) prefix
+     */
+    RANGED(key, fallback = key) {
+        const localizedName = (typeof key === 'string' && (key.includes(":") || key.includes(" "))) ? key : localize(`EMP.effects.${key}`, fallback);
+        return format("EMP.effects.rangedPrefix", { name: localizedName }, `(Ranged) ${localizedName}`);
+    }
+
+    /**
      * Executes the submission process according to the world's configured autorecTarget.
      * If set to 'ask', prompts the GM to select their desired destination.
      * @param {object} [options={}]
@@ -107,6 +129,14 @@ export function CONCENTRATING(key, fallback = key) {
     return autorecManager.CONCENTRATING(key, fallback);
 }
 
+export function MELEE(key, fallback = key) {
+    return autorecManager.MELEE(key, fallback);
+}
+
+export function RANGED(key, fallback = key) {
+    return autorecManager.RANGED(key, fallback);
+}
+
 export async function submit(options = {}) {
     return autorecManager.submit(options);
 }
@@ -120,6 +150,8 @@ export const autorec = {
     submit,
     promptDestinationDialog,
     CONCENTRATING,
+    MELEE,
+    RANGED,
     autoanimations: autoanimationsAdapter,
     blfx: blfxAdapter
 };

@@ -296,11 +296,11 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
         const localizedLabel = (typeof key === 'string' && (key.includes(":") || key.includes(" "))) ? key : localize(`EMP.effects.${key}`, fallback);
         const itemName = options.itemName ?? localizedLabel ?? String(key ?? 'default');
         const slugName = typeof itemName === 'string' ? itemName : String(itemName);
-        const rawItemSlug = options.itemSlug ?? (foundry.utils?.slugify ? foundry.utils.slugify(slugName) : slugName.toLowerCase().replace(/[^a-z0-9]/g, '-'));
+        const rawItemSlug = options.itemSlug ?? (foundry.utils?.slugify ? foundry.utils.slugify(slugName) : slugName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''));
         const itemSlug = rawItemSlug ? rawItemSlug : 'default-item';
         const activityName = options.activityName ?? "Default";
         const slugAct = typeof activityName === 'string' ? activityName : String(activityName);
-        const rawActivitySlug = options.activitySlug ?? (activityName ? (foundry.utils?.slugify ? foundry.utils.slugify(slugAct) : slugAct.toLowerCase().replace(/[^a-z0-9]/g, '-')) : "default");
+        const rawActivitySlug = options.activitySlug ?? (activityName ? (foundry.utils?.slugify ? foundry.utils.slugify(slugAct) : slugAct.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')) : "default");
         const activitySlug = rawActivitySlug ? rawActivitySlug : 'default';
         const triggerMode = this.standardizeTrigger(trigger, options.blfxTrigger);
         const triggerName = options.triggerName ?? BLFX_TRIGGER_NAMES[triggerMode] ?? triggerMode;

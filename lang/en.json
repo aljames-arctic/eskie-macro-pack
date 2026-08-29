@@ -190,6 +190,8 @@
         },
         "effects": {
             "concentratingPrefix": "Concentrating: {name}",
+            "meleePrefix": "(Melee) {name}",
+            "rangedPrefix": "(Ranged) {name}",
             "angry": "Angry",
             "armsOfHadar": "Arms of Hadar",
             "banishment": "Banishment",

@@ -34,7 +34,7 @@ If the effect meets any of the above criteria, register it at the bottom of the 
 1.  **Import the Autorec Manager:**
     Add the following import at the top of the file (adjusting relative path as necessary):
     ```javascript
-    import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
+    import { autorec, CONCENTRATING, MELEE, RANGED } from '../../../adapters/modules/autorec/autorec.js';
     ```
 
 2.  **Call the register method:**
@@ -48,3 +48,11 @@ If the effect meets any of the above criteria, register it at the bottom of the 
     *   `DEFAULT_CONFIG`: The default configuration object for the effect.
     *   `'1.0.0'`: The initial version string.
     *   `'Display Label'`: Optional display label.
+
+3.  **Dual Melee & Ranged Attack Registration Rule:**
+    When registering both a melee attack and a ranged attack for a single versatile/thrown item (e.g. *Dagger*, *Spear*, *Handaxe*), preface the item name with `(Melee)` or `(Ranged)` respectively (or use `MELEE(...)` and `RANGED(...)` helpers):
+    ```javascript
+    autorec.register(autorec.MELEE("dagger", "Dagger"), "melee-target", "eskie.effect.daggerMelee", DEFAULT_CONFIG, '1.0.0', '(Melee) Dagger');
+    autorec.register(autorec.RANGED("dagger", "Dagger"), "ranged-target", "eskie.effect.daggerThrown", DEFAULT_CONFIG, '1.0.0', '(Ranged) Dagger');
+    ```
+    This ensures both entries are recognized in Automated Animations and stored without collisions in Boss Loot FX.

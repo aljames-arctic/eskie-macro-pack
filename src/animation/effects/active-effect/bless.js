@@ -21,7 +21,7 @@ function createCaster(token, config = {}) {
     let hue = -20;
 
     const sequence = new Sequence();
-    applySound(sequence, sound?.cast ?? sound);
+    applySound(sequence, sound.cast);
         // Effect on the caster
         sequence.effect()
             .file(closest(`jb2a.bless.200px.intro.${color}`))
@@ -112,7 +112,7 @@ function createTarget(target, config = {}) {
     let hue = -20;
 
     const sequence = new Sequence();
-    applySound(sequence, sound?.target ?? sound);
+    applySound(sequence, sound.target);
             // Effects on the targets
             sequence.effect()
                 .copySprite(target)

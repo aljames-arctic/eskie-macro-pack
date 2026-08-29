@@ -20,7 +20,7 @@ function createAura(token, config = {}, options = {}) {
     const label = `${id} - ${token.id}`;
 
     const sequence = new Sequence();
-    applySound(sequence, sound?.aura ?? sound);
+    applySound(sequence, sound.aura);
 
     sequence
         .effect()
@@ -61,7 +61,7 @@ async function playAura(token, config = {}, options = {}) {
 function createDamageEffect(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const sequence = new Sequence();
-    applySound(sequence, mConfig.sound?.damage ?? mConfig.sound);
+    applySound(sequence, mConfig.sound.damage);
     sequence
         .effect()
         .file(closest("jb2a.fireflies.many.02.red"))

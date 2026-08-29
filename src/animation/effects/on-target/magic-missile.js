@@ -22,8 +22,8 @@ async function create(token, target, config = {}) {
     if (spellLevel) mCount = spellLevel + 2;
 
     const seq = new Sequence();
-    applySound(seq, sound?.cast ?? sound);
-    applySound(seq, sound?.launch, 250);
+    applySound(seq, sound.cast);
+    applySound(seq, sound.launch, 250);
 
     // Orbit tuning (grid units)
     const orbitRadius = 0.55;

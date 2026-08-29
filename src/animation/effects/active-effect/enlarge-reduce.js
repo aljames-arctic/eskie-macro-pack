@@ -29,7 +29,7 @@ async function createEnlarge(token, config = {}) {
     const { id, scaleFactor, sound } = mConfig;
 
     const sequence = new Sequence();
-    applySound(sequence, sound?.enlarge ?? sound);
+    applySound(sequence, sound.enlarge);
 
     sequence
         .effect()
@@ -159,7 +159,7 @@ async function createReduce(token, config = {}) {
     const { id, scaleFactor, sound } = mConfig;
 
     const sequence = new Sequence();
-    applySound(sequence, sound?.reduce ?? sound);
+    applySound(sequence, sound.reduce);
 
     sequence
         .effect()

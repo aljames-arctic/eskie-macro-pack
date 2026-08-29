@@ -32,8 +32,8 @@ async function createMelee(token, target, config = {}) {
     let targetSquare = adapter.getNearestSquareCenter(token, target);
 
     let seq = new Sequence();
-    applySound(seq, sound?.attack ?? sound);
-    applySound(seq, sound?.impact, 150);
+    applySound(seq, sound.attack);
+    applySound(seq, sound.impact, 150);
     seq = seq
 
         .effect()
@@ -107,8 +107,8 @@ function createRanged(token, target, config = {}) {
     const { id, color, sound } = mConfig;
 
     let seq = new Sequence();
-    applySound(seq, sound?.attack ?? sound);
-    applySound(seq, sound?.impact, 150);
+    applySound(seq, sound.attack);
+    applySound(seq, sound.impact, 150);
     seq = seq
         .effect()
         .file(closest(`eskie.slice.01_ranged.black.${color.attack}`))

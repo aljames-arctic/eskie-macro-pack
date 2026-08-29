@@ -20,7 +20,7 @@ async function createCast(token, config = {}) {
     const { id, color, sound } = mConfig;
 
     const seq = new Sequence();
-    applySound(seq, sound?.cast ?? sound);
+    applySound(seq, sound.cast);
 
     seq.effect()
         .name(`${id} - ${token.id}`)
@@ -58,7 +58,7 @@ async function createUse(token, config = {}) {
     const { id, color, sound } = mConfig;
 
     const seq = new Sequence();
-    applySound(seq, sound?.use ?? sound);
+    applySound(seq, sound.use);
 
     seq.effect()
         .name(`${id}Use - ${token.id}`)

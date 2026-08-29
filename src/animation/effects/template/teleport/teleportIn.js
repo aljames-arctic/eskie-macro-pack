@@ -2,20 +2,24 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from "../../../../lib/filemanager.js";
-import { applySound } from "../../../utils/sound.js";
-
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../../utils/sound.js";
 import { adapter } from "../../../../adapters/index.js";
+
 const DEFAULT_CONFIG = {
     id: 'TeleportIn',
+    sound: {
+        teleportIn: { ...DEFAULT_SOUND_CONFIG }
+    }
 };
 
 function create(token, targets, config = {}) {
-    const { id, position } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id, position } = mConfig;
     const maxDistance = Math.max(...targets.map(target => 3 * Math.max(Math.abs(target.x - token.x), Math.abs(target.y - token.y)) / canvas.dimensions.size + 1));
     const {x, y} = token.center;
 
     let sequence = new Sequence();
-    applySound(sequence, config.sound?.teleportIn ?? config.sound);
+    applySound(sequence, mConfig.sound.teleportIn);
     sequence = sequence.animation()
         .on(token)
         .teleportTo(position)

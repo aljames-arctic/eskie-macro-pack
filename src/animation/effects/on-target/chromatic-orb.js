@@ -40,8 +40,8 @@ async function create(token, target, config = {}) {
     const effectOffsetY = Math.round((Math.random() - 0.5) * (canvas.grid.size/2));
 
     let seq = new Sequence();
-    applySound(seq, sound?.cast ?? sound);
-    applySound(seq, sound?.impact, effectDuration + 2000);
+    applySound(seq, sound.cast);
+    applySound(seq, sound.impact, effectDuration + 2000);
     seq = seq
         .addNamedLocation("position", { x: target.center.x + effectOffsetX, y: target.center.y + effectOffsetY })
 

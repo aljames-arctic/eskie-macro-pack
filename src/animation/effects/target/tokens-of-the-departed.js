@@ -23,7 +23,7 @@ async function createHarvest(token, target, config = {}) {
     if (!token || !target) return;
 
     const seq = new Sequence();
-    applySound(seq, sound?.harvest ?? sound);
+    applySound(seq, sound.harvest);
 
     seq.effect()
         .delay(50)
@@ -147,7 +147,7 @@ async function createUse(token, target, config = {}) {
 
     const label = `${id}Use - ${target.id}`;
     const seq = new Sequence();
-    applySound(seq, sound?.use ?? sound);
+    applySound(seq, sound.use);
 
     seq.effect()
         .file(closest('jb2a.extras.tmfx.border.circle.outpulse.01.fast'))

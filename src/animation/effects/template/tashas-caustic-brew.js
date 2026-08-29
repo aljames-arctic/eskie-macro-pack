@@ -52,7 +52,7 @@ async function createCast(source, config = {}) {
         if (position.cancelled) return;
     }
     let sequence = new Sequence();
-    applySound(sequence, sound?.cast ?? sound);
+    applySound(sequence, sound.cast);
     sequence = sequence
         .effect()
         .file(closest('jb2a.markers.bubble.02.complete.green'))
@@ -111,7 +111,7 @@ async function playCast(source, config = {}) {
 async function createTarget(source, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_CAST, config);
     let sequence = new Sequence();
-    applySound(sequence, mConfig.sound?.burn ?? mConfig.sound);
+    applySound(sequence, mConfig.sound.burn);
 
     let targets = mConfig.targets?.length ? mConfig.targets : Array.from(game.user.targets);
 

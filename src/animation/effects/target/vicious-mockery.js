@@ -28,7 +28,7 @@ async function createViciousMockeryCast(token, config = {}) {
     // const { id } = mConfig; // Not directly used in this animation for naming persistent effects
 
     const sequence = new Sequence();
-    applySound(sequence, mConfig.sound?.cast ?? mConfig.sound);
+    applySound(sequence, mConfig.sound.cast);
 
     sequence
         .effect()
@@ -92,6 +92,7 @@ async function createViciousMockeryImpact(target, word, config = {}) {
     // const { id } = mConfig; // Not directly used in this animation for naming persistent effects
 
     const sequence = new Sequence();
+    applySound(sequence, mConfig.sound.mock);
 
     const style = {
         "fill": "#ffffff",

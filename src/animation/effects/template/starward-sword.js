@@ -23,10 +23,6 @@ async function createStarwardSword(token, config = {}, options = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { size, darkMap, cameraZoom, sound } = mConfig;
     let { targets } = mConfig;
-    const castSound = sound?.cast ?? sound;
-    const slashSound = sound?.slash ?? sound;
-    const impactSound = sound?.impact;
-    const finisherSound = sound?.finisher ?? sound?.slash ?? sound;
 
     const cfg = {
         radius: size * canvas.grid.size,
@@ -93,7 +89,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
     //Opening
     const mainSequence = new Sequence();
-    applySound(mainSequence, castSound);
+    applySound(mainSequence, sound.cast);
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
         mainSequence
@@ -182,7 +178,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                 if (u === 4) {
                     const slashSeq = new Sequence();
                     slashSeq.wait(200 * (u + 1) - 199);
-                    applySound(slashSeq, slashSound);
+                    applySound(slashSeq, sound.slash);
 
                     mainSequence.addSequence(slashSeq
 
@@ -240,7 +236,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                         .thenDo(function () {
                             targets.forEach(target => {
                                 const targetSeq = new Sequence();
-                                if (impactSound?.enable) applySound(targetSeq, impactSound);
+                                applySound(targetSeq, sound.impact);
                                 targetSeq
 
                                     .animation()
@@ -292,7 +288,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                 } else {
                     const slashSeq = new Sequence();
                     slashSeq.wait(200 * (u + 1) - 199);
-                    applySound(slashSeq, slashSound);
+                    applySound(slashSeq, sound.slash);
 
                     mainSequence.addSequence(slashSeq
 
@@ -349,7 +345,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                         .thenDo(function () {
                             targets.forEach(target => {
                                 const targetSeq = new Sequence();
-                                if (impactSound?.enable) applySound(targetSeq, impactSound);
+                                applySound(targetSeq, sound.impact);
                                 targetSeq
 
                                     .effect()
@@ -379,7 +375,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
             }
         } else if (e === 9) {
             const finalSeq = new Sequence();
-            applySound(finalSeq, finisherSound);
+            applySound(finalSeq, sound.finisher);
             mainSequence.addSequence(finalSeq
 
                 .effect()
@@ -393,7 +389,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                 .thenDo(function () {
                     targets.forEach(target => {
                         const targetSeq = new Sequence();
-                        if (impactSound?.enable) applySound(targetSeq, impactSound);
+                        applySound(targetSeq, sound.impact);
                         targetSeq
 
                             .effect()
@@ -495,7 +491,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
         } else {
             const slashSeq = new Sequence();
-            applySound(slashSeq, slashSound);
+            applySound(slashSeq, sound.slash);
             mainSequence.addSequence(slashSeq
 
                 .effect()
@@ -520,7 +516,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                 .thenDo(function () {
                     targets.forEach(target => {
                         const targetSeq = new Sequence();
-                        if (impactSound?.enable) applySound(targetSeq, impactSound);
+                        applySound(targetSeq, sound.impact);
                         targetSeq
 
                             .effect()

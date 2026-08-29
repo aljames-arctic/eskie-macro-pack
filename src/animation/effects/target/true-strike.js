@@ -29,7 +29,7 @@ async function createTrueStrikeCast(token, config = {}) {
     const { id, sound } = mConfig;
 
     const sequence = new Sequence();
-    applySound(sequence, sound?.cast ?? sound);
+    applySound(sequence, sound.cast);
 
     sequence
         .effect()
@@ -133,7 +133,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
     // const { id } = mConfig; // Not directly used in this animation for naming persistent effects
 
     const sequence = new Sequence();
-    applySound(sequence, mConfig.sound?.attack ?? mConfig.sound);
+    applySound(sequence, mConfig.sound.attack);
 
     sequence
         .effect()

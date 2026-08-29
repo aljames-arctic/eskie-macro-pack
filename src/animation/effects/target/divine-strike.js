@@ -98,7 +98,7 @@ async function createMelee(token, target, config = {}) {
         .delay(300)
         .shake({ duration: 1000, strength: 1, rotation: false, fadeOutDuration: 1000 });
 
-    applySound(sequence, sound?.burst);
+    applySound(sequence, sound.burst);
 
     sequence.effect()
         .delay(300)
@@ -215,7 +215,7 @@ async function createRanged(token, target, config = {}) {
     }
     sequence.wait(500);
 
-    applySound(sequence, sound?.burst);
+    applySound(sequence, sound.burst);
 
     sequence.effect()
         .file(closest('jb2a.ranged.02.projectile.01.yellow'))
@@ -295,7 +295,7 @@ async function createTwilightMelee(token, target, config = {}) {
         .randomizeMirrorY()
         .zIndex(1);
 
-    applySound(sequence, sound?.burst);
+    applySound(sequence, sound.burst);
 
     sequence.effect()
         .delay(150)
@@ -393,7 +393,7 @@ async function createTwilightRanged(token, target, config = {}) {
         .zIndex(1)
         .waitUntilFinished(-500);
 
-    applySound(sequence, sound?.burst);
+    applySound(sequence, sound.burst);
 
     sequence.effect()
         .file(closest('eskie.damage.radiant.01.rainbow'))

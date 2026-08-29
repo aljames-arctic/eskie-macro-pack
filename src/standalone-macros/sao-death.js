@@ -21,7 +21,6 @@ const closest = (path) => {
 };
 
 const tokenWidth = token.document?.width ?? 1;
-const tokenHeight = token.document?.height ?? 1;
 const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
 
 const sequence = new Sequence();

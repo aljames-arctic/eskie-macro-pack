@@ -49,8 +49,6 @@ async function create(tile, targets, config = {}) {
     let seq = new Sequence();
 
     if (finalTargets.length > 0) {
-        const target = finalTargets[0];
-
         seq = seq
             // Electricity burst at the door tile
             .effect()

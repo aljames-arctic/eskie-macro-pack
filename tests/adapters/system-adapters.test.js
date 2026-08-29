@@ -1,7 +1,7 @@
 import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { initializeSystemAdapter, Dnd5eSystemAdapter, Pf2eSystemAdapter, GenericSystemAdapter, BaseSystemAdapter } from '../../src/adapters/system/index.js';
+import { initializeSystemAdapter, Dnd5eSystemAdapter, Pf2eSystemAdapter, GenericSystemAdapter } from '../../src/adapters/system/index.js';
 
 test('initializeSystemAdapter instantiates matching system adapter or generic fallback', async () => {
     const dnd5e = await initializeSystemAdapter('dnd5e');

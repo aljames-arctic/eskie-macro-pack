@@ -41,8 +41,6 @@ const closest = (path) => {
     return path;
 };
 
-const allTokens = [token, ...targets];
-
 if (typeof Tagger !== "undefined") {
     Tagger.addTags(token, "TrueStrike");
 }

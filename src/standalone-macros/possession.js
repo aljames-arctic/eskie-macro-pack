@@ -20,7 +20,6 @@ const closest = (path) => {
     return path;
 };
 
-const tokenId = token.id ?? token.document?.id ?? "";
 const activePossessions = Sequencer.EffectManager.getEffects({ name: "eskie.effect.possession.main*" });
 if (activePossessions.length > 0) {
     await Sequencer.EffectManager.endEffects({ name: "eskie.effect.possession.main*" });

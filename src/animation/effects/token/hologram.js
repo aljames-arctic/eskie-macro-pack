@@ -1,9 +1,8 @@
 // Original Author: EskieMoh#2969
 // Modular Conversion: bakanabaka
 
-import { closest } from '../../../lib/filemanager.js';
 
-const HOLOGRAM_TAG = 'Hologram';
+
 const EFFECT_NAME = 'Holo';
 
 export const DEFAULT_CONFIG = {
@@ -13,7 +12,7 @@ export const DEFAULT_CONFIG = {
 
 async function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { id, tint } = mConfig;
+    const { tint } = mConfig;
 
     const tokenRotation = token.document.rotation || 0;
 

@@ -44,7 +44,6 @@ if (blue.x > red.x) {
     blue = temp;
 }
 
-const gridSize = canvas.grid.size ?? 100;
 const interpolatePos = (r, b, t, count) => {
     const rC = r.center;
     const bC = b.center;

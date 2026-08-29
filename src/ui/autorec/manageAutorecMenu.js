@@ -3,12 +3,7 @@ import { log } from '../../lib/logger.js';
 import { BaseFoundryAdapter } from "../../adapters/foundry/index.js";
 import { autorecUpdateFormApplication } from "../autoanimations/updateMenu.js";
 import { BlfxAutorecUpdateFormApplication, generateBlfxAutorecUpdate } from "../blfx/updateMenu.js";
-import {
-    isBlfxAutorecAvailable,
-    isBlfxCustomAutoRecUpdatesEnabled,
-    promptEnableBlfxUpdates,
-    blfxAdapter
-} from "../../adapters/modules/blfx/blfx-module-adapter.js";
+import { isBlfxAutorecAvailable, isBlfxCustomAutoRecUpdatesEnabled, promptEnableBlfxUpdates, blfxAdapter } from "../../adapters/modules/blfx/blfx-module-adapter.js";
 
 const foundryPlatform = new BaseFoundryAdapter();
 

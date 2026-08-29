@@ -14,7 +14,6 @@ if (isPlaying) {
 } else {
     const tintColor = '#00BFFF';
     const duration = 600;
-    const shatterColor = 'blue';
     const deleteToken = false;
     const center = true;
     const rotation = 0;

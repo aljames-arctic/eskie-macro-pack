@@ -3,7 +3,6 @@
 
 import { closest } from '../../../lib/filemanager.js';
 
-const AVAILABLE_SIZES = [10, 20, 30, 60];
 const DEFAULT_CONFIG = {
     radius: 7.5,
 };
@@ -16,12 +15,6 @@ const DEFAULT_CONFIG = {
  */
 async function create(position, config = {}) {
     config = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-
-    const pickEffectSize = (r) => AVAILABLE_SIZES.reduce(
-        (acc, size) => (size <= r ? size : acc),
-        AVAILABLE_SIZES[0]
-    );
-    const effectSize = pickEffectSize(config.radius);
 
     const sequence = new Sequence();
 

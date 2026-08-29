@@ -1,7 +1,7 @@
 // Original Author: Unknown (from discord)
 // Modular Conversion: bakanabaka
 
-import { closest, absolutePath } from '../../../lib/filemanager.js';
+import { absolutePath } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { teleportIn } from "./teleport/teleportIn.js";
 import { teleportOut } from "./teleport/teleportOut.js";

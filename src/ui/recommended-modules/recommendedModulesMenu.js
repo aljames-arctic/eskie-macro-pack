@@ -1,5 +1,5 @@
 import { MODULE_ID } from "../../lib/constants.js";
-import { log } from '../../lib/logger.js';
+
 import { adapter } from '../../adapters/index.js';
 
 export const RECOMMENDED_CATEGORIES = [

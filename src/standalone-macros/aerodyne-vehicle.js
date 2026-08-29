@@ -20,10 +20,7 @@ const closest = (path) => {
     return path;
 };
 
-const id = "AerodyneVehicle";
 const effectName = "Fly";
-const tokenId = token.id ?? token.document?.id ?? "";
-const label = `${id}-${tokenId}`;
 
 // Toggle hover flight state
 const activeEffects = Sequencer.EffectManager.getEffects({ name: effectName, object: token }) ?? [];

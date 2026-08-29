@@ -1,4 +1,4 @@
-import { detectUtil } from './detectUtil.js'
+import { detectUtil } from './detectUtil.js';
 
 const defaultDetectionConfig = {
     poisoned: 'jb2a.magic_signs.rune.abjuration.complete.red',

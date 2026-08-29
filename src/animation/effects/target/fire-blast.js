@@ -7,7 +7,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 const DEFAULT_CONFIG = {
     pushDistance: 80,

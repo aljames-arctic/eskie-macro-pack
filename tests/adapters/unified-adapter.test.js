@@ -1,7 +1,7 @@
 import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { adapter, Adapter, BaseFoundryAdapter, FoundryCurrentAdapter, Dnd5eSystemAdapter, Pf2eSystemAdapter, GenericSystemAdapter } from '../../src/adapters/index.js';
+import { adapter, Adapter, FoundryCurrentAdapter, Dnd5eSystemAdapter } from '../../src/adapters/index.js';
 
 test('Unified Adapter init initializes Foundry, System, and Module layers', async () => {
     game.release = { generation: 14 };

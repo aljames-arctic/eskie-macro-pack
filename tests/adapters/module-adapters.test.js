@@ -1,24 +1,7 @@
 import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {
-    initializeModuleAdapters,
-    hasActiveModuleAdapters,
-    BaseModuleAdapter,
-    MidiQolModuleAdapter,
-    AutoanimationsModuleAdapter,
-    autoanimationsAdapter,
-    BlfxModuleAdapter,
-    blfxAdapter,
-    SocketlibModuleAdapter,
-    socketlibAdapter,
-    AutorecManager,
-    autorecManager,
-    MassEditModuleAdapter,
-    massEditAdapter,
-    TokenAttacherModuleAdapter,
-    tokenAttacherAdapter
-} from '../../src/adapters/modules/index.js';
+import { initializeModuleAdapters, hasActiveModuleAdapters, MidiQolModuleAdapter, AutoanimationsModuleAdapter, BlfxModuleAdapter, SocketlibModuleAdapter, AutorecManager, MassEditModuleAdapter, TokenAttacherModuleAdapter } from '../../src/adapters/modules/index.js';
 import { adapter } from '../../src/adapters/index.js';
 
 test('initializeModuleAdapters and hasActiveModuleAdapters detect active modules', () => {

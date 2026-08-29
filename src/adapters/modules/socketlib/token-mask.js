@@ -1,4 +1,4 @@
-import { MODULE_ID } from "../../../lib/constants.js";
+
 import { log } from '../../../lib/logger.js';
 import { socket, socketlib } from "./socketlib-module-adapter.js";
 import { tokenMaskEffect, tokenMaskTracker, playLocal, stopLocal } from "../../../animation/mask/token-mask.js";

@@ -1,5 +1,5 @@
-import { dependency } from './dependency.js'
-import { log } from './logger.js'
+import { dependency } from './dependency.js';
+import { log } from './logger.js';
 
 /**
  * Traverses the Sequencer database to find the best-fit path for a given set of categories.

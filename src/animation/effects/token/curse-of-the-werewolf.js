@@ -4,7 +4,7 @@
 ** */
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+
 
 const DEFAULT_CONFIG = {
     id: 'curse-of-the-werewolf',

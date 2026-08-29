@@ -106,8 +106,8 @@ async function create(tile, targets, config = {}) {
         await tile.document.setFlag(MODULE_ID, `${label} - pinned`, [...currentPinnedIds, ...finalTargetIds]);
         
         finalTargets.forEach(target => {
-            const targetName = target.name || target.document?.name || 'Token';
-            const buryEffectName = `${label}-${target.name}-${target.id}`;
+            const targetName = target.name ?? target.document?.name ?? 'Token';
+            const buryEffectName = `${label}-${targetName}-${target.id}`;
 
             seq = seq
                 // Persistent copy sprite under rocks

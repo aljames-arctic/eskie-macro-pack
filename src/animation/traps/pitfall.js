@@ -61,9 +61,7 @@ async function create(tile, targets, config = {}) {
 
     if (finalTargets.length > 0) {
         finalTargets.forEach(target => {
-            const targetName = target.name || target.document?.name || 'Token';
             const targetWidth = target.document?.width ?? target.width ?? 1;
-            const targetHeight = target.document?.height ?? target.height ?? 1;
             const fallenEffectName = `pitfall-fallen-${target.id}`;
 
             seq = seq

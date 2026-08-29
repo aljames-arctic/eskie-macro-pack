@@ -11,7 +11,6 @@ const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select a token!");
 
 const id = "stunningFist";
-const tokenId = token.id ?? token.document?.id ?? "";
 const activeStuns = Sequencer.EffectManager.getEffects({ name: `${id}*` });
 if (activeStuns.length > 0) {
     Sequencer.EffectManager.endEffects({ name: `${id}*` });

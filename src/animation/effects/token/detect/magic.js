@@ -1,4 +1,4 @@
-import { detectUtil } from './detectUtil.js'
+import { detectUtil } from './detectUtil.js';
 import { dependency } from '../../../../lib/dependency.js';
 
 /*

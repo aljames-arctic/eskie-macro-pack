@@ -1,4 +1,4 @@
-import { MODULE_ID } from "../lib/constants.js"
+import { MODULE_ID } from "../lib/constants.js";
 
 export function settingsOverride(config = {}) {
     if (!game.settings.get(MODULE_ID, 'enableSounds')) {

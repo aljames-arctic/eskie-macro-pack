@@ -25,16 +25,10 @@ const closest = (path) => {
     return path;
 };
 
-const AVAILABLE_SIZES = [10, 20, 30, 60];
 const DEFAULT_CONFIG = {
     radius: 7.5,
     cloudRadius: 12,
 };
-
-const pickEffectSize = (r) => AVAILABLE_SIZES.reduce(
-    (acc, size) => (size <= r ? size : acc),
-    AVAILABLE_SIZES[0]
-);
 
 const id = "call-lightning";
 const label = `${id}-${token.id}`;
@@ -78,9 +72,6 @@ async function getStrikeLocation(labelPrompt = "Call Lightning Strike") {
  * Plays the downward lightning bolt strike visual sequence on target or point location.
  */
 function addLightningStrikeToSequence(sequence, position, config = {}) {
-    const radius = config.radius ?? DEFAULT_CONFIG.radius;
-    const effectSize = pickEffectSize(radius);
-
     // Downward lightning bolt strike from sky / storm cloud
     sequence.effect()
         .file(closest("jb2a.lightning_strike.blue"))

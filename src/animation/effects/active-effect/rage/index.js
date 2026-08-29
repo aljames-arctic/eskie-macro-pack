@@ -1,10 +1,10 @@
 import { autorec, CONCENTRATING } from "../../../../adapters/modules/autorec/autorec-module-adapter.js";
 
-import { rageV1 as v1, DEFAULT_CONFIG as config_v1} from "./rage_v1.js";
-import { electric as v2, DEFAULT_CONFIG as config_v2} from "./rage-electric.js";
-import { superSaiyan as v3, DEFAULT_CONFIG as config_v3} from "./rage-super-saiyan.js";
-import { rageV2 as v4, DEFAULT_CONFIG as config_v4} from "./rage_v2.js";
-import { rageTotem as v5, DEFAULT_CONFIG as config_v5} from "./rage_totem.js";
+import { rageV1 as v1, DEFAULT_CONFIG as config_v1 } from "./rage_v1.js";
+import { electric as v2, DEFAULT_CONFIG as config_v2 } from "./rage-electric.js";
+import { superSaiyan as v3, DEFAULT_CONFIG as config_v3 } from "./rage-super-saiyan.js";
+import { rageV2 as v4, DEFAULT_CONFIG as config_v4 } from "./rage_v2.js";
+import { rageTotem as v5, DEFAULT_CONFIG as config_v5 } from "./rage_totem.js";
 
 const DEFAULT_CONFIG = {
     version: 4,

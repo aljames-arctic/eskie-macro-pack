@@ -1,4 +1,4 @@
-import { hexCast } from "./hex-cast.js"
+import { hexCast } from "./hex-cast.js";
 import { hexDamage } from "./hex-damage.js";
 
 export const hex = {

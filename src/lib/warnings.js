@@ -1,4 +1,4 @@
-import { log } from "./logger.js"
+import { log } from "./logger.js";
 
 export function deprecation(newObj, oldPath, newPath, dateStr) {
     const wrapped = {};

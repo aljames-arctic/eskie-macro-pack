@@ -1,6 +1,6 @@
 import { adapter } from "../../../adapters/index.js";
 import { blur } from "../../scene-overlays/status-blur.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { autorec } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { log } from '../../../lib/logger.js';
 
 /* **

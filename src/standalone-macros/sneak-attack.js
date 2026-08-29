@@ -158,7 +158,6 @@ const rangedColorDamage = rangedColor.damage ?? "red";
 const sequence = new Sequence();
 
 for (const target of targets) {
-    const targetWidth = target.document?.width ?? 1;
     const targetRotation = target.document?.rotation ?? 0;
     const targetSquare = getNearestSquareCenter(token, target);
 

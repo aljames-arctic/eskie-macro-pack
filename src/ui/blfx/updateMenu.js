@@ -55,8 +55,12 @@ function extractVersionFromNote(note) {
 export function groupBlfxEntriesByTrigger(entries = []) {
     const preferredOrder = [
         "After Activity Use (Default)",
-        "After Attack Roll",
-        "After Damage Roll",
+        "After Attack Roll (Melee)",
+        "After Attack Roll (Ranged)",
+        "After Attack Roll (On Token)",
+        "After Damage Roll (Melee)",
+        "After Damage Roll (Ranged)",
+        "After Damage Roll (On Token)",
         "After Active Effects",
         "After Summon",
         "After Template Create"
@@ -64,7 +68,31 @@ export function groupBlfxEntriesByTrigger(entries = []) {
 
     const groups = {};
     for (const item of entries) {
-        const triggerHeader = item.triggerName || item.triggerMode;
+        const triggerMode = item.triggerMode ?? item.entry?.animationData?.eventType ?? '';
+        const rawTriggerName = item.triggerName ?? item.triggerMode ?? '';
+        const macroType = item.macroType ?? item.entry?.animationData?.macroType ?? '';
+        const itemName = item.itemName ?? item.label ?? '';
+
+        let triggerHeader = rawTriggerName;
+
+        if (triggerMode === 'afterAttack' || rawTriggerName.includes('After Attack Roll') || rawTriggerName.includes('afterAttack')) {
+            if (macroType.includes('Melee') || itemName.startsWith('(Melee)')) {
+                triggerHeader = 'After Attack Roll (Melee)';
+            } else if (macroType.includes('Ranged') || itemName.startsWith('(Ranged)')) {
+                triggerHeader = 'After Attack Roll (Ranged)';
+            } else {
+                triggerHeader = 'After Attack Roll (On Token)';
+            }
+        } else if (triggerMode === 'afterDamage' || rawTriggerName.includes('After Damage Roll') || rawTriggerName.includes('afterDamage')) {
+            if (macroType.includes('Melee') || itemName.startsWith('(Melee)')) {
+                triggerHeader = 'After Damage Roll (Melee)';
+            } else if (macroType.includes('Ranged') || itemName.startsWith('(Ranged)')) {
+                triggerHeader = 'After Damage Roll (Ranged)';
+            } else {
+                triggerHeader = 'After Damage Roll (On Token)';
+            }
+        }
+
         if (!groups[triggerHeader]) {
             groups[triggerHeader] = {
                 triggerName: triggerHeader,
@@ -149,6 +177,7 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
                         subtext,
                         label: itemName,
                         menu: triggerName,
+                        macroType: newEntry.animationData?.macroType ?? '',
                         entry: newEntry
                     };
 

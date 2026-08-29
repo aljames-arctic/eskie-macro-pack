@@ -52,22 +52,32 @@ test('blfx.register allows configuring multiple activities for a single item whe
     assert.equal(EMP_BLFX_Registry['dnd5e']['dagger']['thrown-attack']['afterAttack'].animationData.macroType, 'Attack Ranged');
 });
 
-test('groupBlfxEntriesByTrigger groups entries into preferred section order', () => {
+test('groupBlfxEntriesByTrigger groups entries into preferred section and sub-section order', () => {
     const rawEntries = [
-        { itemName: 'Shield', triggerName: 'After Attack Roll', triggerMode: 'afterAttack' },
+        { itemName: 'Shield', triggerName: 'After Attack Roll', triggerMode: 'afterAttack', macroType: 'On Target or Token' },
+        { itemName: '(Melee) Dagger', triggerName: 'After Attack Roll', triggerMode: 'afterAttack', macroType: 'Attack Melee' },
+        { itemName: '(Ranged) Dagger', triggerName: 'After Attack Roll', triggerMode: 'afterAttack', macroType: 'Attack Ranged' },
         { itemName: 'Fireball', triggerName: 'After Template Create', triggerMode: 'createTemplate' },
         { itemName: 'Rage', triggerName: 'After Active Effects', triggerMode: 'afterActiveEffects' },
-        { itemName: 'Bless', triggerName: 'After Activity Use (Default)', triggerMode: 'afterItemUse' }
+        { itemName: 'Bless', triggerName: 'After Activity Use (Default)', triggerMode: 'afterItemUse' },
+        { itemName: '(Melee) Divine Strike', triggerName: 'After Damage Roll', triggerMode: 'afterDamage', macroType: 'Attack Melee' },
+        { itemName: '(Ranged) Divine Strike', triggerName: 'After Damage Roll', triggerMode: 'afterDamage', macroType: 'Attack Ranged' }
     ];
 
     const sections = groupBlfxEntriesByTrigger(rawEntries);
-    assert.equal(sections.length, 4);
+    assert.equal(sections.length, 8);
     assert.equal(sections[0].triggerName, 'After Activity Use (Default)');
-    assert.equal(sections[1].triggerName, 'After Attack Roll');
-    assert.equal(sections[2].triggerName, 'After Active Effects');
-    assert.equal(sections[3].triggerName, 'After Template Create');
+    assert.equal(sections[1].triggerName, 'After Attack Roll (Melee)');
+    assert.equal(sections[2].triggerName, 'After Attack Roll (Ranged)');
+    assert.equal(sections[3].triggerName, 'After Attack Roll (On Token)');
+    assert.equal(sections[4].triggerName, 'After Damage Roll (Melee)');
+    assert.equal(sections[5].triggerName, 'After Damage Roll (Ranged)');
+    assert.equal(sections[6].triggerName, 'After Active Effects');
+    assert.equal(sections[7].triggerName, 'After Template Create');
     assert.equal(sections[0].entries[0].itemName, 'Bless');
-    assert.equal(sections[3].entries[0].itemName, 'Fireball');
+    assert.equal(sections[1].entries[0].itemName, '(Melee) Dagger');
+    assert.equal(sections[2].entries[0].itemName, '(Ranged) Dagger');
+    assert.equal(sections[3].entries[0].itemName, 'Shield');
 });
 
 test('buildBlfxPayload constructs valid resources payload with multi-package compatibility flags', () => {

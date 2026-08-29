@@ -65,3 +65,36 @@ test('adapter.getTokenOwners and adapter.getDistance function contracts', () => 
     // 300, 400 -> hypot = 500 px. 500 / 100 * 5 = 25 scene units.
     assert.equal(adapter.getDistance(t1, t2), 25);
 });
+
+test('tokensOfTheDeparted exports stop functions on root, harvest, and use sub-objects', async () => {
+    const { tokensOfTheDeparted } = await import('../../src/animation/effects/target/tokens-of-the-departed.js');
+    assert.equal(typeof tokensOfTheDeparted.stop, 'function');
+    assert.equal(typeof tokensOfTheDeparted.harvest.stop, 'function');
+    assert.equal(typeof tokensOfTheDeparted.use.stop, 'function');
+
+    const endEffectsCalls = [];
+    globalThis.Sequencer.EffectManager.endEffects = (opts) => endEffectsCalls.push(opts);
+
+    const token = { id: 'token-123' };
+    const target = { id: 'target-456' };
+
+    // Test tokensOfTheDeparted.use.stop(target)
+    endEffectsCalls.length = 0;
+    await tokensOfTheDeparted.use.stop(target);
+    assert.equal(endEffectsCalls.length, 1);
+    assert.deepEqual(endEffectsCalls[0], { name: 'tokensOfTheDepartedUse - target-456', object: target });
+
+    // Test tokensOfTheDeparted.use.stop(token, target)
+    endEffectsCalls.length = 0;
+    await tokensOfTheDeparted.use.stop(token, target);
+    assert.equal(endEffectsCalls.length, 1);
+    assert.deepEqual(endEffectsCalls[0], { name: 'tokensOfTheDepartedUse - target-456', object: target });
+
+    // Test tokensOfTheDeparted.stop(target)
+    endEffectsCalls.length = 0;
+    await tokensOfTheDeparted.stop(target);
+    assert.equal(endEffectsCalls.length, 2);
+    assert.deepEqual(endEffectsCalls[0], { name: 'tokensOfTheDepartedUse - target-456', object: target });
+    assert.deepEqual(endEffectsCalls[1], { name: 'tokensOfTheDeparted - target-456', object: target });
+});
+

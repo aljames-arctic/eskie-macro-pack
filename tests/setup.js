@@ -12,6 +12,11 @@ globalThis.tokenAttacher = undefined;
 globalThis.MassEdit = undefined;
 globalThis.socketlib = undefined;
 globalThis.adapter = undefined;
+globalThis.Sequencer = {
+    EffectManager: {
+        endEffects: () => {}
+    }
+};
 
 globalThis.ContextMenu = class ContextMenu {
     constructor(element, selector, menuItems, options = {}) {

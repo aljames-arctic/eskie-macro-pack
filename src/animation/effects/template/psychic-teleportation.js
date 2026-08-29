@@ -1,5 +1,5 @@
 import { closest } from '../../../lib/filemanager.js';
-import { template } from '../../../lib/templates.js';
+import { template as templatelib } from '../../../lib/templates.js';
 import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
@@ -18,7 +18,7 @@ async function create(token, config = {}) {
         icon: portalPath, 
         label: id
     };
-    let [position, _] = await template.getPosition(template, cfg);
+    let [position, _] = await templatelib.getPosition(template, cfg);
     if (!position) { return; }
 
     let seq = new Sequence()

@@ -4,7 +4,7 @@
 ** */
 
 import { closest } from "../../../lib/filemanager.js";
-import { template } from '../../../lib/templates.js';
+import { template as templatelib } from '../../../lib/templates.js';
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 
 const DEFAULT_CONFIG = {
@@ -144,7 +144,7 @@ async function createSpikeGrowth(token, config = {}, options = {}) {
         icon: portalPath, 
         label: 'Spike Growth'
     };
-    let [position, _] = await template.getPosition(template, cfg);
+    let [position, _] = await templatelib.getPosition(template, cfg);
     if (!position) { return; }
 
     const initialSequence = await createInitialSpikeGrowth(position, config);

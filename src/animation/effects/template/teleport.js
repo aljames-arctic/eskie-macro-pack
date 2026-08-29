@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest, absolutePath } from '../../../lib/filemanager.js';
-import { template } from '../../../lib/templates.js';
+import { template as templatelib } from '../../../lib/templates.js';
 import { teleportIn } from "./teleport/teleportIn.js";
 import { teleportOut } from "./teleport/teleportOut.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
@@ -20,7 +20,7 @@ async function create(token, config = {}) {
         icon: absolutePath("jb2a.portals.vertical.vortex.purple"), 
         label: 'Teleportation Destination',
     };
-    [config.position, _] = await template.getPosition(template, cfg);
+    [config.position, _] = await templatelib.getPosition(template, cfg);
     if (!config.position) { return; }
 
     let [tOut, tIn] = await Promise.all([

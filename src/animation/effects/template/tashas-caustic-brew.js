@@ -3,7 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
-import { template } from '../../../lib/templates.js';
+import { template as templatelib } from '../../../lib/templates.js';
 
 const DEFAULT_CONFIG_CAST = {
     id: 'tashasCausticBrewCast',
@@ -35,7 +35,7 @@ async function createCast(source, config = {}) {
 
     let position;
     if (mConfig.template) {
-        const [primary, secondary] = await template.getPosition(mConfig.template);
+        const [primary, secondary] = await templatelib.getPosition(mConfig.template);
         position = secondary || primary;
         if (!position) {
             position = await Sequencer.Crosshair.show(crosshairConfig);

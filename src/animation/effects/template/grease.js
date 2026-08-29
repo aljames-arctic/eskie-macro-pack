@@ -3,7 +3,7 @@
 //Modular by: bakanabaka
 
 import { closest, absolutePath } from "../../../lib/filemanager.js";
-import { template } from "../../../lib/templates.js";
+import { template as templatelib } from "../../../lib/templates.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 
 const DEFAULT_CONFIG = {
@@ -21,11 +21,10 @@ async function create(token, config = {}) {
         icon: absolutePath("jb2a.portals.vertical.vortex.purple"), 
         label: 'Grease'
     };
-    let [primary, secondary] = await template.getPosition(template, cfg);
-    if (!primary) { return; }
+    let [primary, secondary, center] = await templatelib.getPosition(template, cfg);
+    if (!primary && !center) { return; }
 
-    let position = primary;
-    if (secondary) { position = {x:(secondary.x + primary.x)/2, y:(secondary.y + primary.y)/2}; }
+    const position = center ?? (secondary ? { x: (secondary.x + primary.x) / 2, y: (secondary.y + primary.y) / 2 } : primary);
     
 
     const seq = new Sequence();

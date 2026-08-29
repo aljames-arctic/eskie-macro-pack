@@ -15,7 +15,6 @@ export const DEFAULT_CONFIG = {
         ground: { enabled: true, duration: -1 },
     },
     sound: { ...DEFAULT_SOUND_CONFIG },
-    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function play(token, config = {}) {

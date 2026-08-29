@@ -8,7 +8,7 @@ import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autore
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
-    id: "hide"
+    id: "hide",
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 

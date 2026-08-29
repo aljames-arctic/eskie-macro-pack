@@ -12,7 +12,6 @@ export const DEFAULT_CONFIG = {
     id: 'ElectricRage',
     color: 'purple',
     sound: { ...DEFAULT_SOUND_CONFIG },
-    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function create(token, config = {}) {

@@ -9,7 +9,8 @@ const DEFAULT_CONFIG = {
     id: "romanCandle",
     position: undefined,
     shots: 3,
-}
+    sound: { ...DEFAULT_SOUND_CONFIG }
+};
 
 async function create(token, config = {}) {
     var items = Sequencer.Database.getPathsUnder('jb2a.bolt.fire');
@@ -25,8 +26,7 @@ async function create(token, config = {}) {
             drawOutline: true,
             interval: 0,
             rememberControlled: true
-            sound: { ...DEFAULT_SOUND_CONFIG },
-};
+        };
         position = await Sequencer.Crosshair.show(crosshairConfig);
         if (position.cancelled) return undefined;
     }

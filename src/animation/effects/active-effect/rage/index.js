@@ -7,8 +7,10 @@ import { rageV2 as v4, DEFAULT_CONFIG as config_v4 } from "./rage_v2.js";
 import { rageTotem as v5, DEFAULT_CONFIG as config_v5 } from "./rage_totem.js";
 
 import { adapter } from "../../../../adapters/index.js";
+import { DEFAULT_SOUND_CONFIG } from "../../../utils/sound.js";
 const DEFAULT_CONFIG = {
     version: 4,
+    sound: { ...DEFAULT_SOUND_CONFIG },
     config_v1,
     config_v2,
     config_v3,
@@ -17,15 +19,15 @@ const DEFAULT_CONFIG = {
 };
 
 function getVersion(config = {}) {
-    const { version } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { version, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Merge the DEFAULT_CONFIG with our possibly modified input config
     const map = [ 
-        {fn: v1, cfg: adapter.mergeObject(config_v1, config.config_v1 ?? {})},
-        {fn: v2, cfg: adapter.mergeObject(config_v2, config.config_v2 ?? {})},
-        {fn: v3, cfg: adapter.mergeObject(config_v3, config.config_v3 ?? {})},
-        {fn: v4, cfg: adapter.mergeObject(config_v4, config.config_v4 ?? {})},
-        {fn: v5, cfg: adapter.mergeObject(config_v5, config.config_v5 ?? {})},
+        {fn: v1, cfg: adapter.mergeObject(config_v1, { sound, ...(config.config_v1 ?? {}) })},
+        {fn: v2, cfg: adapter.mergeObject(config_v2, { sound, ...(config.config_v2 ?? {}) })},
+        {fn: v3, cfg: adapter.mergeObject(config_v3, { sound, ...(config.config_v3 ?? {}) })},
+        {fn: v4, cfg: adapter.mergeObject(config_v4, { sound, ...(config.config_v4 ?? {}) })},
+        {fn: v5, cfg: adapter.mergeObject(config_v5, { sound, ...(config.config_v5 ?? {}) })},
     ];
     
     if ( version > map.length || version <= 0 ) return;
@@ -70,4 +72,4 @@ export const rage = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("rage", "effect", "eskie.effect.rage", DEFAULT_CONFIG, '1.0.0', "Rage");
+autorec.register("rage", "effect", "eskie.effect.rage", DEFAULT_CONFIG, '1.0.1', "Rage");

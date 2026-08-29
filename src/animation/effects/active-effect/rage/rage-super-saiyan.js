@@ -10,8 +10,7 @@ import { adapter } from "../../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../../utils/sound.js";
 export const DEFAULT_CONFIG = {
     id: 'SSJRage',
-    color: 'orange'
-    sound: { ...DEFAULT_SOUND_CONFIG },
+    color: 'orange',
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 

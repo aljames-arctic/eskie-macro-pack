@@ -14,14 +14,13 @@ export const DEFAULT_CONFIG = {
     color: 'red',
     effect: {
         ground: { enabled: true, persist: true },
-    }
-    sound: { ...DEFAULT_SOUND_CONFIG },
+    },
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, color, effect } = mConfig;
+    const { id, color, effect, sound } = mConfig;
     const label = `${id} - ${token.id}`;
 
     let seq = new Sequence();

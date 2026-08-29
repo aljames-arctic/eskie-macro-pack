@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
     effect: {
         miss: 'eskie.objects.meat_hook.ranged.01.physical.normal.iron',
         hit: 'eskie.objects.meat_hook.ranged.01.physical.latch.iron'
-    }
+    },
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 

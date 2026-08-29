@@ -9,7 +9,7 @@ import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'animateDead',
-    choice: 'Skeleton' // Default to Skeleton if not specified
+    choice: 'Skeleton', // Default to Skeleton if not specified
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 

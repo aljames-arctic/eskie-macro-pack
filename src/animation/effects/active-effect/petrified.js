@@ -10,7 +10,7 @@ import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapte
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
-    id: 'Petrified'
+    id: 'Petrified',
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 

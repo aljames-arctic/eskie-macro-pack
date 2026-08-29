@@ -9,7 +9,7 @@ import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'tokensOfTheDeparted',
     color: 'teal',
-    changeLight: true
+    changeLight: true,
     sound: {
         harvest: { ...DEFAULT_SOUND_CONFIG },
         use: { ...DEFAULT_SOUND_CONFIG }

@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
     id: 'ghostWalk',
     changeLight: true,
     color: '#58feb0',
-    padding: 1
+    padding: 1,
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 

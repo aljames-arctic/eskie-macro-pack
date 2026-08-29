@@ -8,8 +8,7 @@ import { adapter } from "../../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../../utils/sound.js";
 export const DEFAULT_CONFIG = {
     id: 'RageV1',
-    color: 'red'
-    sound: { ...DEFAULT_SOUND_CONFIG },
+    color: 'red',
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 

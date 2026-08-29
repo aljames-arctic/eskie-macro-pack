@@ -8,7 +8,7 @@ import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'goodberry',
-    color: 'green'
+    color: 'green',
     sound: {
         cast: { ...DEFAULT_SOUND_CONFIG },
         use: { ...DEFAULT_SOUND_CONFIG }

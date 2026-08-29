@@ -6,8 +6,7 @@ import { matt } from '../../utils/matt-tiles.js';
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 export const DEFAULT_CONFIG = {
-    id: 'Cunning Action'
-    sound: { ...DEFAULT_SOUND_CONFIG },
+    id: 'Cunning Action',
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 

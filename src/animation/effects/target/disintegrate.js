@@ -31,7 +31,7 @@ const DEFAULT_CONFIG = {
             { img: `jb2a.extras.tmfx.border.circle.inpulse.01.fast` },
             { img: `jb2a.disintegrate.green` },
         ],
-    }
+    },
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 

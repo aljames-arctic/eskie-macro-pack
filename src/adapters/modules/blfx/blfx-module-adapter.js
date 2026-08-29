@@ -186,7 +186,7 @@ const token = target || source || (typeof workflow !== 'undefined' && workflow?.
 if (typeof effect !== 'undefined' && effect) {
     config.activeEffect = effect;
 }
-const effectFn = foundry.utils.getProperty(globalThis, '${animation}');
+const effectFn = (globalThis.eskie?.adapter ?? foundry.utils).getProperty(globalThis, '${animation}');
 if (effectFn?.play) {
     if (source && target && source.id !== target.id) {
         await effectFn.play(source, target, config);
@@ -205,7 +205,7 @@ const template = (typeof templateDocument !== 'undefined' && templateDocument) |
 const targets = (typeof targetTokens !== 'undefined' && targetTokens) || (typeof targets !== 'undefined' && targets) || (typeof workflow !== 'undefined' && (workflow?.targets?.first?.() ? Array.from(workflow.targets) : [])) || [];
 if (template) config.template = template;
 if (targets?.length) config.targets = targets;
-const effect = foundry.utils.getProperty(globalThis, '${animation}');
+const effect = (globalThis.eskie?.adapter ?? foundry.utils).getProperty(globalThis, '${animation}');
 if (effect?.play) {
     await effect.play(token, config);
 }`;
@@ -218,7 +218,7 @@ const config = ${serializedConfig};
 const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
 const targets = (typeof targetTokens !== 'undefined' && targetTokens?.length) ? targetTokens : [];
 if (targets.length) config.targets = targets;
-const effect = foundry.utils.getProperty(globalThis, '${animation}');
+const effect = (globalThis.eskie?.adapter ?? foundry.utils).getProperty(globalThis, '${animation}');
 if (effect?.play && token) {
     await effect.play(token, config);
 }`;
@@ -230,7 +230,7 @@ const config = ${serializedConfig};
 
 const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
 const target = (typeof targetTokens !== 'undefined' && (targetTokens?.first?.() ?? Array.from(targetTokens ?? [])[0])) || (typeof workflow !== 'undefined' && (workflow?.targets?.first?.() ?? Array.from(workflow?.targets ?? [])[0])) || Array.from(game.user?.targets ?? [])[0] || null;
-const effect = foundry.utils.getProperty(globalThis, '${animation}');
+const effect = (globalThis.eskie?.adapter ?? foundry.utils).getProperty(globalThis, '${animation}');
 if (effect?.play) {
     if (target) {
         await effect.play(token, target, config);
@@ -244,7 +244,7 @@ if (effect?.play) {
 const config = ${serializedConfig};
 
 const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
-const effect = foundry.utils.getProperty(globalThis, '${animation}');
+const effect = (globalThis.eskie?.adapter ?? foundry.utils).getProperty(globalThis, '${animation}');
 if (effect?.play && token) {
     await effect.play(token, config);
 }`;
@@ -268,7 +268,7 @@ export function buildBlfxPayload(registry = EMP_BLFX_Registry) {
                 customAutoRecognition: true
             }
         },
-        customAutoRecognition: foundry.utils.duplicate(registry)
+        customAutoRecognition: foundryPlatform.duplicate(registry)
     };
 }
 
@@ -285,17 +285,17 @@ export function mergeBlfxCustomAutoRec(existingData, empRegistry = EMP_BLFX_Regi
         try { existingData = JSON.parse(existingData); } catch {}
     }
     if (existingData?.customAutoRecognition && typeof existingData.customAutoRecognition === 'object' && !Array.isArray(existingData.customAutoRecognition)) {
-        baseCustomTree = foundry.utils.duplicate(existingData.customAutoRecognition);
+        baseCustomTree = foundryPlatform.duplicate(existingData.customAutoRecognition);
     } else if (existingData?.flags?.['boss-loot-assets-premium']?.customAutoRecognition && typeof existingData.flags['boss-loot-assets-premium'].customAutoRecognition === 'object') {
-        baseCustomTree = foundry.utils.duplicate(existingData.flags['boss-loot-assets-premium'].customAutoRecognition);
+        baseCustomTree = foundryPlatform.duplicate(existingData.flags['boss-loot-assets-premium'].customAutoRecognition);
     } else if (existingData && typeof existingData === 'object' && !Array.isArray(existingData) && !existingData.flags) {
-        baseCustomTree = foundry.utils.duplicate(existingData);
+        baseCustomTree = foundryPlatform.duplicate(existingData);
     }
     if (typeof baseCustomTree !== 'object' || baseCustomTree === null || Array.isArray(baseCustomTree)) {
         baseCustomTree = {};
     }
 
-    const mergedTree = foundry.utils.duplicate(baseCustomTree);
+    const mergedTree = foundryPlatform.duplicate(baseCustomTree);
 
     for (const [systemId, items] of Object.entries(empRegistry ?? {})) {
         if (!items || typeof items !== 'object') continue;
@@ -404,11 +404,11 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
         const localizedLabel = (typeof key === 'string' && (key.includes(":") || key.includes(" "))) ? key : localize(`EMP.effects.${key}`, fallback);
         const itemName = options.itemName ?? localizedLabel ?? String(key ?? 'default');
         const slugName = typeof itemName === 'string' ? itemName : String(itemName);
-        const rawItemSlug = options.itemSlug ?? (foundry.utils?.slugify ? foundry.utils.slugify(slugName) : slugName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''));
+        const rawItemSlug = options.itemSlug ?? foundryPlatform.slugify(slugName);
         const itemSlug = rawItemSlug ? rawItemSlug : 'default-item';
         const activityName = options.activityName ?? "Default";
         const slugAct = typeof activityName === 'string' ? activityName : String(activityName);
-        const rawActivitySlug = options.activitySlug ?? (activityName ? (foundry.utils?.slugify ? foundry.utils.slugify(slugAct) : slugAct.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')) : "default");
+        const rawActivitySlug = options.activitySlug ?? (activityName ? foundryPlatform.slugify(slugAct) : "default");
         const activitySlug = rawActivitySlug ? rawActivitySlug : 'default';
         const triggerMode = this.standardizeTrigger(trigger, options.blfxTrigger);
         const triggerName = options.triggerName ?? BLFX_TRIGGER_NAMES[triggerMode] ?? triggerMode;
@@ -474,7 +474,7 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
             lastUpdate = "0.0.0";
         }
 
-        const shouldUpdate = force || isDevelopment || foundry.utils.isNewerVersion(effectiveVersion, lastUpdate);
+        const shouldUpdate = force || isDevelopment || foundryPlatform.isNewerVersion(effectiveVersion, lastUpdate);
         if (!shouldUpdate) return;
 
         if (!this.isAutorecSupported()) {

@@ -216,7 +216,7 @@ async function createMaskTiles(object, config = {}) {
     // 3. Create all three tiles in parallel in the Foundry database
     const [[objectRevealMask], [sceneRevealMask], [objectShapeMask]] = await Promise.all([
         socket.tile.create(revealMaskData),
-        socket.tile.create(foundry.utils.deepClone(revealMaskData)),
+        socket.tile.create(adapter.deepClone(revealMaskData)),
         socket.tile.create(shapeMaskData)
     ]);
 
@@ -264,7 +264,7 @@ To prevent mask tiles from spawning offset from the token, coordinate calculatio
 
 ```javascript
 function getRevealOffset(object, scale = 1) {
-    const isV14Plus = foundry.utils.isNewerVersion(game.version, "14");
+    const isV14Plus = adapter.isNewerVersion(game.version, "14");
     const widthAdjustment = (object.document.documentName === 'Token') ? canvas.grid.size : 1;
     const scaleXY = object.document.texture.scaleX;
     const totalScale = scaleXY * scale;
@@ -280,7 +280,7 @@ function getRevealOffset(object, scale = 1) {
 }
 
 function getShapeOffset(object) {
-    const isV14Plus = foundry.utils.isNewerVersion(game.version, "14");
+    const isV14Plus = adapter.isNewerVersion(game.version, "14");
     return isV14Plus ? object.center : { x: object.x, y: object.y };
 }
 ```

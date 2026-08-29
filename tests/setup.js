@@ -166,6 +166,21 @@ globalThis.foundry = {
             }
             return false;
         },
+        slugify: (str) => String(str ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
+        hasProperty: (obj, path) => {
+            if (!obj || !path) return false;
+            return path.split('.').reduce((acc, part) => (acc && part in acc ? acc[part] : undefined), obj) !== undefined;
+        },
+        diffObject: (original, other) => {
+            const diff = {};
+            for (const key in other) {
+                if (original[key] !== other[key]) diff[key] = other[key];
+            }
+            return diff;
+        },
+        flattenObject: (obj) => ({ ...obj }),
+        expandObject: (obj) => ({ ...obj }),
+        debounce: (fn, delay) => fn,
         fromUuidSync: (uuid) => null,
         fromUuid: async (uuid) => null,
         Collection: class Collection extends Map {

@@ -148,7 +148,7 @@ export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
         const effectConfig = { ...(config ?? {}), animation };
 
         const entry = {
-            id: foundry.utils.randomID(),
+            id: this.foundry.randomID(),
             label: localizedLabel,
             macro: {
                 enable: true,
@@ -164,7 +164,7 @@ export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
             }
         };
 
-        return foundry.utils.mergeObject(defaultEntry, entry, { inplace: false });
+        return this.foundry.mergeObject(defaultEntry, entry);
     }
 
     /**
@@ -195,7 +195,7 @@ export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
         const developmentVersion = "#{VERSION}#";
         const moduleVersion = game?.modules?.get(MODULE_ID)?.version ?? "1.0.0";
         const lastUpdate = game?.settings?.get(MODULE_ID, "autorecVersion") ?? "0.0.0";
-        const shouldUpdate = moduleVersion === developmentVersion || foundry.utils.isNewerVersion(moduleVersion, lastUpdate);
+        const shouldUpdate = moduleVersion === developmentVersion || this.foundry.isNewerVersion(moduleVersion, lastUpdate);
         if (!shouldUpdate) return;
 
         if (!dependency.isActivated({ id: "autoanimations", min: "6.5.1" }, localize("EMP.autoanimations.skipped", "EMP | Automated Animations integration skipped."))) {

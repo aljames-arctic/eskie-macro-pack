@@ -181,11 +181,11 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
 
     let existingTree = {};
     if (existingData?.customAutoRecognition && typeof existingData.customAutoRecognition === 'object' && !Array.isArray(existingData.customAutoRecognition)) {
-        existingTree = foundry.utils.duplicate(existingData.customAutoRecognition);
+        existingTree = foundryPlatform.duplicate(existingData.customAutoRecognition);
     } else if (existingData?.flags?.['boss-loot-assets-premium']?.customAutoRecognition && typeof existingData.flags['boss-loot-assets-premium'].customAutoRecognition === 'object') {
-        existingTree = foundry.utils.duplicate(existingData.flags['boss-loot-assets-premium'].customAutoRecognition);
+        existingTree = foundryPlatform.duplicate(existingData.flags['boss-loot-assets-premium'].customAutoRecognition);
     } else if (existingData && typeof existingData === 'object' && !Array.isArray(existingData) && !existingData.flags) {
-        existingTree = foundry.utils.duplicate(existingData);
+        existingTree = foundryPlatform.duplicate(existingData);
     }
     if (typeof existingTree !== 'object' || existingTree === null || Array.isArray(existingTree)) {
         existingTree = {};
@@ -239,7 +239,7 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
                     } else if (typeof existingEntry.note === 'string' && existingEntry.note.includes("Eskie Macro Pack")) {
                         const newVersion = extractVersionFromNote(newEntry.note);
                         const oldVersion = extractVersionFromNote(existingEntry.note);
-                        if (foundry.utils.isNewerVersion(newVersion, oldVersion)) {
+                        if (foundryPlatform.isNewerVersion(newVersion, oldVersion)) {
                             updatedEntries.push(formatted);
                         } else {
                             sameEntries.push(formatted);
@@ -259,7 +259,7 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
     log.groupEnd();
 
     // 2nd Pass: Build the merged tree, filtering out excluded missing entries
-    const mergedTree = foundry.utils.duplicate(existingTree);
+    const mergedTree = foundryPlatform.duplicate(existingTree);
 
     // Add selected missing entries
     for (const item of missingEntries) {

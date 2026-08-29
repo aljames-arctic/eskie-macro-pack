@@ -1,5 +1,6 @@
 import { dependency } from './dependency.js';
 import { log } from './logger.js';
+import { adapter } from '../adapters/index.js';
 
 const BBC_DEPENDENCY = { id: 'bakana-better-crosshairs', ref: "Bakana's Better Crosshairs" };
 
@@ -36,7 +37,7 @@ function normalizeCrosshairInvocation(targetOrPlaceable, config = {}) {
         log.debug(`normalizeCrosshairInvocation | Passed object is a ${docName} ("${targetOrPlaceable?.name ?? targetOrPlaceable?.document?.name}"), normalizing to token config.`);
         return {
             placeable: null,
-            config: foundry.utils.mergeObject({ token: targetOrPlaceable }, config, { inplace: false })
+            config: adapter.mergeObject({ token: targetOrPlaceable }, config)
         };
     }
 

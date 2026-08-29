@@ -45,7 +45,7 @@ new Sequence()
     .play();
 
 targets.forEach(target => {
-    const value = foundry.utils.getProperty(target, path);
+    const value = (globalThis.eskie?.adapter ?? foundry.utils).getProperty(target, path);
     const isUndead = Array.isArray(value)
         ? value.map(v => String(v).toLowerCase()).includes('undead')
         : String(value ?? '').toLowerCase().includes('undead');

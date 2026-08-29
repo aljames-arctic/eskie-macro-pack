@@ -2,6 +2,7 @@ import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { initializeFoundryAdapter, BaseFoundryAdapter, FoundryCurrentAdapter, USER_PERMISSION_TIERS } from '../../src/adapters/foundry/index.js';
+import { adapter } from '../../src/adapters/index.js';
 
 test('initializeFoundryAdapter returns BaseFoundryAdapter on v12/v13 baseline and FoundryCurrentAdapter on v14+', () => {
     // V12 baseline
@@ -415,6 +416,41 @@ test('BaseFoundryAdapter mergeObject defaults to non-inplace safe merge', () => 
     adapter.mergeObject(inplaceTarget, { y: 20 }, { inplace: true });
     assert.equal(inplaceTarget.y, 20);
 });
+
+test('BaseFoundryAdapter and UnifiedAdapter abstract all utility operations cleanly', () => {
+    const bfa = new BaseFoundryAdapter();
+
+    // slugify
+    assert.equal(bfa.slugify('Fire Blast 01!'), 'fire-blast-01');
+    assert.equal(adapter.slugify('Healing Word (Mass)'), 'healing-word-mass');
+
+    // hasProperty & getProperty & setProperty
+    const obj = { foo: { bar: 42 } };
+    assert.equal(bfa.hasProperty(obj, 'foo.bar'), true);
+    assert.equal(bfa.hasProperty(obj, 'foo.baz'), false);
+    assert.equal(adapter.hasProperty(obj, 'foo.bar'), true);
+
+    adapter.setProperty(obj, 'foo.baz', 100);
+    assert.equal(bfa.getProperty(obj, 'foo.baz'), 100);
+    assert.equal(adapter.getProperty(obj, 'foo.baz'), 100);
+
+    // isNewerVersion
+    assert.equal(bfa.isNewerVersion('2.0.0', '1.9.9'), true);
+    assert.equal(bfa.isNewerVersion('1.0.0', '1.0.0'), false);
+    assert.equal(adapter.isNewerVersion('1.5.0', '1.4.2'), true);
+
+    // duplicate & deepClone
+    const cloned = adapter.deepClone({ nest: { count: 5 } });
+    assert.deepEqual(cloned, { nest: { count: 5 } });
+    const duplicated = adapter.duplicate({ list: [1, 2, 3] });
+    assert.deepEqual(duplicated, { list: [1, 2, 3] });
+
+    // randomID
+    const id = adapter.randomID(16);
+    assert.equal(typeof id, 'string');
+    assert.equal(id.length, 16);
+});
+
 
 
 

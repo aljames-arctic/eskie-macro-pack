@@ -274,6 +274,90 @@ export class BaseFoundryAdapter {
     }
 
     /**
+     * Test whether a target object has a property at a specified path.
+     * @param {Object} obj Target object
+     * @param {string} path Dot-separated property path
+     * @returns {boolean}
+     */
+    hasProperty(obj, path) {
+        if (typeof foundry !== 'undefined' && foundry.utils?.hasProperty) {
+            return foundry.utils.hasProperty(obj, path);
+        }
+        return this.getProperty(obj, path) !== undefined;
+    }
+
+    /**
+     * Slugify a string according to Foundry VTT standards.
+     * @param {string} text Target text to slugify
+     * @param {Object} [options={}] Slugify options
+     * @returns {string} Slugified string
+     */
+    slugify(text, options = {}) {
+        if (typeof foundry !== 'undefined' && foundry.utils?.slugify) {
+            return foundry.utils.slugify(text, options);
+        }
+        const str = String(text ?? '').toLowerCase();
+        return str.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    }
+
+    /**
+     * Compute the difference between two objects.
+     * @param {Object} original Original object
+     * @param {Object} other Modified object
+     * @param {Object} [options={}] Comparison options
+     * @returns {Object} Difference object
+     */
+    diffObject(original, other, options = {}) {
+        if (typeof foundry !== 'undefined' && foundry.utils?.diffObject) {
+            return foundry.utils.diffObject(original, other, options);
+        }
+        return {};
+    }
+
+    /**
+     * Flatten a nested object structure into dot-separated paths.
+     * @param {Object} obj Object to flatten
+     * @param {number} [d=0] Current recursion depth
+     * @returns {Object} Flattened object
+     */
+    flattenObject(obj, d = 0) {
+        if (typeof foundry !== 'undefined' && foundry.utils?.flattenObject) {
+            return foundry.utils.flattenObject(obj, d);
+        }
+        return { ...obj };
+    }
+
+    /**
+     * Expand a flattened object with dot-separated keys into a deeply nested structure.
+     * @param {Object} obj Flattened object
+     * @param {number} [d=0] Current recursion depth
+     * @returns {Object} Expanded nested object
+     */
+    expandObject(obj, d = 0) {
+        if (typeof foundry !== 'undefined' && foundry.utils?.expandObject) {
+            return foundry.utils.expandObject(obj, d);
+        }
+        return { ...obj };
+    }
+
+    /**
+     * Debounce a function call by a specified delay.
+     * @param {Function} fn Function to debounce
+     * @param {number} delay Delay in milliseconds
+     * @returns {Function} Debounced function
+     */
+    debounce(fn, delay) {
+        if (typeof foundry !== 'undefined' && foundry.utils?.debounce) {
+            return foundry.utils.debounce(fn, delay);
+        }
+        let timeoutId;
+        return function (...args) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => fn.apply(this, args), delay);
+        };
+    }
+
+    /**
      * Enrich an HTML string with Foundry enrichers, roll data, and document links.
      * @param {string} content HTML string to enrich
      * @param {Object} [options={}] Enrichment options (rollData, secrets, relativeTo, etc.)

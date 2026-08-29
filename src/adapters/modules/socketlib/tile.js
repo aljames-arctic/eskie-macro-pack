@@ -1,6 +1,7 @@
 import { MODULE_ID } from "../../../lib/constants.js";
 import { log } from "../../../lib/logger.js";
 import { socketlib } from "./socketlib-module-adapter.js";
+import { adapter } from "../../index.js";
 
 const tileTrackers = new Map();
 
@@ -16,7 +17,7 @@ async function waitForTileReplication(tileId) {
         resolvePromise = resolve;
     });
 
-    const trackerId = foundry.utils.randomID();
+    const trackerId = adapter.randomID();
     
     // Safety timeout (10 seconds)
     const timeoutId = setTimeout(() => {
@@ -103,7 +104,7 @@ async function createTile(updates = {}) {
         width: 1,
         height: 1
     };
-    updates = foundry.utils.mergeObject(DEFAULT_TILE_UPDATES, updates, { inplace: false });
+    updates = adapter.mergeObject(DEFAULT_TILE_UPDATES, updates);
     return canvas.scene.createEmbeddedDocuments("Tile", [updates]);
 }
 

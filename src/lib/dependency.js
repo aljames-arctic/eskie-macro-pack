@@ -2,6 +2,7 @@ import { log } from './logger.js';
 
 /**
  * Checks if the versions are in ascending order.
+ * Delegates to adapter.isNewerVersion when available.
  * @param {string} min The minimum version.
  * @param {string} version The version to check.
  * @param {string} max The maximum version.
@@ -9,9 +10,28 @@ import { log } from './logger.js';
  * @private
  */
 function _isAscending(min, version, max) {
+    const isNewer = (a, b) => {
+        if (typeof globalThis.eskie !== 'undefined' && globalThis.eskie?.adapter?.isNewerVersion) {
+            return globalThis.eskie.adapter.isNewerVersion(a, b);
+        }
+        if (typeof foundry !== 'undefined' && foundry.utils?.isNewerVersion) {
+            return foundry.utils.isNewerVersion(a, b);
+        }
+        const partsA = String(a).split('.').map(n => parseInt(n, 10) || 0);
+        const partsB = String(b).split('.').map(n => parseInt(n, 10) || 0);
+        const len = Math.max(partsA.length, partsB.length);
+        for (let i = 0; i < len; i++) {
+            const valA = partsA[i] ?? 0;
+            const valB = partsB[i] ?? 0;
+            if (valA > valB) return true;
+            if (valA < valB) return false;
+        }
+        return false;
+    };
+
     let isValidVersion = true;
-    if (min) isValidVersion = isValidVersion && !foundry.utils.isNewerVersion(min, version);
-    if (max) isValidVersion = isValidVersion && !foundry.utils.isNewerVersion(version, max);
+    if (min) isValidVersion = isValidVersion && !isNewer(min, version);
+    if (max) isValidVersion = isValidVersion && !isNewer(version, max);
     return isValidVersion;
 }
 

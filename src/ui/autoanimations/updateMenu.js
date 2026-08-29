@@ -26,7 +26,7 @@ export async function generateAutorecUpdate(autorec, excludedIds = new Set()) {
             const existingEntry = settings[key]?.find(e => e.label === newEntry.label);
             if (existingEntry) {
                 if (existingEntry.metaData?.name === "Eskie Macro Pack") {
-                    if (foundry.utils.isNewerVersion(newEntry.metaData.version, existingEntry.metaData.version ?? "0.0.0")) {
+                    if (foundryPlatform.isNewerVersion(newEntry.metaData.version, existingEntry.metaData.version ?? "0.0.0")) {
                         updatedEntries[key].push(newEntry);
                     } else {
                         same[key].push(existingEntry);

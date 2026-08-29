@@ -25,7 +25,7 @@ Hooks.once('init', async () => {
 
     function setupModule() {
         function setupApiCalls(exportedFunctions) {
-            globalThis.eskie = foundry.utils.mergeObject(
+            globalThis.eskie = adapter.mergeObject(
                 globalThis.eskie ?? {},
                 exportedFunctions
             );

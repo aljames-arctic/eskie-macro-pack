@@ -143,6 +143,34 @@ export class Adapter {
         return this.foundry.isEmpty(obj);
     }
 
+    isNewerVersion(a, b) {
+        return this.foundry.isNewerVersion(a, b);
+    }
+
+    hasProperty(obj, path) {
+        return this.foundry.hasProperty(obj, path);
+    }
+
+    slugify(text, options = {}) {
+        return this.foundry.slugify(text, options);
+    }
+
+    diffObject(original, other, options = {}) {
+        return this.foundry.diffObject(original, other, options);
+    }
+
+    flattenObject(obj, d = 0) {
+        return this.foundry.flattenObject(obj, d);
+    }
+
+    expandObject(obj, d = 0) {
+        return this.foundry.expandObject(obj, d);
+    }
+
+    debounce(fn, delay) {
+        return this.foundry.debounce(fn, delay);
+    }
+
     async enrichHTML(content, options = {}) {
         return this.foundry.enrichHTML(content, options);
     }

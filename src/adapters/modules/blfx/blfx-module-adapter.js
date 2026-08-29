@@ -495,7 +495,7 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
                 new BlfxAutorecUpdateFormApplication(this.registry).render(true);
             }
         } else {
-            log.info(localize("EMP.blfxUpdateMenu.nothing", "All Eskie Macro Pack animations are up to date in Boss Loot FX!"));
+            log.info(localize("EMP.blfxUpdateMenu.nothing", "All Eskie Macro Pack animations are up to date!"));
         }
 
         if (!isDevelopment && game.settings) {

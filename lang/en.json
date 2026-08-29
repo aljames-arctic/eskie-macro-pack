@@ -176,7 +176,7 @@
             "customHint": "These presets already exist in Boss Loot FX from another source or custom edit and will not be overwritten.",
             "updated": "Animation Presets to Update",
             "warning": "This will update Eskie Macro Pack animation presets in Boss Loot FX. Custom presets from other sources will remain untouched.",
-            "nothing": "All Eskie Macro Pack animations are up to date in Boss Loot FX!",
+            "nothing": "All Eskie Macro Pack animations are up to date!",
             "acceptButton": "Apply Updates",
             "cancelButton": "Cancel"
         },

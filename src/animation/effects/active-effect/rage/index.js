@@ -7,10 +7,8 @@ import { rageV2 as v4, DEFAULT_CONFIG as config_v4 } from "./rage_v2.js";
 import { rageTotem as v5, DEFAULT_CONFIG as config_v5 } from "./rage_totem.js";
 
 import { adapter } from "../../../../adapters/index.js";
-import { DEFAULT_SOUND_CONFIG } from "../../../utils/sound.js";
 const DEFAULT_CONFIG = {
     version: 4,
-    sound: { ...DEFAULT_SOUND_CONFIG },
     config_v1,
     config_v2,
     config_v3,
@@ -72,4 +70,4 @@ export const rage = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("rage", "effect", "eskie.effect.rage", DEFAULT_CONFIG, '1.0.2', "Rage");
+autorec.register("rage", "effect", "eskie.effect.rage", DEFAULT_CONFIG, '1.0.3', "Rage");

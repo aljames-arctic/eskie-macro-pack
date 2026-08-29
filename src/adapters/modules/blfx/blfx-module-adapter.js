@@ -298,12 +298,7 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
         const slugName = typeof itemName === 'string' ? itemName : String(itemName);
         const rawItemSlug = options.itemSlug ?? (foundry.utils?.slugify ? foundry.utils.slugify(slugName) : slugName.toLowerCase().replace(/[^a-z0-9]/g, '-'));
         const itemSlug = rawItemSlug ? rawItemSlug : 'default-item';
-        const defaultActivityName = ['melee', 'melee-target'].includes(trigger)
-            ? "Melee Attack"
-            : (['range', 'ranged-target'].includes(trigger)
-                ? "Ranged Attack"
-                : "Default");
-        const activityName = options.activityName ?? defaultActivityName;
+        const activityName = options.activityName ?? "Default";
         const slugAct = typeof activityName === 'string' ? activityName : String(activityName);
         const rawActivitySlug = options.activitySlug ?? (activityName ? (foundry.utils?.slugify ? foundry.utils.slugify(slugAct) : slugAct.toLowerCase().replace(/[^a-z0-9]/g, '-')) : "default");
         const activitySlug = rawActivitySlug ? rawActivitySlug : 'default';

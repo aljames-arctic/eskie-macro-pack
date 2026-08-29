@@ -11,12 +11,7 @@ const DEFAULT_CONFIG = {
     id: 'wailsFromTheGrave',
     type: 'slashing', // 'slashing', 'piercing', 'bludgeoning'
     weight: 'medium', // 'light', 'medium', 'heavy'
-    sound: {
-        ...DEFAULT_SOUND_CONFIG,
-        enable: true,
-        volume: 0.5,
-        file: 'eskie.sound.roar.02'
-    }
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 function getNearestSquareCenter(token, target1) {
@@ -87,7 +82,17 @@ async function createDamageOnly(target, config = {}) {
             .scaleToObject(0.6, { considerTokenScale: true })
             .zIndex(2);
 
-        applySound(seq, { ...sound, delay: idx * 100 });
+        seq.effect()
+            .name(`${id} - ${target.id}`)
+            .delay(idx * 100)
+            .file(closest('eskie.sound.roar.02'))
+            .atLocation(target, { offset, gridUnits: true })
+            .scaleToObject(0.9, { considerTokenScale: true })
+            .zIndex(1)
+            .duration(1000)
+            .fadeOut(400)
+            .tint('#111111')
+            .opacity(0.9);
     });
 
     seq.effect()
@@ -101,6 +106,8 @@ async function createDamageOnly(target, config = {}) {
         .duration(1000)
         .fadeOut(750)
         .tint('#58feb0');
+
+    applySound(seq, sound);
 
     return seq;
 }
@@ -130,6 +137,7 @@ async function createAttack(token, target1, target2, config = {}) {
 
     const randomOffset = target2 ? generateOffsets(target2, 3) : generateOffsets(target1, 3);
     const seq = new Sequence();
+    applySound(seq, sound);
 
     // Primary strike on target 1
     seq.effect()
@@ -213,7 +221,16 @@ async function createAttack(token, target1, target2, config = {}) {
                 .scaleToObject(0.6, { considerTokenScale: true })
                 .zIndex(2);
 
-            applySound(damageSeq, { ...sound, delay: idx * 100 });
+            damageSeq.effect()
+                .delay(idx * 100)
+                .file(closest('eskie.sound.roar.02'))
+                .atLocation(target2, { offset, gridUnits: true })
+                .scaleToObject(0.9, { considerTokenScale: true })
+                .zIndex(1)
+                .duration(1000)
+                .fadeOut(400)
+                .tint('#111111')
+                .opacity(0.9);
         });
 
         damageSeq.effect()
@@ -262,6 +279,6 @@ export const wailsFromTheGrave = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('wailsFromTheGrave', 'melee-target', 'eskie.effect.wailsFromTheGrave.attack', DEFAULT_CONFIG, '0.0.1', 'Wails from the Grave');
-autorec.register('wailsFromTheGraveDamage', 'ranged-target', 'eskie.effect.wailsFromTheGrave.damage', DEFAULT_CONFIG, '0.0.1', 'Wails from the Grave (Damage)');
+autorec.register('wailsFromTheGrave', 'melee-target', 'eskie.effect.wailsFromTheGrave.attack', DEFAULT_CONFIG, '0.0.2', 'Wails from the Grave');
+autorec.register('wailsFromTheGraveDamage', 'ranged-target', 'eskie.effect.wailsFromTheGrave.damage', DEFAULT_CONFIG, '0.0.2', 'Wails from the Grave (Damage)');
 

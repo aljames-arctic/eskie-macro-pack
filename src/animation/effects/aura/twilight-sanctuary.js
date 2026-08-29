@@ -117,7 +117,7 @@ async function play(token, config = {}) {
 async function stop(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
-    if (token) Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}`, object: token });
+    if (token) Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}` });
 }
 
 export const twilightSanctuary = {

@@ -129,4 +129,18 @@ test('entangle template and entangled active effect exports and contracts', asyn
     assert.deepEqual(endEffectsCalls[0], { name: 'entangled - victim-123', object: token });
 });
 
+test('twilightSanctuary.stop ends effects by name without restricting to object: token', async () => {
+    const { twilightSanctuary } = await import('../../src/animation/effects/aura/twilight-sanctuary.js');
+    assert.equal(typeof twilightSanctuary.stop, 'function');
+
+    const endEffectsCalls = [];
+    globalThis.Sequencer.EffectManager.endEffects = (opts) => endEffectsCalls.push(opts);
+
+    const token = { id: 'cleric-789' };
+    await twilightSanctuary.stop(token);
+    assert.equal(endEffectsCalls.length, 1);
+    assert.deepEqual(endEffectsCalls[0], { name: 'twilightSanctuary - cleric-789' });
+});
+
+
 

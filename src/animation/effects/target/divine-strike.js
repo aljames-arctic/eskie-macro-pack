@@ -475,9 +475,9 @@ export const divineStrike = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register(autorec.MELEE('divineStrike', 'Divine Strike'), 'melee-target', 'eskie.effect.divineStrike.melee', DEFAULT_CONFIG, '0.0.1', '(Melee) Divine Strike');
-autorec.register(autorec.RANGED('divineStrike', 'Divine Strike'), 'ranged-target', 'eskie.effect.divineStrike.ranged', DEFAULT_CONFIG, '0.0.1', '(Ranged) Divine Strike');
-autorec.register(autorec.MELEE('divineStrikeTwilight', 'Divine Strike (Twilight)'), 'melee-target', 'eskie.effect.divineStrike.twilight.melee', DEFAULT_CONFIG, '0.0.1', '(Melee) Divine Strike (Twilight)');
-autorec.register(autorec.RANGED('divineStrikeTwilight', 'Divine Strike (Twilight)'), 'ranged-target', 'eskie.effect.divineStrike.twilight.ranged', DEFAULT_CONFIG, '0.0.1', '(Ranged) Divine Strike (Twilight)');
+autorec.register(autorec.MELEE('divineStrike', 'Divine Strike'), 'melee-target', 'eskie.effect.divineStrike.melee', DEFAULT_CONFIG, '0.0.2', '(Melee) Divine Strike', { blfxTrigger: 'afterDamage' });
+autorec.register(autorec.RANGED('divineStrike', 'Divine Strike'), 'ranged-target', 'eskie.effect.divineStrike.ranged', DEFAULT_CONFIG, '0.0.2', '(Ranged) Divine Strike', { blfxTrigger: 'afterDamage' });
+autorec.register(autorec.MELEE('divineStrikeTwilight', 'Divine Strike (Twilight)'), 'melee-target', 'eskie.effect.divineStrike.twilight.melee', DEFAULT_CONFIG, '0.0.2', '(Melee) Divine Strike (Twilight)', { blfxTrigger: 'afterDamage' });
+autorec.register(autorec.RANGED('divineStrikeTwilight', 'Divine Strike (Twilight)'), 'ranged-target', 'eskie.effect.divineStrike.twilight.ranged', DEFAULT_CONFIG, '0.0.2', '(Ranged) Divine Strike (Twilight)', { blfxTrigger: 'afterDamage' });
 
 

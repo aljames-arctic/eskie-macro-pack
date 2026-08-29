@@ -85,6 +85,22 @@ test('blfx.register populates activityName, activityType, and animation slots wi
     assert.equal(entry.animationData.thirdAnimation.fileName, 'blfx.spell.cast.circles2.energy1.smoke.orange');
 });
 
+test('divineStrike registers into BLFX under afterDamage with Attack Melee / Attack Ranged macroType', async () => {
+    await import('../../src/animation/effects/target/divine-strike.js');
+
+    assert.ok(EMP_BLFX_Registry['dnd5e']['melee-divine-strike']['default']['afterDamage']);
+    const meleeEntry = EMP_BLFX_Registry['dnd5e']['melee-divine-strike']['default']['afterDamage'];
+    assert.equal(meleeEntry.triggerName, 'After Damage Roll');
+    assert.equal(meleeEntry.animationData.macroType, 'Attack Melee');
+    assert.equal(meleeEntry.note, 'Eskie Macro Pack (0.0.2)');
+
+    assert.ok(EMP_BLFX_Registry['dnd5e']['ranged-divine-strike']['default']['afterDamage']);
+    const rangedEntry = EMP_BLFX_Registry['dnd5e']['ranged-divine-strike']['default']['afterDamage'];
+    assert.equal(rangedEntry.triggerName, 'After Damage Roll');
+    assert.equal(rangedEntry.animationData.macroType, 'Attack Ranged');
+    assert.equal(rangedEntry.note, 'Eskie Macro Pack (0.0.2)');
+});
+
 test('groupBlfxEntriesByTrigger groups entries into preferred section and sub-section order', () => {
     const rawEntries = [
         { itemName: 'Shield', triggerName: 'After Attack Roll', triggerMode: 'afterAttack', macroType: 'On Target or Token' },

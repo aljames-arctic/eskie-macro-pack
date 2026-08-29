@@ -420,7 +420,7 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
                 ? "On Target or Token (AE)"
                 : (triggerMode === "createTemplate"
                     ? "Template"
-                    : (triggerMode === "afterAttack"
+                    : (triggerMode === "afterAttack" || triggerMode === "afterDamage"
                         ? (['melee', 'melee-target'].includes(trigger) ? "Attack Melee" : "Attack Ranged")
                         : (triggerMode === "afterSummon"
                             ? "Summon"

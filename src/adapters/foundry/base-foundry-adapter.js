@@ -1,6 +1,6 @@
 import { dependency } from '../../lib/dependency.js';
-import { massEditAdapter } from '../modules/mass-edit/index.js';
-import { tokenAttacherAdapter } from '../modules/token-attacher/index.js';
+import { massEditAdapter } from '../modules/mass-edit/mass-edit-module-adapter.js';
+import { tokenAttacherAdapter } from '../modules/token-attacher/token-attacher-module-adapter.js';
 
 /**
  * User permission tiers for ownership priority evaluation.

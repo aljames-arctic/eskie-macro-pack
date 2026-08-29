@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: 'ghostWalk',
@@ -116,6 +116,6 @@ export const ghostWalk = {
     default_config: DEFAULT_CONFIG
 };
 
-autoanimations.register('ghostWalk', 'token', 'eskie.effect.ghostWalk', DEFAULT_CONFIG, '0.0.0', 'Ghost Walk');
-autoanimations.register('ghostWalk', 'effect', 'eskie.effect.ghostWalk', DEFAULT_CONFIG, '0.0.0', 'Ghost Walk');
+autorec.register('ghostWalk', 'token', 'eskie.effect.ghostWalk', DEFAULT_CONFIG, '0.0.0', 'Ghost Walk');
+autorec.register('ghostWalk', 'effect', 'eskie.effect.ghostWalk', DEFAULT_CONFIG, '0.0.0', 'Ghost Walk');
 

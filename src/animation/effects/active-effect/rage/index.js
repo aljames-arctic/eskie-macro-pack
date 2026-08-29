@@ -1,4 +1,4 @@
-import { autoanimations } from "../../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../../adapters/modules/autorec/autorec.js";
 
 import { rageV1 as v1, DEFAULT_CONFIG as config_v1} from "./rage_v1.js";
 import { electric as v2, DEFAULT_CONFIG as config_v2} from "./rage-electric.js";
@@ -69,4 +69,4 @@ export const rage = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("rage", "effect", "eskie.effect.rage", DEFAULT_CONFIG, '1.0.0', "Rage");
+autorec.register("rage", "effect", "eskie.effect.rage", DEFAULT_CONFIG, '1.0.0', "Rage");

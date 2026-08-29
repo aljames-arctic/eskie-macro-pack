@@ -4,7 +4,7 @@
  */
 
 import { closest } from '../../../lib/filemanager.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: 'healing-word',
@@ -149,5 +149,5 @@ export const healingWord = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("healingWord", "ranged-target", "eskie.effect.healingWord", DEFAULT_CONFIG, "0.0.0", "Healing Word");
-autoanimations.register("massHealingWord", "ranged-target", "eskie.effect.healingWord", DEFAULT_CONFIG, "0.0.0", "Mass Healing Word");
+autorec.register("healingWord", "ranged-target", "eskie.effect.healingWord", DEFAULT_CONFIG, "0.0.0", "Healing Word");
+autorec.register("massHealingWord", "ranged-target", "eskie.effect.healingWord", DEFAULT_CONFIG, "0.0.0", "Mass Healing Word");

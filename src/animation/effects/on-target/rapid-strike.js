@@ -1,7 +1,7 @@
 import { adapter } from '../../../adapters/index.js';
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from "../../../lib/settings.js";
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: "Rapid Strike",
@@ -121,4 +121,4 @@ export const rapidStrike = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("rapidStrike", "melee-target", "eskie.effect.rapidStrike", DEFAULT_CONFIG, "0.0.0", "Rapid Strike");
+autorec.register("rapidStrike", "melee-target", "eskie.effect.rapidStrike", DEFAULT_CONFIG, "0.0.0", "Rapid Strike");

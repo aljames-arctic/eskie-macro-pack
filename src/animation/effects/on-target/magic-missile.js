@@ -2,7 +2,7 @@
 //Modular Conversion: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
-import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 import { adapter } from "../../../adapters/index.js";
 
 const DEFAULT_CONFIG = {
@@ -111,4 +111,4 @@ export const magicMissile = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("magicMissile", "ranged-target", "eskie.effect.magicMissile", DEFAULT_CONFIG, "0.0.0", "Magic Missile");
+autorec.register("magicMissile", "ranged-target", "eskie.effect.magicMissile", DEFAULT_CONFIG, "0.0.0", "Magic Missile");

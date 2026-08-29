@@ -4,7 +4,7 @@
 ** */
 
 import { closest } from '../../../lib/filemanager.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: 'curse-of-the-werewolf',

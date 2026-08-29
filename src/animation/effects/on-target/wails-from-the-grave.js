@@ -3,7 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: 'wailsFromTheGrave',
@@ -268,6 +268,6 @@ export const wailsFromTheGrave = {
     default_config: DEFAULT_CONFIG
 };
 
-autoanimations.register('wailsFromTheGrave', 'melee-target', 'eskie.effect.wailsFromTheGrave.attack', DEFAULT_CONFIG, '0.0.0', 'Wails from the Grave');
-autoanimations.register('wailsFromTheGraveDamage', 'ranged-target', 'eskie.effect.wailsFromTheGrave.damage', DEFAULT_CONFIG, '0.0.0', 'Wails from the Grave (Damage)');
+autorec.register('wailsFromTheGrave', 'melee-target', 'eskie.effect.wailsFromTheGrave.attack', DEFAULT_CONFIG, '0.0.0', 'Wails from the Grave');
+autorec.register('wailsFromTheGraveDamage', 'ranged-target', 'eskie.effect.wailsFromTheGrave.damage', DEFAULT_CONFIG, '0.0.0', 'Wails from the Grave (Damage)');
 

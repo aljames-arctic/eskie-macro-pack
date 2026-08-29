@@ -3,7 +3,7 @@
 
 import { closest, absolutePath } from '../../../lib/filemanager.js';
 import { template } from '../../../lib/templates.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: 'DimensionDoor',
@@ -98,4 +98,4 @@ export const dimensionDoor = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("dimensionDoor", "template", "eskie.effect.dimensionDoor", DEFAULT_CONFIG, "0.0.0", "Dimension Door");
+autorec.register("dimensionDoor", "template", "eskie.effect.dimensionDoor", DEFAULT_CONFIG, "0.0.0", "Dimension Door");

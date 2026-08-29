@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: 'thornWhip',
@@ -119,5 +119,5 @@ export const thornWhip = {
     default_config: DEFAULT_CONFIG
 };
 
-autoanimations.register('thornWhip', 'ranged-target', 'eskie.effect.thornWhip', DEFAULT_CONFIG, '0.0.0', 'Thorn Whip');
+autorec.register('thornWhip', 'ranged-target', 'eskie.effect.thornWhip', DEFAULT_CONFIG, '0.0.0', 'Thorn Whip');
 

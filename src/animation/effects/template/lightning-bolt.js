@@ -6,7 +6,7 @@
 import { closest } from '../../../lib/filemanager.js';
 import { template } from '../../../lib/templates.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 import { adapter } from '../../../adapters/index.js';
 
 const DEFAULT_CONFIG = {
@@ -138,4 +138,4 @@ export const lightningBolt = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("lightningBolt", "template", "eskie.effect.lightningBolt", DEFAULT_CONFIG, "0.0.0", "Lightning Bolt");
+autorec.register("lightningBolt", "template", "eskie.effect.lightningBolt", DEFAULT_CONFIG, "0.0.0", "Lightning Bolt");

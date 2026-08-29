@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../../lib/filemanager.js';
-import { autoanimations } from '../../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../../adapters/modules/autorec/autorec.js';
 import { adapter } from '../../../../adapters/index.js';
 
 const DEFAULT_CONFIG = {
@@ -120,5 +120,5 @@ export const eyesOfTheGrave = {
     default_config: DEFAULT_CONFIG
 };
 
-autoanimations.register('eyesOfTheGrave', 'token', 'eskie.effect.detect.eyesOfTheGrave', DEFAULT_CONFIG, '0.0.0', 'Eyes of the Grave');
+autorec.register('eyesOfTheGrave', 'token', 'eskie.effect.detect.eyesOfTheGrave', DEFAULT_CONFIG, '0.0.0', 'Eyes of the Grave');
 

@@ -5,7 +5,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
-import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 import { adapter } from "../../../adapters/index.js";
 
 const DEFAULT_CONFIG = {
@@ -406,4 +406,4 @@ export const banishment = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("banishment", "effect", "eskie.effect.banishment", DEFAULT_CONFIG, '2.0.1', "Banishment");
+autorec.register("banishment", "effect", "eskie.effect.banishment", DEFAULT_CONFIG, '2.0.1', "Banishment");

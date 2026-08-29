@@ -1,4 +1,4 @@
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 import { socket } from '../../../adapters/modules/socketlib/socketlib.js';
 import { closest } from '../../../lib/filemanager.js'
 import { matt } from '../../utils/matt-tiles.js';
@@ -122,4 +122,4 @@ export const dash = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("dash", "effect", "eskie.effect.dash", DEFAULT_CONFIG, "0.0.0", "Dash");
+autorec.register("dash", "effect", "eskie.effect.dash", DEFAULT_CONFIG, "0.0.0", "Dash");

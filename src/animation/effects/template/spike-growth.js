@@ -5,7 +5,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { template } from '../../../lib/templates.js';
-import { autoanimations, CONCENTRATING } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 
 const DEFAULT_CONFIG = {
     id: 'spikeGrowth',
@@ -183,5 +183,5 @@ export const spikeGrowth = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("spikeGrowth", "template", "eskie.effect.spikeGrowth", DEFAULT_CONFIG, "0.0.0", "Spike Growth");
-autoanimations.register(CONCENTRATING("spikeGrowth", "Spike Growth"), "effect", "eskie.effect.spikeGrowth", DEFAULT_CONFIG);
+autorec.register("spikeGrowth", "template", "eskie.effect.spikeGrowth", DEFAULT_CONFIG, "0.0.0", "Spike Growth");
+autorec.register(CONCENTRATING("spikeGrowth", "Spike Growth"), "effect", "eskie.effect.spikeGrowth", DEFAULT_CONFIG);

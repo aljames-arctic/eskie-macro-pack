@@ -1,6 +1,6 @@
 import { adapter } from "../../../adapters/index.js";
 import { blur } from "../../scene-overlays/status-blur.js";
-import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 import { log } from '../../../lib/logger.js';
 
 /* **
@@ -56,4 +56,4 @@ export const blurredVision = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("blurredVision", "effect", "eskie.effect.blurredVision", DEFAULT_CONFIG, "0.0.0", "Blurred Vision");
+autorec.register("blurredVision", "effect", "eskie.effect.blurredVision", DEFAULT_CONFIG, "0.0.0", "Blurred Vision");

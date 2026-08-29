@@ -4,7 +4,7 @@
  */
 
 import { closest } from '../../../../lib/filemanager.js';
-import { autoanimations } from '../../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: 'hex',
@@ -91,4 +91,4 @@ export const hexCast = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("hexed", "effect", "eskie.effect.hex.cast", DEFAULT_CONFIG, "0.0.0", "Hexed");
+autorec.register("hexed", "effect", "eskie.effect.hex.cast", DEFAULT_CONFIG, "0.0.0", "Hexed");

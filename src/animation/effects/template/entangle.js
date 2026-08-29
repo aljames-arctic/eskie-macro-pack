@@ -3,7 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
-import { autoanimations, CONCENTRATING } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: 'entangle',
@@ -132,6 +132,6 @@ export const entangle = {
     default_config: DEFAULT_CONFIG
 };
 
-autoanimations.register('entangle', 'template', 'eskie.effect.entangle', DEFAULT_CONFIG, '0.0.0', 'Entangle');
-autoanimations.register(CONCENTRATING('entangle', 'Entangle'), 'effect', 'eskie.effect.entangle', DEFAULT_CONFIG);
+autorec.register('entangle', 'template', 'eskie.effect.entangle', DEFAULT_CONFIG, '0.0.0', 'Entangle');
+autorec.register(CONCENTRATING('entangle', 'Entangle'), 'effect', 'eskie.effect.entangle', DEFAULT_CONFIG);
 

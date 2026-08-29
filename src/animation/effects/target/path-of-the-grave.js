@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: 'pathOfTheGrave',
@@ -157,6 +157,6 @@ export const pathOfTheGrave = {
     default_config: DEFAULT_CONFIG
 };
 
-autoanimations.register('pathOfTheGrave', 'ranged-target', 'eskie.effect.pathOfTheGrave', DEFAULT_CONFIG, '0.0.0', 'Path of the Grave');
-autoanimations.register('channelDivinityPathToTheGrave', 'ranged-target', 'eskie.effect.pathOfTheGrave', DEFAULT_CONFIG, '0.0.0', 'Channel Divinity: Path to the Grave');
+autorec.register('pathOfTheGrave', 'ranged-target', 'eskie.effect.pathOfTheGrave', DEFAULT_CONFIG, '0.0.0', 'Path of the Grave');
+autorec.register('channelDivinityPathToTheGrave', 'ranged-target', 'eskie.effect.pathOfTheGrave', DEFAULT_CONFIG, '0.0.0', 'Channel Divinity: Path to the Grave');
 

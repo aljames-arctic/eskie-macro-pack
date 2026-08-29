@@ -7,7 +7,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     pushDistance: 80,
@@ -300,4 +300,4 @@ export const fireBlast = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("fireBlast", 'ranged-target', 'eskie.effect.fireBlast', DEFAULT_CONFIG, '0.1.0', "Fire Blast");
+autorec.register("fireBlast", 'ranged-target', 'eskie.effect.fireBlast', DEFAULT_CONFIG, '0.1.0', "Fire Blast");

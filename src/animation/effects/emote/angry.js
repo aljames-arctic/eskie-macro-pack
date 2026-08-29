@@ -1,5 +1,5 @@
 import { closest } from "../../../lib/filemanager.js";
-import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 
 /* **
    Originally Published: 4/14/2023
@@ -67,4 +67,4 @@ export const angry = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("angry", "effect", "eskie.effect.emote.angry", DEFAULT_CONFIG, "0.0.0", "Angry");
+autorec.register("angry", "effect", "eskie.effect.emote.angry", DEFAULT_CONFIG, "0.0.0", "Angry");

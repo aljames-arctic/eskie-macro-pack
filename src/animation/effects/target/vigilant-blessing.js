@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 import { adapter } from '../../../adapters/index.js';
 
 const DEFAULT_CONFIG = {
@@ -149,5 +149,5 @@ export const vigilantBlessing = {
     default_config: DEFAULT_CONFIG
 };
 
-autoanimations.register('vigilantBlessing', 'ranged-target', 'eskie.effect.vigilantBlessing.target', DEFAULT_CONFIG, '0.0.0', 'Vigilant Blessing');
-autoanimations.register('vigilantBlessing', 'effect', 'eskie.effect.vigilantBlessing.effect', DEFAULT_CONFIG, '0.0.0', 'Vigilant Blessing');
+autorec.register('vigilantBlessing', 'ranged-target', 'eskie.effect.vigilantBlessing.target', DEFAULT_CONFIG, '0.0.0', 'Vigilant Blessing');
+autorec.register('vigilantBlessing', 'effect', 'eskie.effect.vigilantBlessing.effect', DEFAULT_CONFIG, '0.0.0', 'Vigilant Blessing');

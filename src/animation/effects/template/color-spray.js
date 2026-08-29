@@ -4,7 +4,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { template } from "../../../lib/templates.js";
-import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 
 const DEFAULT_CONFIG = {
     id: 'colorSpray',
@@ -130,4 +130,4 @@ export const colorSpray = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("colorSpray", 'template', 'eskie.effect.colorSpray', DEFAULT_CONFIG, '1.0', "Color Spray");
+autorec.register("colorSpray", 'template', 'eskie.effect.colorSpray', DEFAULT_CONFIG, '1.0', "Color Spray");

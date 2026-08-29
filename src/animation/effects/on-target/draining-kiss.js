@@ -4,7 +4,7 @@
  */
 
 import { closest } from '../../../lib/filemanager.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: 'draining-kiss',
@@ -154,4 +154,4 @@ export const drainingKiss = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("drainingKiss", "melee-target", "eskie.effect.drainingKiss", DEFAULT_CONFIG, "0.0.0", "Draining Kiss");
+autorec.register("drainingKiss", "melee-target", "eskie.effect.drainingKiss", DEFAULT_CONFIG, "0.0.0", "Draining Kiss");

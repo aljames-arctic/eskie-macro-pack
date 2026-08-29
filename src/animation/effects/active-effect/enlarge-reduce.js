@@ -4,7 +4,7 @@
 ** */
 
 import { closest } from "../../../lib/filemanager.js";
-import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 
 const DEFAULT_CONFIG = {
     id: 'enlargeReduce',
@@ -283,5 +283,5 @@ export const enlargeReduce = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("enlarged", "effect", "eskie.effect.enlargeReduce.enlarge", DEFAULT_CONFIG, "0.0.0", "Enlarged");
-autoanimations.register("reduced", "effect", "eskie.effect.enlargeReduce.reduce", DEFAULT_CONFIG, "0.0.0", "Reduced");
+autorec.register("enlarged", "effect", "eskie.effect.enlargeReduce.enlarge", DEFAULT_CONFIG, "0.0.0", "Enlarged");
+autorec.register("reduced", "effect", "eskie.effect.enlargeReduce.reduce", DEFAULT_CONFIG, "0.0.0", "Reduced");

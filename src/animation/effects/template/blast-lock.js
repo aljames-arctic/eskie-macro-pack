@@ -8,7 +8,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { template } from '../../../lib/templates.js';
 import { socket } from '../../../adapters/modules/socketlib/socketlib.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 
 const DEFAULT_CONFIG = {
@@ -178,4 +178,4 @@ export const blastLock = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("blastLock", "template", "eskie.effect.blastLock", DEFAULT_CONFIG, "0.0.0", "Blast Lock");
+autorec.register("blastLock", "template", "eskie.effect.blastLock", DEFAULT_CONFIG, "0.0.0", "Blast Lock");

@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
-import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 
 const DEFAULT_CONFIG = {
     id: 'bless',
@@ -173,5 +173,5 @@ export const bless = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("bless", "token", "eskie.effect.bless.cast", DEFAULT_CONFIG, "0.0.0", "Bless");
-autoanimations.register("bless", "effect", "eskie.effect.bless.effect", DEFAULT_CONFIG, "0.0.0", "Bless");
+autorec.register("bless", "token", "eskie.effect.bless.cast", DEFAULT_CONFIG, "0.0.0", "Bless");
+autorec.register("bless", "effect", "eskie.effect.bless.effect", DEFAULT_CONFIG, "0.0.0", "Bless");

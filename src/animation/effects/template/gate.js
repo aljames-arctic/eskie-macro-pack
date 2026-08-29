@@ -7,7 +7,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { template } from '../../../lib/templates.js';
-import { autoanimations, CONCENTRATING } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: `gate`,
@@ -239,5 +239,5 @@ export const gate = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("gate", "template", "eskie.effect.gate", DEFAULT_CONFIG, "0.0.0", "Gate");
-autoanimations.register(CONCENTRATING("gate", "Gate"), "effect", "eskie.effect.gate", DEFAULT_CONFIG);
+autorec.register("gate", "template", "eskie.effect.gate", DEFAULT_CONFIG, "0.0.0", "Gate");
+autorec.register(CONCENTRATING("gate", "Gate"), "effect", "eskie.effect.gate", DEFAULT_CONFIG);

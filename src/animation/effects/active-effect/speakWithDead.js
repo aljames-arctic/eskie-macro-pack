@@ -1,6 +1,6 @@
 // Original Author: EskieMoh#2969
 // Updater: @bakanabaka
-import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
 
@@ -320,4 +320,4 @@ export const speakWithDead = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("speakWithDead", "effect", "eskie.effect.speakWithDead", DEFAULT_CONFIG, "0.0.0", "Speak with Dead");
+autorec.register("speakWithDead", "effect", "eskie.effect.speakWithDead", DEFAULT_CONFIG, "0.0.0", "Speak with Dead");

@@ -4,7 +4,7 @@
  */
 
 import { closest } from '../../../lib/filemanager.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: 'firecracker',
@@ -82,4 +82,4 @@ export const firecracker = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("firecracker", "template", "eskie.effect.firecracker", DEFAULT_CONFIG, "0.0.0", "Firecracker");
+autorec.register("firecracker", "template", "eskie.effect.firecracker", DEFAULT_CONFIG, "0.0.0", "Firecracker");

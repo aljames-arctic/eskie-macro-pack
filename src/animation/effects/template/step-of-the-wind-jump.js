@@ -3,7 +3,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { template } from '../../../lib/templates.js';
-import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 
 const DEFAULT_CONFIG = {
     id: 'step-of-the-wind-jump'
@@ -202,4 +202,4 @@ export const stepOfTheWindJump = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("stepOfTheWindJump", "template", "eskie.effect.stepOfTheWind.jump", DEFAULT_CONFIG, "0.0.0", "Step of the Wind Jump");
+autorec.register("stepOfTheWindJump", "template", "eskie.effect.stepOfTheWind.jump", DEFAULT_CONFIG, "0.0.0", "Step of the Wind Jump");

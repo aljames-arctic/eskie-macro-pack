@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: 'tokensOfTheDeparted',
@@ -237,6 +237,6 @@ export const tokensOfTheDeparted = {
     default_config: DEFAULT_CONFIG
 };
 
-autoanimations.register('tokensOfTheDeparted', 'ranged-target', 'eskie.effect.tokensOfTheDeparted.harvest', DEFAULT_CONFIG, '0.0.0', 'Tokens of the Departed');
-autoanimations.register('tokensOfTheDepartedUse', 'ranged-target', 'eskie.effect.tokensOfTheDeparted.use', DEFAULT_CONFIG, '0.0.0', 'Tokens of the Departed (Use)');
+autorec.register('tokensOfTheDeparted', 'ranged-target', 'eskie.effect.tokensOfTheDeparted.harvest', DEFAULT_CONFIG, '0.0.0', 'Tokens of the Departed');
+autorec.register('tokensOfTheDepartedUse', 'ranged-target', 'eskie.effect.tokensOfTheDeparted.use', DEFAULT_CONFIG, '0.0.0', 'Tokens of the Departed (Use)');
 

@@ -3,7 +3,7 @@
 //Integration: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
-import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 
 const DEFAULT_CONFIG = {
     id: "hide"
@@ -84,4 +84,4 @@ export const hide = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("hide", "effect", "eskie.effect.hide", DEFAULT_CONFIG, "0.0.0", "Hide");
+autorec.register("hide", "effect", "eskie.effect.hide", DEFAULT_CONFIG, "0.0.0", "Hide");

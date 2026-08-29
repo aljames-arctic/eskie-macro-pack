@@ -1,6 +1,6 @@
 import { closest } from '../../../lib/filemanager.js';
 import { template } from '../../../lib/templates.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: 'Psychic Teleportation',
@@ -163,4 +163,4 @@ export const psychicTeleportation = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("psychicTeleportation", "template", "eskie.effect.psychicTeleportation", DEFAULT_CONFIG, "0.0.0", "Psychic Teleportation");
+autorec.register("psychicTeleportation", "template", "eskie.effect.psychicTeleportation", DEFAULT_CONFIG, "0.0.0", "Psychic Teleportation");

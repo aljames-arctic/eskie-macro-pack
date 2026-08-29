@@ -6,7 +6,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
-import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 import { log } from "../../../lib/logger.js";
 
 const DEFAULT_CONFIG = {
@@ -102,4 +102,4 @@ export const benignTransportation = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("benignTransportation", "ranged-target", "eskie.effect.benignTransportation", DEFAULT_CONFIG, "0.0.0", "Benign Transportation");
+autorec.register("benignTransportation", "ranged-target", "eskie.effect.benignTransportation", DEFAULT_CONFIG, "0.0.0", "Benign Transportation");

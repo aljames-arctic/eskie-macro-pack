@@ -3,7 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js'
 import { socket } from '../../../adapters/modules/socketlib/socketlib.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 import { matt } from '../../utils/matt-tiles.js';
 
 export const DEFAULT_CONFIG = {
@@ -142,4 +142,4 @@ export const stepOfTheWindMove = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("stepOfTheWind", "effect", "eskie.effect.stepOfTheWind.move", DEFAULT_CONFIG, "0.0.0", "Step of the Wind");
+autorec.register("stepOfTheWind", "effect", "eskie.effect.stepOfTheWind.move", DEFAULT_CONFIG, "0.0.0", "Step of the Wind");

@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: 'goodberry',
@@ -130,7 +130,7 @@ export const goodberry = {
     default_config: DEFAULT_CONFIG
 };
 
-autoanimations.register('goodberry', 'token', 'eskie.effect.goodberry.cast', DEFAULT_CONFIG, '0.0.0', 'Goodberry');
-autoanimations.register('goodberryUse', 'token', 'eskie.effect.goodberry.use', DEFAULT_CONFIG, '0.0.0', 'Goodberry (Use)');
-autoanimations.register('goodberry', 'effect', 'eskie.effect.goodberry.use', DEFAULT_CONFIG, '0.0.0', 'Goodberry');
+autorec.register('goodberry', 'token', 'eskie.effect.goodberry.cast', DEFAULT_CONFIG, '0.0.0', 'Goodberry');
+autorec.register('goodberryUse', 'token', 'eskie.effect.goodberry.use', DEFAULT_CONFIG, '0.0.0', 'Goodberry (Use)');
+autorec.register('goodberry', 'effect', 'eskie.effect.goodberry.use', DEFAULT_CONFIG, '0.0.0', 'Goodberry');
 

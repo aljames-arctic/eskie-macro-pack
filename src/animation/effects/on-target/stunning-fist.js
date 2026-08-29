@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
-import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 
 const DEFAULT_CONFIG = {
     id: 'stunningFist',
@@ -198,4 +198,4 @@ export const stunningFist = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("stunningFist", "melee-target", "eskie.effect.stunningFist", DEFAULT_CONFIG, "0.0.0", "Stunning Fist")
+autorec.register("stunningFist", "melee-target", "eskie.effect.stunningFist", DEFAULT_CONFIG, "0.0.0", "Stunning Fist")

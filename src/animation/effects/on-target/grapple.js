@@ -1,4 +1,4 @@
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 import { socket } from '../../../adapters/modules/socketlib/socketlib.js';
 import { closest } from '../../../lib/filemanager.js'
 import { matt } from '../../utils/matt-tiles.js';

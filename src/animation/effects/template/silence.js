@@ -5,7 +5,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { template } from '../../../lib/templates.js';
-import { autoanimations, CONCENTRATING } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 
 const DEFAULT_CONFIG = {
     id: 'silence',
@@ -150,5 +150,5 @@ export const silence = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("silence", "template", "eskie.effect.silence", DEFAULT_CONFIG, "0.0.0", "Silence");
-autoanimations.register(CONCENTRATING("silence", "Silence"), "effect", "eskie.effect.silence", DEFAULT_CONFIG);
+autorec.register("silence", "template", "eskie.effect.silence", DEFAULT_CONFIG, "0.0.0", "Silence");
+autorec.register(CONCENTRATING("silence", "Silence"), "effect", "eskie.effect.silence", DEFAULT_CONFIG);

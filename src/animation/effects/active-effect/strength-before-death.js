@@ -2,7 +2,7 @@
 //Author: .eskie
 
 import { closest } from '../../../lib/filemanager.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: "Strength Before Death",
@@ -292,4 +292,4 @@ export const strengthBeforeDeath = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("strengthBeforeDeath", "effect", "eskie.effect.strengthBeforeDeath", DEFAULT_CONFIG, "0.0.0", "Strength Before Death");
+autorec.register("strengthBeforeDeath", "effect", "eskie.effect.strengthBeforeDeath", DEFAULT_CONFIG, "0.0.0", "Strength Before Death");

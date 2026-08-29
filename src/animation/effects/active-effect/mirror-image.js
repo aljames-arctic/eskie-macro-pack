@@ -4,7 +4,7 @@
 ** */
 
 import { closest } from "../../../lib/filemanager.js";
-import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 
 const DEFAULT_CONFIG = {
     id: 'mirrorImage',
@@ -213,4 +213,4 @@ export const mirrorImage = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("mirrorImage", "effect", "eskie.effect.mirrorImage", DEFAULT_CONFIG, "0.0.0", "Mirror Image");
+autorec.register("mirrorImage", "effect", "eskie.effect.mirrorImage", DEFAULT_CONFIG, "0.0.0", "Mirror Image");

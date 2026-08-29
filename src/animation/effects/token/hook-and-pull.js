@@ -3,7 +3,7 @@
 
 import { utils } from '../../utils/index.js';
 import { closest } from '../../../lib/filemanager.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     isHit: false,
@@ -98,4 +98,4 @@ export const hookAndPull = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("hookAndPull", "ranged-target", "eskie.effect.hookAndPull", DEFAULT_CONFIG, "0.0.0", "Hook and Pull");
+autorec.register("hookAndPull", "ranged-target", "eskie.effect.hookAndPull", DEFAULT_CONFIG, "0.0.0", "Hook and Pull");

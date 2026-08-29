@@ -5,7 +5,7 @@ import { time } from "../../../lib/time.js";
 import { matt } from '../../utils/matt-tiles.js';
 import { closest } from '../../../lib/filemanager.js';
 import { socket } from '../../../adapters/modules/socketlib/socketlib.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 import { MODULE_ID } from "../../../lib/constants.js";
 
 function hslToHex(h, s, l) {
@@ -164,4 +164,4 @@ export const sandevistan = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("sandevistan", "effect", "eskie.effect.sandevistan", DEFAULT_CONFIG, "0.0.0", "Sandevistan");
+autorec.register("sandevistan", "effect", "eskie.effect.sandevistan", DEFAULT_CONFIG, "0.0.0", "Sandevistan");

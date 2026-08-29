@@ -2,7 +2,7 @@
 // Updater: @bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 import { adapter } from '../../../adapters/index.js';
 
 const DEFAULT_CONFIG = {
@@ -164,5 +164,5 @@ export const eyesOfNight = {
     default_config: DEFAULT_CONFIG
 };
 
-autoanimations.register('eyesOfNight', 'ranged-target', 'eskie.effect.eyesOfNight.target', DEFAULT_CONFIG, '0.0.0', 'Eyes of Night');
-autoanimations.register('eyesOfNight', 'effect', 'eskie.effect.eyesOfNight.effect', DEFAULT_CONFIG, '0.0.0', 'Eyes of Night');
+autorec.register('eyesOfNight', 'ranged-target', 'eskie.effect.eyesOfNight.target', DEFAULT_CONFIG, '0.0.0', 'Eyes of Night');
+autorec.register('eyesOfNight', 'effect', 'eskie.effect.eyesOfNight.effect', DEFAULT_CONFIG, '0.0.0', 'Eyes of Night');

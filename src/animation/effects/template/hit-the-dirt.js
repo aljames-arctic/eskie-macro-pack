@@ -1,6 +1,6 @@
 import { closest } from '../../../lib/filemanager.js';
 import { template } from '../../../lib/templates.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 //Last Updated: 4/30/2024
 //Author: EskieMoh#2969
@@ -108,5 +108,5 @@ export const hitTheDirt = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("hitTheDirt", 'template', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, "0.0.0", "Hit the Dirt");
-autoanimations.register("hitTheDirt", 'effect', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, "0.0.0", "Hit the Dirt");
+autorec.register("hitTheDirt", 'template', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, "0.0.0", "Hit the Dirt");
+autorec.register("hitTheDirt", 'effect', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, "0.0.0", "Hit the Dirt");

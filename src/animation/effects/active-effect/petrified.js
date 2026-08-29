@@ -5,7 +5,7 @@
 ** */
 
 import { closest } from '../../../lib/filemanager.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: 'Petrified'
@@ -77,4 +77,4 @@ export const petrified = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("petrified", "effect", "eskie.effect.petrified", DEFAULT_CONFIG, "0.0.0", "Petrified");
+autorec.register("petrified", "effect", "eskie.effect.petrified", DEFAULT_CONFIG, "0.0.0", "Petrified");

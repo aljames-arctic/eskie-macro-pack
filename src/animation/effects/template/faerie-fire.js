@@ -3,7 +3,7 @@
 
 import { closest, absolutePath } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
-import { autoanimations } from '../../../adapters/modules/autoanimations/autoanimations.js';
+import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec.js';
 
 const DEFAULT_CONFIG = {
     id: 'faerieFire',
@@ -213,5 +213,5 @@ export const faerieFire = {
     default_config: DEFAULT_CONFIG
 };
 
-autoanimations.register('faerieFire', 'template', 'eskie.effect.faerieFire.template', DEFAULT_CONFIG, '0.0.0', 'Faerie Fire');
-autoanimations.register('faerieFire', 'effect', 'eskie.effect.faerieFire.effect', DEFAULT_CONFIG, '0.0.0', 'Faerie Fire');
+autorec.register('faerieFire', 'template', 'eskie.effect.faerieFire.template', DEFAULT_CONFIG, '0.0.0', 'Faerie Fire');
+autorec.register('faerieFire', 'effect', 'eskie.effect.faerieFire.effect', DEFAULT_CONFIG, '0.0.0', 'Faerie Fire');

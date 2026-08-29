@@ -5,7 +5,7 @@ import { closest, absolutePath } from '../../../lib/filemanager.js';
 import { template } from '../../../lib/templates.js';
 import { teleportIn } from "./teleport/teleportIn.js";
 import { teleportOut } from "./teleport/teleportOut.js";
-import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 
 const DEFAULT_CONFIG = {
     id: 'Teleportation',
@@ -46,4 +46,4 @@ export const teleport = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("teleport", "template", "eskie.effect.teleport", DEFAULT_CONFIG, "0.0.0", "Teleport");
+autorec.register("teleport", "template", "eskie.effect.teleport", DEFAULT_CONFIG, "0.0.0", "Teleport");

@@ -3,7 +3,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
-import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 
 const DEFAULT_CONFIG = {
     id: 'Flurry Of Blows',
@@ -90,5 +90,5 @@ export const flurryOfBlows = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("flurryOfBlows", "melee-target", "eskie.effect.flurryOfBlows", DEFAULT_CONFIG, "0.0.0", "Flurry Of Blows");
+autorec.register("flurryOfBlows", "melee-target", "eskie.effect.flurryOfBlows", DEFAULT_CONFIG, "0.0.0", "Flurry Of Blows");
 

@@ -1,7 +1,7 @@
 import { closest } from "../../../lib/filemanager.js";
 import { adapter } from "../../../adapters/index.js";
 import { blur } from "../../scene-overlays/status-blur.js";
-import { autoanimations } from "../../../adapters/modules/autoanimations/autoanimations.js";
+import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec.js";
 import { log } from '../../../lib/logger.js';
 
 /* **
@@ -123,4 +123,4 @@ export const drunk = {
     default_config: DEFAULT_CONFIG,
 };
 
-autoanimations.register("drunk", "effect", "eskie.effect.emote.drunk", DEFAULT_CONFIG, "0.0.0", "Drunk");
+autorec.register("drunk", "effect", "eskie.effect.emote.drunk", DEFAULT_CONFIG, "0.0.0", "Drunk");

@@ -10,9 +10,6 @@ const closest = (path) => {
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn('Please select a token!');
 
-const entangle = true;
-const targets = Array.from(game.user.targets);
-
 new Sequence()
     .crosshair('position')
     .type('rect')
@@ -66,20 +63,6 @@ new Sequence()
     .belowTokens()
     .zIndex(1)
     .randomRotation()
-    .thenDo(() => {
-        targets.forEach(target => {
-            new Sequence()
-                .effect()
-                .delay(1000)
-                .name('Entangle')
-                .file(closest('eskie.nature.vine.normal.token.01.physical.green'))
-                .attachTo(target)
-                .scaleToObject(1.3, { considerTokenScale: true })
-                .persist()
-                .playIf(entangle)
-                .play();
-        });
-    })
     .effect()
     .name('Entangle')
     .atLocation('position')

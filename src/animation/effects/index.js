@@ -35,6 +35,7 @@ import { drunk } from './active-effect/drunk.js';
 import { emote } from './emote/index.js';
 import { enlargeReduce } from './active-effect/enlarge-reduce.js';
 import { entangle } from './template/entangle.js';
+import { entangled } from './active-effect/entangled.js';
 import { eyesOfNight } from './target/eyesOfNight.js';
 import { faerieFire } from './template/faerie-fire.js';
 import { farStep } from './token/far-step.js';
@@ -153,6 +154,7 @@ export const effect = {
     emote,
     enlargeReduce,
     entangle,
+    entangled,
     eyesOfNight,
     eyesOfTheGrave,
     faerieFire,

@@ -98,3 +98,35 @@ test('tokensOfTheDeparted exports stop functions on root, harvest, and use sub-o
     assert.deepEqual(endEffectsCalls[1], { name: 'tokensOfTheDeparted - target-456', object: target });
 });
 
+test('entangle template and entangled active effect exports and contracts', async () => {
+    const { entangle } = await import('../../src/animation/effects/template/entangle.js');
+    const { entangled } = await import('../../src/animation/effects/active-effect/entangled.js');
+    const { effect } = await import('../../src/animation/effects/index.js');
+
+    assert.equal(typeof entangle.create, 'function');
+    assert.equal(typeof entangle.play, 'function');
+    assert.equal(typeof entangle.stop, 'function');
+    assert.equal(entangle.entangled, entangled);
+    assert.equal(effect.entangled, entangled);
+    assert.equal(effect.entangle, entangle);
+
+    // Initial cast DEFAULT_CONFIG must not contain target entangle flags
+    assert.equal(entangle.default_config.entangle, undefined);
+    assert.equal(entangle.default_config.targets, undefined);
+
+    // Entangled active effect contracts
+    assert.equal(typeof entangled.create, 'function');
+    assert.equal(typeof entangled.play, 'function');
+    assert.equal(typeof entangled.stop, 'function');
+    assert.equal(entangled.default_config.id, 'entangled');
+
+    const endEffectsCalls = [];
+    globalThis.Sequencer.EffectManager.endEffects = (opts) => endEffectsCalls.push(opts);
+
+    const token = { id: 'victim-123' };
+    await entangled.stop(token);
+    assert.equal(endEffectsCalls.length, 1);
+    assert.deepEqual(endEffectsCalls[0], { name: 'entangled - victim-123', object: token });
+});
+
+

@@ -5,20 +5,19 @@ import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
+import { entangled } from '../active-effect/entangled.js';
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'entangle',
-    entangle: true,
     color: 'green',
-    targets: undefined,
     template: undefined,
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, entangle, color, targets, template, sound } = mConfig;
+    const { id, color, template, sound } = mConfig;
 
     const portalEntry = Sequencer.Database.getEntry(closest('eskie.crosshair.rectangle.fantasy_01.white.full.20x20ft'));
     const portalPath = typeof portalEntry === 'string' ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
@@ -32,8 +31,6 @@ async function create(token, config = {}) {
     let [primary, secondary, center] = await templatelib.getPosition(template, cfg);
     if (!center && !primary) return;
     const targetPos = center ?? primary;
-
-    const targetTokens = targets?.length ? targets : Array.from(game.user.targets);
 
     const seq = new Sequence();
     applySound(seq, sound);
@@ -71,21 +68,6 @@ async function create(token, config = {}) {
         .belowTokens()
         .zIndex(1)
         .randomRotation();
-
-    // Individual target vine restraints (isolated sequences to prevent compounding delay)
-    if (entangle && targetTokens.length > 0) {
-        for (const targetToken of targetTokens) {
-            const targetSeq = new Sequence()
-                .effect()
-                .delay(1000)
-                .name(`${id} - ${targetToken.id}`)
-                .file(closest('eskie.nature.vine.normal.token.01.physical.green'))
-                .attachTo(targetToken)
-                .scaleToObject(1.3, { considerTokenScale: true })
-                .persist();
-            seq.addSequence(targetSeq);
-        }
-    }
 
     // Conjuration complete magic sign
     seq.effect()
@@ -133,9 +115,10 @@ export const entangle = {
     create,
     play,
     stop,
+    entangled,
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('entangle', 'template', 'eskie.effect.entangle', DEFAULT_CONFIG, '0.0.1', 'Entangle');
-autorec.register(CONCENTRATING('entangle', 'Entangle'), 'effect', 'eskie.effect.entangle', DEFAULT_CONFIG, "0.0.1");
+autorec.register('entangle', 'template', 'eskie.effect.entangle', DEFAULT_CONFIG, '0.0.2', 'Entangle');
+autorec.register(CONCENTRATING('entangle', 'Entangle'), 'effect', 'eskie.effect.entangle', DEFAULT_CONFIG, '0.0.2');
 

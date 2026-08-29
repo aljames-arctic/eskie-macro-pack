@@ -5,15 +5,17 @@
 import { closest } from "../../../lib/filemanager.js";
 import { template as templatelib } from "../../../lib/templates.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
     id: 'colorSpray',
     wave_count: 4,
-}
+    sound: { ...DEFAULT_SOUND_CONFIG }
+};
 
 async function create(token, config) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { wave_count, template } = mConfig;
+    const { wave_count, template, sound } = mConfig;
 
     const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
     const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
@@ -32,6 +34,7 @@ async function create(token, config) {
     }
 
     const seq = new Sequence();
+    applySound(seq, sound);
     
     //Cast Effect
     seq.effect()
@@ -130,4 +133,4 @@ export const colorSpray = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("colorSpray", 'template', 'eskie.effect.colorSpray', DEFAULT_CONFIG, '1.0', "Color Spray");
+autorec.register("colorSpray", 'template', 'eskie.effect.colorSpray', DEFAULT_CONFIG, '1.0.1', "Color Spray");

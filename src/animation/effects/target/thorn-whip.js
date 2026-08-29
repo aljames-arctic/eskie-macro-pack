@@ -3,17 +3,19 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'thornWhip',
     color: 'green',
     timingAdjust: -100,
-    pull: true
+    pull: true,
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(token, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { id, color, timingAdjust, pull } = mConfig;
+    const { id, color, timingAdjust, pull, sound } = mConfig;
 
     if (!token || !target) return;
 
@@ -37,6 +39,7 @@ async function create(token, target, config = {}) {
     const canPull = pull && (target.document.width <= 2);
 
     const seq = new Sequence();
+    applySound(seq, sound);
 
     // Nature casting on source token
     seq.effect()
@@ -119,5 +122,5 @@ export const thornWhip = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('thornWhip', 'ranged-target', 'eskie.effect.thornWhip', DEFAULT_CONFIG, '0.0.0', 'Thorn Whip');
+autorec.register('thornWhip', 'ranged-target', 'eskie.effect.thornWhip', DEFAULT_CONFIG, '0.0.1', 'Thorn Whip');
 

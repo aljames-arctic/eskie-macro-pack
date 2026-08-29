@@ -4,13 +4,18 @@
 import { closest, absolutePath } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'DimensionDoor',
+    sound: {
+        teleportOut: { ...DEFAULT_SOUND_CONFIG },
+        teleportIn: { ...DEFAULT_SOUND_CONFIG }
+    }
 };
 
 async function create(token, config = {}) {
-    const { id, template } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id, template, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     const cfg = { 
         radius: 1,
@@ -21,10 +26,12 @@ async function create(token, config = {}) {
     let [position, _] = await templatelib.getPosition(template, cfg);
     if (!position) { return; }
 
-    let sequence = new Sequence()
-        .animation()
-            .on(token)
-            .opacity(0)
+    let sequence = new Sequence();
+    applySound(sequence, sound?.teleportOut ?? sound);
+
+    sequence.animation()
+        .on(token)
+        .opacity(0)
 
         .effect()
             .file(closest("jb2a.fireball.beam.purple"))
@@ -69,9 +76,11 @@ async function create(token, config = {}) {
             .playbackRate(1.75)
             .rotateTowards(token)
             .rotate(180)
-            .anchor({ x: 0.9, y: 0.5 })
+            .anchor({ x: 0.9, y: 0.5 });
 
-        .animation()
+    applySound(sequence, sound?.teleportIn);
+
+    sequence.animation()
             .on(token)
             .teleportTo(position, { offset: { x: -1, y: -1 } })
             .snapToGrid()
@@ -98,4 +107,4 @@ export const dimensionDoor = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("dimensionDoor", "template", "eskie.effect.dimensionDoor", DEFAULT_CONFIG, "0.0.0", "Dimension Door");
+autorec.register("dimensionDoor", "template", "eskie.effect.dimensionDoor", DEFAULT_CONFIG, "0.0.1", "Dimension Door");

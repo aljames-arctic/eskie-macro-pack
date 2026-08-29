@@ -2,11 +2,16 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
-const DEFAULT_CONFIG = {};
+const DEFAULT_CONFIG = {
+    sound: { ...DEFAULT_SOUND_CONFIG }
+};
 
 async function create(token, target, config = {}) {
+    config = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     const sequence = new Sequence();
+    applySound(sequence, config.sound);
 
     sequence.effect()
         .file(closest("jb2a.toll_the_dead.red.skull_smoke"))

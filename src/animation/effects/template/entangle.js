@@ -4,18 +4,20 @@
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'entangle',
     entangle: true,
     color: 'green',
     targets: undefined,
-    template: undefined
+    template: undefined,
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { id, entangle, color, targets, template } = mConfig;
+    const { id, entangle, color, targets, template, sound } = mConfig;
 
     const portalEntry = Sequencer.Database.getEntry(closest('eskie.crosshair.rectangle.fantasy_01.white.full.20x20ft'));
     const portalPath = typeof portalEntry === 'string' ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
@@ -33,6 +35,7 @@ async function create(token, config = {}) {
     const targetTokens = targets?.length ? targets : Array.from(game.user.targets);
 
     const seq = new Sequence();
+    applySound(seq, sound);
 
     // Casting on token
     seq.effect()
@@ -132,6 +135,6 @@ export const entangle = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('entangle', 'template', 'eskie.effect.entangle', DEFAULT_CONFIG, '0.0.0', 'Entangle');
+autorec.register('entangle', 'template', 'eskie.effect.entangle', DEFAULT_CONFIG, '0.0.1', 'Entangle');
 autorec.register(CONCENTRATING('entangle', 'Entangle'), 'effect', 'eskie.effect.entangle', DEFAULT_CONFIG);
 

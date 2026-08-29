@@ -4,21 +4,24 @@
 import { closest } from '../../../lib/filemanager.js';
 import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { adapter } from '../../../adapters/index.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'twilightSanctuary',
     darkMap: true,
-    radius: 30
+    radius: 30,
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { id, darkMap } = mConfig;
+    const { id, darkMap, sound } = mConfig;
 
     if (!token) return;
 
     const label = `${id} - ${token.id}`;
     const seq = new Sequence();
+    applySound(seq, sound);
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
@@ -124,6 +127,6 @@ export const twilightSanctuary = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('twilightSanctuary', 'aura', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG, '0.0.0', 'Twilight Sanctuary');
-autorec.register('channelDivinityTwilightSanctuary', 'aura', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG, '0.0.0', 'Channel Divinity: Twilight Sanctuary');
+autorec.register('twilightSanctuary', 'aura', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG, '0.0.1', 'Twilight Sanctuary');
+autorec.register('channelDivinityTwilightSanctuary', 'aura', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG, '0.0.1', 'Channel Divinity: Twilight Sanctuary');
 autorec.register(CONCENTRATING('twilightSanctuary', 'Twilight Sanctuary'), 'effect', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG);

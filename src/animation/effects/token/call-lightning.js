@@ -2,9 +2,11 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     radius: 7.5,
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 /**
@@ -17,6 +19,7 @@ async function create(position, config = {}) {
     config = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     const sequence = new Sequence();
+    applySound(sequence, config.sound);
 
     sequence.effect()
         .file(closest("jb2a.lightning_strike.blue"))

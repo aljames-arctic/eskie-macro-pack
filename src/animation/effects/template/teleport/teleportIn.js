@@ -2,6 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from "../../../../lib/filemanager.js";
+import { applySound } from "../../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
     id: 'TeleportIn',
@@ -13,6 +14,7 @@ function create(token, targets, config = {}) {
     const {x, y} = token.center;
 
     let sequence = new Sequence();
+    applySound(sequence, config.sound?.teleportIn ?? config.sound);
     sequence = sequence.animation()
         .on(token)
         .teleportTo(position)

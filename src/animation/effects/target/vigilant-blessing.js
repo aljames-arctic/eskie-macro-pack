@@ -4,21 +4,24 @@
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { adapter } from '../../../adapters/index.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'vigilantBlessing',
-    darkMap: true
+    darkMap: true,
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(token, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { id, darkMap } = mConfig;
+    const { id, darkMap, sound } = mConfig;
 
     const recipient = target ?? token;
     if (!recipient) return;
 
     const label = `${id} - ${recipient.id}`;
     const seq = new Sequence();
+    applySound(seq, sound);
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
@@ -149,5 +152,5 @@ export const vigilantBlessing = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('vigilantBlessing', 'ranged-target', 'eskie.effect.vigilantBlessing.target', DEFAULT_CONFIG, '0.0.0', 'Vigilant Blessing');
-autorec.register('vigilantBlessing', 'effect', 'eskie.effect.vigilantBlessing.effect', DEFAULT_CONFIG, '0.0.0', 'Vigilant Blessing');
+autorec.register('vigilantBlessing', 'ranged-target', 'eskie.effect.vigilantBlessing.target', DEFAULT_CONFIG, '0.0.1', 'Vigilant Blessing');
+autorec.register('vigilantBlessing', 'effect', 'eskie.effect.vigilantBlessing.effect', DEFAULT_CONFIG, '0.0.1', 'Vigilant Blessing');

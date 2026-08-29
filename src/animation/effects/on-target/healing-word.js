@@ -5,11 +5,13 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'healing-word',
     color: 'green',
     word: 'Heal!',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function getColor(color) {
@@ -26,13 +28,14 @@ function getColor(color) {
 
 async function create(token, targets, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { id, color, word } = mConfig;
+    const { id, color, word, sound } = mConfig;
     const targetList = [targets].flat().filter(Boolean);
 
     const colorVal = getColor(color);
     const hue = colorVal.hue;
 
     const seq = new Sequence();
+    applySound(seq, sound);
 
     const style = {
         "fill": "#ffffff",
@@ -149,5 +152,5 @@ export const healingWord = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("healingWord", "ranged-target", "eskie.effect.healingWord", DEFAULT_CONFIG, "0.0.0", "Healing Word");
-autorec.register("massHealingWord", "ranged-target", "eskie.effect.healingWord", DEFAULT_CONFIG, "0.0.0", "Mass Healing Word");
+autorec.register("healingWord", "ranged-target", "eskie.effect.healingWord", DEFAULT_CONFIG, "0.0.1", "Healing Word");
+autorec.register("massHealingWord", "ranged-target", "eskie.effect.healingWord", DEFAULT_CONFIG, "0.0.1", "Mass Healing Word");

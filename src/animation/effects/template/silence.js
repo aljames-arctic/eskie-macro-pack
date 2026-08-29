@@ -6,10 +6,12 @@
 import { closest } from "../../../lib/filemanager.js";
 import { template as templatelib } from '../../../lib/templates.js';
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
     id: 'silence',
     size: 9,
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 /**
@@ -22,7 +24,7 @@ const DEFAULT_CONFIG = {
  */
 async function createSilence(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { id, size, template } = mConfig;
+    const { id, size, template, sound } = mConfig;
 
     const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
     const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
@@ -36,6 +38,7 @@ async function createSilence(token, config = {}) {
     if (!position) { return; }
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
     sequence
         .effect()
         .file(closest("jb2a.moonbeam.01.outro.rainbow"))
@@ -150,5 +153,5 @@ export const silence = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("silence", "template", "eskie.effect.silence", DEFAULT_CONFIG, "0.0.0", "Silence");
+autorec.register("silence", "template", "eskie.effect.silence", DEFAULT_CONFIG, "0.0.1", "Silence");
 autorec.register(CONCENTRATING("silence", "Silence"), "effect", "eskie.effect.silence", DEFAULT_CONFIG);

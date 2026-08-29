@@ -3,16 +3,19 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
     id: "divineSmite",
-    color: "yellowwhite"
+    color: "yellowwhite",
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(token, target, config = {}) {
-    const { id, color } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id, color, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     let seq = new Sequence();
+    applySound(seq, sound);
     seq = seq.effect()
         .delay(500)
         .file(closest(`jb2a.particles.outward.white.02.03`))
@@ -80,4 +83,4 @@ export const divineSmite = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("divineSmite", "melee-target", "eskie.effect.divineSmite", DEFAULT_CONFIG, "0.0.0", "Divine Smite");
+autorec.register("divineSmite", "melee-target", "eskie.effect.divineSmite", DEFAULT_CONFIG, "0.0.1", "Divine Smite");

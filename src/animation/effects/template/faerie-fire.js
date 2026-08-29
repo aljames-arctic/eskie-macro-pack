@@ -4,12 +4,14 @@
 import { closest, absolutePath } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'faerieFire',
     color: 'green', // 'blue', 'green', 'purple'
     aoeDistance: 10,
-    glow: true
+    glow: true,
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 function getTintAndHue(color) {
@@ -40,7 +42,7 @@ async function create(token, config = {}) {
 
 async function createCloud(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { id, template, color } = mConfig;
+    const { id, template, color, sound } = mConfig;
     const { tintColor, hue, hue2 } = getTintAndHue(color);
 
     const cfg = {
@@ -54,6 +56,7 @@ async function createCloud(token, config = {}) {
     const targetPos = center ?? primary;
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
 
     if (token) {
         sequence.effect()
@@ -136,10 +139,11 @@ async function createCloud(token, config = {}) {
 
 function createEffect(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { id, color, glow } = mConfig;
+    const { id, color, glow, sound } = mConfig;
     const { tintColor } = getTintAndHue(color);
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
 
     if (glow) {
         sequence.effect()
@@ -213,5 +217,5 @@ export const faerieFire = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('faerieFire', 'template', 'eskie.effect.faerieFire.template', DEFAULT_CONFIG, '0.0.0', 'Faerie Fire');
-autorec.register('faerieFire', 'effect', 'eskie.effect.faerieFire.effect', DEFAULT_CONFIG, '0.0.0', 'Faerie Fire');
+autorec.register('faerieFire', 'template', 'eskie.effect.faerieFire.template', DEFAULT_CONFIG, '0.0.1', 'Faerie Fire');
+autorec.register('faerieFire', 'effect', 'eskie.effect.faerieFire.effect', DEFAULT_CONFIG, '0.0.1', 'Faerie Fire');

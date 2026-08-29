@@ -6,11 +6,13 @@
 import { closest } from "../../../lib/filemanager.js";
 import { template as templatelib } from '../../../lib/templates.js';
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
     id: 'spikeGrowth',
     size: 8, // Default size for crosshairs and initial effect
     tint: "#033b0cff", // Default tint for spikes
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 /**
@@ -23,9 +25,10 @@ const DEFAULT_CONFIG = {
  */
 async function createInitialSpikeGrowth(position, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { size } = mConfig;
+    const { size, sound } = mConfig;
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
 
     sequence
         .effect()
@@ -183,5 +186,5 @@ export const spikeGrowth = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("spikeGrowth", "template", "eskie.effect.spikeGrowth", DEFAULT_CONFIG, "0.0.0", "Spike Growth");
+autorec.register("spikeGrowth", "template", "eskie.effect.spikeGrowth", DEFAULT_CONFIG, "0.0.1", "Spike Growth");
 autorec.register(CONCENTRATING("spikeGrowth", "Spike Growth"), "effect", "eskie.effect.spikeGrowth", DEFAULT_CONFIG);

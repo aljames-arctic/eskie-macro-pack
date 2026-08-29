@@ -2,6 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from "../../../../lib/filemanager.js";
+import { applySound } from "../../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
     id: 'TeleportOut',
@@ -13,6 +14,7 @@ function create(token, targets, config = {}) {
     const maxDistance = Math.max(...targets.map(target => 3 * Math.max(Math.abs(target.x - token.x), Math.abs(target.y - token.y)) / canvas.dimensions.size + 1));
 
     let sequence = new Sequence();
+    applySound(sequence, mConfig.sound?.teleportOut ?? mConfig.sound);
     sequence = sequence.effect()
         .file(closest("jb2a.particles.outward.blue.01.05"))
         .atLocation(token)

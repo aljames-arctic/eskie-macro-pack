@@ -6,11 +6,13 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
     id: 'armsOfHadar',
     excludeSelf: true,
     targets: [],
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 /**
@@ -24,9 +26,10 @@ const DEFAULT_CONFIG = {
  * @returns {Promise<Sequence>} A promise that resolves with the Sequence object.
  */
 async function create(token, config = {}) {
-    const { id, targets } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    const { id, targets, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
 
     let sequence = new Sequence();
+    applySound(sequence, sound);
     sequence.thenDo(function () {
         targets.forEach(target => {
             new Sequence()
@@ -213,4 +216,4 @@ export const armsOfHadar = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("armsOfHadar", "template", "eskie.effect.armsOfHadar", DEFAULT_CONFIG, "0.0.0", "Arms of Hadar");
+autorec.register("armsOfHadar", "template", "eskie.effect.armsOfHadar", DEFAULT_CONFIG, "0.0.1", "Arms of Hadar");

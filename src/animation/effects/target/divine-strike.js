@@ -4,12 +4,17 @@
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { adapter } from '../../../adapters/index.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     darkMap: true,
     type: 'slashing', // 'slashing', 'piercing', 'bludgeoning'
     weight: 'medium', // 'light', 'medium', 'heavy'
-    isCrit: false
+    isCrit: false,
+    sound: {
+        attack: { ...DEFAULT_SOUND_CONFIG },
+        burst: { ...DEFAULT_SOUND_CONFIG }
+    }
 };
 
 function getNearestSquareCenter(token, target) {
@@ -37,9 +42,10 @@ function getNearestSquareCenter(token, target) {
 
 async function createMelee(token, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { darkMap } = mConfig;
+    const { darkMap, sound } = mConfig;
 
     const sequence = new Sequence();
+    applySound(sequence, sound?.attack ?? sound);
     for (let i = 0; i < 4; i++) {
         const offset = [
             { x: 0.3 * token.document.width, y: -0.85 * token.document.width },
@@ -92,6 +98,8 @@ async function createMelee(token, target, config = {}) {
         .delay(300)
         .shake({ duration: 1000, strength: 1, rotation: false, fadeOutDuration: 1000 });
 
+    applySound(sequence, sound?.burst);
+
     sequence.effect()
         .delay(300)
         .file(closest('jb2a.impact.ground_crack.01.purple'))
@@ -143,9 +151,10 @@ async function playMelee(token, target, config = {}) {
 
 async function createRanged(token, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { darkMap } = mConfig;
+    const { darkMap, sound } = mConfig;
 
     const sequence = new Sequence();
+    applySound(sequence, sound?.attack ?? sound);
     const distance = {
         x: (token.center.x - target.center.x),
         y: (token.center.y - target.center.y)
@@ -206,6 +215,8 @@ async function createRanged(token, target, config = {}) {
     }
     sequence.wait(500);
 
+    applySound(sequence, sound?.burst);
+
     sequence.effect()
         .file(closest('jb2a.ranged.02.projectile.01.yellow'))
         .atLocation(token)
@@ -237,7 +248,7 @@ async function playRanged(token, target, config = {}) {
 
 async function createTwilightMelee(token, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { darkMap, type, weight, isCrit } = mConfig;
+    const { darkMap, type, weight, isCrit, sound } = mConfig;
 
     if (!token || !target) return;
 
@@ -248,6 +259,7 @@ async function createTwilightMelee(token, target, config = {}) {
     const targetSquare = getNearestSquareCenter(token, target);
 
     const sequence = new Sequence();
+    applySound(sequence, sound?.attack ?? sound);
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
@@ -282,6 +294,8 @@ async function createTwilightMelee(token, target, config = {}) {
         .spriteOffset({ x: effectOffset * token.document.width }, { gridUnits: true })
         .randomizeMirrorY()
         .zIndex(1);
+
+    applySound(sequence, sound?.burst);
 
     sequence.effect()
         .delay(150)
@@ -339,11 +353,12 @@ async function playTwilightMelee(token, target, config = {}) {
 
 async function createTwilightRanged(token, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { darkMap, isCrit } = mConfig;
+    const { darkMap, isCrit, sound } = mConfig;
 
     if (!token || !target) return;
 
     const sequence = new Sequence();
+    applySound(sequence, sound?.attack ?? sound);
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
@@ -377,6 +392,8 @@ async function createTwilightRanged(token, target, config = {}) {
         .randomizeMirrorY()
         .zIndex(1)
         .waitUntilFinished(-500);
+
+    applySound(sequence, sound?.burst);
 
     sequence.effect()
         .file(closest('eskie.damage.radiant.01.rainbow'))
@@ -458,9 +475,9 @@ export const divineStrike = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register(autorec.MELEE('divineStrike', 'Divine Strike'), 'melee-target', 'eskie.effect.divineStrike.melee', DEFAULT_CONFIG, '0.0.0', '(Melee) Divine Strike');
-autorec.register(autorec.RANGED('divineStrike', 'Divine Strike'), 'ranged-target', 'eskie.effect.divineStrike.ranged', DEFAULT_CONFIG, '0.0.0', '(Ranged) Divine Strike');
-autorec.register(autorec.MELEE('divineStrikeTwilight', 'Divine Strike (Twilight)'), 'melee-target', 'eskie.effect.divineStrike.twilight.melee', DEFAULT_CONFIG, '0.0.0', '(Melee) Divine Strike (Twilight)');
-autorec.register(autorec.RANGED('divineStrikeTwilight', 'Divine Strike (Twilight)'), 'ranged-target', 'eskie.effect.divineStrike.twilight.ranged', DEFAULT_CONFIG, '0.0.0', '(Ranged) Divine Strike (Twilight)');
+autorec.register(autorec.MELEE('divineStrike', 'Divine Strike'), 'melee-target', 'eskie.effect.divineStrike.melee', DEFAULT_CONFIG, '0.0.1', '(Melee) Divine Strike');
+autorec.register(autorec.RANGED('divineStrike', 'Divine Strike'), 'ranged-target', 'eskie.effect.divineStrike.ranged', DEFAULT_CONFIG, '0.0.1', '(Ranged) Divine Strike');
+autorec.register(autorec.MELEE('divineStrikeTwilight', 'Divine Strike (Twilight)'), 'melee-target', 'eskie.effect.divineStrike.twilight.melee', DEFAULT_CONFIG, '0.0.1', '(Melee) Divine Strike (Twilight)');
+autorec.register(autorec.RANGED('divineStrikeTwilight', 'Divine Strike (Twilight)'), 'ranged-target', 'eskie.effect.divineStrike.twilight.ranged', DEFAULT_CONFIG, '0.0.1', '(Ranged) Divine Strike (Twilight)');
 
 

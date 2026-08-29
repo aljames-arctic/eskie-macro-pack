@@ -3,10 +3,12 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
     id: 'dreadLord',
     darkMap: true,
+    sound: { ...DEFAULT_SOUND_CONFIG },
     form: {
         change: false,
         baseForm: null,
@@ -16,9 +18,10 @@ const DEFAULT_CONFIG = {
 
 async function create(token, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
-    const {id, darkMap} = mConfig;
+    const { id, darkMap, sound } = mConfig;
 
     let seq = new Sequence();
+    applySound(seq, sound);
     seq = seq.effect()
         .file(closest("jb2a.energy_strands.in.yellow.01.2"))
         .attachTo(token)

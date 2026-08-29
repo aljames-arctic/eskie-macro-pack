@@ -3,20 +3,23 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'pathOfTheGrave',
-    color: 'teal'
+    color: 'teal',
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(token, target, config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
 
     if (!token || !target) return;
 
     const label = `${id} - ${target.id}`;
     const seq = new Sequence();
+    applySound(seq, sound);
 
     seq.effect()
         .file(closest('jb2a.extras.tmfx.outflow.circle.01'))
@@ -157,6 +160,6 @@ export const pathOfTheGrave = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('pathOfTheGrave', 'ranged-target', 'eskie.effect.pathOfTheGrave', DEFAULT_CONFIG, '0.0.0', 'Path of the Grave');
-autorec.register('channelDivinityPathToTheGrave', 'ranged-target', 'eskie.effect.pathOfTheGrave', DEFAULT_CONFIG, '0.0.0', 'Channel Divinity: Path to the Grave');
+autorec.register('pathOfTheGrave', 'ranged-target', 'eskie.effect.pathOfTheGrave', DEFAULT_CONFIG, '0.0.1', 'Path of the Grave');
+autorec.register('channelDivinityPathToTheGrave', 'ranged-target', 'eskie.effect.pathOfTheGrave', DEFAULT_CONFIG, '0.0.1', 'Channel Divinity: Path to the Grave');
 

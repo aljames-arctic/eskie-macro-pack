@@ -6,9 +6,14 @@ import { template as templatelib } from '../../../lib/templates.js';
 import { teleportIn } from "./teleport/teleportIn.js";
 import { teleportOut } from "./teleport/teleportOut.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
     id: 'Teleportation',
+    sound: {
+        teleportOut: { ...DEFAULT_SOUND_CONFIG },
+        teleportIn: { ...DEFAULT_SOUND_CONFIG }
+    }
 };
 
 async function create(token, config = {}) {
@@ -46,4 +51,4 @@ export const teleport = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("teleport", "template", "eskie.effect.teleport", DEFAULT_CONFIG, "0.0.0", "Teleport");
+autorec.register("teleport", "template", "eskie.effect.teleport", DEFAULT_CONFIG, "0.0.1", "Teleport");

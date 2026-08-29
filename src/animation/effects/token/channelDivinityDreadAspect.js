@@ -3,18 +3,21 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { adapter } from "../../../adapters/index.js";
+import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
     id: 'ChannelDivinityDreadAspect',
     darkMap: true,
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(token, targets, config = {}) {
     const targetList = [targets].flat().filter(Boolean);
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const {darkMap} = mConfig;
+    const { darkMap, sound } = mConfig;
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
 
     sequence.effect()
         .file(closest("jb2a.extras.tmfx.border.circle.inpulse.01.fast"))

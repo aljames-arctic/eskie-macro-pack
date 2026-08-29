@@ -2,12 +2,18 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
-const DEFAULT_CONFIG = {};
+const DEFAULT_CONFIG = {
+    sound: { ...DEFAULT_SOUND_CONFIG }
+};
 
 async function create(token, target, config = {}) {
-    let seq = new Sequence()
-        .effect()
+    config = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
+    let seq = new Sequence();
+    applySound(seq, config.sound);
+
+    seq.effect()
             .file(closest("jb2a.extras.tmfx.inpulse.circle.01.normal"))
             .atLocation(target)
             .scaleToObject(1)

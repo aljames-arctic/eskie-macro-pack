@@ -4,15 +4,17 @@
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { adapter } from '../../../adapters/index.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'eyesOfNight',
-    darkMap: true
+    darkMap: true,
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(token, targets = [], config = {}) {
     const mConfig = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
-    const { id, darkMap } = mConfig;
+    const { id, darkMap, sound } = mConfig;
 
     const targetList = [targets].flat().filter(Boolean);
 
@@ -32,6 +34,7 @@ async function create(token, targets = [], config = {}) {
     };
 
     const sequence = new Sequence();
+    applySound(sequence, sound);
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
@@ -164,5 +167,5 @@ export const eyesOfNight = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('eyesOfNight', 'ranged-target', 'eskie.effect.eyesOfNight.target', DEFAULT_CONFIG, '0.0.0', 'Eyes of Night');
-autorec.register('eyesOfNight', 'effect', 'eskie.effect.eyesOfNight.effect', DEFAULT_CONFIG, '0.0.0', 'Eyes of Night');
+autorec.register('eyesOfNight', 'ranged-target', 'eskie.effect.eyesOfNight.target', DEFAULT_CONFIG, '0.0.1', 'Eyes of Night');
+autorec.register('eyesOfNight', 'effect', 'eskie.effect.eyesOfNight.effect', DEFAULT_CONFIG, '0.0.1', 'Eyes of Night');

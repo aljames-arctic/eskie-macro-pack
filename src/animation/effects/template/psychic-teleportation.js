@@ -1,13 +1,15 @@
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'Psychic Teleportation',
+    sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
 async function create(token, config = {}) {
-    const { id, template } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
+    const { id, template, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, { inplace: false });
     
     const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
     const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
@@ -21,10 +23,12 @@ async function create(token, config = {}) {
     let [position, _] = await templatelib.getPosition(template, cfg);
     if (!position) { return; }
 
-    let seq = new Sequence()
-        .animation()
-            .on(token)
-            .opacity(0)
+    let seq = new Sequence();
+    applySound(seq, sound);
+
+    seq.animation()
+        .on(token)
+        .opacity(0)
 
         .effect()
             .name(id)
@@ -163,4 +167,4 @@ export const psychicTeleportation = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("psychicTeleportation", "template", "eskie.effect.psychicTeleportation", DEFAULT_CONFIG, "0.0.0", "Psychic Teleportation");
+autorec.register("psychicTeleportation", "template", "eskie.effect.psychicTeleportation", DEFAULT_CONFIG, "0.0.1", "Psychic Teleportation");

@@ -83,7 +83,17 @@ export async function generateAutorecUpdate(autorec, excludedIds = new Set()) {
             ...(same[key] ?? []),
             ...(customNew[key] ?? []),
         ];
-        newSettings[key] = [...new Map(newEntriesForKey.map((v) => [v.id, v])).values()].sort((a, b) => (a.label || "").localeCompare(b.label || ""));
+        // Deduplicate EMP entries by label to eliminate any legacy duplicates
+        const seenEmpLabels = new Set();
+        const deduplicatedEntries = [];
+        for (const entry of newEntriesForKey) {
+            if (entry.metaData?.name === "Eskie Macro Pack") {
+                if (seenEmpLabels.has(entry.label)) continue;
+                seenEmpLabels.add(entry.label);
+            }
+            deduplicatedEntries.push(entry);
+        }
+        newSettings[key] = [...new Map(deduplicatedEntries.map((v) => [v.id, v])).values()].sort((a, b) => (a.label || "").localeCompare(b.label || ""));
     }
     newSettings.version = (await game.settings.get("autoanimations", "aaAutorec"))?.version ?? "0.0.0";
 

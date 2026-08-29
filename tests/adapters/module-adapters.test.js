@@ -84,7 +84,7 @@ test('MidiQolModuleAdapter parses flags and HTML saves display with DOMParser', 
 });
 
 test('AutoanimationsModuleAdapter standardizes triggers and generates compliant autorec entries', () => {
-    const aa = new AutoanimationsModuleAdapter();
+    const aa = new AutoanimationsModuleAdapter({ melee: [], range: [], ontoken: [], templatefx: [], preset: [], aura: [], aefx: [] });
     assert.equal(aa.standardizeTrigger('token'), 'ontoken');
     assert.equal(aa.standardizeTrigger('template'), 'templatefx');
     assert.equal(aa.standardizeTrigger('melee-target'), 'melee');
@@ -98,6 +98,22 @@ test('AutoanimationsModuleAdapter standardizes triggers and generates compliant 
     assert.equal(entry.metaData.name, 'Eskie Macro Pack');
     assert.equal(entry.metaData.version, '1.0.0');
     assert.ok(entry.macro.args.includes('eskie.effect.magicMissile'));
+
+    // Register two different template effects and verify they remain distinct and non-mutating
+    aa.register('teleport', 'template', 'eskie.effect.teleport', {}, '1.0.0', 'Teleport');
+    aa.register('dimensionDoor', 'template', 'eskie.effect.dimensionDoor', {}, '1.0.0', 'Dimension Door');
+
+    const templateEntries = aa.menu.templatefx.filter(e => e.label === 'Teleport' || e.label === 'Dimension Door');
+    assert.equal(templateEntries.length, 2);
+    assert.notEqual(templateEntries[0], templateEntries[1]);
+    assert.equal(templateEntries[0].label, 'Teleport');
+    assert.equal(templateEntries[1].label, 'Dimension Door');
+
+    // Registering the same key again updates the existing entry rather than duplicating it
+    aa.register('teleport', 'template', 'eskie.effect.teleport', {}, '1.0.1', 'Teleport');
+    const teleportEntries = aa.menu.templatefx.filter(e => e.label === 'Teleport');
+    assert.equal(teleportEntries.length, 1);
+    assert.equal(teleportEntries[0].metaData.version, '1.0.1');
 });
 
 test('BlfxModuleAdapter standardizes triggers and generates compliant macro commands', () => {

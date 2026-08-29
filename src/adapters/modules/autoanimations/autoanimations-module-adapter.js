@@ -92,9 +92,9 @@ export function CONCENTRATING(key, fallback = key) {
  * and dialog synchronization.
  */
 export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
-    constructor() {
+    constructor(menu = null) {
         super("autoanimations");
-        this.menu = EMP_AA_Menu;
+        this.menu = menu ?? EMP_AA_Menu;
     }
 
     /**
@@ -119,7 +119,9 @@ export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
     createAutorecEntry(key, trigger, animation, config, version = "0.0.0", fallback = key) {
         const stdTrigger = this.standardizeTrigger(trigger);
         const defaultMenu = defaultMenuSettings[stdTrigger];
-        const defaultEntry = defaultMenu[0];
+        const defaultEntry = this.foundry.deepClone
+            ? this.foundry.deepClone(defaultMenu[0])
+            : (typeof structuredClone === 'function' ? structuredClone(defaultMenu[0]) : JSON.parse(JSON.stringify(defaultMenu[0])));
         const compendium = `Compendium.${MODULE_ID}.eskie-aa-integration`;
 
         const localizedLabel = (typeof key === 'string' && (key.includes(":") || key.includes(" "))) ? key : localize(`EMP.effects.${key}`, fallback);
@@ -164,7 +166,7 @@ export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
             }
         };
 
-        return this.foundry.mergeObject(defaultEntry, entry);
+        return this.foundry.mergeObject(defaultEntry, entry, { inplace: false });
     }
 
     /**
@@ -181,7 +183,12 @@ export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
         const stdTrigger = this.standardizeTrigger(trigger);
         const entry = this.createAutorecEntry(key, stdTrigger, animation, config, version, fallback);
         if (entry) {
-            this.menu[stdTrigger].push(entry);
+            const existingIdx = this.menu[stdTrigger].findIndex(e => e.label === entry.label);
+            if (existingIdx >= 0) {
+                this.menu[stdTrigger][existingIdx] = entry;
+            } else {
+                this.menu[stdTrigger].push(entry);
+            }
         }
         blfxAdapter.register(key, trigger, animation, config, version, fallback, options);
     }

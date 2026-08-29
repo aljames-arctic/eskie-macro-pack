@@ -54,4 +54,4 @@ export const entangled = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('entangled', 'effect', 'eskie.effect.entangled', DEFAULT_CONFIG, '0.0.1', 'Entangled');
+autorec.register('entangled', 'effect', 'eskie.effect.entangled', DEFAULT_CONFIG, '0.0.2', 'Entangled');

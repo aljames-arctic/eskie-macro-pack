@@ -3,7 +3,7 @@ import { log } from '../../../lib/logger.js';
 import { localize, format } from "../../../lib/utils.js";
 import { autoanimationsAdapter } from "../autoanimations/autoanimations-module-adapter.js";
 import { blfxAdapter } from "../blfx/blfx-module-adapter.js";
-import { AutorecDestinationDialog } from "../../../ui/autorec/destinationDialog.js";
+import { ManageAutorecApp } from "../../../ui/autorec/manageAutorecMenu.js";
 
 /**
  * Unified Auto-Recognition (Autorec) Manager for Eskie Macro Pack.
@@ -105,17 +105,27 @@ export class AutorecManager {
                     return;
                 }
 
-                new AutorecDestinationDialog().render(true);
+                if (isAaActive && !isBlfxActive) {
+                    await this.aa.submit();
+                    return;
+                }
+
+                if (isBlfxActive && !isAaActive) {
+                    await this.blfx.submit(options.force ?? false);
+                    return;
+                }
+
+                new ManageAutorecApp().render(true);
                 break;
             }
         }
     }
 
     /**
-     * Opens the destination choice dialog manually.
+     * Opens the manage auto-recognition dialog manually.
      */
     promptDestinationDialog() {
-        new AutorecDestinationDialog().render(true);
+        new ManageAutorecApp().render(true);
     }
 }
 

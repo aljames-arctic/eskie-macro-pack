@@ -2,9 +2,7 @@ import { MODULE_ID } from "./lib/constants.js";
 import {
     RecommendedModulesFormApplication,
     WorldScriptsFormApplication,
-    autorecUpdateFormApplication,
-    BlfxAutorecUpdateFormApplication,
-    AutorecDestinationDialog
+    ManageAutorecFormApplication
 } from "./ui/index.js";
 import { blfx } from "./adapters/modules/blfx/blfx.js";
 import { updateMacroCompendiums } from "./lib/standalone-macros.js";
@@ -26,13 +24,13 @@ Hooks.once('init', function() {
         restricted: false
     });
 
-    // Auto-Recognition Destination Chooser Menu
-    game.settings.registerMenu(MODULE_ID, 'autorecDestinationMenu', {
-        name: 'EMP.settings.autorecDestinationMenu.name',
-        label: 'EMP.settings.autorecDestinationMenu.label',
-        hint: 'EMP.settings.autorecDestinationMenu.hint',
+    // Unified Auto-Recognition Management Menu
+    game.settings.registerMenu(MODULE_ID, 'manageAutorec', {
+        name: 'EMP.settings.manageAutorec.name',
+        label: 'EMP.settings.manageAutorec.label',
+        hint: 'EMP.settings.manageAutorec.hint',
         icon: 'fa-solid fa-wand-magic-sparkles',
-        type: AutorecDestinationDialog,
+        type: ManageAutorecFormApplication,
         restricted: true
     });
 
@@ -67,32 +65,12 @@ Hooks.once('init', function() {
         restricted: true
     });
 
-    // Register AA Autorec Update Menu
-    game.settings.registerMenu(MODULE_ID, 'autorecUpdate', {
-        name: 'EMP.settings.autorecUpdate.name',
-        label: 'EMP.settings.autorecUpdate.label',
-        hint: 'EMP.settings.autorecUpdate.hint',
-        icon: 'fa-solid fa-wrench',
-        type: autorecUpdateFormApplication,
-        restricted: true
-    });
-
-    // Register BLFX Sync Menu
-    game.settings.registerMenu(MODULE_ID, 'blfxSync', {
-        name: 'EMP.settings.blfxSync.name',
-        label: 'EMP.settings.blfxSync.label',
-        hint: 'EMP.settings.blfxSync.hint',
-        icon: 'fa-solid fa-dragon',
-        type: BlfxAutorecUpdateFormApplication,
-        restricted: true
-    });
-
     // Destination target configuration: 'ask', 'autoanimations', 'blfx', 'none'
     game.settings.register(MODULE_ID, 'autorecTarget', {
         name: 'EMP.settings.autorecTarget.name',
         hint: 'EMP.settings.autorecTarget.hint',
         scope: 'world',
-        config: true,
+        config: false,
         type: String,
         choices: {
             'ask': 'EMP.settings.autorecTarget.choices.ask',
@@ -154,7 +132,7 @@ Hooks.once('init', function() {
     });
 });
 
-// Dynamic visibility of AA and BLFX buttons in settings config
+// Dynamic visibility of Manage Autorec menu button in settings config
 Hooks.on('renderSettingsConfig', function(app, html, data) {
     const root = html?.querySelector ? html : html?.[0];
     if (!root) return;
@@ -167,12 +145,9 @@ Hooks.on('renderSettingsConfig', function(app, html, data) {
         Hooks.events?.['blfx.register.CustomAutoRec']
     );
 
-    const target = game.settings?.get(MODULE_ID, 'autorecTarget') ?? 'ask';
+    const hasActiveAutorec = isAaActive || isBlfxActive;
 
-    if (!isAaActive || target === 'blfx' || target === 'none') {
-        root.querySelector(`[data-key="${MODULE_ID}.autorecUpdate"]`)?.closest('.form-group')?.remove();
-    }
-    if (!isBlfxActive || target === 'autoanimations' || target === 'none') {
-        root.querySelector(`[data-key="${MODULE_ID}.blfxSync"]`)?.closest('.form-group')?.remove();
+    if (!hasActiveAutorec) {
+        root.querySelector(`[data-key="${MODULE_ID}.manageAutorec"]`)?.closest('.form-group')?.remove();
     }
 });

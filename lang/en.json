@@ -15,6 +15,11 @@
                 "label": "Update AA Autorec",
                 "hint": "Force an update of the Automated Animations Autorecognition."
             },
+            "manageAutorec": {
+                "name": "Manage Auto-Recognition",
+                "label": "Manage Auto-Recognition",
+                "hint": "Configure auto-recognition integration targets and synchronize animation presets for Automated Animations and Boss Loot FX."
+            },
             "autorecDestinationMenu": {
                 "name": "Auto-Recognition Integration Target",
                 "label": "Configure Autorec Target",
@@ -187,6 +192,27 @@
                     "description": "Do not automatically register effects into any animation manager."
                 }
             }
+        },
+        "manageAutorec": {
+            "menuTitle": "Eskie Macro Pack — Manage Auto-Recognition",
+            "menuHint": "Manage auto-recognition integrations, sync animation presets, and configure automation targets for your active companion modules.",
+            "syncSectionTitle": "Module Presets Synchronization",
+            "aaTitle": "Automated Animations",
+            "aaDescription": "Review and synchronize Eskie Macro Pack's custom animation presets with Automated Animations.",
+            "blfxTitle": "Boss Loot FX",
+            "blfxDescription": "Review and synchronize Eskie Macro Pack's custom auto-recognition presets with Boss Loot FX.",
+            "syncButton": "Sync Presets",
+            "targetSectionTitle": "Auto-Recognition Target",
+            "targetSectionHint": "Both Automated Animations and Boss Loot FX are active. Choose which automation system Eskie Macro Pack should prioritize and register presets to by default.",
+            "targets": {
+                "ask": {
+                    "name": "Prompt on Startup",
+                    "description": "Prompt to choose whenever new animation presets are detected on load."
+                }
+            },
+            "saveButton": "Save Target",
+            "closeButton": "Close",
+            "savedNotify": "Auto-recognition settings saved successfully."
         },
         "effects": {
             "concentratingPrefix": "Concentrating: {name}",

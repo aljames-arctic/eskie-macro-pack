@@ -1,0 +1,151 @@
+<div class="eskie-world-scripts-container eskie-autorec-destination-form eskie-manage-autorec-form">
+    <div class="eskie-world-scripts-header">
+        <div class="eskie-header-icon">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+        <div class="eskie-header-text">
+            <h2>{{localize "EMP.manageAutorec.menuTitle"}}</h2>
+            <p class="notes">{{localize "EMP.manageAutorec.menuHint"}}</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- SECTION 1: Synchronization Actions (only shown if respective module is active) -->
+    <div class="eskie-autorec-sync-section">
+        <div class="eskie-blfx-section-divider">
+            <span>{{localize "EMP.manageAutorec.syncSectionTitle"}}</span>
+        </div>
+
+        <div class="eskie-world-scripts-list" style="margin-top: 6px;">
+            {{#if isAaActive}}
+            <div class="eskie-script-card">
+                <div class="eskie-card-icon-wrapper">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                </div>
+                <div class="eskie-card-details">
+                    <div class="eskie-card-title-row">
+                        <h3 class="eskie-card-title">{{localize "EMP.manageAutorec.aaTitle"}}</h3>
+                        <span class="eskie-status-badge active">{{localize "EMP.recommendedModules.status.active"}}</span>
+                    </div>
+                    <p class="eskie-card-description">{{localize "EMP.manageAutorec.aaDescription"}}</p>
+                </div>
+                <div class="eskie-card-actions">
+                    <button type="button" name="syncAa" class="eskie-btn-secondary">
+                        <i class="fa-solid fa-arrows-rotate"></i> {{localize "EMP.manageAutorec.syncButton"}}
+                    </button>
+                </div>
+            </div>
+            {{/if}}
+
+            {{#if isBlfxActive}}
+            <div class="eskie-script-card">
+                <div class="eskie-card-icon-wrapper">
+                    <i class="fa-solid fa-dragon"></i>
+                </div>
+                <div class="eskie-card-details">
+                    <div class="eskie-card-title-row">
+                        <h3 class="eskie-card-title">{{localize "EMP.manageAutorec.blfxTitle"}}</h3>
+                        <span class="eskie-status-badge active">{{localize "EMP.recommendedModules.status.active"}}</span>
+                    </div>
+                    <p class="eskie-card-description">{{localize "EMP.manageAutorec.blfxDescription"}}</p>
+                </div>
+                <div class="eskie-card-actions">
+                    <button type="button" name="syncBlfx" class="eskie-btn-secondary">
+                        <i class="fa-solid fa-arrows-rotate"></i> {{localize "EMP.manageAutorec.syncButton"}}
+                    </button>
+                </div>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+
+    <!-- SECTION 2: Auto-Recognition Target (Only visible if at least 2 modules are active) -->
+    {{#if hasMultipleAutorec}}
+    <div class="eskie-autorec-target-section" style="margin-top: 10px;">
+        <div class="eskie-blfx-section-divider">
+            <span>{{localize "EMP.manageAutorec.targetSectionTitle"}}</span>
+        </div>
+        <p class="notes" style="margin: 4px 0 8px 0; font-size: 0.8rem; color: #94a3b8;">
+            {{localize "EMP.manageAutorec.targetSectionHint"}}
+        </p>
+
+        <div class="eskie-world-scripts-list">
+            <!-- Option: Automated Animations -->
+            <label class="eskie-script-card {{#if (eq currentTarget 'autoanimations')}}active{{/if}}">
+                <div class="eskie-card-icon-wrapper">
+                    <i class="fa-solid fa-film"></i>
+                </div>
+                <div class="eskie-card-details">
+                    <div class="eskie-card-title-row">
+                        <h3 class="eskie-card-title">{{localize "EMP.autorecManager.targets.autoanimations.name"}}</h3>
+                    </div>
+                    <p class="eskie-card-description">{{localize "EMP.autorecManager.targets.autoanimations.description"}}</p>
+                </div>
+                <div class="eskie-card-toggle-wrapper">
+                    <input type="radio" name="autorecTarget" value="autoanimations" {{#if (eq currentTarget 'autoanimations')}}checked{{/if}}>
+                </div>
+            </label>
+
+            <!-- Option: Boss Loot FX -->
+            <label class="eskie-script-card {{#if (eq currentTarget 'blfx')}}active{{/if}}">
+                <div class="eskie-card-icon-wrapper">
+                    <i class="fa-solid fa-dragon"></i>
+                </div>
+                <div class="eskie-card-details">
+                    <div class="eskie-card-title-row">
+                        <h3 class="eskie-card-title">{{localize "EMP.autorecManager.targets.blfx.name"}}</h3>
+                    </div>
+                    <p class="eskie-card-description">{{localize "EMP.autorecManager.targets.blfx.description"}}</p>
+                </div>
+                <div class="eskie-card-toggle-wrapper">
+                    <input type="radio" name="autorecTarget" value="blfx" {{#if (eq currentTarget 'blfx')}}checked{{/if}}>
+                </div>
+            </label>
+
+            <!-- Option: Ask on Startup -->
+            <label class="eskie-script-card {{#if (eq currentTarget 'ask')}}active{{/if}}">
+                <div class="eskie-card-icon-wrapper">
+                    <i class="fa-solid fa-circle-question"></i>
+                </div>
+                <div class="eskie-card-details">
+                    <div class="eskie-card-title-row">
+                        <h3 class="eskie-card-title">{{localize "EMP.manageAutorec.targets.ask.name"}}</h3>
+                    </div>
+                    <p class="eskie-card-description">{{localize "EMP.manageAutorec.targets.ask.description"}}</p>
+                </div>
+                <div class="eskie-card-toggle-wrapper">
+                    <input type="radio" name="autorecTarget" value="ask" {{#if (eq currentTarget 'ask')}}checked{{/if}}>
+                </div>
+            </label>
+
+            <!-- Option: None / Disabled -->
+            <label class="eskie-script-card {{#if (eq currentTarget 'none')}}active{{/if}}">
+                <div class="eskie-card-icon-wrapper">
+                    <i class="fa-solid fa-ban"></i>
+                </div>
+                <div class="eskie-card-details">
+                    <div class="eskie-card-title-row">
+                        <h3 class="eskie-card-title">{{localize "EMP.autorecManager.targets.none.name"}}</h3>
+                    </div>
+                    <p class="eskie-card-description">{{localize "EMP.autorecManager.targets.none.description"}}</p>
+                </div>
+                <div class="eskie-card-toggle-wrapper">
+                    <input type="radio" name="autorecTarget" value="none" {{#if (eq currentTarget 'none')}}checked{{/if}}>
+                </div>
+            </label>
+        </div>
+    </div>
+    {{/if}}
+
+    <footer class="eskie-world-scripts-footer eskie-aa-button-row" style="margin-top: 14px;">
+        {{#if hasMultipleAutorec}}
+        <button type="submit" name="submit" class="eskie-btn-primary">
+            <i class="fa-solid fa-floppy-disk"></i> {{localize "EMP.manageAutorec.saveButton"}}
+        </button>
+        {{/if}}
+        <button type="button" name="cancel" class="eskie-btn-secondary">
+            <i class="fa-solid fa-xmark"></i> {{localize "EMP.manageAutorec.closeButton"}}
+        </button>
+    </footer>
+</div>

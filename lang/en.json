@@ -180,6 +180,14 @@
             "acceptButton": "Apply Updates",
             "cancelButton": "Cancel"
         },
+        "blfxPrompt": {
+            "enableUpdatesTitle": "Boss Loot FX — Enable Custom Auto-Rec Updates",
+            "enableUpdatesHeading": "External Custom Auto-Recognition updates are disabled in Boss Loot FX.",
+            "enableUpdatesMessage": "Before Eskie Macro Pack can synchronize custom animation presets, external module updates must be enabled in Boss Loot FX settings.",
+            "instructions": "Please go to Game Settings → Configure Settings → Boss Loot FX and enable 'Allow Custom Auto-Rec Updates' (blfxCustomAutoRecUpdates).",
+            "openSettings": "Open Settings",
+            "dismiss": "Dismiss"
+        },
         "autorecManager": {
             "menuTitle": "Eskie Macro Pack — Auto-Recognition Target",
             "promptTitle": "Choose Auto-Recognition Integration",

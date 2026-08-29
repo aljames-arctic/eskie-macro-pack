@@ -3,7 +3,11 @@ import { log } from '../../lib/logger.js';
 import { BaseFoundryAdapter } from "../../adapters/foundry/index.js";
 import { autorecUpdateFormApplication } from "../autoanimations/updateMenu.js";
 import { BlfxAutorecUpdateFormApplication } from "../blfx/updateMenu.js";
-import { isBlfxAutorecAvailable } from "../../adapters/modules/blfx/blfx-module-adapter.js";
+import {
+    isBlfxAutorecAvailable,
+    isBlfxCustomAutoRecUpdatesEnabled,
+    promptEnableBlfxUpdates
+} from "../../adapters/modules/blfx/blfx-module-adapter.js";
 
 const foundryPlatform = new BaseFoundryAdapter();
 
@@ -79,8 +83,12 @@ export class ConfigureAutorecApp extends foundryPlatform.HandlebarsApplicationMi
 
         // Sync BLFX submenu button handler
         const syncBlfxBtn = this.element?.querySelector('button[name="syncBlfx"]');
-        syncBlfxBtn?.addEventListener('click', (event) => {
+        syncBlfxBtn?.addEventListener('click', async (event) => {
             event.preventDefault();
+            if (!isBlfxCustomAutoRecUpdatesEnabled()) {
+                await promptEnableBlfxUpdates();
+                return;
+            }
             new BlfxAutorecUpdateFormApplication().render(true);
         });
 

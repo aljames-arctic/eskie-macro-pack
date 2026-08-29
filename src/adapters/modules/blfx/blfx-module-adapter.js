@@ -1,8 +1,11 @@
 import { BaseModuleAdapter } from "../base-module-adapter.js";
+import { BaseFoundryAdapter } from "../../foundry/index.js";
 import { MODULE_ID } from "../../../lib/constants.js";
 import { log } from '../../../lib/logger.js';
 import { localize } from "../../../lib/utils.js";
 import { BlfxAutorecUpdateFormApplication, generateBlfxAutorecUpdate } from "../../../ui/blfx/updateMenu.js";
+
+const foundryPlatform = new BaseFoundryAdapter();
 
 /**
  * Checks whether the current Foundry environment is generation 14 or newer.
@@ -25,6 +28,87 @@ export function isBlfxAutorecAvailable() {
         game?.modules?.get('boss-loot-assets-premium')?.active ||
         game?.modules?.get('blfx-animation-editor-premium')?.active
     );
+}
+
+/**
+ * Checks whether Boss Loot FX has enabled external custom auto-recognition updates in game settings.
+ * Setting: boss-loot-assets-premium.blfxCustomAutoRecUpdates
+ * @returns {boolean}
+ */
+export function isBlfxCustomAutoRecUpdatesEnabled() {
+    for (const modId of ['boss-loot-assets-premium', 'blfx-animation-editor-premium', 'blfx']) {
+        const fullKey = `${modId}.blfxCustomAutoRecUpdates`;
+        if (game?.settings?.settings?.has?.(fullKey)) {
+            try {
+                return Boolean(game.settings.get(modId, 'blfxCustomAutoRecUpdates'));
+            } catch {
+                // Continue checking fallback namespaces
+            }
+        }
+    }
+    try {
+        const directVal = game?.settings?.get?.('boss-loot-assets-premium', 'blfxCustomAutoRecUpdates');
+        if (typeof directVal === 'boolean') return directVal;
+    } catch {}
+    return false;
+}
+
+/**
+ * Prompts the user with an instructional dialog to enable custom auto-recognition updates in BLFX settings.
+ * @returns {Promise<void>}
+ */
+export async function promptEnableBlfxUpdates() {
+    const title = game.i18n?.localize("EMP.blfxPrompt.enableUpdatesTitle") ?? "Boss Loot FX — Enable Custom Auto-Rec Updates";
+    const heading = game.i18n?.localize("EMP.blfxPrompt.enableUpdatesHeading") ?? "External Custom Auto-Recognition updates are disabled in Boss Loot FX.";
+    const message = game.i18n?.localize("EMP.blfxPrompt.enableUpdatesMessage") ?? "Before Eskie Macro Pack can synchronize custom animation presets, external module updates must be enabled in Boss Loot FX settings.";
+    const instructions = game.i18n?.localize("EMP.blfxPrompt.instructions") ?? "Please go to Game Settings → Configure Settings → Boss Loot FX and enable 'Allow Custom Auto-Rec Updates' (blfxCustomAutoRecUpdates).";
+
+    const dialogCls = foundryPlatform.DialogV2;
+    if (dialogCls?.wait) {
+        const content = `
+            <div style="display: flex; gap: 14px; align-items: flex-start; padding: 6px 0;">
+                <div style="font-size: 2rem; color: #a78bfa; line-height: 1;">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    <p style="margin: 0 0 8px 0; font-weight: 600; color: #f1f5f9; font-size: 0.95rem;">
+                        ${heading}
+                    </p>
+                    <p style="margin: 0 0 8px 0; font-size: 0.88rem; color: #cbd5e1; line-height: 1.4;">
+                        ${message}
+                    </p>
+                    <p style="margin: 0; font-size: 0.82rem; color: #94a3b8; line-height: 1.35;">
+                        ${instructions}
+                    </p>
+                </div>
+            </div>
+        `;
+
+        return dialogCls.wait({
+            window: { title, icon: "fa-solid fa-dragon" },
+            content,
+            buttons: [
+                {
+                    action: "openSettings",
+                    label: game.i18n?.localize("EMP.blfxPrompt.openSettings") ?? "Open Settings",
+                    icon: "fa-solid fa-gear",
+                    callback: () => {
+                        if (game.settings?.sheet) {
+                            game.settings.sheet.render(true);
+                        }
+                    }
+                },
+                {
+                    action: "dismiss",
+                    label: game.i18n?.localize("EMP.blfxPrompt.dismiss") ?? "Dismiss",
+                    icon: "fa-solid fa-xmark",
+                    default: true
+                }
+            ]
+        });
+    }
+
+    ui.notifications?.warn?.(`${heading} ${instructions}`);
 }
 
 /**
@@ -393,11 +477,16 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
         }
 
         const shouldUpdate = force || isDevelopment || foundry.utils.isNewerVersion(effectiveVersion, lastUpdate);
-
         if (!shouldUpdate) return;
 
         if (!this.isAutorecSupported()) {
             log.debug("EMP | Boss Loot FX Custom Auto-Rec skipped: requires Foundry v14+ and the Patreon BLFX module (boss-loot-assets-premium).");
+            return;
+        }
+
+        if (!this.isCustomAutoRecUpdatesEnabled()) {
+            log.warn("EMP | Boss Loot FX Custom Auto-Rec updates are disabled in game settings (boss-loot-assets-premium.blfxCustomAutoRecUpdates).");
+            await this.promptEnableBlfxUpdates();
             return;
         }
 
@@ -417,6 +506,22 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
      */
     isAutorecSupported() {
         return isBlfxAutorecAvailable();
+    }
+
+    /**
+     * Checks whether Boss Loot FX has enabled external custom auto-recognition updates in game settings.
+     * @returns {boolean}
+     */
+    isCustomAutoRecUpdatesEnabled() {
+        return isBlfxCustomAutoRecUpdatesEnabled();
+    }
+
+    /**
+     * Prompts the user to enable custom auto-rec updates in Boss Loot FX settings.
+     * @returns {Promise<void>}
+     */
+    promptEnableBlfxUpdates() {
+        return promptEnableBlfxUpdates();
     }
 
     _getDevelopmentVersion() {
@@ -440,6 +545,8 @@ export const blfx = {
     mergeBlfxCustomAutoRec: (existingData, empRegistry) => mergeBlfxCustomAutoRec(existingData, empRegistry ?? blfxAdapter.registry),
     submit: (force = false) => blfxAdapter.submit(force),
     isAutorecAvailable: isBlfxAutorecAvailable,
+    isCustomAutoRecUpdatesEnabled: isBlfxCustomAutoRecUpdatesEnabled,
+    promptEnableUpdates: promptEnableBlfxUpdates,
     isFoundryV14Plus,
     registry: EMP_BLFX_Registry
 };

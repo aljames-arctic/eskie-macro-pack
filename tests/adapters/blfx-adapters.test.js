@@ -168,3 +168,50 @@ test('generateBlfxAutorecUpdate and readExistingBlfxData handle settings seamles
     assert.ok(Array.isArray(result.customEntries));
     assert.ok(result.newPayload.customAutoRecognition.dnd5e.sample.default.afterAttack);
 });
+
+test('isBlfxCustomAutoRecUpdatesEnabled detects boss-loot-assets-premium.blfxCustomAutoRecUpdates setting', async () => {
+    const { isBlfxCustomAutoRecUpdatesEnabled, promptEnableBlfxUpdates } = await import('../../src/adapters/modules/blfx/blfx.js');
+
+    // When unset
+    assert.equal(isBlfxCustomAutoRecUpdatesEnabled(), false);
+
+    // Mock setting enabled
+    game.settings.settings = new Map();
+    game.settings.settings.set('boss-loot-assets-premium.blfxCustomAutoRecUpdates', {
+        namespace: 'boss-loot-assets-premium',
+        key: 'blfxCustomAutoRecUpdates',
+        default: false
+    });
+
+    const origGet = game.settings.get;
+    game.settings.get = (mod, key) => {
+        if (key === 'blfxCustomAutoRecUpdates') return true;
+        return origGet(mod, key);
+    };
+
+    assert.equal(isBlfxCustomAutoRecUpdatesEnabled(), true);
+
+    game.settings.get = (mod, key) => {
+        if (key === 'blfxCustomAutoRecUpdates') return false;
+        return origGet(mod, key);
+    };
+
+    assert.equal(isBlfxCustomAutoRecUpdatesEnabled(), false);
+    game.settings.get = origGet;
+});
+
+test('promptEnableBlfxUpdates renders instructional DialogV2', async () => {
+    const { promptEnableBlfxUpdates } = await import('../../src/adapters/modules/blfx/blfx.js');
+    let dialogCalled = false;
+    const origWait = foundry.applications.api.DialogV2.wait;
+    foundry.applications.api.DialogV2.wait = async (options) => {
+        dialogCalled = true;
+        assert.ok(options.content.includes('blfxCustomAutoRecUpdates') || options.content.includes('EMP.blfxPrompt'));
+        assert.ok(options.buttons.some(b => b.action === 'openSettings'));
+        return 'dismiss';
+    };
+
+    await promptEnableBlfxUpdates();
+    assert.equal(dialogCalled, true);
+    foundry.applications.api.DialogV2.wait = origWait;
+});

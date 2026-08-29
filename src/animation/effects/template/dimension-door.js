@@ -27,7 +27,7 @@ async function create(token, config = {}) {
     if (!position) { return; }
 
     let sequence = new Sequence();
-    applySound(sequence, sound?.teleportOut ?? sound);
+    applySound(sequence, sound.teleportOut);
 
     sequence.animation()
         .on(token)
@@ -78,7 +78,7 @@ async function create(token, config = {}) {
             .rotate(180)
             .anchor({ x: 0.9, y: 0.5 });
 
-    applySound(sequence, sound?.teleportIn);
+    applySound(sequence, sound.teleportIn);
 
     sequence.animation()
             .on(token)

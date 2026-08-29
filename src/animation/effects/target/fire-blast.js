@@ -67,7 +67,7 @@ async function create(source, target, config = {}) {
     const nyt = -ny;
 
     // --- Charging Phase ---
-    applySound(sequence, sound?.charge ?? sound);
+    applySound(sequence, sound.charge);
 
     sequence.effect()
         .file(closest('jb2a.divine_smite.caster.standard.orange'))
@@ -102,7 +102,7 @@ async function create(source, target, config = {}) {
         .opacity(0.6)
         .belowTokens();
 
-    applySound(sequence, sound?.channel ?? sound);
+    applySound(sequence, sound.channel);
 
     sequence.effect()
         .file(closest('blfx.spell.cast.swirl1.fire1.loop.orange'))
@@ -122,7 +122,7 @@ async function create(source, target, config = {}) {
         .randomRotation()
         .belowTokens();
 
-    applySound(sequence, sound?.attack ?? sound);
+    applySound(sequence, sound.attack);
 
     sequence.effect()
         .file(closest('jb2a.ranged_helix.cast.001.orangeyellow'))
@@ -138,14 +138,14 @@ async function create(source, target, config = {}) {
         .on(source)
         .opacity(0);
 
-    applySound(sequence, sound?.sacredFlame ?? sound);
+    applySound(sequence, sound.sacredFlame);
 
     sequence.effect()
         .file(closest('jb2a.on_token_buff.001.003.orangeyellow'))
         .atLocation(source)
         .scaleToObject(0.5, { considerTokenScale: true });
 
-    applySound(sequence, sound?.burningHands ?? sound);
+    applySound(sequence, sound.burningHands);
 
     sequence.effect()
         .file(closest('jb2a.ranged_missile.cast.001.orangeyellow'))
@@ -204,7 +204,7 @@ async function create(source, target, config = {}) {
         .opacity(1)
         .waitUntilFinished(-1000);
 
-    applySound(sequence, sound?.fireball ?? sound);
+    applySound(sequence, sound.fireball);
 
     // Impact
     sequence.effect()

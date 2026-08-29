@@ -113,7 +113,7 @@ function create(token, targetTokens, config = {}) {
             }
         }
 
-        applySound(littleSeq, sound?.littleBolt ?? sound);
+        applySound(littleSeq, sound.littleBolt);
 
         if (i < propagationLevels.length - 1) {
             littleSeq.wait(config.propagationDelay);
@@ -177,7 +177,7 @@ function create(token, targetTokens, config = {}) {
             }
         }
 
-        applySound(bigSeq, sound?.bigBolt ?? sound);
+        applySound(bigSeq, sound.bigBolt);
 
         if (i < propagationLevels.length - 1) {
             const waitTime = isPrimary ? 800 : config.propagationDelay;

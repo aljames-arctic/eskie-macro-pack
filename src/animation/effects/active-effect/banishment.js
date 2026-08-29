@@ -153,7 +153,7 @@ async function createBanish(target, config = {}) {
     }
 
     const sequence = new Sequence();
-    applySound(sequence, sound?.intro ?? sound);
+    applySound(sequence, sound.intro);
     sequence.effect()
         .file(closest(`jb2a.magic_signs.circle.02.conjuration.intro.${portal.color}`))
         .atLocation(target)
@@ -173,7 +173,7 @@ async function createBanish(target, config = {}) {
     let runeDelay = 0;
     let animationDelay = 4000;
     for (const rune of RUNE_DATA.runes) {
-        applySound(sequence, { ...(sound?.rune ?? sound), delay: runeDelay + 750 });
+        applySound(sequence, { ...sound.rune, delay: runeDelay + 750 });
         sequence.effect()
             .file(closest(`jb2a.magic_signs.rune.conjuration.complete.${portal.color}`))
             .atLocation(target, { offset: rune.offset })
@@ -191,7 +191,7 @@ async function createBanish(target, config = {}) {
     }
 
     sequence.wait(3000);
-    applySound(sequence, sound?.moonbeam ?? sound);
+    applySound(sequence, sound.moonbeam);
 
     sequence.wait(1500);
     sequence.effect()
@@ -344,7 +344,7 @@ async function createReturn(target, config = {}) {
     modifyPortal(portal, target);
 
     const sequence = new Sequence();
-    applySound(sequence, sound?.return ?? sound);
+    applySound(sequence, sound.return);
     sequence.effect()
         .file(closest(`jb2a.explosion.01.${portal.color}`))
         .atLocation(target, { offset: { x: 5, y: -75 } })

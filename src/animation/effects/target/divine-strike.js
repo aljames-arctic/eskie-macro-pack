@@ -45,7 +45,7 @@ async function createMelee(token, target, config = {}) {
     const { darkMap, sound } = mConfig;
 
     const sequence = new Sequence();
-    applySound(sequence, sound?.attack ?? sound);
+    applySound(sequence, sound.attack);
     for (let i = 0; i < 4; i++) {
         const offset = [
             { x: 0.3 * token.document.width, y: -0.85 * token.document.width },
@@ -154,7 +154,7 @@ async function createRanged(token, target, config = {}) {
     const { darkMap, sound } = mConfig;
 
     const sequence = new Sequence();
-    applySound(sequence, sound?.attack ?? sound);
+    applySound(sequence, sound.attack);
     const distance = {
         x: (token.center.x - target.center.x),
         y: (token.center.y - target.center.y)
@@ -259,7 +259,7 @@ async function createTwilightMelee(token, target, config = {}) {
     const targetSquare = getNearestSquareCenter(token, target);
 
     const sequence = new Sequence();
-    applySound(sequence, sound?.attack ?? sound);
+    applySound(sequence, sound.attack);
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
@@ -358,7 +358,7 @@ async function createTwilightRanged(token, target, config = {}) {
     if (!token || !target) return;
 
     const sequence = new Sequence();
-    applySound(sequence, sound?.attack ?? sound);
+    applySound(sequence, sound.attack);
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {

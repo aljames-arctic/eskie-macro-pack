@@ -72,7 +72,7 @@ When asked to update scripts in the `new-submissions` folder or to convert Disco
             ```javascript
             applySound(sequence, sound);
             ```
-        *   For multi-sound animations, pass the corresponding sound sub-object at the appropriate point in the sequence: `applySound(sequence, sound?.charge ?? sound);`.
+        *   For multi-sound animations, pass the corresponding sound sub-object at the appropriate point in the sequence: `applySound(sequence, sound.charge);`.
     *   **Settings Override**:
         *   Import `{ settingsOverride }` from `'../../../lib/settings.js'` and call `config = settingsOverride(config);` at the start of `create` (and `play`, if it merges config) so global audio settings override disabled sounds.
 

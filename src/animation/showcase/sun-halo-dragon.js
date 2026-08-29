@@ -76,7 +76,7 @@ async function create(token, targets = [], config = {}) {
             .fadeOut(250)
             .filter("Blur", { blurX: 15, blurY: 0 });
 
-        applySound(seq, sound?.intro ?? sound);
+        applySound(seq, sound.intro);
 
         seq.effect()
             .file(closest("eskie.screen_overlay.speed_lines.horizontal.02.orange"))
@@ -190,7 +190,7 @@ async function create(token, targets = [], config = {}) {
             .shake({ duration: 250, strength: 1.5, rotation: false, fadeOut: 250 })
 
         .wait(1000);
-        applySound(seq, sound?.cast ?? sound);
+        applySound(seq, sound.cast);
         seq.wait(1000);
 
         seq.effect()

@@ -34,7 +34,7 @@ async function create(token, target, config = {}) {
     const { color, sound } = foundry.utils.mergeObject(DEFAULT_CONFIG, config, {inplace:false});
     let seq = new Sequence();
 
-    applySound(seq, sound?.punch1 ?? sound);
+    applySound(seq, sound.punch1);
     seq = seq.effect()
         .delay(125)
         .file(closest(`jb2a.melee_generic.creature_attack.fist.001.${color}`))
@@ -46,7 +46,7 @@ async function create(token, target, config = {}) {
         .repeats(7,250,250)
         .zIndex(1);
 
-    applySound(seq, sound?.punch2);
+    applySound(seq, sound.punch2);
     seq = seq.effect()
         .delay(250)
         .file(closest(`jb2a.melee_generic.creature_attack.fist.001.${color}`))

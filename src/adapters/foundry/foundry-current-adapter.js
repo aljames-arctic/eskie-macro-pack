@@ -160,38 +160,28 @@ export class FoundryCurrentAdapter extends BaseFoundryAdapter {
             const gridSize = canvas?.grid?.size ?? canvas?.dimensions?.size ?? 100;
             const gridDistance = canvas?.grid?.distance ?? canvas?.scene?.grid?.distance ?? canvas?.dimensions?.distance ?? 5;
 
-            let distancePx = 0;
-            if (config.distance !== undefined && config.distance > 0) {
-                distancePx = (config.distance / gridDistance) * gridSize;
-            } else if (doc.distance !== undefined && doc.distance > 0) {
-                distancePx = (doc.distance / gridDistance) * gridSize;
-            } else if (shape?.distance !== undefined && shape.distance > 0) {
-                distancePx = (shape.distance / gridDistance) * gridSize;
-            } else if (shape?.radius !== undefined && shape.radius > 0) {
-                distancePx = shape.radius;
-            } else if (shape?.height !== undefined && shape.height > 0) {
-                distancePx = shape.height;
-            } else if (shape?.width !== undefined && shape.width > 0) {
-                distancePx = shape.width;
-            }
+            // Grid distance (feet) converted to canvas pixels when provided
+            const gridUnits = config.distance ?? doc.distance ?? shape?.distance;
+            const distancePx = gridUnits !== undefined && gridUnits > 0
+                ? (gridUnits / gridDistance) * gridSize
+                : (shape?.radius ?? shape?.height ?? shape?.width ?? 0);
 
-            const rotation = shape?.rotation ?? doc.rotation ?? config.direction;
+            const rotation = shape?.rotation ?? doc.rotation ?? config.direction ?? 0;
+            const rad = (rotation * Math.PI) / 180;
+
             let secondary;
-
-            if (rotation !== undefined && distancePx > 0) {
-                const rad = (rotation * Math.PI) / 180;
-                secondary = {
-                    x: primary.x + Math.cos(rad) * distancePx,
-                    y: primary.y + Math.sin(rad) * distancePx
-                };
-            } else if (distancePx > 0) {
-                secondary = {
-                    x: primary.x + distancePx,
-                    y: primary.y
-                };
+            if (distancePx > 0) {
+                secondary = { x: primary.x + Math.cos(rad) * distancePx, y: primary.y + Math.sin(rad) * distancePx };
+            } else {
+                const token = config.token ?? config.sourceToken;
+                const tokenCenter = token?.center ?? (token?.x !== undefined ? { x: token.x, y: token.y } : null);
+                if (tokenCenter && Math.hypot(primary.x - tokenCenter.x, primary.y - tokenCenter.y) >= 1) {
+                    secondary = primary;
+                    primary = { x: tokenCenter.x, y: tokenCenter.y };
+                }
             }
 
-            return [primary, secondary, center];
+            return this.resolveDistinctPositions([primary, secondary, center], config, template);
         }
 
         return super.getTemplatePosition(template, config);

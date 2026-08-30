@@ -215,6 +215,14 @@ export class Adapter {
         return this.foundry.getTemplatePosition(template, config);
     }
 
+    getCrosshairPosition(position, config = {}) {
+        return this.foundry.getCrosshairPosition(position, config);
+    }
+
+    resolveDistinctPositions(positions, config = {}, template = null) {
+        return this.foundry.resolveDistinctPositions(positions, config, template);
+    }
+
     getSceneBackground(scene = canvas?.scene, level = null) {
         return this.foundry.getSceneBackground(scene, level);
     }

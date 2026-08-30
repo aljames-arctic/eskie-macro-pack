@@ -1,6 +1,7 @@
 import { dependency } from '../../lib/dependency.js';
 import { massEditAdapter } from '../modules/mass-edit/mass-edit-module-adapter.js';
 import { tokenAttacherAdapter } from '../modules/token-attacher/token-attacher-module-adapter.js';
+import { log } from '../../lib/logger.js';
 
 /**
  * User permission tiers for ownership priority evaluation.
@@ -621,7 +622,7 @@ export class BaseFoundryAdapter {
         const placeable = template.object ?? (template.document ? template : null);
         const farpoint = placeable?.ray?.B ?? doc.ray?.B;
 
-        const primary = {
+        let primary = {
             x: doc.x ?? placeable?.x ?? 0,
             y: doc.y ?? placeable?.y ?? 0
         };
@@ -629,26 +630,27 @@ export class BaseFoundryAdapter {
         const distance = (doc.distance !== undefined && doc.distance > 0)
             ? doc.distance
             : ((placeable?.distance !== undefined && placeable.distance > 0) ? placeable.distance : (config.distance ?? 0));
-        const direction = doc.direction ?? placeable?.direction ?? config.direction;
+        const direction = doc.direction ?? placeable?.direction ?? config.direction ?? 0;
         const gridSize = canvas?.grid?.size ?? canvas?.dimensions?.size ?? 100;
         const gridDistance = canvas?.grid?.distance ?? canvas?.scene?.grid?.distance ?? canvas?.dimensions?.distance ?? 5;
+        const distancePx = (distance / gridDistance) * gridSize;
+        const rad = (direction * Math.PI) / 180;
 
         let secondary;
         if (farpoint && (farpoint.x !== primary.x || farpoint.y !== primary.y)) {
             secondary = { x: farpoint.x, y: farpoint.y };
-        } else if (direction !== undefined && distance > 0) {
-            const distancePx = (distance / gridDistance) * gridSize;
-            const rad = (direction * Math.PI) / 180;
+        } else if (distancePx > 0) {
             secondary = {
                 x: primary.x + Math.cos(rad) * distancePx,
                 y: primary.y + Math.sin(rad) * distancePx
             };
-        } else if (distance > 0) {
-            const distancePx = (distance / gridDistance) * gridSize;
-            secondary = {
-                x: primary.x + distancePx,
-                y: primary.y
-            };
+        } else {
+            const token = config.token ?? config.sourceToken;
+            const tokenCenter = token?.center ?? (token?.x !== undefined ? { x: token.x, y: token.y } : null);
+            if (tokenCenter && Math.hypot(primary.x - tokenCenter.x, primary.y - tokenCenter.y) >= 1) {
+                secondary = primary;
+                primary = { x: tokenCenter.x, y: tokenCenter.y };
+            }
         }
 
         const width = doc.width ?? placeable?.width ?? 0;
@@ -660,6 +662,71 @@ export class BaseFoundryAdapter {
         };
 
         return [primary, secondary, center];
+    }
+
+    /**
+     * Resolves position coordinates from an interactive crosshair placement result.
+     * @param {object} position The raw coordinates returned by Sequencer.Crosshair.show
+     * @param {object} [config={}] Configuration options
+     * @returns {[ {x: number, y: number}, {x: number, y: number}, {x: number, y: number} ]} Array of [primary, secondary, center]
+     */
+    getCrosshairPosition(position, config = {}) {
+        if (!position) return [];
+
+        let primary = { x: position.x ?? 0, y: position.y ?? 0 };
+        const token = config.token ?? config.sourceToken;
+        const tokenCenter = token?.center ?? (token?.x !== undefined ? { x: token.x, y: token.y } : null);
+
+        const gridSize = canvas?.grid?.size ?? canvas?.dimensions?.size ?? 100;
+        const gridDistance = canvas?.grid?.distance ?? canvas?.scene?.grid?.distance ?? canvas?.dimensions?.distance ?? 5;
+
+        const dir = position.direction ?? config.direction ?? token?.document?.rotation ?? 0;
+        const isRayOrCone = position.t === 'ray' || position.t === 'cone' || position.type === 'ray' || position.type === 'cone' || config.type === 'ray' || config.type === 'cone';
+        const isAttached = Boolean(position.sticky || config.sticky || config.stickToToken || isRayOrCone);
+
+        const dist = position.distance ?? config.distance ?? (isAttached ? (config.max ?? 100) : 0);
+        const distancePx = (dist / gridDistance) * gridSize;
+        const rad = (dir * Math.PI) / 180;
+
+        let secondary;
+        if (distancePx > 0) {
+            secondary = {
+                x: primary.x + Math.cos(rad) * distancePx,
+                y: primary.y + Math.sin(rad) * distancePx
+            };
+        } else if (tokenCenter && Math.hypot(primary.x - tokenCenter.x, primary.y - tokenCenter.y) >= 1) {
+            secondary = primary;
+            primary = { x: tokenCenter.x, y: tokenCenter.y };
+        }
+
+        return this.resolveDistinctPositions([primary, secondary, primary], config);
+    }
+
+    /**
+     * Validates that primary and secondary coordinates are distinct (distance >= 1px).
+     * @param {Array} positions Coordinates array [primary, secondary, center]
+     * @param {object} [config={}] Configuration options
+     * @param {Document|object|null} [template=null] Original template or region document
+     * @returns {Array} Validated positions or error array
+     */
+    resolveDistinctPositions(positions, config = {}, template = null) {
+        if (!positions || positions.length === 0 || positions.error || positions[0]?.error) {
+            return positions;
+        }
+        const [primary, secondary, center] = positions;
+        if (!primary) return positions;
+
+        const distancePx = secondary ? Math.hypot(secondary.x - primary.x, secondary.y - primary.y) : 0;
+        if (secondary && distancePx < 1) {
+            log.error('BaseFoundryAdapter | Unable to resolve distinct non-zero positions for animation.', { template, config, primary, secondary });
+            ui?.notifications?.error?.('Eskie Macro Pack | Unable to resolve coordinates for animation.');
+            const err = new Error('Unable to resolve distinct coordinates for template animation');
+            const errResult = [{ error: err, cancelled: true }, undefined, undefined];
+            errResult.error = err;
+            return errResult;
+        }
+
+        return [primary, secondary, center ?? primary];
     }
 
     /* -------------------------------------------- */

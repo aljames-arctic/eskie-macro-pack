@@ -41,6 +41,7 @@ Downloading Visual Studio Code and/or an agentic IDE such as Google's Antigravit
 * Doomrule (@doomrule)
 * Mia Del'Mori (@.tranquilite)
 * Akane (@yamiakane)
+* Papa Nurgle (@papanurgle)
 
 ## Language Contributors
 

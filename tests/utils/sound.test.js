@@ -153,6 +153,18 @@ test('Rage sub-configs include version-specific sound configurations', async () 
     assert.ok(rage.default_config.config_v5.sound, 'config_v5 must have sound property');
 });
 
+test('Mirror Image sub-configs include version-specific sound configurations', async () => {
+    const { mirrorImage } = await import('../../src/animation/effects/active-effect/mirror-image/index.js');
+    assert.ok(mirrorImage.default_config.config_v1.sound, 'config_v1 must have sound property');
+    assert.equal(typeof mirrorImage.default_config.config_v1.sound, 'object');
+    assert.equal(mirrorImage.default_config.config_v1.sound.enable, false);
+    assert.equal(mirrorImage.default_config.config_v1.sound.file, '');
+    assert.ok(mirrorImage.default_config.config_v2.sound, 'config_v2 must have sound property');
+    assert.equal(typeof mirrorImage.default_config.config_v2.sound, 'object');
+    assert.equal(mirrorImage.default_config.config_v2.sound.enable, false);
+    assert.equal(mirrorImage.default_config.config_v2.sound.file, '');
+});
+
 test('wailsFromTheGrave DEFAULT_CONFIG uses standard unconfigured sound ready for customization', async () => {
     const { wailsFromTheGrave } = await import('../../src/animation/effects/on-target/wails-from-the-grave.js');
     assert.ok(wailsFromTheGrave.default_config.sound, 'DEFAULT_CONFIG must have sound property');
@@ -160,4 +172,5 @@ test('wailsFromTheGrave DEFAULT_CONFIG uses standard unconfigured sound ready fo
     assert.equal(wailsFromTheGrave.default_config.sound.enable, false);
     assert.equal(wailsFromTheGrave.default_config.sound.file, '');
 });
+
 

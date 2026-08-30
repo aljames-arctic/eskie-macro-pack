@@ -2,12 +2,22 @@ import { warn } from '../../lib/warnings.js';
 
 import { aerodyneVehicle } from './token/aerodyne-vehicle.js';
 import { animateDead } from './target/animate-dead.js';
+import { arcaneShot } from './arcane-shot/index.js';
 import { armorOfAgathys } from './target/armor-of-agathys/index.js';
 import { armsOfHadar } from './template/arms-of-hadar.js';
 import { banishment } from './active-effect/banishment.js';
+import { battlemaster } from './battlemaster/index.js';
 import { benignTransportation } from './on-target/benign-transportation.js';
 import { blastLock } from './template/blast-lock.js';
 import { bless } from './active-effect/bless.js';
+import { burningHands } from './template/burning-hands.js';
+import { cloudkill } from './template/cloudkill.js';
+import { contagion } from './target/contagion.js';
+import { fireball } from './template/fireball.js';
+import { rayOfSickness } from './target/ray-of-sickness.js';
+import { scorchingRay } from './on-target/scorching-ray.js';
+import { wallOfFire } from './template/wall-of-fire.js';
+import { web } from './template/web.js';
 import { blurredVision } from './active-effect/blurred-vision.js';
 import { burnMask } from '../mask/burn-mask.js';
 import { call } from './token/call.js';
@@ -70,7 +80,7 @@ import { lightningBolt } from './template/lightning-bolt.js';
 import { magicMissile } from './on-target/magic-missile.js';
 import { maxtacTraumaTeamAV } from './tile/maxtac-trauma-team-av.js';
 import { meteorStrike } from './template/meteor-strike.js';
-import { mirrorImage } from './active-effect/mirror-image.js';
+import { mirrorImage } from './active-effect/mirror-image/index.js';
 import { mistyStep } from './token/misty-step.js';
 import { pathOfTheGrave } from './target/path-of-the-grave.js';
 import { petrified } from './active-effect/petrified.js';
@@ -120,13 +130,17 @@ import { saoDeath } from '../mask/sao-death.js';
 
 export const effect = {
     animateDead,
+    arcaneShot,
     armorOfAgathys,
     armsOfHadar,
     banishment,
+    battlemaster,
+    battleMaster: battlemaster,
     benignTransportation,
     blastLock,
     bless,
     blurredVision,
+    burningHands,
     call,
     callLightning,
     curseOfTheWerewolf,
@@ -138,7 +152,9 @@ export const effect = {
     charmed,
     chromaticOrb,
     cloudOfSand,
+    cloudkill,
     colorSpray,
+    contagion,
     dash,
     detect,
     dimensionDoor,
@@ -161,6 +177,7 @@ export const effect = {
     farStep,
     fightingSpirit,
     fingerOfDeath,
+    fireball,
     fireBlast,
     firecracker,
     fireShield,
@@ -198,10 +215,12 @@ export const effect = {
     psychicTeleportation,
     rage,
     rapidStrike,
+    rayOfSickness,
     revivify,
     romanCandle,
     sandevistan,
     sanctuary,
+    scorchingRay,
     shapechange,
     shockingGrasp,
     shuffle,
@@ -239,6 +258,8 @@ export const effect = {
     vigilantBlessing,
     vortexWarp,
     wailsFromTheGrave,
+    wallOfFire,
+    web,
     wings,
     wingsV2: warn.deprecation(wings, 'eskie.effect.wingsV2', 'eskie.effect.wings', 'January 1, 2028'),
     swordArtOnlineDeath: warn.deprecation(saoDeath, 'eskie.effect.swordArtOnlineDeath', 'eskie.mask.saoDeath', 'January 1, 2028')

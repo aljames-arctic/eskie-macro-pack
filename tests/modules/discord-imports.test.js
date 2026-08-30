@@ -215,3 +215,34 @@ test('no animation effect module or standalone macro embeds Sequencer crosshairs
         );
     }
 });
+
+test('no animation effect module or standalone macro animates position on sprite instead of spriteContainer', () => {
+    function getJsFiles(dir) {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        const files = [];
+        for (const entry of entries) {
+            const res = path.resolve(dir, entry.name);
+            if (entry.isDirectory()) {
+                files.push(...getJsFiles(res));
+            } else if (entry.name.endsWith('.js')) {
+                files.push(res);
+            }
+        }
+        return files;
+    }
+
+    const effectFiles = getJsFiles(path.join(rootDir, 'src/animation/effects'));
+    const macroFiles = getJsFiles(path.join(rootDir, 'src/standalone-macros'));
+    const allFiles = [...effectFiles, ...macroFiles];
+
+    for (const filePath of allFiles) {
+        const content = fs.readFileSync(filePath, 'utf8');
+        const relPath = path.relative(rootDir, filePath);
+        assert.doesNotMatch(
+            content,
+            /\.animateProperty\s*\(\s*(['"])sprite\1\s*,\s*(['"])position\./,
+            `${relPath} must animate position on 'spriteContainer' instead of 'sprite'`
+        );
+    }
+});
+

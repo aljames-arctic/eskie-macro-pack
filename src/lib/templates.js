@@ -20,48 +20,65 @@ function resolveDistinctPositions(positions, config = {}, template = null) {
     const token = config.token ?? config.sourceToken;
     const tokenCenter = token?.center ?? (token?.x !== undefined ? { x: token.x, y: token.y } : null);
 
-    // If secondary is missing, resolve relative to token if available
+    const gridSize = canvas?.grid?.size ?? canvas?.dimensions?.size ?? 100;
+    const gridDistance = canvas?.grid?.distance ?? canvas?.scene?.grid?.distance ?? canvas?.dimensions?.distance ?? 5;
+
+    const dir = template?.direction
+        ?? template?.document?.direction
+        ?? primary?.direction
+        ?? config.direction
+        ?? config.currentDirection
+        ?? token?.document?.rotation
+        ?? token?.rotation
+        ?? 0;
+
+    // Check if the placement is in attached/sticky mode or a directional shape (ray / cone)
+    const isRayOrCone = (template?.t === 'ray' || template?.t === 'cone'
+        || template?.document?.t === 'ray' || template?.document?.t === 'cone'
+        || primary?.t === 'ray' || primary?.t === 'cone'
+        || primary?.type === 'ray' || primary?.type === 'cone'
+        || config?.type === 'ray' || config?.type === 'cone');
+
+    const isAttached = Boolean(primary?.sticky || config?.sticky || config?.stickToToken || isRayOrCone);
+
+    const dist = (template?.distance !== undefined && template.distance > 0)
+        ? template.distance
+        : ((template?.document?.distance !== undefined && template.document.distance > 0)
+            ? template.document.distance
+            : ((primary?.distance !== undefined && primary.distance > 0)
+                ? primary.distance
+                : (config.distance ?? (isAttached ? (config.max ?? 100) : 0))));
+
+    const distPx = (dist / gridDistance) * gridSize;
+    const rad = (dir * Math.PI) / 180;
+
+    // If secondary is missing, resolve it
     if (!secondary) {
-        if (tokenCenter && Math.hypot(primary.x - tokenCenter.x, primary.y - tokenCenter.y) >= 1) {
+        if (isAttached || (distPx > 0 && template?.direction !== undefined)) {
+            // In attached mode, primary is the token edge anchor point; project secondary to the far end
+            secondary = {
+                x: primary.x + Math.cos(rad) * distPx,
+                y: primary.y + Math.sin(rad) * distPx
+            };
+        } else if (tokenCenter && Math.hypot(primary.x - tokenCenter.x, primary.y - tokenCenter.y) >= 1) {
+            // Free/detached ground placement away from token
             secondary = primary;
             primary = { x: tokenCenter.x, y: tokenCenter.y };
-        } else {
-            const dir = template?.direction ?? template?.document?.direction ?? config.direction ?? token?.document?.rotation;
-            const dist = (template?.distance !== undefined && template.distance > 0)
-                ? template.distance
-                : ((template?.document?.distance !== undefined && template.document.distance > 0) ? template.document.distance : (config.distance ?? config.max));
-            if (dir !== undefined && dist !== undefined && dist > 0) {
-                const gridSize = canvas?.grid?.size ?? canvas?.dimensions?.size ?? 100;
-                const gridDistance = canvas?.grid?.distance ?? canvas?.scene?.grid?.distance ?? canvas?.dimensions?.distance ?? 5;
-                const distPx = (dist / gridDistance) * gridSize;
-                const rad = (dir * Math.PI) / 180;
-                secondary = {
-                    x: primary.x + Math.cos(rad) * distPx,
-                    y: primary.y + Math.sin(rad) * distPx
-                };
-            }
         }
     }
 
     // Check if secondary collapses to the exact same coordinates as primary
     const isSamePoint = Boolean(secondary) && (Math.hypot(secondary.x - primary.x, secondary.y - primary.y) < 1);
     if (isSamePoint) {
-        if (tokenCenter && Math.hypot(primary.x - tokenCenter.x, primary.y - tokenCenter.y) >= 1) {
-            secondary = primary;
-            primary = { x: tokenCenter.x, y: tokenCenter.y };
-        } else {
-            const gridSize = canvas?.grid?.size ?? canvas?.dimensions?.size ?? 100;
-            const gridDistance = canvas?.grid?.distance ?? canvas?.scene?.grid?.distance ?? canvas?.dimensions?.distance ?? 5;
-            const dir = template?.direction ?? template?.document?.direction ?? config.direction ?? token?.document?.rotation ?? 0;
-            const dist = (template?.distance !== undefined && template.distance > 0)
-                ? template.distance
-                : ((template?.document?.distance !== undefined && template.document.distance > 0) ? template.document.distance : (config.distance ?? config.max ?? 100));
-            const distPx = (dist / gridDistance) * gridSize;
-            const rad = (dir * Math.PI) / 180;
+        if (isAttached || distPx > 0) {
+            // Primary remains the anchor/edge point; secondary extends out to the far end of the ray/template
             secondary = {
                 x: primary.x + Math.cos(rad) * distPx,
                 y: primary.y + Math.sin(rad) * distPx
             };
+        } else if (tokenCenter && Math.hypot(primary.x - tokenCenter.x, primary.y - tokenCenter.y) >= 1) {
+            secondary = primary;
+            primary = { x: tokenCenter.x, y: tokenCenter.y };
         }
     }
 

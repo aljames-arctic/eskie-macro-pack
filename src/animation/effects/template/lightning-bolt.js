@@ -13,6 +13,8 @@ import { log } from '../../../lib/logger.js';
 
 const DEFAULT_CONFIG = {
     id: 'Lightning Bolt',
+    distance: 100,
+    width: 5,
     template: undefined,
     tintMap: false,
     sound: {
@@ -41,7 +43,9 @@ async function create(token, config = {}) {
     const portalPath = portalEntry?.file ?? portalEntry?.files?.[0] ?? portalEntry;
 
     const cfg = { 
-        radius: 1,
+        distance: mConfig.distance ?? 100,
+        width: mConfig.width ?? 5,
+        type: 'ray',
         max: 500,
         icon: portalPath, 
         label: id,
@@ -148,4 +152,4 @@ export const lightningBolt = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("lightningBolt", "template", "eskie.effect.lightningBolt", DEFAULT_CONFIG, "0.0.2", "Lightning Bolt");
+autorec.register("lightningBolt", "template", "eskie.effect.lightningBolt", DEFAULT_CONFIG, "0.0.3", "Lightning Bolt");

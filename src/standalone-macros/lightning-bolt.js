@@ -100,22 +100,23 @@ async function getTargetOrPoint(templateDoc, config = {}) {
         primary = tokenCenter;
     }
 
+    const dir = templateDoc?.direction ?? (point?.direction !== undefined ? point.direction : (token?.document?.rotation ?? 0));
+    const rad = Math.toRadians(dir);
+    const dist = templateDoc?.distance ?? (point?.distance !== undefined ? point.distance : (DEFAULT_CONFIG.distance ?? 100));
+    const distGrid = canvas.dimensions?.distance ?? 5;
+    const gridSize = canvas.dimensions?.size ?? canvas.grid?.size ?? 100;
+    const distPx = (dist / distGrid) * gridSize;
+
     const isSamePoint = !secondary || (Math.hypot(secondary.x - primary.x, secondary.y - primary.y) < 1);
     if (isSamePoint) {
-        if (tokenCenter && Math.hypot(primary.x - tokenCenter.x, primary.y - tokenCenter.y) >= 1) {
-            secondary = primary;
-            primary = tokenCenter;
-        } else {
-            const dir = templateDoc?.direction ?? token?.document?.rotation ?? 0;
-            const rad = Math.toRadians(dir);
-            const dist = templateDoc?.distance ?? 100;
-            const distGrid = canvas.dimensions?.distance ?? 5;
-            const gridSize = canvas.dimensions?.size ?? canvas.grid?.size ?? 100;
-            const distPx = (dist / distGrid) * gridSize;
+        if (templateDoc || point?.sticky || dir !== undefined) {
             secondary = {
                 x: primary.x + Math.cos(rad) * distPx,
                 y: primary.y + Math.sin(rad) * distPx
             };
+        } else if (tokenCenter && Math.hypot(primary.x - tokenCenter.x, primary.y - tokenCenter.y) >= 1) {
+            secondary = primary;
+            primary = tokenCenter;
         }
     }
 

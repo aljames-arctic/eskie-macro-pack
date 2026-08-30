@@ -157,11 +157,18 @@ export class FoundryCurrentAdapter extends BaseFoundryAdapter {
                 y: shape?.center?.y ?? doc.center?.y ?? template.center?.y ?? primary.y
             };
 
-            const distance = shape?.radius ?? shape?.distance ?? 0;
+            const distance = (shape?.radius !== undefined && shape.radius > 0)
+                ? shape.radius
+                : ((shape?.distance !== undefined && shape.distance > 0)
+                    ? shape.distance
+                    : ((shape?.height !== undefined && shape.height > 0)
+                        ? shape.height
+                        : ((shape?.width !== undefined && shape.width > 0) ? shape.width : (config.distance ?? 0))));
+            const rotation = shape?.rotation ?? doc.rotation ?? config.direction;
             let secondary;
 
-            if (shape?.rotation !== undefined && distance > 0) {
-                const rad = (shape.rotation * Math.PI) / 180;
+            if (rotation !== undefined && distance > 0) {
+                const rad = (rotation * Math.PI) / 180;
                 secondary = {
                     x: primary.x + Math.cos(rad) * distance,
                     y: primary.y + Math.sin(rad) * distance

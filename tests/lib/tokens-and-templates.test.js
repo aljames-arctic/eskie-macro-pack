@@ -80,6 +80,32 @@ test('template.getPosition resolves isSamePoint with token and returns error on 
     assert.ok(resolved[0].cancelled);
 });
 
+test('template.getPosition preserves token edge primary and projects far end secondary in attached mode', async () => {
+    const { BaseFoundryAdapter } = await import('../../src/adapters/index.js');
+    adapter.foundry = new BaseFoundryAdapter();
+
+    const token = {
+        center: { x: 100, y: 100 },
+        document: { rotation: 0 }
+    };
+
+    // Attached ray placed at token edge (150, 100) pointing at 0 degrees (East) for 100ft
+    const rayTemplate = {
+        x: 150,
+        y: 100,
+        t: 'ray',
+        distance: 100,
+        direction: 0
+    };
+
+    const [primary, secondary] = await template.getPosition(rayTemplate, { token });
+    assert.deepEqual(primary, { x: 150, y: 100 }); // Must remain token edge, not token center!
+    assert.ok(secondary);
+    assert.equal(secondary.x, 2150); // 150 + (100 / 5) * 100 = 2150
+    assert.equal(secondary.y, 100);
+    assert.equal(Math.hypot(secondary.x - primary.x, secondary.y - primary.y), 2000);
+});
+
 test('adapter.getTokenOwners and adapter.getDistance function contracts', () => {
     const p1 = { id: 'p1', isGM: false, active: true };
     const p2 = { id: 'p2', isGM: false, active: true };

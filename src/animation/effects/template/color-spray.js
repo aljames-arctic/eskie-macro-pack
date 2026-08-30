@@ -25,14 +25,11 @@ async function create(token, config) {
         radius: 1,
         max: 500,
         icon: portalPath, 
-        label: 'Color Spray'
+        label: 'Color Spray',
+        token
     };
     let [position, secondary] = await templatelib.getPosition(template, cfg);
-    if (!position) { return; }
-    if (!secondary) {
-        secondary = position;
-        position = token.center;
-    }
+    if (!position || !secondary || position.cancelled || position.error) { return; }
 
     const seq = new Sequence();
     applySound(seq, sound);

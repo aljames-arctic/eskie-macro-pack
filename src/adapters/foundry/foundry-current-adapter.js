@@ -166,8 +166,11 @@ export class FoundryCurrentAdapter extends BaseFoundryAdapter {
                     x: primary.x + Math.cos(rad) * distance,
                     y: primary.y + Math.sin(rad) * distance
                 };
-            } else {
-                secondary = { x: primary.x, y: primary.y };
+            } else if (distance > 0) {
+                secondary = {
+                    x: primary.x + distance,
+                    y: primary.y
+                };
             }
 
             return [primary, secondary, center];

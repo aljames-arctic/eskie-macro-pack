@@ -27,6 +27,59 @@ test('template.getPosition delegates to adapter.getTemplatePosition', async () =
     assert.deepEqual(pos[2], { x: 150, y: 250 });
 });
 
+test('template.getPosition calculates secondary farpoint for AA templateData without ray', async () => {
+    const { BaseFoundryAdapter } = await import('../../src/adapters/index.js');
+    adapter.foundry = new BaseFoundryAdapter();
+
+    canvas.grid.size = 100;
+    canvas.grid.distance = 5;
+
+    const aaTemplateData = {
+        x: 200,
+        y: 300,
+        distance: 100,
+        direction: 0,
+        width: 5,
+        t: 'ray'
+    };
+
+    const [primary, secondary, center] = await template.getPosition(aaTemplateData);
+    assert.deepEqual(primary, { x: 200, y: 300 });
+    // 100 ft / 5 ft * 100 px = 2000 px along 0 deg (x-axis)
+    assert.deepEqual(secondary, { x: 2200, y: 300 });
+    assert.ok(secondary.x > primary.x);
+});
+
+test('template.getPosition resolves isSamePoint with token and returns error on unresolvable position', async () => {
+    const { BaseFoundryAdapter } = await import('../../src/adapters/index.js');
+    adapter.foundry = new BaseFoundryAdapter();
+
+    const token = {
+        center: { x: 100, y: 100 },
+        document: { rotation: 0 }
+    };
+
+    // Case 1: Template placed at target (500, 500) away from token, with no secondary point
+    const targetTemplate = { x: 500, y: 500, distance: 0 };
+    const [primary, secondary] = await template.getPosition(targetTemplate, { token });
+    assert.deepEqual(primary, { x: 100, y: 100 }); // token center
+    assert.deepEqual(secondary, { x: 500, y: 500 }); // target location
+
+    // Case 2: Template placed at token with zero distance and rotation, but config defines fallback distance/direction
+    const selfTemplate = { x: 100, y: 100, distance: 0 };
+    const [p2, s2] = await template.getPosition(selfTemplate, { token, distance: 50, direction: 90 });
+    assert.deepEqual(p2, { x: 100, y: 100 });
+    assert.ok(s2);
+    assert.ok(Math.hypot(s2.x - p2.x, s2.y - p2.y) > 0);
+
+    // Case 3: Completely unresolvable position (distance 0 and secondary forced to same point)
+    const collapsedPositions = [{ x: 100, y: 100 }, { x: 100, y: 100 }, { x: 100, y: 100 }];
+    const resolved = template.resolveDistinctPositions(collapsedPositions, { distance: 0, max: 0 });
+    assert.ok(resolved.error);
+    assert.ok(resolved[0].error);
+    assert.ok(resolved[0].cancelled);
+});
+
 test('adapter.getTokenOwners and adapter.getDistance function contracts', () => {
     const p1 = { id: 'p1', isGM: false, active: true };
     const p2 = { id: 'p2', isGM: false, active: true };

@@ -100,9 +100,28 @@ async function getTargetOrPoint(templateDoc, config = {}) {
         primary = tokenCenter;
     }
 
-    if (!secondary) {
-        secondary = primary;
-        primary = tokenCenter;
+    const isSamePoint = !secondary || (Math.hypot(secondary.x - primary.x, secondary.y - primary.y) < 1);
+    if (isSamePoint) {
+        if (tokenCenter && Math.hypot(primary.x - tokenCenter.x, primary.y - tokenCenter.y) >= 1) {
+            secondary = primary;
+            primary = tokenCenter;
+        } else {
+            const dir = templateDoc?.direction ?? token?.document?.rotation ?? 0;
+            const rad = Math.toRadians(dir);
+            const dist = templateDoc?.distance ?? 100;
+            const distGrid = canvas.dimensions?.distance ?? 5;
+            const gridSize = canvas.dimensions?.size ?? canvas.grid?.size ?? 100;
+            const distPx = (dist / distGrid) * gridSize;
+            secondary = {
+                x: primary.x + Math.cos(rad) * distPx,
+                y: primary.y + Math.sin(rad) * distPx
+            };
+        }
+    }
+
+    if (secondary && (Math.hypot(secondary.x - primary.x, secondary.y - primary.y) < 1)) {
+        ui.notifications.error("Unable to resolve coordinates for Lightning Bolt");
+        return null;
     }
 
     return [primary, secondary];
@@ -111,11 +130,7 @@ async function getTargetOrPoint(templateDoc, config = {}) {
 const targetPoints = await getTargetOrPoint(scope?.template, DEFAULT_CONFIG);
 if (!targetPoints) return;
 let [primary, secondary] = targetPoints;
-
-if (!secondary) {
-    secondary = primary;
-    primary = token.center ?? { x: token.x, y: token.y };
-}
+if (!primary || !secondary) return;
 
 const sound = DEFAULT_CONFIG.sound ?? { enabled: true, volume: 0.5 };
 const tintMap = DEFAULT_CONFIG.tintMap ?? true;

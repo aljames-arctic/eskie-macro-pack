@@ -617,20 +617,41 @@ export class BaseFoundryAdapter {
     getTemplatePosition(template, config = {}) {
         if (!template) return [];
 
-        const farpoint = template.object?.ray?.B ?? template.ray?.B;
-        const secondary = {
-            x: farpoint?.x ?? template.x ?? 0,
-            y: farpoint?.y ?? template.y ?? 0
-        };
+        const doc = template.document ?? template;
+        const placeable = template.object ?? (template.document ? template : null);
+        const farpoint = placeable?.ray?.B ?? doc.ray?.B;
+
         const primary = {
-            x: template.x ?? 0,
-            y: template.y ?? 0
+            x: doc.x ?? placeable?.x ?? 0,
+            y: doc.y ?? placeable?.y ?? 0
         };
 
-        const gridSize = canvas?.grid?.size ?? 100;
-        const gridDistance = canvas?.grid?.distance ?? canvas?.scene?.grid?.distance ?? 5;
-        const distance = template.distance ?? 0;
-        const width = template.width ?? 0;
+        const distance = (doc.distance !== undefined && doc.distance > 0)
+            ? doc.distance
+            : ((placeable?.distance !== undefined && placeable.distance > 0) ? placeable.distance : (config.distance ?? 0));
+        const direction = doc.direction ?? placeable?.direction ?? config.direction;
+        const gridSize = canvas?.grid?.size ?? canvas?.dimensions?.size ?? 100;
+        const gridDistance = canvas?.grid?.distance ?? canvas?.scene?.grid?.distance ?? canvas?.dimensions?.distance ?? 5;
+
+        let secondary;
+        if (farpoint && (farpoint.x !== primary.x || farpoint.y !== primary.y)) {
+            secondary = { x: farpoint.x, y: farpoint.y };
+        } else if (direction !== undefined && distance > 0) {
+            const distancePx = (distance / gridDistance) * gridSize;
+            const rad = (direction * Math.PI) / 180;
+            secondary = {
+                x: primary.x + Math.cos(rad) * distancePx,
+                y: primary.y + Math.sin(rad) * distancePx
+            };
+        } else if (distance > 0) {
+            const distancePx = (distance / gridDistance) * gridSize;
+            secondary = {
+                x: primary.x + distancePx,
+                y: primary.y
+            };
+        }
+
+        const width = doc.width ?? placeable?.width ?? 0;
         const height = Math.sqrt(Math.max(0, distance * distance - width * width));
 
         const center = {

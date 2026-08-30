@@ -43,14 +43,11 @@ async function create(token, config = {}) {
         radius: 1,
         max: 500,
         icon: portalPath, 
-        label: id
+        label: id,
+        token
     };
     let [primary, secondary] = await templatelib.getPosition(template, cfg);
-    if (primary.cancelled) { return; }
-    if (!secondary) {
-        secondary = primary;
-        primary = token.center;
-    }
+    if (!primary || !secondary || primary.cancelled || primary.error) { return; }
 
     const sequence = new Sequence();
     applySound(sequence, sound);

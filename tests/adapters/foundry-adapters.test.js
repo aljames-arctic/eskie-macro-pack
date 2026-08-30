@@ -98,6 +98,27 @@ test('Template position extraction: V12/V13 MeasuredTemplate vs V14+ Region shap
     assert.deepEqual(v12Pos[0], { x: 1000, y: 2000 }); // primary
     assert.deepEqual(v12Pos[1], { x: 1030, y: 2000 }); // secondary
 
+    // Template without ray (e.g. Automated Animations templateData)
+    const rawTemplateData = {
+        x: 500,
+        y: 600,
+        distance: 100,
+        direction: 90,
+        width: 5,
+        t: 'ray'
+    };
+    const rawPos = v12.getTemplatePosition(rawTemplateData);
+    assert.equal(rawPos.length, 3);
+    assert.deepEqual(rawPos[0], { x: 500, y: 600 }); // primary
+    // 100 distance / 5 gridDistance * 100 gridSize = 2000px in 90 deg direction (downwards)
+    assert.equal(Math.round(rawPos[1].x), 500);
+    assert.equal(Math.round(rawPos[1].y), 2600);
+
+    // Template with zero distance and no ray returns undefined secondary
+    const zeroTemplate = { x: 100, y: 200, distance: 0 };
+    const zeroPos = v12.getTemplatePosition(zeroTemplate);
+    assert.equal(zeroPos[1], undefined);
+
     // V14 Region
     const v14 = new FoundryCurrentAdapter();
     const mockRegion = {
@@ -117,6 +138,14 @@ test('Template position extraction: V12/V13 MeasuredTemplate vs V14+ Region shap
     assert.deepEqual(v14Pos[0], { x: 800, y: 900 }); // primary
     assert.deepEqual(v14Pos[1], { x: 1200, y: 900 }); // secondary (x + radius)
     assert.deepEqual(v14Pos[2], { x: 850, y: 950 }); // center
+
+    // V14 Region with zero distance
+    const zeroRegion = {
+        documentName: 'Region',
+        shapes: [{ x: 800, y: 900, radius: 0 }]
+    };
+    const zeroRegionPos = v14.getTemplatePosition(zeroRegion);
+    assert.equal(zeroRegionPos[1], undefined);
 });
 
 test('Permission tiers and ownership evaluation on BaseFoundryAdapter', () => {

@@ -9,11 +9,7 @@ import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'rayOfSickness',
-    sound: {
-        ...DEFAULT_SOUND_CONFIG,
-        enable: false,
-        file: '',
-    },
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, target, config = {}) {

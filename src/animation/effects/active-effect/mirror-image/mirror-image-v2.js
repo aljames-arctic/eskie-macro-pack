@@ -11,11 +11,7 @@ import { applySound, DEFAULT_SOUND_CONFIG } from '../../../utils/sound.js';
 export const DEFAULT_CONFIG = {
     id: 'mirrorImage',
     imageNumber: 3,
-    sound: {
-        ...DEFAULT_SOUND_CONFIG,
-        enable: false,
-        file: '',
-    },
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 /**

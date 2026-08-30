@@ -13,11 +13,7 @@ const DEFAULT_CONFIG = {
     angle: 53.13,
     coneSize: 'thin', // 'thin', 'wide'
     distance: 15,
-    sound: {
-        ...DEFAULT_SOUND_CONFIG,
-        enable: false,
-        file: '',
-    },
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, config = {}) {

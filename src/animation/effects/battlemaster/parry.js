@@ -13,11 +13,7 @@ const DEFAULT_CONFIG = {
     type: 'slashing', // 'slashing', 'piercing', 'bludgeoning'
     weight: 'medium', // 'light', 'medium', 'heavy'
     color: 'blue',
-    sound: {
-        ...DEFAULT_SOUND_CONFIG,
-        enable: false,
-        file: '',
-    },
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function deg(rad) { return (rad * 180) / Math.PI; }

@@ -13,11 +13,7 @@ const DEFAULT_CONFIG = {
     weight: 'medium', // 'light', 'medium', 'heavy'
     color: 'blue',
     tint: '#01aafe',
-    sound: {
-        ...DEFAULT_SOUND_CONFIG,
-        enable: false,
-        file: '',
-    },
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function deg(rad) { return (rad * 180) / Math.PI; }

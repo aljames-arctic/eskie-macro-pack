@@ -18,11 +18,7 @@ const DEFAULT_CONFIG = {
     id: 'cloudkill',
     radius: 20,
     tintMap: true,
-    sound: {
-        ...DEFAULT_SOUND_CONFIG,
-        enable: false,
-        file: '',
-    },
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, config = {}) {

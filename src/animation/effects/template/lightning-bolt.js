@@ -9,6 +9,7 @@ import { settingsOverride } from '../../../lib/settings.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
+import { log } from '../../../lib/logger.js';
 
 const DEFAULT_CONFIG = {
     id: 'Lightning Bolt',

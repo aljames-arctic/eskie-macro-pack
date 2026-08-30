@@ -195,8 +195,8 @@ async function createAttack(token, target1, target2, config = {}) {
             .spriteOffset({ x: targetOffset.x / 2, y: targetOffset.y / 2 }, { gridUnits: true })
             .fadeIn(1500, { ease: 'easeOutCubic' })
             .scaleIn(0, 1500, { ease: 'easeOutCubic' })
-            .animateProperty('sprite', 'position.x', { from: -targetOffset.x / 2, to: 0, duration: 2000, gridUnits: true, ease: 'easeOutCubic' })
-            .animateProperty('sprite', 'position.y', { from: -targetOffset.y / 2, to: 0, duration: 2000, gridUnits: true, ease: 'easeOutCubic' })
+            .animateProperty('spriteContainer', 'position.x', { from: -targetOffset.x / 2, to: 0, duration: 2000, gridUnits: true, ease: 'easeOutCubic' })
+            .animateProperty('spriteContainer', 'position.y', { from: -targetOffset.y / 2, to: 0, duration: 2000, gridUnits: true, ease: 'easeOutCubic' })
             .zIndex(2);
 
         seq.effect()

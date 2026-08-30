@@ -69,7 +69,7 @@ async function createUse(token, config = {}) {
         .duration(2000)
         .fadeIn(300)
         .scaleOut(0, 250, { ease: 'easeOutCubic' })
-        .animateProperty('sprite', 'position.y', { from: 0.25, to: 0, duration: 300, gridUnits: true, ease: 'easeOutCubic' })
+        .animateProperty('spriteContainer', 'position.y', { from: 0.25, to: 0, duration: 300, gridUnits: true, ease: 'easeOutCubic' })
         .loopProperty('sprite', 'position.y', { from: 0.05, to: 0, duration: 150, gridUnits: true, ease: 'easeOutCubic', delay: 300 })
         .zIndex(1)
         .waitUntilFinished(-250);

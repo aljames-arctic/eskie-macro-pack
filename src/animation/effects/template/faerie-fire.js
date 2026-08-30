@@ -91,7 +91,7 @@ async function createCloud(token, config = {}) {
         .scaleIn(0, 1000, { ease: 'easeOutCubic' })
         .animateProperty('sprite', 'width', { from: 0, to: 0.5, duration: 1000, gridUnits: true, ease: 'easeOutBack' })
         .animateProperty('sprite', 'height', { from: 0, to: 0.5, duration: 1000, gridUnits: true, ease: 'easeOutBack' })
-        .animateProperty('sprite', 'position.y', { from: 0, to: -0.25, duration: 1000, gridUnits: true, ease: 'easeOutBack' })
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.25, duration: 1000, gridUnits: true, ease: 'easeOutBack' })
         .waitUntilFinished(-200);
 
     sequence.effect()

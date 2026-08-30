@@ -93,7 +93,7 @@ async function create(target, ally, config = {}) {
         .zIndex(2)
         .fadeIn(2000)
         .duration(3500)
-        .animateProperty('sprite', 'position.y', { from: 0.4, to: 0, duration: 1500, ease: 'easeInSine', gridUnits: true })
+        .animateProperty('spriteContainer', 'position.y', { from: 0.4, to: 0, duration: 1500, ease: 'easeInSine', gridUnits: true })
         .scaleIn(0, 1500, { ease: 'easeInSine' })
         .scaleOut(0, 500, { ease: 'easeOutCubic' })
         .waitUntilFinished(-500);

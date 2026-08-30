@@ -42,8 +42,8 @@ sequence
         .copySprite(token)
         .atLocation(token)
         .rotateTowards(target)
-        .animateProperty("sprite", "position.x", { from: 0, to: -0.6, duration: 250, gridUnits: true, ease: "easeOutCubic", delay: 100 })
-        .animateProperty("sprite", "position.x", { from: 0, to: 0.6, duration: 400, gridUnits: true, ease: "easeOutSine", delay: 450 })
+        .animateProperty("spriteContainer", "position.x", { from: 0, to: -0.6, duration: 250, gridUnits: true, ease: "easeOutCubic", delay: 100 })
+        .animateProperty("spriteContainer", "position.x", { from: 0, to: 0.6, duration: 400, gridUnits: true, ease: "easeOutSine", delay: 450 })
         .duration(1000)
         .spriteRotation(-baseDeg)
         .spriteOffset({ x: -0.5 }, { gridUnits: true });

@@ -8,11 +8,6 @@ import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapte
 import { template as templatelib } from '../../../lib/templates.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
-const AVAILABLE_SIZES = [10, 20, 30, 60];
-const pickEffectSize = (r) => AVAILABLE_SIZES.reduce(
-    (acc, size) => (size <= r ? size : acc),
-    AVAILABLE_SIZES[0]
-);
 
 const DEFAULT_CONFIG = {
     id: 'cloudkill',
@@ -26,48 +21,17 @@ async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { radius, tintMap, sound, template } = mConfig;
 
-    const effectSize = pickEffectSize(radius);
-
-    let position = null;
-    if (template) {
-        const [primary, secondary, center] = await templatelib.getPosition(template);
-        position = center ?? primary;
-    }
+    const cfg = {
+        radius,
+        label: 'Cloudkill',
+        icon: token?.document?.texture?.src ?? ''
+    };
+    let [primary, secondary, center] = await templatelib.getPosition(template, cfg);
+    if (!primary && !center) return null;
+    const targetPos = center ?? primary;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
-
-    if (!position) {
-        sequence
-            .crosshair('position')
-                .type('circle')
-                .distance(radius)
-                .borderColor('#ffffff', { alpha: 0 })
-                .fillColor('#000000', { alpha: 0.1 })
-                .icon(token?.document?.texture?.src ?? '')
-                .callback(Sequencer.Crosshair.CALLBACKS.SHOW, function(crosshair) {
-                    new Sequence()
-                        .wait(50)
-                        .effect()
-                            .name('Circle Crosshair')
-                            .file(closest(`eskie.crosshair.circle.fantasy_01.white.full.radius_${effectSize}ft`))
-                            .attachTo(crosshair)
-                            .scaleToObject()
-                            .opacity(0.8)
-                            .belowTokens()
-                            .locally()
-                            .persist()
-                        .play();
-                })
-                .callback(Sequencer.Crosshair.CALLBACKS.PLACED, function() {
-                    Sequencer.EffectManager.endEffects({ name: 'Circle Crosshair' });
-                })
-                .callback(Sequencer.Crosshair.CALLBACKS.CANCEL, function() {
-                    Sequencer.EffectManager.endEffects({ name: 'Circle Crosshair' });
-                });
-    }
-
-    const targetPos = position ?? 'position';
     const bgSrc = adapter.getSceneBackground(canvas?.scene);
     const sceneDimensions = canvas?.dimensions ?? { width: 4000, height: 4000 };
     const gridSize = canvas?.grid?.size ?? 100;

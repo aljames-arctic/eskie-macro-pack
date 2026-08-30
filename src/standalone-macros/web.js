@@ -24,39 +24,23 @@ const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
 
 const distance = 28.5;
 
+const targetPos = await Sequencer.Crosshair.show({
+    type: "rect",
+    distance,
+    icon: token.document?.texture?.src ?? "",
+    label: "Web",
+    snapPosition: 240
+});
+if (!targetPos || targetPos.cancelled) return;
+
 const sequence = new Sequence();
 
 sequence
-    .crosshair("position")
-        .type("rect")
-        .distance(distance)
-        .icon(token.document?.texture?.src ?? "")
-        .snapPosition(240)
-        .callback(Sequencer.Crosshair.CALLBACKS.SHOW, function(crosshair) {
-            new Sequence()
-                .wait(50)
-                .effect()
-                    .name("Circle Crosshair")
-                    .file(closest("eskie.crosshair.rectangle.fantasy_01.white.full.20x20ft"))
-                    .attachTo(crosshair)
-                    .scaleToObject()
-                    .belowTokens()
-                    .locally()
-                    .persist()
-                .play();
-        })
-        .callback(Sequencer.Crosshair.CALLBACKS.PLACED, function() {
-            Sequencer.EffectManager.endEffects({ name: "Circle Crosshair" });
-        })
-        .callback(Sequencer.Crosshair.CALLBACKS.CANCEL, function() {
-            Sequencer.EffectManager.endEffects({ name: "Circle Crosshair" });
-        })
-
     .effect()
         .name(`${label} Casting`)
         .file(closest("eskie.casting.arcane.01.side.loop.yellow"))
         .attachTo(token)
-        .rotateTowards("position")
+        .rotateTowards(targetPos)
         .scaleToObject(1.25, { considerTokenScale: true })
         .spriteOffset({ x: -0.15 }, { gridUnits: true })
         .persist()
@@ -64,7 +48,7 @@ sequence
     .effect()
         .name(`${label} Casting`)
         .file(closest("eskie.casting.arcane.01.center.loop.yellow"))
-        .attachTo("position")
+        .atLocation(targetPos)
         .size(1.75, { gridUnits: true })
         .belowTokens()
         .zIndex(1.1)
@@ -72,7 +56,7 @@ sequence
 
     .effect()
         .name(label)
-        .atLocation("position")
+        .atLocation(targetPos)
         .file(closest("jb2a.magic_signs.circle.02.conjuration.complete.dark_yellow"))
         .size(3.5, { gridUnits: true })
         .fadeIn(600)
@@ -85,7 +69,7 @@ sequence
 
     .effect()
         .name(label)
-        .atLocation("position")
+        .atLocation(targetPos)
         .file(closest("jb2a.magic_signs.circle.02.conjuration.complete.dark_yellow"))
         .size(3.5, { gridUnits: true })
         .fadeIn(600, { delay: 2500 })
@@ -99,7 +83,7 @@ sequence
 
     .effect()
         .file(closest("jb2a.markers.light_orb.loop.white"))
-        .atLocation("position")
+        .atLocation(targetPos)
         .scaleIn(0, 1500, { ease: "easeOutCubic" })
         .fadeIn(500)
         .duration(2500)
@@ -109,7 +93,7 @@ sequence
 
     .effect()
         .file(closest("jb2a.shield_themed.above.eldritch_web.01.dark_green"))
-        .atLocation("position")
+        .atLocation(targetPos)
         .scaleIn(0, 1500, { ease: "easeOutCubic" })
         .fadeIn(500)
         .duration(2500)
@@ -124,7 +108,7 @@ sequence
     .effect()
         .delay(250)
         .file(closest("jb2a.impact.004.yellow"))
-        .atLocation("position")
+        .atLocation(targetPos)
         .scaleToObject(0.8, { considerTokenScale: true })
         .scaleIn(0, 200, { ease: "easeOutCubic" })
         .filter("ColorMatrix", { saturate: -1 })
@@ -136,7 +120,7 @@ sequence
     .effect()
         .name(label)
         .file(closest("blfx.spell.template.square.nature.web.1.color1"))
-        .atLocation("position")
+        .atLocation(targetPos)
         .scaleToObject(1, { considerTokenScale: true })
         .persist()
         .zIndex(1)
@@ -144,7 +128,7 @@ sequence
     .effect()
         .name(label)
         .file(closest("blfx.spell.template.square.nature.web.2.color1"))
-        .atLocation("position")
+        .atLocation(targetPos)
         .scaleToObject(1, { considerTokenScale: true })
         .persist()
         .opacity(0.5)

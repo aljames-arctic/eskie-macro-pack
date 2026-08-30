@@ -28,37 +28,15 @@ async function create(token, targetOrConfig, config = {}) {
         position = target.center ?? target;
     } else {
         const crosshairConfig = {
-            t: 'ray',
+            type: 'ray',
             distance: 30,
             width: 5,
-            icon: { texture: token?.document?.texture?.src ?? '' },
-            gridHighlight: false,
-            borderAlpha: 0,
+            icon: token?.document?.texture?.src ?? '',
+            label: 'Piercing Arrow',
             location: { obj: token, lockToEdge: true },
         };
-        const crosshairCallbacks = {
-            [Sequencer.Crosshair.CALLBACKS.SHOW]: (crosshair) => {
-                new Sequence()
-                    .wait(50)
-                    .effect()
-                        .name('Ray Crosshair')
-                        .file(closest('eskie.crosshair.ray.fantasy_01.white.full'))
-                        .attachTo(crosshair)
-                        .stretchTo(crosshair, { attachTo: true, onlyX: true })
-                        .scale(((canvas?.grid?.size ?? 100) / 300) * 0.8)
-                        .locally()
-                        .persist()
-                    .play();
-            },
-            [Sequencer.Crosshair.CALLBACKS.PLACED]: () => {
-                Sequencer.EffectManager.endEffects({ name: 'Ray Crosshair' });
-            },
-            [Sequencer.Crosshair.CALLBACKS.CANCEL]: () => {
-                Sequencer.EffectManager.endEffects({ name: 'Ray Crosshair' });
-            },
-        };
-        position = await Sequencer.Crosshair.show(crosshairConfig, crosshairCallbacks);
-        if (!position || position.cancelled) return;
+        position = await Sequencer.Crosshair.show(crosshairConfig);
+        if (!position || position.cancelled) return null;
     }
 
     const sequence = new Sequence();

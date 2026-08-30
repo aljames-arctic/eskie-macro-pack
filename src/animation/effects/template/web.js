@@ -19,44 +19,17 @@ async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { distance, sound, template } = mConfig;
 
-    let position = null;
-    if (template) {
-        const [primary, secondary, center] = await templatelib.getPosition(template);
-        position = center ?? primary;
-    }
+    const cfg = {
+        distance,
+        label: 'Web',
+        icon: token?.document?.texture?.src ?? ''
+    };
+    let [primary, secondary, center] = await templatelib.getPosition(template, cfg);
+    if (!primary && !center) return null;
+    const targetPos = center ?? primary;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
-
-    if (!position) {
-        sequence
-            .crosshair('position')
-                .type('rect')
-                .distance(distance)
-                .icon(token?.document?.texture?.src ?? '')
-                .snapPosition(240)
-                .callback(Sequencer.Crosshair.CALLBACKS.SHOW, function(crosshair) {
-                    new Sequence()
-                        .wait(50)
-                        .effect()
-                            .name('Circle Crosshair')
-                            .file(closest('eskie.crosshair.rectangle.fantasy_01.white.full.20x20ft'))
-                            .attachTo(crosshair)
-                            .scaleToObject()
-                            .belowTokens()
-                            .locally()
-                            .persist()
-                        .play();
-                })
-                .callback(Sequencer.Crosshair.CALLBACKS.PLACED, function() {
-                    Sequencer.EffectManager.endEffects({ name: 'Circle Crosshair' });
-                })
-                .callback(Sequencer.Crosshair.CALLBACKS.CANCEL, function() {
-                    Sequencer.EffectManager.endEffects({ name: 'Circle Crosshair' });
-                });
-    }
-
-    const targetPos = position ?? 'position';
     const label = `${token?.name ?? 'Token'} Web`;
 
     sequence
@@ -72,7 +45,7 @@ async function create(token, config = {}) {
         .effect()
             .name(`${label} Casting`)
             .file(closest('eskie.casting.arcane.01.center.loop.yellow'))
-            .attachTo(targetPos)
+            .atLocation(targetPos)
             .size(1.75, { gridUnits: true })
             .belowTokens()
             .zIndex(1.1)

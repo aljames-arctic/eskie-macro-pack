@@ -27,41 +27,26 @@ if (color === 'blue') {
 
 const targets = Array.from(game.user.targets);
 
+const targetPos = await Sequencer.Crosshair.show({
+    type: "rect",
+    distance: 28.5,
+    icon: token.document?.texture?.src ?? "",
+    label: "Faerie Fire",
+    snapPosition: 240
+});
+if (!targetPos || targetPos.cancelled) return;
+
 new Sequence()
-    .crosshair('position')
-    .type('rect')
-    .distance(28.5)
-    .icon(token.document.texture.src)
-    .snapPosition(240)
-    .callback(Sequencer.Crosshair.CALLBACKS.SHOW, function(crosshair) {
-        new Sequence()
-            .wait(50)
-            .effect()
-            .name('Circle Crosshair')
-            .file(closest('eskie.crosshair.rectangle.fantasy_01.white.full.20x20ft'))
-            .attachTo(crosshair)
-            .scaleToObject()
-            .belowTokens()
-            .locally()
-            .persist()
-            .play();
-    })
-    .callback(Sequencer.Crosshair.CALLBACKS.PLACED, function(crosshair) {
-        Sequencer.EffectManager.endEffects({ name: 'Circle Crosshair' });
-    })
-    .callback(Sequencer.Crosshair.CALLBACKS.CANCEL, function(crosshair) {
-        Sequencer.EffectManager.endEffects({ name: 'Circle Crosshair' });
-    })
     .effect()
     .file(closest('eskie.casting.nature.01.side.one_shot.white'))
     .attachTo(token)
-    .rotateTowards('position')
+    .rotateTowards(targetPos)
     .scaleToObject(1.25, { considerTokenScale: true })
     .spriteOffset({ x: -0.25 }, { gridUnits: true })
     .filter('Glow', { color: tintColor, distance: 1, outerStrength: 0, innerStrength: 2 })
     .effect()
     .file(closest(`jb2a.sacred_flame.target.${color}`))
-    .atLocation('position')
+    .atLocation(targetPos)
     .scale(0.25)
     .playbackRate(1)
     .duration(1000)
@@ -72,7 +57,7 @@ new Sequence()
     .opacity(0.75)
     .effect()
     .file(closest(`jb2a.sacred_flame.target.${color}`))
-    .atLocation('position')
+    .atLocation(targetPos)
     .scale(0.25)
     .playbackRate(1)
     .duration(1000)
@@ -83,18 +68,18 @@ new Sequence()
     .waitUntilFinished(-200)
     .effect()
     .file(closest(`jb2a.impact.010.${color}`))
-    .atLocation('position', { offset: { y: -0.25 }, gridUnits: true })
+    .atLocation(targetPos, { offset: { y: -0.25 }, gridUnits: true })
     .scaleToObject(0.45)
     .randomRotation()
     .zIndex(1)
     .effect()
     .file(closest(`eskie.pulse.energy.01.${color}`))
-    .atLocation('position', { offset: { y: -0.25 }, gridUnits: true })
+    .atLocation(targetPos, { offset: { y: -0.25 }, gridUnits: true })
     .scaleToObject(1.1)
     .filter('ColorMatrix', { hue: hue2 })
     .effect()
     .file(closest('jb2a.extras.tmfx.outflow.circle.04'))
-    .atLocation('position')
+    .atLocation(targetPos)
     .belowTokens()
     .scaleToObject(1)
     .opacity(0.25)
@@ -104,7 +89,7 @@ new Sequence()
     .tint(tintColor)
     .effect()
     .file(closest(`jb2a.fireflies.{{Pfew}}.02.${color}`))
-    .atLocation('position', { randomOffset: 0.75 })
+    .atLocation(targetPos, { randomOffset: 0.75 })
     .scaleToObject(0.5)
     .randomRotation()
     .duration(750)

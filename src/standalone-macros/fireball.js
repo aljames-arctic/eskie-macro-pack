@@ -19,9 +19,13 @@ const scorchedEarth = true;
 const persistEffect = false;
 const tintMap = true;
 
-const AVAILABLE_SIZES = [10, 20, 30, 60];
-const effectSize = AVAILABLE_SIZES.reduce((acc, size) => (size <= radius ? size : acc), AVAILABLE_SIZES[0]);
-
+const targetPos = await Sequencer.Crosshair.show({
+    type: "circle",
+    distance: radius,
+    icon: token.document?.texture?.src ?? "",
+    label: "Fireball"
+});
+if (!targetPos || targetPos.cancelled) return;
 const tokenWidth = token.document?.width ?? token.width ?? 1;
 const tokenOffset = (tokenWidth - 1) / 2;
 
@@ -30,42 +34,6 @@ const bgSrc = globalThis.eskie?.util?.adapter?.getSceneBackground?.(canvas.scene
     ?? "";
 
 const sequence = new Sequence();
-
-sequence
-    .crosshair("position")
-        .type("circle")
-        .distance(radius)
-        .borderColor("#ffffff", { alpha: 0 })
-        .fillColor("#000000", { alpha: 0.1 })
-        .icon(token.document?.texture?.src ?? "")
-        .callback(Sequencer.Crosshair.CALLBACKS.SHOW, function(crosshair) {
-            new Sequence()
-                .wait(100)
-                .effect()
-                    .name("Circle Crosshair")
-                    .file(closest("eskie.crosshair.line.generic_01.white"))
-                    .attachTo(token)
-                    .stretchTo(crosshair, { attachTo: true })
-                    .opacity(0.8)
-                    .locally()
-                    .persist()
-                .effect()
-                    .name("Circle Crosshair")
-                    .file(closest(`eskie.crosshair.circle.fantasy_01.white.full.radius_${effectSize}ft`))
-                    .attachTo(crosshair)
-                    .scaleToObject()
-                    .opacity(0.8)
-                    .belowTokens()
-                    .locally()
-                    .persist()
-                .play();
-        })
-        .callback(Sequencer.Crosshair.CALLBACKS.PLACED, function() {
-            Sequencer.EffectManager.endEffects({ name: "Circle Crosshair" });
-        })
-        .callback(Sequencer.Crosshair.CALLBACKS.CANCEL, function() {
-            Sequencer.EffectManager.endEffects({ name: "Circle Crosshair" });
-        });
 
 if (tintMap && bgSrc) {
     sequence
@@ -91,14 +59,14 @@ sequence
     .effect()
         .file(closest("jb2a.fireball.beam.orange"))
         .attachTo(token, { offset: { x: 0.25 + tokenOffset }, gridUnits: true, local: true })
-        .stretchTo("position", { attachTo: true })
+        .stretchTo(targetPos, { attachTo: true })
         .duration(1900)
         .zIndex(1)
 
     .effect()
         .file(closest("eskie.pulse.energy.03.slow.orange"))
         .attachTo(token, { offset: { x: -0.575 - tokenOffset }, gridUnits: true, local: true })
-        .rotateTowards("position", { attachTo: true })
+        .rotateTowards(targetPos, { attachTo: true })
         .scaleToObject(2, { considerTokenScale: true })
         .duration(1900)
 
@@ -106,7 +74,7 @@ sequence
         .delay(2000)
         .file(closest("eskie.velocity.02"))
         .atLocation(token)
-        .rotateTowards("position")
+        .rotateTowards(targetPos)
         .size(6, { gridUnits: true })
         .spriteOffset({ x: -4 + tokenOffset }, { gridUnits: true })
         .spriteScale({ x: 1, y: 1.5 })
@@ -116,7 +84,7 @@ sequence
     .effect()
         .file(closest("eskie.star.twinkling_star.02.orangeyellow"))
         .attachTo(token, { offset: { x: -1 - tokenOffset }, gridUnits: true, local: true })
-        .rotateTowards("position")
+        .rotateTowards(targetPos)
         .delay(1800)
         .scaleToObject(3, { considerTokenScale: true })
         .playbackRate(1.2)
@@ -130,13 +98,13 @@ sequence
     .effect()
         .file(closest("jb2a.fireball.beam.orange"))
         .atLocation(token, { offset: { x: 0.2 + tokenOffset }, gridUnits: true, local: true })
-        .stretchTo("position")
+        .stretchTo(targetPos)
         .startTime(2000)
 
     .effect()
         .file(closest("jb2a.cast_generic.fire.side01.orange.0"))
         .atLocation(token)
-        .rotateTowards("position")
+        .rotateTowards(targetPos)
         .size(4.5, { gridUnits: true })
         .startTime(750)
 
@@ -145,7 +113,7 @@ sequence
     .effect()
         .delay(250)
         .file(closest("eskie.star.03.orange"))
-        .atLocation("position")
+        .atLocation(targetPos)
         .scaleToObject(1, { considerTokenScale: true })
         .zIndex(1)
         .filter("ColorMatrix", { saturate: 1, hue: -5 })
@@ -163,14 +131,14 @@ sequence
 
     .effect()
         .file(closest("jb2a.fireball.explosion.orange"))
-        .atLocation("position")
+        .atLocation(targetPos)
         .scaleToObject(1.4, { considerTokenScale: true })
         .scaleIn(0, 500, { ease: "easeOutQuint" })
         .zIndex(2)
 
     .effect()
         .file(closest("jb2a.smoke.puff.ring.02.dark_black"))
-        .atLocation("position")
+        .atLocation(targetPos)
         .scaleToObject(1.8, { considerTokenScale: true })
         .scaleIn(0, 500, { ease: "easeOutQuint" })
         .opacity(0.5)
@@ -180,7 +148,7 @@ sequence
 
     .effect()
         .file(closest("jb2a.extras.tmfx.outpulse.circle.02.normal"))
-        .atLocation("position")
+        .atLocation(targetPos)
         .scaleToObject(4, { considerTokenScale: true })
         .scaleIn(0, 500, { ease: "easeOutQuint" })
         .opacity(0.25)
@@ -193,7 +161,7 @@ if (scorchedEarth) {
     sequence
         .effect()
             .file(closest("jb2a.ground_cracks.orange.01"))
-            .atLocation("position")
+            .atLocation(targetPos)
             .scaleToObject(0.9, { considerTokenScale: true })
             .randomRotation()
             .fadeOut(2000)
@@ -205,7 +173,7 @@ if (scorchedEarth) {
 
         .effect()
             .file(closest("jb2a.scorched_earth.black"))
-            .atLocation("position")
+            .atLocation(targetPos)
             .scaleToObject(0.8, { considerTokenScale: true })
             .fadeOut(2000)
             .duration(5000)

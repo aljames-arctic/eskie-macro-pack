@@ -13,39 +13,14 @@ const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
     ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
     ?? path;
 
-const crosshairConfig = {
-    t: "ray",
+const position = await Sequencer.Crosshair.show({
+    type: "ray",
     distance: 30,
     width: 5,
-    icon: { texture: token.document?.texture?.src ?? "" },
-    gridHighlight: false,
-    borderAlpha: 0,
-    location: { obj: token, lockToEdge: true },
-};
-
-const crosshairCallbacks = {
-    [Sequencer.Crosshair.CALLBACKS.SHOW]: (crosshair) => {
-        new Sequence()
-            .wait(50)
-            .effect()
-                .name("Ray Crosshair")
-                .file(closest("eskie.crosshair.ray.fantasy_01.white.full"))
-                .attachTo(crosshair)
-                .stretchTo(crosshair, { attachTo: true, onlyX: true })
-                .scale(((canvas?.grid?.size ?? 100) / 300) * 0.8)
-                .locally()
-                .persist()
-            .play();
-    },
-    [Sequencer.Crosshair.CALLBACKS.PLACED]: () => {
-        Sequencer.EffectManager.endEffects({ name: "Ray Crosshair" });
-    },
-    [Sequencer.Crosshair.CALLBACKS.CANCEL]: () => {
-        Sequencer.EffectManager.endEffects({ name: "Ray Crosshair" });
-    },
-};
-
-const position = await Sequencer.Crosshair.show(crosshairConfig, crosshairCallbacks);
+    icon: token.document?.texture?.src ?? "",
+    label: "Piercing Arrow",
+    location: { obj: token, lockToEdge: true }
+});
 if (!position || position.cancelled) return;
 
 const tokenWidth = token.document?.width ?? token.width ?? 1;

@@ -24,74 +24,20 @@ const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
 
 const tokenImg = token.document?.texture?.src ?? "";
 
-const position1 = await Sequencer.Crosshair.show(
-    {
-        t: "circle",
-        distance: 2.5,
-        icon: { texture: tokenImg },
-        gridHighlight: false,
-        borderAlpha: 0,
-    },
-    {
-        [Sequencer.Crosshair.CALLBACKS.SHOW]: (crosshair) => {
-            new Sequence()
-                .effect()
-                    .name(`${token.name} Wall Fire Crosshair`)
-                    .file(closest("eskie.crosshair.circle.fantasy_01.white.no_base.radius_10ft"))
-                    .attachTo(crosshair)
-                    .scaleToObject(1.2)
-                    .persist()
-                    .locally()
-                .play();
-        },
-        [Sequencer.Crosshair.CALLBACKS.PLACED]: () => {
-            Sequencer.EffectManager.endEffects({ name: `${token.name} Wall Fire Crosshair` });
-        },
-        [Sequencer.Crosshair.CALLBACKS.CANCEL]: () => {
-            Sequencer.EffectManager.endEffects({ name: `${token.name} Wall Fire Crosshair` });
-        },
-    }
-);
-
+const position1 = await Sequencer.Crosshair.show({
+    type: "circle",
+    distance: 2.5,
+    icon: tokenImg,
+    label: "Wall of Fire (Start)"
+});
 if (!position1 || position1.cancelled) return;
 
-const position2 = await Sequencer.Crosshair.show(
-    {
-        t: "circle",
-        distance: 2.5,
-        icon: { texture: tokenImg },
-        gridHighlight: false,
-        borderAlpha: 0,
-    },
-    {
-        [Sequencer.Crosshair.CALLBACKS.SHOW]: (crosshair) => {
-            new Sequence()
-                .wait(50)
-                .effect()
-                    .name(`${token.name} Wall Fire Crosshair`)
-                    .file(closest("eskie.crosshair.circle.fantasy_01.white.no_base.radius_10ft"))
-                    .atLocation(position1)
-                    .scaleToObject(1.2)
-                    .locally()
-                    .persist()
-                .effect()
-                    .name(`${token.name} Wall Fire Crosshair`)
-                    .file(closest("eskie.crosshair.circle.fantasy_01.white.no_base.radius_10ft"))
-                    .attachTo(crosshair)
-                    .scaleToObject(1.2)
-                    .locally()
-                    .persist()
-                .play();
-        },
-        [Sequencer.Crosshair.CALLBACKS.PLACED]: () => {
-            Sequencer.EffectManager.endEffects({ name: `${token.name} Wall Fire Crosshair` });
-        },
-        [Sequencer.Crosshair.CALLBACKS.CANCEL]: () => {
-            Sequencer.EffectManager.endEffects({ name: `${token.name} Wall Fire Crosshair` });
-        },
-    }
-);
-
+const position2 = await Sequencer.Crosshair.show({
+    type: "circle",
+    distance: 2.5,
+    icon: tokenImg,
+    label: "Wall of Fire (End)"
+});
 if (!position2 || position2.cancelled) return;
 
 const dx = position2.x - position1.x;

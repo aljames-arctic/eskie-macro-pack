@@ -21,51 +21,21 @@ async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { angle, coneSize, distance, sound, template } = mConfig;
 
-    let position = null;
-    if (template) {
-        const [primary, secondary, center] = await templatelib.getPosition(template);
-        position = center ?? primary;
-    }
+    const cfg = {
+        distance,
+        angle,
+        label: 'Burning Hands',
+        icon: token?.document?.texture?.src ?? ''
+    };
+    let [primary, secondary, center] = await templatelib.getPosition(template, cfg);
+    if (!primary && !center) return null;
+    const targetPos = center ?? primary;
 
     const tokenWidth = token?.document?.width ?? token?.width ?? 1;
     const tokenOffset = (tokenWidth - 1) / 2;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
-
-    if (!position) {
-        sequence
-            .crosshair('position')
-                .type('cone')
-                .location(token, { lockToEdge: true, lockToEdgeDirection: true })
-                .distance(distance)
-                .angle(angle)
-                .borderColor('#ffffff', { alpha: 0 })
-                .fillColor('#000000', { alpha: 0.1 })
-                .icon(token?.document?.texture?.src ?? '')
-                .callback(Sequencer.Crosshair.CALLBACKS.SHOW, function(crosshair) {
-                    new Sequence()
-                        .wait(50)
-                        .effect()
-                            .name('Cone Crosshair')
-                            .file(closest(`eskie.crosshair.cone.${coneSize}.fantasy_01.white.full`))
-                            .attachTo(crosshair)
-                            .stretchTo(crosshair, { attachTo: true })
-                            .opacity(0.8)
-                            .belowTokens()
-                            .locally()
-                            .persist()
-                        .play();
-                })
-                .callback(Sequencer.Crosshair.CALLBACKS.PLACED, function() {
-                    Sequencer.EffectManager.endEffects({ name: 'Cone Crosshair' });
-                })
-                .callback(Sequencer.Crosshair.CALLBACKS.CANCEL, function() {
-                    Sequencer.EffectManager.endEffects({ name: 'Cone Crosshair' });
-                });
-    }
-
-    const targetPos = position ?? 'position';
     const label = `${token?.name ?? 'Token'} Burning Hands`;
 
     sequence

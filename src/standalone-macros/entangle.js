@@ -15,36 +15,21 @@ if (isPlaying) {
     return ui.notifications.info(`Ended Entangle for ${token.document.name}.`);
 }
 
+const targetPos = await Sequencer.Crosshair.show({
+    type: "rect",
+    distance: 28.5,
+    icon: token.document?.texture?.src ?? "",
+    label: "Entangle",
+    snapPosition: 240
+});
+if (!targetPos || targetPos.cancelled) return;
+
 new Sequence()
-    .crosshair('position')
-    .type('rect')
-    .distance(28.5)
-    .icon(token.document.texture.src)
-    .snapPosition(240)
-    .callback(Sequencer.Crosshair.CALLBACKS.SHOW, function(crosshair) {
-        new Sequence()
-            .wait(50)
-            .effect()
-            .name('Entangle Crosshair')
-            .file(closest('eskie.crosshair.rectangle.fantasy_01.white.full.20x20ft'))
-            .attachTo(crosshair)
-            .scaleToObject()
-            .belowTokens()
-            .locally()
-            .persist()
-            .play();
-    })
-    .callback(Sequencer.Crosshair.CALLBACKS.PLACED, function() {
-        Sequencer.EffectManager.endEffects({ name: 'Entangle Crosshair' });
-    })
-    .callback(Sequencer.Crosshair.CALLBACKS.CANCEL, function() {
-        Sequencer.EffectManager.endEffects({ name: 'Entangle Crosshair' });
-    })
     .effect()
     .name(label)
     .file(closest('eskie.casting.nature.01.side.loop.green'))
     .attachTo(token)
-    .rotateTowards('position')
+    .rotateTowards(targetPos)
     .scaleToObject(1.25, { considerTokenScale: true })
     .spriteOffset({ x: -0.25 }, { gridUnits: true })
     .duration(2000)
@@ -52,7 +37,7 @@ new Sequence()
     .effect()
     .name(label)
     .file(closest('eskie.casting.nature.01.center.loop.green'))
-    .attachTo('position')
+    .atLocation(targetPos)
     .size(1, { gridUnits: true })
     .belowTokens()
     .duration(2000)
@@ -62,7 +47,7 @@ new Sequence()
     .delay(500)
     .name(label)
     .file(closest('eskie.nature.vine.normal.circle.01.physical.green.radius_20ft'))
-    .atLocation('position')
+    .atLocation(targetPos)
     .scaleToObject(1.15)
     .persist()
     .belowTokens()
@@ -70,7 +55,7 @@ new Sequence()
     .randomRotation()
     .effect()
     .name(label)
-    .atLocation('position')
+    .atLocation(targetPos)
     .file(closest('jb2a.magic_signs.circle.02.conjuration.complete.dark_green'))
     .size(3.5, { gridUnits: true })
     .fadeIn(600)
@@ -82,7 +67,7 @@ new Sequence()
     .duration(3000)
     .effect()
     .name(label)
-    .atLocation('position')
+    .atLocation(targetPos)
     .file(closest('jb2a.magic_signs.circle.02.conjuration.complete.dark_green'))
     .size(3.5, { gridUnits: true })
     .fadeIn(600, { delay: 2500 })

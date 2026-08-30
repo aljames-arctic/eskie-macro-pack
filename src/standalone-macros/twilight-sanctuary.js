@@ -12,7 +12,7 @@ if (!token) return ui.notifications.warn('Please select a token!');
 
 const darkMap = true;
 const effectName = `Twilight Sanctuary ${token.document.name}`;
-const isPlaying = Sequencer.EffectManager.getEffects({ name: effectName, object: token }).length > 0;
+const isPlaying = Sequencer.EffectManager.getEffects({ name: effectName }).length > 0;
 
 if (isPlaying) {
     Sequencer.EffectManager.endEffects({ name: effectName });

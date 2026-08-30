@@ -165,3 +165,18 @@ test('banishingArrow and enfeeblingArrow do not restore visibility or end effect
     assert.doesNotMatch(enfeeblingModule, /\.thenDo\s*\(\s*function\s*\(\s*\)\s*\{[\s\S]*?endEffects/, 'enfeeblingArrow module create() must not prematurely end effects in thenDo');
     assert.doesNotMatch(enfeeblingMacro, /\.thenDo\s*\(\s*function\s*\(\s*\)\s*\{[\s\S]*?endEffects/, 'enfeebling-arrow macro must not prematurely end effects in thenDo');
 });
+
+test('all KNOWN_STANDALONE_MACROS match disk files 1:1', () => {
+    const standaloneDir = path.join(rootDir, 'src/standalone-macros');
+    const diskFiles = fs.readdirSync(standaloneDir).filter(f => f.endsWith('.js'));
+    const knownSet = new Set(KNOWN_STANDALONE_MACROS);
+
+    for (const diskFile of diskFiles) {
+        assert.ok(knownSet.has(diskFile), `${diskFile} on disk must be in KNOWN_STANDALONE_MACROS`);
+    }
+
+    for (const knownFile of KNOWN_STANDALONE_MACROS) {
+        const filePath = path.join(standaloneDir, knownFile);
+        assert.ok(fs.existsSync(filePath), `Known macro ${knownFile} must exist on disk`);
+    }
+});

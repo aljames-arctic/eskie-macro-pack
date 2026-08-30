@@ -14,6 +14,12 @@ const target = Array.from(game.user.targets)[0];
 if (!target) return ui.notifications.warn('Please target a token or location!');
 
 const label = `${target.document.name} Tokens of the Departed`;
+const isPlaying = Sequencer.EffectManager.getEffects({ name: label, object: target }).length > 0;
+
+if (isPlaying) {
+    Sequencer.EffectManager.endEffects({ name: label, object: target });
+    return ui.notifications.info(`Ended Tokens of the Departed on ${target.document.name}.`);
+}
 
 new Sequence()
     .effect()

@@ -54,6 +54,7 @@ export const KNOWN_STANDALONE_MACROS = [
     'enfeebling-arrow.js',
     'enlarge-reduce.js',
     'entangle.js',
+    'entangled.js',
     'eyes-of-night.js',
     'eyes-of-the-grave.js',
     'faerie-fire.js',

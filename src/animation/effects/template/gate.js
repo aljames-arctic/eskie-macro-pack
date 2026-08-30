@@ -131,7 +131,7 @@ async function create(token, config = {}) {
     if (!position) { return; }
 
     let destPlane = destination;
-    if (typeof destPlane !== "string" || destPlane === "Menu Prompt") {
+    if (!destPlane || destPlane === "Menu Prompt") {
         destPlane = await _getDestination(destinationList);
         if (!destPlane) { return; }
     }

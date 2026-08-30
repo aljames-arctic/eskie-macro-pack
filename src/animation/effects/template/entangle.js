@@ -20,7 +20,7 @@ async function create(token, config = {}) {
     const { id, color, template, sound } = mConfig;
 
     const portalEntry = Sequencer.Database.getEntry(closest('eskie.crosshair.rectangle.fantasy_01.white.full.20x20ft'));
-    const portalPath = typeof portalEntry === 'string' ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
+    const portalPath = portalEntry?.file ?? portalEntry?.files?.[0] ?? portalEntry;
     const cfg = {
         radius: 20,
         max: 90,

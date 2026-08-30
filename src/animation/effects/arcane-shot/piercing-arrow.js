@@ -14,14 +14,9 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token, targetOrConfig, config = {}) {
-    let target = targetOrConfig;
-    let rawConfig = config;
-    if (targetOrConfig && typeof targetOrConfig === 'object' && !targetOrConfig.document && !targetOrConfig.center && !targetOrConfig.x && !targetOrConfig.documentName) {
-        rawConfig = targetOrConfig;
-        target = null;
-    }
-
-    rawConfig = settingsOverride(rawConfig);
+    const isTarget = Boolean(targetOrConfig?.document || targetOrConfig?.center || targetOrConfig?.x);
+    const target = isTarget ? targetOrConfig : null;
+    const rawConfig = settingsOverride(isTarget ? config : (targetOrConfig ?? config));
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, rawConfig);
     const { sound, template } = mConfig;
 

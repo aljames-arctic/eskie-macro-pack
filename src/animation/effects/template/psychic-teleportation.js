@@ -13,7 +13,7 @@ async function create(token, config = {}) {
     const { id, template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     
     const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
-    const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
+    const portalPath = portalEntry?.file ?? portalEntry?.files?.[0] ?? portalEntry;
 
     const cfg = { 
         radius: 1,

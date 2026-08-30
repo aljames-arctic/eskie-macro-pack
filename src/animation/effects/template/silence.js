@@ -28,7 +28,7 @@ async function createSilence(token, config = {}) {
     const { id, size, template, sound } = mConfig;
 
     const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
-    const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
+    const portalPath = portalEntry?.file ?? portalEntry?.files?.[0] ?? portalEntry;
     const cfg = { 
         radius: 20,
         max: 120,

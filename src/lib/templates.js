@@ -75,6 +75,22 @@ function resolveDistinctPositions(positions, config = {}, template = null) {
         return errResult;
     }
 
+    const distancePx = secondary ? Math.hypot(secondary.x - primary.x, secondary.y - primary.y) : 0;
+    log.debug('templatelib.getPosition | Coordinates resolved:', {
+        source: tokenCenter ? { ...tokenCenter, name: token?.document?.name ?? token?.name } : null,
+        primary,
+        secondary,
+        center: center ?? primary,
+        distancePx,
+        template: template ? {
+            x: template.x ?? template.document?.x,
+            y: template.y ?? template.document?.y,
+            direction: template.direction ?? template.document?.direction,
+            distance: template.distance ?? template.document?.distance,
+            type: template.t ?? template.document?.t ?? template.documentName
+        } : null
+    });
+
     return [primary, secondary, center ?? primary];
 }
 

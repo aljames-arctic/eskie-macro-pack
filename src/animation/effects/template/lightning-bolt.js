@@ -49,6 +49,15 @@ async function create(token, config = {}) {
     let [primary, secondary] = await templatelib.getPosition(template, cfg);
     if (!primary || !secondary || primary.cancelled || primary.error) { return; }
 
+    const sourcePos = token?.center ?? (token?.x !== undefined ? { x: token.x, y: token.y } : null);
+    const distPx = Math.hypot(secondary.x - primary.x, secondary.y - primary.y);
+    log.debug('lightningBolt.create | Points for animation:', {
+        source: sourcePos ? { ...sourcePos, name: token?.document?.name ?? token?.name } : null,
+        primary,
+        secondary,
+        distancePx: distPx
+    });
+
     const sequence = new Sequence();
     applySound(sequence, sound);
 

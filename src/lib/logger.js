@@ -20,13 +20,13 @@ function getVerbosityLevel() {
     try {
         if (game?.settings) {
             const setting = game.settings.get(MODULE_ID, 'logVerbosity');
-            cachedVerbosity = VERBOSITY_LEVELS[setting] ?? VERBOSITY_LEVELS['warn'];
+            cachedVerbosity = VERBOSITY_LEVELS[setting] ?? VERBOSITY_LEVELS['debug'];
             return cachedVerbosity;
         }
     } catch (e) {
         // Settings not yet registered or game not fully initialized
     }
-    return VERBOSITY_LEVELS['warn'];
+    return VERBOSITY_LEVELS['debug'];
 }
 
 const groupStack = [];

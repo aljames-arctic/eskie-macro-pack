@@ -1,40 +1,76 @@
 // Standalone Macro: Mirror Image
-// Original Author: EskieMoh#2969
-// Update Author: bakanabaka
+// Original Author: .eskie / EskieMoh#2969
+// Modular Conversion: bakanabaka
+
+if (!game.modules.get("sequencer")?.active) {
+    return ui.notifications.error("The 'Mirror Image' macro requires the 'Sequencer' module to be installed and active!");
+}
 
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select a token!");
 
 const closest = (path) => {
-    return game.modules.get("eskie-macros")?.api?.util?.closest?.(path) ?? path;
+    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
+        return eskie.util.file.closest(path);
+    }
+    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
+    if (typeof apiClosest === "function") {
+        return apiClosest(path);
+    }
+    return path;
 };
 
-const id = "mirrorImage";
-const imageNumber = 3;
-const label = `${id} - ${token.id}`;
+const tokenId = token.id ?? token.document?.id ?? "";
+const tokenName = token.name ?? token.document?.name ?? "Token";
 
-// Check if effect is already active for this token (acting as a toggle)
-const isPlaying = Sequencer.EffectManager.getEffects({ name: `${label}*`, object: token }).length > 0;
+// Toggle / re-entrant persistent effect handling: stop active mirror image if present
+const activeEffects = [
+    ...Sequencer.EffectManager.getEffects({ name: `mirrorImage - ${tokenId}*` }),
+    ...Sequencer.EffectManager.getEffects({ name: `${tokenName} Mirror Image *` })
+];
 
-if (isPlaying) {
-    Sequencer.EffectManager.endEffects({ name: `${label}*`, object: token });
-    Sequencer.EffectManager.endEffects({ name: `${label}*` });
-
+if (activeEffects.length > 0) {
+    Sequencer.EffectManager.endEffects({ name: `mirrorImage - ${tokenId}*` });
+    Sequencer.EffectManager.endEffects({ name: `${tokenName} Mirror Image *` });
     await new Sequence()
         .animation()
             .on(token)
             .fadeIn(1000)
             .opacity(1)
-            .play();
-} else {
-    // Initial token opacity setup
-    await new Sequence()
-        .animation()
-            .on(token)
-            .opacity(0)
-            .play();
+        .play();
+    return ui.notifications.info(`Ended Mirror Image on ${tokenName}.`);
+}
 
-    const sequence = new Sequence()
+// Dialog for selection between visual styles (similar to Rage)
+const choice = await Dialog.wait({
+    title: "Mirror Image",
+    content: "<p style='text-align: center;'>Select a visual style for Mirror Image:</p>",
+    buttons: {
+        v2: {
+            icon: '<i class="fas fa-sparkles" style="color: #dca9fe;"></i>',
+            label: "Rising Stars (V2)",
+            callback: () => "v2"
+        },
+        v1: {
+            icon: '<i class="fas fa-clone" style="color: #d0c2ff;"></i>',
+            label: "Classic Shimmer (V1)",
+            callback: () => "v1"
+        }
+    },
+    default: "v2",
+    close: () => null
+});
+
+if (!choice) return;
+
+const imageNumber = 3;
+
+if (choice === "v1") {
+    // V1 - Classic Shimmer
+    const label = `mirrorImage - ${tokenId}`;
+    const sequence = new Sequence();
+
+    sequence
         .effect()
             .file(closest("jb2a.shimmer.01.purple"))
             .opacity(0.5)
@@ -61,7 +97,7 @@ if (isPlaying) {
             .atLocation(token)
             .scaleToObject(1, { considerTokenScale: true })
             .belowTokens()
-            .animateProperty('spriteContainer', 'position.x', { from: -80, to: 80, duration: 1500, pingPong: true })
+            .animateProperty("spriteContainer", "position.x", { from: -80, to: 80, duration: 1500, pingPong: true })
             .duration(1500)
             .opacity(0.75)
             .tint("#d0c2ff")
@@ -73,7 +109,7 @@ if (isPlaying) {
             .atLocation(token)
             .scaleToObject(1, { considerTokenScale: true })
             .belowTokens()
-            .animateProperty('spriteContainer', 'position.x', { from: 80, to: -80, duration: 1500, pingPong: true })
+            .animateProperty("spriteContainer", "position.x", { from: 80, to: -80, duration: 1500, pingPong: true })
             .duration(1500)
             .opacity(0.75)
             .tint("#d0c2ff")
@@ -83,7 +119,7 @@ if (isPlaying) {
 
         // Image 1
         .effect()
-            .name(`${label} (1)`) // Unique name for stopping
+            .name(`${label} (1)`)
             .copySprite(token)
             .spriteRotation(-token.document.rotation)
             .atLocation(token)
@@ -92,8 +128,8 @@ if (isPlaying) {
             .belowTokens()
             .attachTo(token, { bindAlpha: false, bindRotation: false })
             .persist()
-            .animateProperty('sprite', 'rotation', { from: 180, to: -10, duration: 500 })
-            .loopProperty('spriteContainer', 'position.x', { from: -5, to: 5, duration: 2500, pingPong: true })
+            .animateProperty("sprite", "rotation", { from: 180, to: -10, duration: 500 })
+            .loopProperty("spriteContainer", "position.x", { from: -5, to: 5, duration: 2500, pingPong: true })
             .zeroSpriteRotation()
             .opacity(0.75)
             .tint("#d0c2ff")
@@ -102,7 +138,7 @@ if (isPlaying) {
 
         // Image 2
         .effect()
-            .name(`${label} (2)`) // Unique name for stopping
+            .name(`${label} (2)`)
             .copySprite(token)
             .spriteRotation(-token.document.rotation)
             .scaleToObject(1, { considerTokenScale: true })
@@ -112,8 +148,8 @@ if (isPlaying) {
             .belowTokens()
             .attachTo(token, { bindAlpha: false, bindRotation: false })
             .persist()
-            .animateProperty('sprite', 'rotation', { from: 0, to: 190, duration: 500 })
-            .loopProperty('spriteContainer', 'position.x', { from: -5, to: 5, duration: 2500, pingPong: true, delay: 250 })
+            .animateProperty("sprite", "rotation", { from: 0, to: 190, duration: 500 })
+            .loopProperty("spriteContainer", "position.x", { from: -5, to: 5, duration: 2500, pingPong: true, delay: 250 })
             .zeroSpriteRotation()
             .opacity(0.75)
             .tint("#d0c2ff")
@@ -122,7 +158,7 @@ if (isPlaying) {
 
         // Image 3
         .effect()
-            .name(`${label} (3)`) // Unique name for stopping
+            .name(`${label} (3)`)
             .copySprite(token)
             .spriteRotation(-token.document.rotation)
             .scaleToObject(1, { considerTokenScale: true })
@@ -132,8 +168,8 @@ if (isPlaying) {
             .belowTokens()
             .attachTo(token, { bindAlpha: false, bindRotation: false })
             .persist()
-            .animateProperty('sprite', 'rotation', { from: 0, to: 90, duration: 250 })
-            .loopProperty('spriteContainer', 'position.x', { from: -5, to: 5, duration: 2500, pingPong: true })
+            .animateProperty("sprite", "rotation", { from: 0, to: 90, duration: 250 })
+            .loopProperty("spriteContainer", "position.x", { from: -5, to: 5, duration: 2500, pingPong: true })
             .zeroSpriteRotation()
             .opacity(0.75)
             .tint("#d0c2ff")
@@ -148,15 +184,154 @@ if (isPlaying) {
             .opacity(0.5)
             .rotate(90)
             .scaleToObject(1.25)
-            .atLocation(token);
+            .atLocation(token)
 
-    await sequence.play();
-
-    // Final token opacity fade-in
-    await new Sequence()
         .animation()
             .on(token)
             .fadeIn(1000)
+            .opacity(1);
+
+    await sequence.play();
+} else {
+    // V2 - Rising Stars
+    const label = `${tokenName} Mirror Image`;
+    const sequence = new Sequence();
+
+    sequence
+        .animation()
+            .delay(250)
+            .on(token)
+            .opacity(0)
+
+        .effect()
+            .file(closest("eskie.casting.arcane.01.center.one_shot.purple"))
+            .attachTo(token, { bindAlpha: false })
+            .scaleToObject(0.8, { considerTokenScale: true })
+            .zIndex(2)
+
+        .effect()
+            .copySprite(token)
+            .attachTo(token, { bindAlpha: false })
+            .scaleToObject(1, { considerTokenScale: true })
+            .animateProperty("sprite", "alpha", { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", delay: 250 })
+            .animateProperty("sprite", "alpha", { from: 0, to: 0.5, duration: 250, ease: "easeInCubic", delay: 750 })
+            .duration(1250)
+
+        .effect()
+            .file(closest("blfx.spell.template.circle.particles.3.rise.star1.loop.color1"))
+            .attachTo(token, { bindAlpha: false })
+            .scaleToObject(1.75, { considerTokenScale: true })
+            .zIndex(1)
+            .startTime(1000)
+            .animateProperty("sprite", "position.x", { from: 0.25, to: -0.25, duration: 500, gridUnits: true, ease: "easeOutCubic" })
+            .animateProperty("sprite", "position.x", { from: 0, to: 0.25, duration: 250, gridUnits: true, ease: "easeInCubic", delay: 500 })
+            .duration(2250)
+            .fadeIn(500, { ease: "easeOutCubic" })
+            .fadeOut(500, { ease: "easeInCubic" })
+            .opacity(0.8)
+            .belowTokens()
+
+        .effect()
+            .copySprite(token)
+            .attachTo(token, { bindAlpha: false })
+            .scaleToObject(1, { considerTokenScale: true })
+            .zIndex(0)
+            .opacity(0.5)
+            .tint("#dca9fe")
+            .animateProperty("sprite", "position.x", { from: 0.25, to: -0.25, duration: 500, gridUnits: true, ease: "easeOutCubic" })
+            .animateProperty("sprite", "position.x", { from: 0, to: 0.25, duration: 250, gridUnits: true, ease: "easeInCubic", delay: 500 })
+            .duration(1250)
+            .fadeIn(500, { ease: "easeOutCubic" })
+            .fadeOut(500, { ease: "easeInCubic" })
+            .belowTokens()
+
+        .effect()
+            .file(closest("blfx.spell.template.circle.particles.3.rise.star1.loop.color1"))
+            .attachTo(token, { bindAlpha: false })
+            .scaleToObject(1.75, { considerTokenScale: true })
+            .zIndex(1)
+            .startTime(1000)
+            .animateProperty("sprite", "position.x", { from: -0.25, to: 0.25, duration: 500, gridUnits: true, ease: "easeOutCubic" })
+            .animateProperty("sprite", "position.x", { from: 0, to: -0.25, duration: 250, gridUnits: true, ease: "easeInCubic", delay: 500 })
+            .duration(2250)
+            .fadeIn(500, { ease: "easeOutCubic" })
+            .fadeOut(500, { ease: "easeInCubic" })
+            .opacity(0.8)
+            .belowTokens()
+
+        .effect()
+            .copySprite(token)
+            .attachTo(token, { bindAlpha: false })
+            .scaleToObject(1, { considerTokenScale: true })
+            .zIndex(0)
+            .opacity(0.5)
+            .tint("#dca9fe")
+            .animateProperty("sprite", "position.x", { from: -0.25, to: 0.25, duration: 500, gridUnits: true, ease: "easeOutCubic" })
+            .animateProperty("sprite", "position.x", { from: 0, to: -0.25, duration: 250, gridUnits: true, ease: "easeInCubic", delay: 500 })
+            .duration(1250)
+            .fadeIn(500, { ease: "easeOutCubic" })
+            .fadeOut(500, { ease: "easeInCubic" })
+            .belowTokens()
+
+        .animation()
+            .delay(1000)
+            .on(token)
             .opacity(1)
-            .play();
+
+        .effect()
+            .delay(750)
+            .file(closest("jb2a.particles.outward.purple.02.04"))
+            .attachTo(token, { bindAlpha: false })
+            .scaleToObject(1.25, { considerTokenScale: true })
+            .zIndex(1)
+            .scaleIn(0, 500, { ease: "easeOutCubic" })
+            .fadeOut(500)
+            .duration(1000);
+
+    const radius = 0.45;
+    for (let i = 0; i < imageNumber; i++) {
+        const angle = (Math.PI * 2 / imageNumber) * i - Math.PI / 2;
+        const offsetX = Math.cos(angle) * radius;
+        const offsetY = Math.sin(angle) * radius;
+
+        const imgSeq = new Sequence()
+            .wait(750)
+            .effect()
+                .name(`${label} ${i + 1}`)
+                .copySprite(token)
+                .attachTo(token, { offset: { x: offsetX, y: offsetY }, gridUnits: true, bindAlpha: false, local: false })
+                .scaleToObject(1, { considerTokenScale: true })
+                .zIndex(0)
+                .opacity(0.5)
+                .tint("#dca9fe")
+                .animateProperty("sprite", "position.x", { from: -offsetX, to: 0, duration: 500, gridUnits: true, ease: "easeOutCubic" })
+                .animateProperty("sprite", "position.y", { from: -offsetY, to: 0, duration: 500, gridUnits: true, ease: "easeOutCubic" })
+                .duration(1500)
+                .fadeIn(500, { ease: "easeOutCubic" })
+                .fadeOut(1000)
+                .belowTokens()
+                .persist()
+                .loopProperty("sprite", "alpha", { from: 0.5, to: 0.35, duration: 3000, ease: "easeInOutSine", pingPong: true })
+                .loopProperty("spriteContainer", "position.x", { from: 0, to: -offsetX / 8, duration: 3000, gridUnits: true, ease: "easeInOutSine", pingPong: true })
+                .loopProperty("spriteContainer", "position.y", { from: 0, to: -offsetY / 8, duration: 3000, gridUnits: true, ease: "easeInOutSine", pingPong: true })
+
+            .effect()
+                .name(`${label} ${i + 1}`)
+                .file(closest("blfx.spell.template.circle.particles.3.rise.star1.loop.color1"))
+                .attachTo(token, { bindAlpha: false })
+                .scaleToObject(1.75, { considerTokenScale: true })
+                .zIndex(1)
+                .startTime(1000)
+                .animateProperty("sprite", "position.x", { from: 0, to: offsetX, duration: 500, gridUnits: true, ease: "easeOutCubic" })
+                .animateProperty("sprite", "position.y", { from: 0, to: offsetY, duration: 500, gridUnits: true, ease: "easeOutCubic" })
+                .duration(2250)
+                .fadeIn(500, { ease: "easeOutCubic" })
+                .fadeOut(1000, { ease: "easeInCubic" })
+                .opacity(0.8)
+                .belowTokens();
+
+        sequence.addSequence(imgSeq);
+    }
+
+    await sequence.play();
 }

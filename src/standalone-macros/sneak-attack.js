@@ -46,28 +46,17 @@ const mode = config.mode ?? "auto";
  * Safely resolves Free vs Patreon asset paths if the eskie module is active.
  * Falls back to direct database key if running as a standalone copy-paste macro.
  */
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    const apiClosest = game.modules?.get("eskie-macros")?.api?.util?.closest;
-    if (typeof apiClosest === "function") {
-        return apiClosest(path);
-    }
-    return path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
 /**
  * Finds the center of the grid square on a target token that is nearest to a source token.
  */
 function getNearestSquareCenter(token, target) {
-    if (typeof eskie !== "undefined" && eskie.util?.tokens?.getNearestSquareCenter) {
-        return eskie.util.tokens.getNearestSquareCenter(token, target);
-    }
-    const apiGetNearest = game.modules?.get("eskie-macros")?.api?.util?.tokens?.getNearestSquareCenter;
-    if (typeof apiGetNearest === "function") {
-        return apiGetNearest(token, target);
-    }
+    const delegate = globalThis.eskie?.util?.tokens?.getNearestSquareCenter
+        ?? globalThis.game?.modules?.get("eskie-macros")?.api?.util?.tokens?.getNearestSquareCenter;
+    if (delegate) return delegate(token, target);
 
     const gs = canvas.grid?.size ?? 100;
     const srcCenter = token.center ?? { x: token.x, y: token.y };
@@ -99,13 +88,9 @@ function getNearestSquareCenter(token, target) {
  * Calculates 3D scene distance in units (e.g. feet) between two tokens.
  */
 function getDistance(t1, t2) {
-    if (typeof eskie !== "undefined" && eskie.util?.tokens?.getDistance) {
-        return eskie.util.tokens.getDistance(t1, t2);
-    }
-    const apiDist = game.modules?.get("eskie-macros")?.api?.util?.tokens?.getDistance;
-    if (typeof apiDist === "function") {
-        return apiDist(t1, t2);
-    }
+    const delegate = globalThis.eskie?.util?.tokens?.getDistance
+        ?? globalThis.game?.modules?.get("eskie-macros")?.api?.util?.tokens?.getDistance;
+    if (delegate) return delegate(t1, t2);
 
     const p1 = t1.center ?? { x: t1.x, y: t1.y };
     const p2 = t2.center ?? { x: t2.x, y: t2.y };

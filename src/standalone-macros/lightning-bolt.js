@@ -9,16 +9,9 @@ if (!game.modules.get("sequencer")?.active) {
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select a token!");
 
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
-    if (typeof apiClosest === "function") {
-        return apiClosest(path);
-    }
-    return path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
 const DEFAULT_CONFIG = {
     id: 'lightningBolt',
@@ -96,7 +89,7 @@ async function getTargetOrPoint(templateDoc, config = {}) {
         primary = tokenCenter;
     } else {
         const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
-        const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
+        const portalPath = portalEntry?.file ?? portalEntry?.files?.[0] ?? portalEntry;
         const crosshairCfg = {
             radius: 1,
             max: 500,
@@ -117,7 +110,7 @@ async function getTargetOrPoint(templateDoc, config = {}) {
     return [primary, secondary];
 }
 
-const targetPoints = await getTargetOrPoint(typeof template !== "undefined" ? template : undefined, DEFAULT_CONFIG);
+const targetPoints = await getTargetOrPoint(globalThis.template, DEFAULT_CONFIG);
 if (!targetPoints) return;
 let [primary, secondary] = targetPoints;
 

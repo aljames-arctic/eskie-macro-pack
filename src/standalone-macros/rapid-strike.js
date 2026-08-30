@@ -20,28 +20,17 @@ if (targets.length === 0) {
  * Safely resolves Free vs Patreon asset paths if the eskie module is active.
  * Falls back to direct database key if running as a standalone copy-paste macro.
  */
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    const apiClosest = game.modules?.get("eskie-macros")?.api?.util?.closest;
-    if (typeof apiClosest === "function") {
-        return apiClosest(path);
-    }
-    return path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
 /**
  * Finds the center of the grid square on a target token that is nearest to a source token.
  */
 function getNearestSquareCenter(token, target) {
-    if (typeof eskie !== "undefined" && eskie.util?.tokens?.getNearestSquareCenter) {
-        return eskie.util.tokens.getNearestSquareCenter(token, target);
-    }
-    const apiGetNearest = game.modules?.get("eskie-macros")?.api?.util?.tokens?.getNearestSquareCenter;
-    if (typeof apiGetNearest === "function") {
-        return apiGetNearest(token, target);
-    }
+    const delegate = globalThis.eskie?.util?.tokens?.getNearestSquareCenter
+        ?? globalThis.game?.modules?.get("eskie-macros")?.api?.util?.tokens?.getNearestSquareCenter;
+    if (delegate) return delegate(token, target);
 
     const gs = canvas.grid?.size ?? 100;
     const srcCenter = token.center ?? { x: token.x, y: token.y };

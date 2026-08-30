@@ -9,12 +9,9 @@
 const source = canvas.tokens.controlled[0];
 if (!source) return ui.notifications.warn('EMP | Please select a token!');
 
-const closest = (path) => {
-    if (typeof eskie !== 'undefined' && eskie.util?.file?.closest) return eskie.util.file.closest(path);
-    const apiClosest = game.modules?.get('eskie-macros')?.api?.util?.closest;
-    if (typeof apiClosest === 'function') return apiClosest(path);
-    return path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
 async function crosshairImage(crosshairs, token) {
     new Sequence()

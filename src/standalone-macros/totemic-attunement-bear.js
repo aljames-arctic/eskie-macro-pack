@@ -13,16 +13,9 @@ if (!token) return ui.notifications.warn("Please select your Barbarian token!");
 const targets = Array.from(game.user.targets);
 const affectTargets = targets.length > 0 ? targets : [token];
 
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
-    if (typeof apiClosest === "function") {
-        return apiClosest(path);
-    }
-    return path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
 const id = "Bear Totemic Attunement";
 const color = "red";

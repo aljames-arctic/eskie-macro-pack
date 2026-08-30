@@ -21,21 +21,14 @@ if (isPlaying) {
     const tokenOverlay = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
     const revealOverlay = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
 
-    const closest = (path) => {
-        if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-            return eskie.util.file.closest(path);
-        }
-        const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
-        if (typeof apiClosest === "function") {
-            return apiClosest(path);
-        }
-        return path;
-    };
+    const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
     
     let revealOverlayPath = revealOverlay;
     try { 
         const entry = Sequencer.Database.getEntry(closest(revealOverlay));
-        revealOverlayPath = (typeof entry === 'string') ? entry : (entry?.file ?? entry?.files?.[0] ?? closest(revealOverlay));
+        revealOverlayPath = entry?.file ?? entry?.files?.[0] ?? entry ?? closest(revealOverlay);
     } catch (e) {}
 
     let sequence = new Sequence()
@@ -90,7 +83,7 @@ if (isPlaying) {
             const tokenShapeMask = canvas.scene.tiles.get(tiles[2].id);
 
             // Attach to token (requires Token Attacher module)
-            if (typeof tokenAttacher !== 'undefined') {
+            if (globalThis.tokenAttacher) {
                 await tokenAttacher.attachElementsToToken([tokenRevealMask, sceneRevealMask, tokenShapeMask], token, true);
             }
 

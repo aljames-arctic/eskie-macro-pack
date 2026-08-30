@@ -20,12 +20,12 @@ function _randomUiImage() {
     return UI_IMAGES[Math.floor(Math.random() * UI_IMAGES.length)];
 }
 
-const isHacking = (typeof Tagger !== "undefined" && Tagger.hasTags(token, HACK_TAG)) ||
+const isHacking = (globalThis.Tagger?.hasTags(token, HACK_TAG)) ||
                   Sequencer.EffectManager.getEffects({ name: EFFECT_NAME, object: token }).length > 0;
 
 if (isHacking) {
     // Toggle off: remove tag, end effects, restore token opacity
-    if (typeof Tagger !== "undefined") await Tagger.removeTags(token, HACK_TAG);
+    if (globalThis.Tagger) await Tagger.removeTags(token, HACK_TAG);
     await Sequencer.EffectManager.endEffects({ name: EFFECT_NAME, object: token });
 
     new Sequence()

@@ -31,15 +31,9 @@ if (activeEffects.length > 0) {
  * Safely resolves Free vs Patreon asset paths if the eskie module is active.
  * Falls back to the direct string path otherwise.
  */
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    if (game.modules.get("eskie-macros")?.api?.util?.closest) {
-        return game.modules.get("eskie-macros").api.util.closest(path);
-    }
-    return path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
 /**
  * Finds the adjacent grid center point with the minimal perpendicular distance

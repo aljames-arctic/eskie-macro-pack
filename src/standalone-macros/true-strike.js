@@ -17,7 +17,7 @@ const activeTrueStrike = Sequencer.EffectManager.getEffects({ name: "*TrueStrike
     Sequencer.EffectManager.getEffects({ name: "*true-strike*" })
 );
 if (activeTrueStrike.length > 0) {
-    if (typeof Tagger !== "undefined") {
+    if (globalThis.Tagger) {
         Tagger.removeTags(token, "TrueStrike");
     }
     Sequencer.EffectManager.endEffects({ name: "*TrueStrike*" });
@@ -30,18 +30,11 @@ if (targets.length === 0) {
     return ui.notifications.warn("Please target at least one token!");
 }
 
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
-    if (typeof apiClosest === "function") {
-        return apiClosest(path);
-    }
-    return path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
-if (typeof Tagger !== "undefined") {
+if (globalThis.Tagger) {
     Tagger.addTags(token, "TrueStrike");
 }
 

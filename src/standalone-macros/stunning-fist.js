@@ -21,16 +21,9 @@ if (activeStuns.length > 0) {
 const target = game.user.targets.first();
 if (!target) return ui.notifications.warn("Please select a target!");
 
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
-    if (typeof apiClosest === "function") {
-        return apiClosest(path);
-    }
-    return path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
 const targetId = target.id ?? target.document?.id ?? "";
 const label = `${id}-${targetId}`;

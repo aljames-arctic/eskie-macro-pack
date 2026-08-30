@@ -9,16 +9,9 @@ if (!game.modules.get("sequencer")?.active) {
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select a token!");
 
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
-    if (typeof apiClosest === "function") {
-        return apiClosest(path);
-    }
-    return path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
 const DEFAULT_CONFIG = {
     id: 'tashasCausticBrewCast',
@@ -85,7 +78,7 @@ async function getAimPoint(templateDoc, config = {}) {
     }
 }
 
-const templateDoc = typeof scope !== "undefined" ? scope.template : (typeof template !== "undefined" ? template : undefined);
+const templateDoc = globalThis.scope?.template ?? globalThis.template;
 const position = await getAimPoint(templateDoc, DEFAULT_CONFIG);
 if (!position) return;
 

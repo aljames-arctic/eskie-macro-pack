@@ -28,16 +28,9 @@ if (activeEffects.length > 0) {
     return;
 }
 
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    const apiClosest = game.modules?.get('eskie-macros')?.api?.util?.closest;
-    if (typeof apiClosest === "function") {
-        return apiClosest(path);
-    }
-    return path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
 // Check for existing saved recall anchor flag
 const savedAnchor = token.document?.getFlag("world", "teleportRecallAnchor");
@@ -150,7 +143,7 @@ if (choices.mode === "recall" && savedAnchor?.x && savedAnchor?.y) {
     destination = { x: savedAnchor.x, y: savedAnchor.y };
 } else {
     const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
-    const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
+    const portalPath = portalEntry?.file ?? portalEntry?.files?.[0] ?? portalEntry;
 
     const crosshairConfig = {
         size: token.document?.width ?? 1,

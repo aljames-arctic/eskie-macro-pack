@@ -26,16 +26,9 @@ if (!red || !blue || red.id === blue.id) {
     return ui.notifications.warn("Please select 1 token and target 1 opponent token to play the Attack Attack duel show!");
 }
 
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
-    if (typeof apiClosest === "function") {
-        return apiClosest(path);
-    }
-    return path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
 // Ensure blue is left, red is right
 if (blue.x > red.x) {

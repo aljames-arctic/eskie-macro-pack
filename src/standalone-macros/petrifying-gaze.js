@@ -14,16 +14,9 @@ if (targetTokens.length === 0) {
     return ui.notifications.warn("Please target one or more tokens to gaze upon!");
 }
 
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
-    if (typeof apiClosest === "function") {
-        return apiClosest(path);
-    }
-    return path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
 const eyeAnimation = "jb2a.eyes.01.single.orangeyellow";
 const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;

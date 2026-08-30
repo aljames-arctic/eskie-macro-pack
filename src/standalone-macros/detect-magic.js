@@ -9,16 +9,9 @@ if (!game.modules.get("sequencer")?.active) {
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select your token!");
 
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
-    if (typeof apiClosest === "function") {
-        return apiClosest(path);
-    }
-    return path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
 const distanceFeet = 30;
 const detectionConfig = {
@@ -61,7 +54,7 @@ for (const target of targets) {
 
     const matchedTags = [];
     for (const school of Object.keys(detectionConfig)) {
-        const hasTagger = typeof Tagger !== "undefined" && Tagger.hasTags(target, [school]);
+        const hasTagger = globalThis.Tagger?.hasTags(target, [school]);
         const items = target.actor?.items ?? [];
         const hasSpellSchool = Array.from(items).some((item) =>
             (item.system?.school ?? "").toLowerCase() === school

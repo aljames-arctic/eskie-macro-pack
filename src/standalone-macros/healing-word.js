@@ -10,15 +10,9 @@ if (!game.modules.get("sequencer")?.active) {
  * Safely resolves Free vs Patreon asset paths if the eskie module is active.
  * Falls back to the default path if running as a standalone copy-paste macro.
  */
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    if (game.modules.get('eskie-macros')?.api?.util?.closest) {
-        return game.modules.get('eskie-macros').api.util.closest(path);
-    }
-    return path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
 // Casting token validation
 const token = canvas.tokens.controlled[0];

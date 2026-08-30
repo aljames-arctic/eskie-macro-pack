@@ -13,12 +13,9 @@ const effectName = `Silence ${token.document?.name ?? token.name} ${id}`;
  * Safely resolves Free vs Patreon asset paths if the eskie module is active.
  * Falls back to the default path if running as a standalone copy-paste macro.
  */
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    return game.modules?.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
 // Check if effect is already playing (toggle stop support)
 const isPlaying = Sequencer.EffectManager.getEffects({ name: effectName }).length > 0;
@@ -27,7 +24,7 @@ if (isPlaying) {
     Sequencer.EffectManager.endEffects({ name: effectName });
 } else {
     const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
-    const portalPath = typeof portalEntry === "string" ? portalEntry : (portalEntry?.file ?? portalEntry?.files?.[0]);
+    const portalPath = portalEntry?.file ?? portalEntry?.files?.[0] ?? portalEntry;
 
     const position = await Sequencer.Crosshair.show({
         size: size,

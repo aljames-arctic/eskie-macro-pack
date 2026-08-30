@@ -9,16 +9,9 @@ if (!game.modules.get("sequencer")?.active) {
 const token = canvas.tokens.controlled[0] ?? game.user.targets.first();
 if (!token) return ui.notifications.warn("Please select or target the token to shatter!");
 
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
-    if (typeof apiClosest === "function") {
-        return apiClosest(path);
-    }
-    return path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
 const tokenWidth = token.document?.width ?? 1;
 const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;

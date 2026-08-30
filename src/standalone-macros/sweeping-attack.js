@@ -15,16 +15,9 @@ if (targets.length === 0) return ui.notifications.warn("Please select at least o
 const target1 = targets[0];
 const target2 = targets[1] ?? target1;
 
-const closest = (path) => {
-    if (typeof eskie !== "undefined" && eskie.util?.file?.closest) {
-        return eskie.util.file.closest(path);
-    }
-    const apiClosest = game.modules.get("eskie-macros")?.api?.util?.closest;
-    if (typeof apiClosest === "function") {
-        return apiClosest(path);
-    }
-    return path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
 const getNearestSquareCenter = (srcToken, tgtToken) => {
     if (!srcToken || !tgtToken) return null;

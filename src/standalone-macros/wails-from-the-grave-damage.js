@@ -1,11 +1,8 @@
 // Standalone Macro: Wails from the Grave (Damage Only)
 // Author: .eskie
-const closest = (path) => {
-    if (typeof eskie !== 'undefined' && eskie.util?.file?.closest) return eskie.util.file.closest(path);
-    const apiClosest = game.modules?.get('eskie-macros')?.api?.util?.closest;
-    if (typeof apiClosest === 'function') return apiClosest(path);
-    return path;
-};
+const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
+    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
+    ?? path;
 
 const target = Array.from(game.user.targets)[0];
 if (!target) return ui.notifications.warn('Please target a token!');

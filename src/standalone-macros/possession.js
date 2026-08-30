@@ -9,9 +9,7 @@ if (!game.modules.get("sequencer")?.active) {
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select the possessing ghost/spirit token!");
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const activePossessions = Sequencer.EffectManager.getEffects({ name: "eskie.effect.possession.main*" });
 if (activePossessions.length > 0) {

@@ -28,9 +28,7 @@ if (activeEffects.length > 0) {
     return;
 }
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 // Check for existing saved recall anchor flag
 const savedAnchor = token.document?.getFlag("world", "teleportRecallAnchor");

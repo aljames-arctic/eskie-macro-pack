@@ -18,14 +18,10 @@ if (isPlaying) {
     return ui.notifications.info(`Ended Cloudkill for ${token.name}.`);
 }
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const radius = 20;
-const bgSrc = globalThis.eskie?.util?.adapter?.getSceneBackground?.(canvas.scene)?.src
-    ?? canvas.scene?.background?.src
-    ?? "";
+const bgSrc = canvas.scene?.background?.src ?? "";
 
 const targetPos = await Sequencer.Crosshair.show({
     type: "circle",

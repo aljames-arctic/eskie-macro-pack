@@ -12,9 +12,7 @@ if (!token) return ui.notifications.warn("Please select a token!");
 const target = game.user.targets.first();
 if (!target) return ui.notifications.warn("Please select a target!");
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const sequence = new Sequence();
 

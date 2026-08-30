@@ -25,9 +25,7 @@ if (activeEffects.length > 0 || activeConEffects.length > 0 || activeIdEffects.l
     return;
 }
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const tokenWidth = token.document?.width ?? 1;
 const tokenHeight = token.document?.height ?? 1;

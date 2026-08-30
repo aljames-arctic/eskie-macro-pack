@@ -13,9 +13,7 @@ const effectName = `Silence ${token.document?.name ?? token.name} ${id}`;
  * Safely resolves Free vs Patreon asset paths if the eskie module is active.
  * Falls back to the default path if running as a standalone copy-paste macro.
  */
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 // Check if effect is already playing (toggle stop support)
 const isPlaying = Sequencer.EffectManager.getEffects({ name: effectName }).length > 0;

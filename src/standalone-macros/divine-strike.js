@@ -32,16 +32,13 @@ const label = `${id}-${token.id}`;
  * Safely resolves Free vs Patreon asset paths if the eskie module is active.
  * Falls back to direct database key if running as a standalone copy-paste macro.
  */
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 /**
  * Calculates 3D scene distance in units (e.g. feet) between two tokens.
  */
 function getDistance(t1, t2) {
-    const delegate = globalThis.eskie?.util?.tokens?.getDistance
-        ?? globalThis.game?.modules?.get("eskie-macros")?.api?.util?.tokens?.getDistance;
+    const delegate = game.modules.get("eskie-macros")?.api?.util?.tokens?.getDistance;
     if (delegate) return delegate(t1, t2);
 
     const p1 = t1.center ?? { x: t1.x, y: t1.y };

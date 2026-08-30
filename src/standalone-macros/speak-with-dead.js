@@ -39,9 +39,7 @@ if (isPlaying) {
 // Helper Functions
 // ==========================================
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 function _addMagicCircleEffects(token, id) {
     let seq = new Sequence()

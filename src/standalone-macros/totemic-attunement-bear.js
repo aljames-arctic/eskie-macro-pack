@@ -13,9 +13,7 @@ if (!token) return ui.notifications.warn("Please select your Barbarian token!");
 const targets = Array.from(game.user.targets);
 const affectTargets = targets.length > 0 ? targets : [token];
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const id = "Bear Totemic Attunement";
 const color = "red";

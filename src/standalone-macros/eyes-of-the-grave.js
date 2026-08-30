@@ -1,8 +1,6 @@
 // Standalone Macro: Eyes of the Grave
 // Author: .eskie
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn('Please select a token!');
@@ -42,7 +40,7 @@ new Sequence()
     .play();
 
 targets.forEach(target => {
-    const value = (globalThis.eskie?.adapter ?? foundry.utils).getProperty(target, path);
+    const value = foundry.utils.getProperty(target, path);
     const isUndead = Array.isArray(value)
         ? value.map(v => String(v).toLowerCase()).includes('undead')
         : String(value ?? '').toLowerCase().includes('undead');

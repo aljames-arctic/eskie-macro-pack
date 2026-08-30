@@ -20,9 +20,7 @@ if (targets.length === 0) {
  * Safely resolves Free vs Patreon asset paths if the eskie module is active.
  * Falls back to the default path if running as a standalone copy-paste macro.
  */
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const id = "revivify";
 

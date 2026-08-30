@@ -21,9 +21,7 @@ if (isPlaying) {
     const tokenOverlay = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
     const revealOverlay = `eskie.texture_mask.tile_base.shatter.${center ? 'center' : 'side'}.01`;
 
-    const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+    const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
     
     let revealOverlayPath = revealOverlay;
     try { 
@@ -83,7 +81,7 @@ if (isPlaying) {
             const tokenShapeMask = canvas.scene.tiles.get(tiles[2].id);
 
             // Attach to token (requires Token Attacher module)
-            if (globalThis.tokenAttacher) {
+            if (game.modules.get('token-attacher')?.active) {
                 await tokenAttacher.attachElementsToToken([tokenRevealMask, sceneRevealMask, tokenShapeMask], token, true);
             }
 

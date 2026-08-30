@@ -11,9 +11,7 @@ if (!target) {
     return ui.notifications.warn("Please select a Vehicle Tile or Token to deploy the MaxTac Trauma Team AV!");
 }
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const id = "MaxTacTraumaTeamAV";
 const targetId = target.id ?? target.document?.id ?? "";
@@ -28,10 +26,10 @@ const h = target.document?.height ?? target.h ?? 1;
 // Top-level Run-1 Start / Run-2 Stop Toggle Check
 const activeFly = Sequencer.EffectManager.getEffects({ name: effectNameFly, object: target }) ?? [];
 const activeLanding = Sequencer.EffectManager.getEffects({ name: effectNameLanding, object: target }) ?? [];
-const hasTag = globalThis.Tagger?.hasTags(target, flyingTag);
+const hasTag = game.modules.get('tagger')?.active && Tagger.hasTags(target, flyingTag);
 
 if (activeFly.length > 0 || activeLanding.length > 0 || hasTag) {
-    if (globalThis.Tagger) {
+    if (game.modules.get('tagger')?.active) {
         await Tagger.removeTags(target, flyingTag);
     }
     await Sequencer.EffectManager.endEffects({ name: effectNameLanding, object: target });
@@ -92,7 +90,7 @@ if (activeFly.length > 0 || activeLanding.length > 0 || hasTag) {
     return ui.notifications.info("MaxTac Trauma Team AV departed zone.");
 }
 
-if (globalThis.Tagger) {
+if (game.modules.get('tagger')?.active) {
     await Tagger.addTags(target, flyingTag);
 }
 

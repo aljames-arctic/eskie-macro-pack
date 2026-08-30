@@ -9,9 +9,7 @@ if (!game.modules.get("sequencer")?.active) {
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select a token!");
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const DEFAULT_CONFIG = {
     id: 'lightningBolt',
@@ -110,7 +108,7 @@ async function getTargetOrPoint(templateDoc, config = {}) {
     return [primary, secondary];
 }
 
-const targetPoints = await getTargetOrPoint(globalThis.template, DEFAULT_CONFIG);
+const targetPoints = await getTargetOrPoint(scope?.template, DEFAULT_CONFIG);
 if (!targetPoints) return;
 let [primary, secondary] = targetPoints;
 

@@ -14,9 +14,7 @@ if (targets.length === 0) {
     return ui.notifications.warn("Please target enemies to subject to Dread Aspect!");
 }
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const tokenWidth = token.document?.width ?? 1;
 const scaleX = token.document?.texture?.scaleX ?? 1;

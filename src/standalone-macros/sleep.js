@@ -14,9 +14,7 @@ if (targets.length === 0) {
     return ui.notifications.warn("Please select at least one target!");
 }
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const id = "Sleep";
 

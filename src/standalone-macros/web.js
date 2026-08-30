@@ -18,9 +18,7 @@ if (isPlaying) {
     return ui.notifications.info(`Ended Web for ${token.name}.`);
 }
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const distance = 28.5;
 

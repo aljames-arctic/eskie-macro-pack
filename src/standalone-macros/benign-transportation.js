@@ -25,9 +25,7 @@ if (activeEffects.length > 0) {
     return;
 }
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const soundFile = "psfx.2nd-level-spells.misty-step.v1.outro.fire";
 const soundVolume = 0.5;

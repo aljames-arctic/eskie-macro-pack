@@ -1,8 +1,6 @@
 // Standalone Macro: Keeper of Souls
 // Author: .eskie
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const targets = Array.from(game.user.targets);
 if (targets.length < 2) return ui.notifications.warn('Please select 2 targets: Target 1 (Fallen) and Target 2 (Ally to heal)!');

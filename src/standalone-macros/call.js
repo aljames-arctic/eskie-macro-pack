@@ -12,9 +12,7 @@ if (!game.modules.get("sequencer")?.active) {
  * Safely resolves Free vs Patreon asset paths if the eskie module is active.
  * Falls back to the default path if running as a standalone copy-paste macro.
  */
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn('Please select a token!');
@@ -49,12 +47,12 @@ const UNICODE_CHARS = [
     '☲', '☳', '☴', '☵', '☶', '☷', '⣹', '⣺', '⣻', '⣼', '⣽', '⣾', '⣿',
 ];
 
-const isCalling = (globalThis.Tagger?.hasTags(token, CALL_TAG)) ||
+const isCalling = (game.modules.get('tagger')?.active && Tagger.hasTags(token, CALL_TAG)) ||
                   Sequencer.EffectManager.getEffects({ name: EFFECT_NAME, object: token }).length > 0;
 
 if (isCalling) {
     // Toggle off: remove tag, end effects, restore token opacity
-    if (globalThis.Tagger) await Tagger.removeTags(token, CALL_TAG);
+    if (game.modules.get('tagger')?.active) await Tagger.removeTags(token, CALL_TAG);
     await Sequencer.EffectManager.endEffects({ name: EFFECT_NAME, object: token });
     await Sequencer.EffectManager.endEffects({ name: EFFECT_NAME_TEXT, object: token });
 

@@ -40,7 +40,7 @@ function create(token, config = {}) {
     const sequence = new Sequence();
     applySound(sequence, sound);
     sequence.thenDo(async () => {
-    if (globalThis.FXMASTER)
+    if (game.modules.get('fxmaster')?.active)
         await FXMASTER.filters.switch("SandyfilterID", "color", {
             color: { value: "#76feb1", apply: true },
             saturation: 0.9,
@@ -108,7 +108,7 @@ async function stop(token, config = {}) {
         await matt.movement.stop(token, label);
 
         Sequencer.EffectManager.endEffects({ name: label, object: token });
-        if (globalThis.FXMASTER)
+        if (game.modules.get('fxmaster')?.active)
             FXMASTER.filters.switch("SandyfilterID", "color", {
                 color: { value: "#ffffff", apply: false },
             });

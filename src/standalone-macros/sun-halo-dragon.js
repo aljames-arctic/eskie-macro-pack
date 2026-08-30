@@ -11,9 +11,7 @@ if (!token) return ui.notifications.warn("Please select your Flame Hashira / Dem
 
 const targets = Array.from(game.user.targets);
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const crosshairConfig = {
     size: 1,

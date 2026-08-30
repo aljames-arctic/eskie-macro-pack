@@ -9,9 +9,7 @@ if (!game.modules.get("sequencer")?.active) {
 const target = game.user.targets.first() ?? canvas.tokens.controlled[0];
 if (!target) return ui.notifications.warn("Please select or target a token to terrify!");
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
 const targetWidth = target.document?.width ?? 1;

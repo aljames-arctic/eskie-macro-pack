@@ -14,9 +14,7 @@ if (activeEffects.length > 0) {
     return;
 }
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const DEFAULT_DESTINATIONS = [
     { label: 'First World', value: 'First World' },

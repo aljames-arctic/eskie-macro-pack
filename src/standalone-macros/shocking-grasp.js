@@ -24,9 +24,7 @@ const id = DEFAULT_CONFIG.id ?? "shockingGrasp";
  * Safely resolves Free vs Patreon asset paths if the eskie module is active.
  * Falls back to direct database key if running as a standalone copy-paste macro.
  */
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 // 3. Toggle / Re-entrant Persistent Effect Handling
 const isPlaying = Sequencer.EffectManager.getEffects({ name: id, object: token }).length > 0 ||

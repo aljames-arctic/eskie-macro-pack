@@ -14,9 +14,7 @@ if (!token) return ui.notifications.warn("Please select a token!");
  * Safely resolves Free vs Patreon asset paths if the eskie module is active.
  * Falls back to direct database key if running as a standalone copy-paste macro.
  */
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const DEFAULT_CONFIG = {
     id: "firecracker",
@@ -41,8 +39,8 @@ if (isPlaying) {
 
 // Target point placement: decouple from template if provided in scope, else show Crosshair picker
 let position;
-if (globalThis.scope?.template) {
-    position = { x: globalThis.scope.template.x, y: globalThis.scope.template.y };
+if (scope?.template) {
+    position = { x: scope.template.x, y: scope.template.y };
 } else {
     const crosshairConfig = {
         size: 1,

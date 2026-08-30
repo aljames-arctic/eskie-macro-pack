@@ -9,9 +9,7 @@ if (!game.modules.get("sequencer")?.active) {
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select a token!");
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const id = "hit-the-dirt";
 const tokenId = token.id ?? token.document?.id ?? "";
@@ -59,7 +57,7 @@ const cfg = {
     rememberControlled: true,
 };
 
-const position = await getPosition(globalThis.scope?.template, cfg);
+const position = await getPosition(scope?.template, cfg);
 if (!position) return;
 
 const sequence = new Sequence();

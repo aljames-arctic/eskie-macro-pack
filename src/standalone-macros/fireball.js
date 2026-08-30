@@ -10,9 +10,7 @@ if (!game.modules.get("sequencer")?.active) {
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select a token!");
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const radius = 20;
 const scorchedEarth = true;
@@ -29,9 +27,7 @@ if (!targetPos || targetPos.cancelled) return;
 const tokenWidth = token.document?.width ?? token.width ?? 1;
 const tokenOffset = (tokenWidth - 1) / 2;
 
-const bgSrc = globalThis.eskie?.util?.adapter?.getSceneBackground?.(canvas.scene)?.src
-    ?? canvas.scene?.background?.src
-    ?? "";
+const bgSrc = canvas.scene?.background?.src ?? "";
 
 const sequence = new Sequence();
 

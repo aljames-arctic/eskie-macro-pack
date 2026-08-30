@@ -12,9 +12,7 @@ if (!token) return ui.notifications.warn("Please select a token!");
 const target = game.user.targets.first();
 if (!target) return ui.notifications.warn("Please select a target!");
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const tokenCenter = token.center ?? { x: token.x ?? 0, y: token.y ?? 0 };
 const targetCenter = target.center ?? { x: target.x ?? 0, y: target.y ?? 0 };

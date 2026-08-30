@@ -12,9 +12,7 @@ if (!token) return ui.notifications.warn("Please select a token!");
 const targets = Array.from(game.user.targets);
 if (targets.length === 0) return ui.notifications.warn("Please select at least one target!");
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const midpoint = {
     x: targets.reduce((sum, t) => sum + (t.center?.x ?? t.x ?? 0), 0) / targets.length,

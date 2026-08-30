@@ -9,9 +9,7 @@ if (!game.modules.get("sequencer")?.active) {
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select your Cyberpunk / Monk token!");
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const id = "Sandevistan";
 const tokenId = token.id ?? token.document?.id ?? "";
@@ -22,7 +20,7 @@ const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: 
 if (activeEffects.length > 0) {
     Sequencer.EffectManager.endEffects({ name: label, object: token });
     Sequencer.EffectManager.endEffects({ name: `${label} - Trail` });
-    if (globalThis.FXMASTER) {
+    if (game.modules.get('fxmaster')?.active) {
         FXMASTER.filters.switch("SandyfilterID", "color", {
             color: { value: "#ffffff", apply: false },
         });
@@ -46,7 +44,7 @@ const hslToHex = (h, s, l) => {
 const sequence = new Sequence();
 
 sequence.thenDo(async () => {
-    if (globalThis.FXMASTER) {
+    if (game.modules.get('fxmaster')?.active) {
         await FXMASTER.filters.switch("SandyfilterID", "color", {
             color: { value: "#76feb1", apply: true },
             saturation: 0.9,

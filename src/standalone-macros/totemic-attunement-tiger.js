@@ -16,9 +16,7 @@ const count = 2; // dual claw pounce strikes
 const tokenId = token.id ?? token.document?.id ?? "";
 const label = `${id} - ${tokenId}`;
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
 if (activeEffects.length > 0) {

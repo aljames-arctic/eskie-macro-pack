@@ -9,9 +9,7 @@ if (!game.modules.get("sequencer")?.active) {
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn("Please select your token!");
 
-const closest = (path) => globalThis.eskie?.util?.file?.closest?.(path)
-    ?? globalThis.game?.modules?.get('eskie-macros')?.api?.util?.closest?.(path)
-    ?? path;
+const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const distanceFeet = 30;
 const detectionConfig = {
@@ -59,7 +57,7 @@ for (const target of targets) {
     const matchedTags = [];
     for (const tag of Object.keys(detectionConfig)) {
         const isMatch = targetType.includes(tag) || customType.includes(tag)
-            || (globalThis.Tagger?.hasTags(target, [tag]));
+            || (game.modules.get('tagger')?.active && Tagger.hasTags(target, [tag]));
         if (isMatch) {
             matchedTags.push(tag);
         }

@@ -146,6 +146,16 @@ test('Template position extraction: V12/V13 MeasuredTemplate vs V14+ Region shap
     };
     const zeroRegionPos = v14.getTemplatePosition(zeroRegion);
     assert.equal(zeroRegionPos[1], undefined);
+
+    // V14 Region with config.distance in grid units (feet) converted to pixels
+    const rayRegion = {
+        documentName: 'Region',
+        shapes: [{ x: 150, y: 100, rotation: 0 }]
+    };
+    const rayPos = v14.getTemplatePosition(rayRegion, { distance: 100 });
+    assert.deepEqual(rayPos[0], { x: 150, y: 100 });
+    assert.equal(rayPos[1].x, 2150); // 150 + (100 / 5) * 100 = 2150 px
+    assert.equal(rayPos[1].y, 100);
 });
 
 test('Permission tiers and ownership evaluation on BaseFoundryAdapter', () => {

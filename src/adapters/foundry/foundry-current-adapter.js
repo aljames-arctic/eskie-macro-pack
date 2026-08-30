@@ -157,25 +157,36 @@ export class FoundryCurrentAdapter extends BaseFoundryAdapter {
                 y: shape?.center?.y ?? doc.center?.y ?? template.center?.y ?? primary.y
             };
 
-            const distance = (shape?.radius !== undefined && shape.radius > 0)
-                ? shape.radius
-                : ((shape?.distance !== undefined && shape.distance > 0)
-                    ? shape.distance
-                    : ((shape?.height !== undefined && shape.height > 0)
-                        ? shape.height
-                        : ((shape?.width !== undefined && shape.width > 0) ? shape.width : (config.distance ?? 0))));
+            const gridSize = canvas?.grid?.size ?? canvas?.dimensions?.size ?? 100;
+            const gridDistance = canvas?.grid?.distance ?? canvas?.scene?.grid?.distance ?? canvas?.dimensions?.distance ?? 5;
+
+            let distancePx = 0;
+            if (config.distance !== undefined && config.distance > 0) {
+                distancePx = (config.distance / gridDistance) * gridSize;
+            } else if (doc.distance !== undefined && doc.distance > 0) {
+                distancePx = (doc.distance / gridDistance) * gridSize;
+            } else if (shape?.distance !== undefined && shape.distance > 0) {
+                distancePx = (shape.distance / gridDistance) * gridSize;
+            } else if (shape?.radius !== undefined && shape.radius > 0) {
+                distancePx = shape.radius;
+            } else if (shape?.height !== undefined && shape.height > 0) {
+                distancePx = shape.height;
+            } else if (shape?.width !== undefined && shape.width > 0) {
+                distancePx = shape.width;
+            }
+
             const rotation = shape?.rotation ?? doc.rotation ?? config.direction;
             let secondary;
 
-            if (rotation !== undefined && distance > 0) {
+            if (rotation !== undefined && distancePx > 0) {
                 const rad = (rotation * Math.PI) / 180;
                 secondary = {
-                    x: primary.x + Math.cos(rad) * distance,
-                    y: primary.y + Math.sin(rad) * distance
+                    x: primary.x + Math.cos(rad) * distancePx,
+                    y: primary.y + Math.sin(rad) * distancePx
                 };
-            } else if (distance > 0) {
+            } else if (distancePx > 0) {
                 secondary = {
-                    x: primary.x + distance,
+                    x: primary.x + distancePx,
                     y: primary.y
                 };
             }

@@ -154,7 +154,7 @@ test('Rage sub-configs include version-specific sound configurations', async () 
 });
 
 test('Mirror Image sub-configs include version-specific sound configurations', async () => {
-    const { mirrorImage } = await import('../../src/animation/effects/active-effect/mirror-image/index.js');
+    const { mirrorImage } = await import('../../src/animation/effects/active-effect/mirror-image.js');
     assert.ok(mirrorImage.default_config.config_v1.sound, 'config_v1 must have sound property');
     assert.equal(typeof mirrorImage.default_config.config_v1.sound, 'object');
     assert.equal(mirrorImage.default_config.config_v1.sound.enable, false);

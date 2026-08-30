@@ -80,7 +80,7 @@ import { lightningBolt } from './template/lightning-bolt.js';
 import { magicMissile } from './on-target/magic-missile.js';
 import { maxtacTraumaTeamAV } from './tile/maxtac-trauma-team-av.js';
 import { meteorStrike } from './template/meteor-strike.js';
-import { mirrorImage } from './active-effect/mirror-image/index.js';
+import { mirrorImage } from './active-effect/mirror-image.js';
 import { mistyStep } from './token/misty-step.js';
 import { pathOfTheGrave } from './target/path-of-the-grave.js';
 import { petrified } from './active-effect/petrified.js';

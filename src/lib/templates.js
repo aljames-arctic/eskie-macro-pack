@@ -88,7 +88,8 @@ function resolveDistinctPositions(positions, config = {}, template = null) {
  */
 async function getPosition(template, config = {}) {
     let positions;
-    if (template) {
+    const isTemplateObject = Boolean(template && typeof template === 'object' && (template.x !== undefined || template.document !== undefined || template.shapes !== undefined || template.direction !== undefined));
+    if (isTemplateObject) {
         positions = adapter.getTemplatePosition(template, config);
     } else {
         const position = await Sequencer?.Crosshair?.show?.(config);

@@ -12,7 +12,7 @@ import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'Lightning Bolt',
-    template: true,
+    template: undefined,
     tintMap: false,
     sound: {
         secondary: {
@@ -138,4 +138,4 @@ export const lightningBolt = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("lightningBolt", "template", "eskie.effect.lightningBolt", DEFAULT_CONFIG, "0.0.1", "Lightning Bolt");
+autorec.register("lightningBolt", "template", "eskie.effect.lightningBolt", DEFAULT_CONFIG, "0.0.2", "Lightning Bolt");

@@ -615,7 +615,7 @@ export class BaseFoundryAdapter {
      * @returns {[ {x: number, y: number}, {x: number, y: number}, {x: number, y: number} ]} Array of [primary, secondary, center] coordinates
      */
     getTemplatePosition(template, config = {}) {
-        if (!template) return [];
+        if (!template || typeof template !== 'object') return [];
 
         const doc = template.document ?? template;
         const placeable = template.object ?? (template.document ? template : null);

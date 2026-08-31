@@ -11,25 +11,6 @@ Hooks.once('init', function() {
 
     const isDevBuild = game.modules?.get(MODULE_ID)?.version === "#{VERSION}#";
 
-    // Recommended Modules Guide Menu
-    game.settings.registerMenu(MODULE_ID, 'recommendedModules', {
-        name: 'EMP.settings.recommendedModules.name',
-        label: 'EMP.settings.recommendedModules.label',
-        icon: 'fa-solid fa-puzzle-piece',
-        type: RecommendedModulesFormApplication,
-        restricted: false
-    });
-
-    // Configure Auto-Recognition Menu
-    game.settings.registerMenu(MODULE_ID, 'configureAutorec', {
-        name: 'EMP.settings.configureAutorec.name',
-        label: 'EMP.settings.configureAutorec.label',
-        hint: 'EMP.settings.configureAutorec.hint',
-        icon: 'fa-solid fa-wand-magic-sparkles',
-        type: ConfigureAutorecFormApplication,
-        restricted: true
-    });
-
     // Dev-only standalone macro compendium sync menu (enabled when version is #{VERSION}#)
     if (isDevBuild) {
         game.settings.registerMenu(MODULE_ID, 'generateCompendiums', {
@@ -51,6 +32,25 @@ Hooks.once('init', function() {
             restricted: true
         });
     }
+
+    // Recommended Modules Guide Menu (View Companion Modules)
+    game.settings.registerMenu(MODULE_ID, 'recommendedModules', {
+        name: 'EMP.settings.recommendedModules.name',
+        label: 'EMP.settings.recommendedModules.label',
+        icon: 'fa-solid fa-puzzle-piece',
+        type: RecommendedModulesFormApplication,
+        restricted: true
+    });
+
+    // Configure Auto-Recognition Menu
+    game.settings.registerMenu(MODULE_ID, 'configureAutorec', {
+        name: 'EMP.settings.configureAutorec.name',
+        label: 'EMP.settings.configureAutorec.label',
+        hint: 'EMP.settings.configureAutorec.hint',
+        icon: 'fa-solid fa-wand-magic-sparkles',
+        type: ConfigureAutorecFormApplication,
+        restricted: true
+    });
 
     // World Scripts Configuration Menu
     game.settings.registerMenu(MODULE_ID, 'worldScripts', {
@@ -139,33 +139,28 @@ export function injectSettingsHeaders(html, _app = null) {
     const root = html?.querySelector ? html : html?.[0];
     if (!root?.querySelector) return;
 
-    // 1. Move recommendedModules (User Menu) into the User Settings section before logVerbosity if both are present
-    const recMenuSelector = [
-        `[data-key="${MODULE_ID}.recommendedModules"]`,
-        `[data-action="${MODULE_ID}.recommendedModules"]`,
-        `[data-setting-id="${MODULE_ID}.recommendedModules"]`,
-        `[data-entry-id="${MODULE_ID}.recommendedModules"]`,
-        `[data-key="recommendedModules"]`,
-        `[data-action="recommendedModules"]`
-    ].join(', ');
-    const logVerbositySelector = [
-        `[name="${MODULE_ID}.logVerbosity"]`,
-        `[data-setting-id="${MODULE_ID}.logVerbosity"]`,
-        `[data-entry-id="${MODULE_ID}.logVerbosity"]`,
-        `[name="logVerbosity"]`
+    // 1. Ensure generateCompendiums (Dev Menu) is at the very top of World Settings if present
+    const genCompSelector = [
+        `[data-key="${MODULE_ID}.generateCompendiums"]`,
+        `[data-action="${MODULE_ID}.generateCompendiums"]`,
+        `[data-setting-id="${MODULE_ID}.generateCompendiums"]`,
+        `[data-entry-id="${MODULE_ID}.generateCompendiums"]`,
+        `[data-key="generateCompendiums"]`,
+        `[data-action="generateCompendiums"]`
     ].join(', ');
 
-    const recMenuEl = root.querySelector(recMenuSelector);
-    const logVerbosityEl = root.querySelector(logVerbositySelector);
-
-    if (recMenuEl && logVerbosityEl) {
-        const recFg = recMenuEl.closest('.form-group') ?? recMenuEl;
-        const logFg = logVerbosityEl.closest('.form-group') ?? logVerbosityEl;
-        if (recFg && logFg && recFg.parentNode && recFg.parentNode === logFg.parentNode) {
-            const next = recFg.nextElementSibling;
-            const isAlreadyBeforeClient = next === logFg || (next?.classList?.contains('emp-settings-section-header') && next?.dataset?.scope === 'client');
-            if (!isAlreadyBeforeClient) {
-                logFg.parentNode.insertBefore(recFg, logFg);
+    const genCompEl = root.querySelector(genCompSelector);
+    if (genCompEl) {
+        const genCompFg = genCompEl.closest('.form-group') ?? genCompEl;
+        const parent = genCompFg?.parentNode;
+        const firstEl = parent?.firstElementChild ?? parent?.children?.[0];
+        if (parent && firstEl && firstEl !== genCompFg) {
+            if (firstEl.classList?.contains('emp-settings-section-header') && firstEl.dataset?.scope === 'world') {
+                if (firstEl.nextElementSibling !== genCompFg) {
+                    parent.insertBefore(genCompFg, firstEl.nextElementSibling);
+                }
+            } else {
+                parent.insertBefore(genCompFg, firstEl);
             }
         }
     }
@@ -173,13 +168,13 @@ export function injectSettingsHeaders(html, _app = null) {
     // 2. Insert section headers before the respective first setting in each scope
     const sections = [
         {
-            keys: ['configureAutorec', 'manageAutorec', 'generateCompendiums', 'worldScripts', 'enableSounds'],
+            keys: ['generateCompendiums', 'recommendedModules', 'configureAutorec', 'manageAutorec', 'worldScripts', 'enableSounds'],
             scope: 'world',
             title: game.i18n?.localize?.('EMP.settingsSections.world') ?? 'World Settings',
             icon: 'fas fa-globe'
         },
         {
-            keys: ['recommendedModules'],
+            keys: [],
             scope: 'user',
             title: game.i18n?.localize?.('EMP.settingsSections.user') ?? 'User Settings',
             icon: 'fas fa-user'

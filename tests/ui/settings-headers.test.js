@@ -20,6 +20,10 @@ class MockElement {
         };
     }
 
+    get firstElementChild() {
+        return this.children[0] ?? null;
+    }
+
     appendChild(child) {
         if (child.parentNode) {
             const oldIdx = child.parentNode.children.indexOf(child);
@@ -100,24 +104,24 @@ if (!globalThis.document) {
     };
 }
 
-test('injectSettingsHeaders inserts world, user, and client headers into EMP SettingsConfig DOM', () => {
+test('injectSettingsHeaders inserts world and client headers into EMP SettingsConfig DOM', () => {
     const origCreateElement = globalThis.document.createElement;
     globalThis.document.createElement = (tagName) => new MockElement(tagName);
 
     try {
         const root = new MockElement('div', { className: 'settings-list' });
 
-        // World group (configureAutorec menu button)
+        // World group (generateCompendiums menu button at top)
         const fgWorld = new MockElement('div', { className: 'form-group' });
-        const btnWorld = new MockElement('button', { dataset: { key: `${MODULE_ID}.configureAutorec` } });
+        const btnWorld = new MockElement('button', { dataset: { key: `${MODULE_ID}.generateCompendiums` } });
         fgWorld.appendChild(btnWorld);
         root.appendChild(fgWorld);
 
-        // User group (recommendedModules menu button)
-        const fgUser = new MockElement('div', { className: 'form-group' });
-        const btnUser = new MockElement('button', { dataset: { key: `${MODULE_ID}.recommendedModules` } });
-        fgUser.appendChild(btnUser);
-        root.appendChild(fgUser);
+        // World group (recommendedModules menu button)
+        const fgRec = new MockElement('div', { className: 'form-group' });
+        const btnRec = new MockElement('button', { dataset: { key: `${MODULE_ID}.recommendedModules` } });
+        fgRec.appendChild(btnRec);
+        root.appendChild(fgRec);
 
         // Client group (logVerbosity)
         const fgClient = new MockElement('div', { className: 'form-group' });
@@ -128,36 +132,32 @@ test('injectSettingsHeaders inserts world, user, and client headers into EMP Set
         // First injection
         injectSettingsHeaders(root);
 
-        assert.equal(root.children.length, 6, 'Should have 3 headers and 3 form groups (total 6)');
+        assert.equal(root.children.length, 5, 'Should have 2 headers (world, client) and 3 form groups (total 5)');
         assert.equal(root.children[0].className, 'emp-settings-section-header');
         assert.equal(root.children[0].dataset.scope, 'world');
         assert.equal(root.children[1], fgWorld);
+        assert.equal(root.children[2], fgRec);
 
-        assert.equal(root.children[2].className, 'emp-settings-section-header');
-        assert.equal(root.children[2].dataset.scope, 'user');
-        assert.equal(root.children[3], fgUser);
-
-        assert.equal(root.children[4].className, 'emp-settings-section-header');
-        assert.equal(root.children[4].dataset.scope, 'client');
-        assert.equal(root.children[5], fgClient);
+        assert.equal(root.children[3].className, 'emp-settings-section-header');
+        assert.equal(root.children[3].dataset.scope, 'client');
+        assert.equal(root.children[4], fgClient);
 
         // Second injection (idempotency check)
         injectSettingsHeaders(root);
-        assert.equal(root.children.length, 6, 'Should remain 6 items without duplicate headers');
+        assert.equal(root.children.length, 5, 'Should remain 5 items without duplicate headers');
     } finally {
-        document.createElement = origCreateElement;
+        globalThis.document.createElement = origCreateElement;
     }
 });
 
-test('injectSettingsHeaders moves recommendedModules into the User Settings section', () => {
+test('injectSettingsHeaders positions generateCompendiums at the very top of World Settings', () => {
     const origCreateElement = globalThis.document.createElement;
     globalThis.document.createElement = (tagName) => new MockElement(tagName);
 
     try {
         const root = new MockElement('div', { className: 'settings-list' });
 
-        // In Foundry, menus are registered and rendered at the top of the module section
-        // recommendedModules is registered first, followed by world menus
+        // In Foundry, menus are registered in arbitrary order; suppose recommendedModules was rendered first
         const fgRecMenu = new MockElement('div', { className: 'form-group' });
         const btnRec = new MockElement('button', { dataset: { key: `${MODULE_ID}.recommendedModules` } });
         fgRecMenu.appendChild(btnRec);
@@ -179,6 +179,12 @@ test('injectSettingsHeaders moves recommendedModules into the User Settings sect
         fgSounds.appendChild(inputSounds);
         root.appendChild(fgSounds);
 
+        // generateCompendiums menu button (registered further down)
+        const fgGenComp = new MockElement('div', { className: 'form-group' });
+        const btnGenComp = new MockElement('button', { dataset: { key: `${MODULE_ID}.generateCompendiums` } });
+        fgGenComp.appendChild(btnGenComp);
+        root.appendChild(fgGenComp);
+
         // Client setting
         const fgLog = new MockElement('div', { className: 'form-group' });
         const inputLog = new MockElement('input', { name: `${MODULE_ID}.logVerbosity` });
@@ -189,28 +195,26 @@ test('injectSettingsHeaders moves recommendedModules into the User Settings sect
 
         // Expected DOM structure:
         // [0]: World Header
-        // [1]: fgAutorecMenu (World Menu)
-        // [2]: fgWorldScriptsMenu (World Menu)
-        // [3]: fgSounds (World Setting)
-        // [4]: User Header
-        // [5]: fgRecMenu (User Menu relocated here!)
+        // [1]: fgGenComp (generateCompendiums elevated to very top!)
+        // [2]: fgRecMenu (recommendedModules / View Companion Modules in World Settings)
+        // [3]: fgAutorecMenu (World Menu)
+        // [4]: fgWorldScriptsMenu (World Menu)
+        // [5]: fgSounds (World Setting)
         // [6]: Client Header
         // [7]: fgLog (Client Setting)
         assert.equal(root.children.length, 8);
         assert.equal(root.children[0].className, 'emp-settings-section-header');
         assert.equal(root.children[0].dataset.scope, 'world');
-        assert.equal(root.children[1], fgAutorecMenu);
-        assert.equal(root.children[2], fgWorldScriptsMenu);
-        assert.equal(root.children[3], fgSounds);
-
-        assert.equal(root.children[4].className, 'emp-settings-section-header');
-        assert.equal(root.children[4].dataset.scope, 'user');
-        assert.equal(root.children[5], fgRecMenu, 'recommendedModules should be relocated under User Settings');
+        assert.equal(root.children[1], fgGenComp, 'generateCompendiums should be at the very top of World Settings');
+        assert.equal(root.children[2], fgRecMenu, 'recommendedModules should be in World Settings');
+        assert.equal(root.children[3], fgAutorecMenu);
+        assert.equal(root.children[4], fgWorldScriptsMenu);
+        assert.equal(root.children[5], fgSounds);
 
         assert.equal(root.children[6].className, 'emp-settings-section-header');
         assert.equal(root.children[6].dataset.scope, 'client');
         assert.equal(root.children[7], fgLog);
     } finally {
-        document.createElement = origCreateElement;
+        globalThis.document.createElement = origCreateElement;
     }
 });

@@ -18,16 +18,6 @@ export function isFoundryV13Plus() {
 }
 
 /**
- * Checks whether the current Foundry environment is generation 14 or newer.
- * @returns {boolean}
- */
-export function isFoundryV14Plus() {
-    if (!game?.release && !game?.version) return false;
-    const generation = game.release?.generation ?? parseInt(String(game.version ?? "0").split('.')[0], 10);
-    return Boolean(generation >= 14);
-}
-
-/**
  * Checks whether Boss Loot FX Custom Auto-Recognition is supported and available.
  * Requires Foundry v13+ AND the Patreon module ('boss-loot-assets-premium') to be active.
  * Free module ('boss-loot-assets-free') does not support Custom Auto-Recognition.
@@ -648,6 +638,5 @@ export const blfx = {
     isCustomAutoRecUpdatesEnabled: isBlfxCustomAutoRecUpdatesEnabled,
     promptEnableUpdates: promptEnableBlfxUpdates,
     isFoundryV13Plus,
-    isFoundryV14Plus,
     registry: EMP_BLFX_Registry
 };

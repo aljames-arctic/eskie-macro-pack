@@ -418,13 +418,11 @@ test('isFoundryV13Plus and isBlfxAutorecAvailable enforce v13+ baseline', () => 
         // v12
         game.release = { generation: 12 };
         assert.equal(blfx.isFoundryV13Plus(), false);
-        assert.equal(blfx.isFoundryV14Plus(), false);
         assert.equal(blfx.isAutorecAvailable(), false);
 
         // v13 without premium module
         game.release = { generation: 13 };
         assert.equal(blfx.isFoundryV13Plus(), true);
-        assert.equal(blfx.isFoundryV14Plus(), false);
         assert.equal(blfx.isAutorecAvailable(), false);
 
         // v13 with premium module
@@ -434,7 +432,6 @@ test('isFoundryV13Plus and isBlfxAutorecAvailable enforce v13+ baseline', () => 
         // v14 with premium module
         game.release = { generation: 14 };
         assert.equal(blfx.isFoundryV13Plus(), true);
-        assert.equal(blfx.isFoundryV14Plus(), true);
         assert.equal(blfx.isAutorecAvailable(), true);
     } finally {
         game.release = origRelease;

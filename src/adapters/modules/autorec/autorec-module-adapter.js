@@ -86,7 +86,7 @@ export class AutorecManager {
                 if (isBlfxAutorecAvailable()) {
                     await this.blfx.submit(options.force ?? false);
                 } else {
-                    log.debug("EMP | BLFX autorec target configured but requires Foundry v14+ and Patreon module (boss-loot-assets-premium).");
+                    log.debug("EMP | BLFX autorec target configured but requires Foundry v13+ and Patreon module (boss-loot-assets-premium).");
                 }
                 break;
 
@@ -100,7 +100,7 @@ export class AutorecManager {
                 const isBlfxActive = isBlfxAutorecAvailable();
 
                 if (!isAaActive && !isBlfxActive) {
-                    log.debug("EMP | Neither Automated Animations nor Boss Loot FX (v14+ Patreon) is active. Skipping autorec destination prompt.");
+                    log.debug("EMP | Neither Automated Animations nor Boss Loot FX (v13+ Patreon) is active. Skipping autorec destination prompt.");
                     return;
                 }
 

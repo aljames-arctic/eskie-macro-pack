@@ -409,3 +409,35 @@ test('submit does not re-prompt on subsequent loads for a non-development releas
     for (const k of Object.keys(blfxAdapter.registry)) delete blfxAdapter.registry[k];
     Object.assign(blfxAdapter.registry, origRegistry);
 });
+
+test('isFoundryV13Plus and isBlfxAutorecAvailable enforce v13+ baseline', () => {
+    const origRelease = game.release;
+    const origModules = game.modules;
+
+    try {
+        // v12
+        game.release = { generation: 12 };
+        assert.equal(blfx.isFoundryV13Plus(), false);
+        assert.equal(blfx.isFoundryV14Plus(), false);
+        assert.equal(blfx.isAutorecAvailable(), false);
+
+        // v13 without premium module
+        game.release = { generation: 13 };
+        assert.equal(blfx.isFoundryV13Plus(), true);
+        assert.equal(blfx.isFoundryV14Plus(), false);
+        assert.equal(blfx.isAutorecAvailable(), false);
+
+        // v13 with premium module
+        game.modules.set('boss-loot-assets-premium', { active: true });
+        assert.equal(blfx.isAutorecAvailable(), true);
+
+        // v14 with premium module
+        game.release = { generation: 14 };
+        assert.equal(blfx.isFoundryV13Plus(), true);
+        assert.equal(blfx.isFoundryV14Plus(), true);
+        assert.equal(blfx.isAutorecAvailable(), true);
+    } finally {
+        game.release = origRelease;
+        game.modules = origModules;
+    }
+});

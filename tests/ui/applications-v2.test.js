@@ -112,8 +112,8 @@ test('ConfigureAutorecApp inherits from ApplicationV2 with HandlebarsApplication
     assert.equal(context.isBlfxActive, false);
     assert.equal(context.hasActiveAutorec, false);
 
-    // Case 5: Patreon BLFX module active on Foundry v14+ -> IS active
-    game.release = { generation: 14 };
+    // Case 5: Patreon BLFX module active on Foundry v13+ -> IS active
+    game.release = { generation: 13 };
     game.modules.set('boss-loot-assets-premium', { active: true });
     context = await dialog._prepareContext();
     assert.equal(context.isAaActive, false);
@@ -122,6 +122,7 @@ test('ConfigureAutorecApp inherits from ApplicationV2 with HandlebarsApplication
     assert.equal(context.hasMultipleAutorec, false);
 
     // Case 6: Both AA and Patreon BLFX active on v14 -> Both active (>= 2)
+    game.release = { generation: 14 };
     game.modules.set('autoanimations', { active: true });
     game.modules.set('boss-loot-assets-premium', { active: true });
     context = await dialog._prepareContext();
@@ -169,7 +170,7 @@ test('renderSettingsConfig conditionally hides manageAutorec button when no modu
     renderHook({}, htmlFree, {});
     assert.equal(htmlFree.formGroup.removed, true);
 
-    // Case 3: Patreon BLFX on v12 -> removed (requires v14+)
+    // Case 3: Patreon BLFX on v12 -> removed (requires v13+)
     game.release = { generation: 12 };
     game.modules.set('boss-loot-assets-premium', { active: true });
     const htmlV12 = createMockHtml();
@@ -183,12 +184,11 @@ test('renderSettingsConfig conditionally hides manageAutorec button when no modu
     renderHook({}, html2, {});
     assert.equal(html2.formGroup.removed, false);
 
-    // Case 5: Patreon BLFX active on v14 -> kept
-    game.release = { generation: 14 };
+    // Case 5: Patreon BLFX active on v13+ -> kept
+    game.release = { generation: 13 };
     game.modules.set('autoanimations', { active: false });
     game.modules.set('boss-loot-assets-premium', { active: true });
     const html3 = createMockHtml();
     renderHook({}, html3, {});
     assert.equal(html3.formGroup.removed, false);
 });
-

@@ -8,23 +8,33 @@ import { BlfxAutorecUpdateFormApplication, generateBlfxAutorecUpdate } from "../
 const foundryPlatform = new BaseFoundryAdapter();
 
 /**
+ * Checks whether the current Foundry environment is generation 13 or newer.
+ * @returns {boolean}
+ */
+export function isFoundryV13Plus() {
+    if (!game?.release && !game?.version) return false;
+    const generation = game.release?.generation ?? parseInt(String(game.version ?? "0").split('.')[0], 10);
+    return Boolean(generation >= 13);
+}
+
+/**
  * Checks whether the current Foundry environment is generation 14 or newer.
  * @returns {boolean}
  */
 export function isFoundryV14Plus() {
-    if (typeof game === 'undefined') return false;
+    if (!game?.release && !game?.version) return false;
     const generation = game.release?.generation ?? parseInt(String(game.version ?? "0").split('.')[0], 10);
     return Boolean(generation >= 14);
 }
 
 /**
  * Checks whether Boss Loot FX Custom Auto-Recognition is supported and available.
- * Requires Foundry v14+ AND the Patreon module ('boss-loot-assets-premium') to be active.
+ * Requires Foundry v13+ AND the Patreon module ('boss-loot-assets-premium') to be active.
  * Free module ('boss-loot-assets-free') does not support Custom Auto-Recognition.
  * @returns {boolean}
  */
 export function isBlfxAutorecAvailable() {
-    return isFoundryV14Plus() && Boolean(
+    return isFoundryV13Plus() && Boolean(
         game?.modules?.get('boss-loot-assets-premium')?.active ||
         game?.modules?.get('blfx-animation-editor-premium')?.active
     );
@@ -565,7 +575,7 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
         if (!shouldUpdate) return;
 
         if (!this.isAutorecSupported()) {
-            log.debug("EMP | Boss Loot FX Custom Auto-Rec skipped: requires Foundry v14+ and the Patreon BLFX module (boss-loot-assets-premium).");
+            log.debug("EMP | Boss Loot FX Custom Auto-Rec skipped: requires Foundry v13+ and the Patreon BLFX module (boss-loot-assets-premium).");
             return;
         }
 
@@ -637,6 +647,7 @@ export const blfx = {
     isAutorecAvailable: isBlfxAutorecAvailable,
     isCustomAutoRecUpdatesEnabled: isBlfxCustomAutoRecUpdatesEnabled,
     promptEnableUpdates: promptEnableBlfxUpdates,
+    isFoundryV13Plus,
     isFoundryV14Plus,
     registry: EMP_BLFX_Registry
 };

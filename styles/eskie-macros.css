@@ -901,3 +901,37 @@ input:checked + .eskie-slider:before {
     border-color: rgba(167, 139, 250, 0.35);
     background: rgba(30, 30, 36, 0.75);
 }
+
+/* ==========================================================================
+   Module Settings Section Headers
+   ========================================================================== */
+
+.emp-settings-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    margin: 1.5em 0 0.6em 0;
+    padding: 0.4em 0.75em;
+    background: rgba(167, 139, 250, 0.12);
+    border-left: 4px solid #a78bfa;
+    border-radius: 4px;
+    font-size: 1.1em;
+    font-weight: 700;
+    color: inherit;
+    letter-spacing: 0.02em;
+}
+
+.emp-settings-section-header i {
+    color: #a78bfa;
+    font-size: 1em;
+}
+
+.emp-settings-section-header span {
+    color: inherit;
+    font-weight: 700;
+}
+
+.emp-settings-section-header:first-of-type {
+    margin-top: 0.4em;
+}
+

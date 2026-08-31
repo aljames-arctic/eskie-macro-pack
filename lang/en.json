@@ -1,5 +1,10 @@
 {
     "EMP": {
+        "settingsSections": {
+            "world": "World Settings",
+            "user": "User Settings",
+            "client": "Client Settings"
+        },
         "settings": {
             "enableSounds": {
                 "name": "Enable Macro Sounds",

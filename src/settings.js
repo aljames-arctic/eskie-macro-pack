@@ -128,7 +128,113 @@ Hooks.once('init', function() {
     });
 });
 
-// Dynamic visibility of Manage Autorec menu button in settings config
+/**
+ * Injects structured World, User, and Client section headers into SettingsConfig
+ * and ensures user-scoped menus (like recommendedModules) are grouped cleanly.
+ *
+ * @param {HTMLElement|jQuery} html - The settings config DOM element
+ * @param {object} [_app=null] - The settings application instance
+ */
+export function injectSettingsHeaders(html, _app = null) {
+    const root = html?.querySelector ? html : html?.[0];
+    if (!root?.querySelector) return;
+
+    // 1. Move recommendedModules (User Menu) into the User Settings section before logVerbosity if both are present
+    const recMenuSelector = [
+        `[data-key="${MODULE_ID}.recommendedModules"]`,
+        `[data-action="${MODULE_ID}.recommendedModules"]`,
+        `[data-setting-id="${MODULE_ID}.recommendedModules"]`,
+        `[data-entry-id="${MODULE_ID}.recommendedModules"]`,
+        `[data-key="recommendedModules"]`,
+        `[data-action="recommendedModules"]`
+    ].join(', ');
+    const logVerbositySelector = [
+        `[name="${MODULE_ID}.logVerbosity"]`,
+        `[data-setting-id="${MODULE_ID}.logVerbosity"]`,
+        `[data-entry-id="${MODULE_ID}.logVerbosity"]`,
+        `[name="logVerbosity"]`
+    ].join(', ');
+
+    const recMenuEl = root.querySelector(recMenuSelector);
+    const logVerbosityEl = root.querySelector(logVerbositySelector);
+
+    if (recMenuEl && logVerbosityEl) {
+        const recFg = recMenuEl.closest('.form-group') ?? recMenuEl;
+        const logFg = logVerbosityEl.closest('.form-group') ?? logVerbosityEl;
+        if (recFg && logFg && recFg.parentNode && recFg.parentNode === logFg.parentNode) {
+            const next = recFg.nextElementSibling;
+            const isAlreadyBeforeClient = next === logFg || (next?.classList?.contains('emp-settings-section-header') && next?.dataset?.scope === 'client');
+            if (!isAlreadyBeforeClient) {
+                logFg.parentNode.insertBefore(recFg, logFg);
+            }
+        }
+    }
+
+    // 2. Insert section headers before the respective first setting in each scope
+    const sections = [
+        {
+            keys: ['configureAutorec', 'manageAutorec', 'generateCompendiums', 'worldScripts', 'enableSounds'],
+            scope: 'world',
+            title: game.i18n?.localize?.('EMP.settingsSections.world') ?? 'World Settings',
+            icon: 'fas fa-globe'
+        },
+        {
+            keys: ['recommendedModules'],
+            scope: 'user',
+            title: game.i18n?.localize?.('EMP.settingsSections.user') ?? 'User Settings',
+            icon: 'fas fa-user'
+        },
+        {
+            keys: ['logVerbosity'],
+            scope: 'client',
+            title: game.i18n?.localize?.('EMP.settingsSections.client') ?? 'Client Settings',
+            icon: 'fas fa-desktop'
+        }
+    ];
+
+    for (const section of sections) {
+        let targetEl = null;
+        for (const key of section.keys) {
+            const selector = [
+                `[data-setting-id="${MODULE_ID}.${key}"]`,
+                `[data-entry-id="${MODULE_ID}.${key}"]`,
+                `[name="${MODULE_ID}.${key}"]`,
+                `[data-key="${MODULE_ID}.${key}"]`,
+                `[data-action="${MODULE_ID}.${key}"]`,
+                `[data-setting-id="${key}"]`,
+                `[data-entry-id="${key}"]`,
+                `[name="${key}"]`,
+                `[data-key="${key}"]`,
+                `[data-action="${key}"]`
+            ].join(', ');
+            targetEl = root.querySelector(selector);
+            if (targetEl) break;
+        }
+
+        if (!targetEl) continue;
+
+        const formGroup = targetEl.closest('.form-group') ?? targetEl;
+        const parent = formGroup?.parentNode;
+        if (!formGroup || !parent) continue;
+
+        // Ensure we don't insert duplicate headers
+        const existing = parent.querySelector?.(`.emp-settings-section-header[data-scope="${section.scope}"]`);
+        if (existing) continue;
+
+        const prev = formGroup.previousElementSibling;
+        if (prev?.classList?.contains('emp-settings-section-header') && prev?.dataset?.scope === section.scope) {
+            continue;
+        }
+
+        const header = document.createElement('div');
+        header.className = 'emp-settings-section-header';
+        header.dataset.scope = section.scope;
+        header.innerHTML = `<i class="${section.icon}"></i><span>${section.title}</span>`;
+        parent.insertBefore(header, formGroup);
+    }
+}
+
+// Dynamic visibility of Manage Autorec menu button and settings headers injection
 Hooks.on('renderSettingsConfig', function(app, html, data) {
     const root = html?.querySelector ? html : html?.[0];
     if (!root) return;
@@ -141,4 +247,6 @@ Hooks.on('renderSettingsConfig', function(app, html, data) {
         root.querySelector(`[data-key="${MODULE_ID}.configureAutorec"]`)?.closest('.form-group')?.remove();
         root.querySelector(`[data-key="${MODULE_ID}.manageAutorec"]`)?.closest('.form-group')?.remove();
     }
+
+    injectSettingsHeaders(html, app);
 });

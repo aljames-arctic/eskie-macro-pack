@@ -56,7 +56,7 @@
                 "hint": "View companion modules that provide assets, audio, and functionality for Eskie Macro Pack."
             },
             "generateCompendiums": {
-                "name": "Generate Macro Compendiums (Dev Only)",
+                "name": "Generate Macro Compendiums",
                 "label": "Generate Compendiums",
                 "hint": "Synchronizes all standalone macro files from src/standalone-macros/ into the module compendium."
             },

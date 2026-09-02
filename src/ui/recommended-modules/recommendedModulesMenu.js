@@ -188,7 +188,7 @@ export class RecommendedModulesApp extends adapter.foundry.HandlebarsApplication
     static DEFAULT_OPTIONS = {
         id: "eskie-recommended-modules-menu",
         classes: ["eskie-world-scripts-form", "eskie-recommended-modules-form"],
-        tag: "div",
+        tag: "form",
         window: {
             title: "EMP.recommendedModules.menuTitle"
         },
@@ -197,7 +197,11 @@ export class RecommendedModulesApp extends adapter.foundry.HandlebarsApplication
             height: "auto"
         },
         form: {
+            handler: RecommendedModulesApp._formHandler,
             closeOnSubmit: true
+        },
+        actions: {
+            close: RecommendedModulesApp._onClose
         }
     };
 
@@ -207,6 +211,24 @@ export class RecommendedModulesApp extends adapter.foundry.HandlebarsApplication
                 template: `modules/${MODULE_ID}/src/ui/recommended-modules/recommendedModulesMenu.html`
             }
         };
+    }
+
+    _onRender(context, options) {
+        super._onRender?.(context, options);
+
+        const closeBtn = this.element?.querySelector?.('button[data-action="close"], button[name="submit"], .eskie-world-scripts-footer button');
+        closeBtn?.addEventListener?.("click", (event) => {
+            event?.preventDefault?.();
+            this.close?.();
+        });
+    }
+
+    static async _onClose(event, target) {
+        return this.close?.();
+    }
+
+    static async _formHandler(event, form, formData) {
+        return this.close?.();
     }
 
     async _prepareContext(options) {

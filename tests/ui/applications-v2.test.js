@@ -57,18 +57,78 @@ test('WorldScriptsApp inherits from ApplicationV2 with HandlebarsApplicationMixi
     assert.ok(context.scripts.some(s => s.id === 'rollAnimation'));
 });
 
-test('RecommendedModulesApp inherits from ApplicationV2 with HandlebarsApplicationMixin', async () => {
+test('RecommendedModulesApp inherits from ApplicationV2 with HandlebarsApplicationMixin and supports close button functionality', async () => {
     assert.equal(RecommendedModulesApp, RecommendedModulesFormApplication);
     const app = new RecommendedModulesApp();
     assert.ok(app);
     assert.equal(RecommendedModulesApp.DEFAULT_OPTIONS.id, 'eskie-recommended-modules-menu');
+    assert.equal(RecommendedModulesApp.DEFAULT_OPTIONS.tag, 'form');
+    assert.equal(RecommendedModulesApp.DEFAULT_OPTIONS.form.closeOnSubmit, true);
+    assert.equal(RecommendedModulesApp.DEFAULT_OPTIONS.form.handler, RecommendedModulesApp._formHandler);
+    assert.equal(RecommendedModulesApp.DEFAULT_OPTIONS.actions.close, RecommendedModulesApp._onClose);
 
+    // Verify _onClose closes application
+    let closeCalled = false;
+    const mockApp = {
+        close() {
+            closeCalled = true;
+            return Promise.resolve();
+        }
+    };
+    await RecommendedModulesApp._onClose.call(mockApp);
+    assert.equal(closeCalled, true);
+
+    // Verify _formHandler closes application
+    closeCalled = false;
+    await RecommendedModulesApp._formHandler.call(mockApp);
+    assert.equal(closeCalled, true);
+
+    // Verify _onRender binds click listener that triggers close
+    closeCalled = false;
+    let clickHandler = null;
+    let defaultPrevented = false;
+    app.close = async () => { closeCalled = true; };
+    app.element = {
+        querySelector(selector) {
+            if (selector.includes('button[data-action="close"]')) {
+                return {
+                    addEventListener(event, handler) {
+                        if (event === 'click') clickHandler = handler;
+                    }
+                };
+            }
+            return null;
+        }
+    };
+    app._onRender({}, {});
+    assert.ok(clickHandler);
+    clickHandler({
+        preventDefault() {
+            defaultPrevented = true;
+        }
+    });
+    assert.equal(defaultPrevented, true);
+    assert.equal(closeCalled, true);
+
+    // Verify context preparation
     const context = await app._prepareContext();
     assert.ok(Array.isArray(context.categories));
     assert.ok(context.categories.some(c => c.id === 'assets'));
     const autoCategory = context.categories.find(c => c.id === 'automation');
     assert.ok(autoCategory);
     assert.ok(autoCategory.modules.some(m => m.id === 'boss-loot-assets-premium'));
+});
+
+test('RecommendedModulesApp template includes data-action="close" on close button', async () => {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
+    const dirname = path.dirname(fileURLToPath(import.meta.url));
+    const templatePath = path.resolve(dirname, '../../src/ui/recommended-modules/recommendedModulesMenu.html');
+    const templateContent = fs.readFileSync(templatePath, 'utf8');
+
+    assert.ok(templateContent.includes('data-action="close"'));
+    assert.ok(templateContent.includes('EMP.recommendedModules.closeButton'));
 });
 
 test('ConfigureAutorecApp inherits from ApplicationV2 with HandlebarsApplicationMixin and manages module visibility', async () => {

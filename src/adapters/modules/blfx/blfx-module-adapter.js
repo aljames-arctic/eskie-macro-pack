@@ -393,7 +393,7 @@ export function mergeBlfxCustomAutoRec(existingData, empRegistry = EMP_BLFX_Regi
                     } else if (typeof existingEntry.note === 'string' && existingEntry.note.includes("Eskie Macro Pack")) {
                         mergedTree[systemId][itemSlug][activitySlug][triggerMode] = newEntry;
                     } else {
-                        log.debug(`EMP | Preserving user custom BLFX entry for ${itemSlug}/${activitySlug}/${triggerMode}`);
+                        log.debug(`Preserving user custom BLFX entry for ${itemSlug}/${activitySlug}/${triggerMode}`);
                     }
                 }
             }
@@ -565,18 +565,18 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
         if (!shouldUpdate) return;
 
         if (!this.isAutorecSupported()) {
-            log.debug("EMP | Boss Loot FX Custom Auto-Rec skipped: requires Foundry v13+ and the Patreon BLFX module (boss-loot-assets-premium).");
+            log.debug("Boss Loot FX Custom Auto-Rec skipped: requires Foundry v13+ and the Patreon BLFX module (boss-loot-assets-premium).");
             return;
         }
 
-        log.debug(`EMP | Checking Boss Loot FX Custom Auto-Rec (version: ${effectiveVersion})...`);
+        log.debug(`Checking Boss Loot FX Custom Auto-Rec (version: ${effectiveVersion})...`);
 
         const { missingEntries, updatedEntries, customEntries } = await generateBlfxAutorecUpdate(this.registry);
         const hasChanges = Boolean(missingEntries.length || updatedEntries.length || customEntries.length);
 
         if (hasChanges) {
             if (!this.isCustomAutoRecUpdatesEnabled()) {
-                log.warn("EMP | Boss Loot FX Custom Auto-Rec updates are disabled in game settings (boss-loot-assets-premium.blfxCustomAutoRecUpdates).");
+                log.warn("Boss Loot FX Custom Auto-Rec updates are disabled in game settings (boss-loot-assets-premium.blfxCustomAutoRecUpdates).");
                 await this.promptEnableBlfxUpdates();
             } else {
                 new BlfxAutorecUpdateFormApplication(this.registry).render(true);

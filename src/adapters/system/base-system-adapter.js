@@ -12,6 +12,9 @@ export class BaseSystemAdapter {
      * @param {BaseFoundryAdapter} [foundry=null] Active Foundry platform adapter
      */
     constructor(systemId, isSupported = false, foundry = null) {
+        if (foundry && !(foundry instanceof BaseFoundryAdapter)) {
+            throw new Error(`BaseSystemAdapter requires a valid BaseFoundryAdapter instance, received: ${foundry}`);
+        }
         this.systemId = systemId;
         this.id = systemId; // Backward-compatibility alias
         this.isSupported = Boolean(isSupported);

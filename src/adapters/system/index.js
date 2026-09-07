@@ -3,6 +3,7 @@ import { Dnd5eSystemAdapter } from './dnd5e-system-adapter.js';
 import { Pf2eSystemAdapter } from './pf2e-system-adapter.js';
 import { GenericSystemAdapter } from './generic-system-adapter.js';
 import { parseAndNormalizeAbility, BASE_ABILITY_MAP } from './helper.js';
+import { BaseFoundryAdapter } from '../foundry/base-foundry-adapter.js';
 import { log } from '../../lib/logger.js';
 
 /**
@@ -23,6 +24,9 @@ export const SYSTEM_ADAPTERS = {
  * @returns {Promise<BaseSystemAdapter>}
  */
 export async function initializeSystemAdapter(systemId = game?.system?.id, foundryAdapter = null) {
+    if (foundryAdapter && !(foundryAdapter instanceof BaseFoundryAdapter)) {
+        throw new Error(`initializeSystemAdapter requires a valid BaseFoundryAdapter instance, received: ${foundryAdapter}`);
+    }
     if (!systemId) {
         return new GenericSystemAdapter(foundryAdapter);
     }

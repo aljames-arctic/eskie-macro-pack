@@ -142,6 +142,91 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
     assert.equal(playTargets[0].id, 'tok-inside', 'Contained token should be the target');
 });
 
+test('matt.trap.setup correctly handles when the trigger tile is the trap tile (single tile)', async () => {
+    const updatedTiles = new Map();
+    globalThis.game.user = { isGM: true, id: 'gm-user-1' };
+    globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', active: true });
+
+    const selfTileDoc = {
+        id: 'tile-self-1',
+        flags: {},
+        x: 200,
+        y: 200,
+        width: 100,
+        height: 100,
+        update: async (data) => {
+            updatedTiles.set('tile-self-1', data);
+            return selfTileDoc;
+        }
+    };
+
+    globalThis.canvas.tiles = {
+        controlled: [{ document: selfTileDoc, id: 'tile-self-1' }],
+        get: (id) => (id === 'tile-self-1' ? { document: selfTileDoc, id } : null)
+    };
+
+    // Simulate selecting the same tile for trigger and trap
+    adapter.buttonDialog = async () => 'continue';
+
+    await matt.trap.setup('eskie.traps.spike', { tileCount: 2 });
+
+    const selfUpdate = updatedTiles.get('tile-self-1');
+    assert.ok(selfUpdate, 'Single tile should be updated');
+    assert.equal(selfUpdate['flags.monks-active-tiles.active'], true);
+    assert.deepEqual(selfUpdate['flags.monks-active-tiles.trigger'], ['enter', 'manual'], 'Combined tile should have both enter and manual triggers');
+    assert.equal(selfUpdate[`flags.${MODULE_ID}.trap.isTriggerTile`], true);
+    assert.equal(selfUpdate[`flags.${MODULE_ID}.trap.isTrapTile`], true);
+    assert.equal(selfUpdate[`flags.${MODULE_ID}.trap.animation`], 'eskie.traps.spike');
+    assert.deepEqual(selfUpdate[`flags.${MODULE_ID}.trap.originIds`], ['tile-self-1']);
+
+    const action = selfUpdate['flags.monks-active-tiles.actions'][0];
+    assert.equal(action.action, 'runcode');
+
+    // Test execution of combined action
+    let playCalled = false;
+    let playTargets = [];
+    globalThis.eskie = {
+        traps: {
+            spike: {
+                play: (tile, tokens) => {
+                    playCalled = true;
+                    playTargets = tokens;
+                    assert.equal(tile.id, 'tile-self-1');
+                }
+            }
+        }
+    };
+    globalThis.game.modules.set(MODULE_ID, { id: MODULE_ID, api: { adapter } });
+
+    const tokenInside = { id: 'tok-on-tile', document: { id: 'tok-on-tile', x: 220, y: 220, width: 1, height: 1 }, x: 220, y: 220, w: 100, h: 100 };
+    globalThis.canvas.tokens = {
+        placeables: [tokenInside]
+    };
+    globalThis.canvas.grid = { size: 100 };
+
+    const mockTile = {
+        id: 'tile-self-1',
+        document: selfTileDoc,
+        x: 200,
+        y: 200,
+        width: 100,
+        height: 100,
+        getFlag: (mod, key) => {
+            if (mod === MODULE_ID && key === 'trap.animation') return 'eskie.traps.spike';
+            if (mod === MODULE_ID && key === 'trap.originIds') return ['tile-self-1'];
+            return null;
+        }
+    };
+    const mockToken = { id: 'tok-on-tile', document: { id: 'tok-on-tile' } };
+
+    const execFn = new Function('token', 'tile', 'canvas', `return (async () => { ${action.data.code} })();`);
+    await execFn(mockToken, mockTile, globalThis.canvas);
+
+    assert.equal(playCalled, true, 'Trap play should be executed on the tile');
+    assert.equal(playTargets.length, 1, 'Token on the tile should be targeted');
+    assert.equal(playTargets[0].id, 'tok-on-tile');
+});
+
 test('adapter.getTokensInTile returns only overlapping tokens', () => {
     const tile = {
         x: 100,

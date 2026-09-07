@@ -1,14 +1,16 @@
 import { BaseFoundryAdapter, USER_PERMISSION_TIERS } from './base-foundry-adapter.js';
-import { FoundryCurrentAdapter } from './foundry-current-adapter.js';
+import { FoundryV12Adapter } from './foundry-v12-adapter.js';
+import { FoundryV13Adapter } from './foundry-v13-adapter.js';
+import { FoundryV14Adapter } from './foundry-v14-adapter.js';
 import { log } from '../../lib/logger.js';
 
-export { BaseFoundryAdapter, FoundryCurrentAdapter, USER_PERMISSION_TIERS };
+export { BaseFoundryAdapter, FoundryV12Adapter, FoundryV13Adapter, FoundryV14Adapter, USER_PERMISSION_TIERS };
 
 /**
  * Initialize and return the active Foundry VTT platform adapter.
- * Uses FoundryCurrentAdapter on modern Foundry releases (v14+) and BaseFoundryAdapter on legacy baseline (v12/v13).
+ * Selects FoundryV14Adapter for v14+, FoundryV13Adapter for v13, and FoundryV12Adapter for v12 baseline.
  * @param {object|null} [parentAdapter=null] Parent Unified Adapter reference
- * @returns {FoundryCurrentAdapter|BaseFoundryAdapter}
+ * @returns {FoundryV14Adapter|FoundryV13Adapter|FoundryV12Adapter}
  */
 export function initializeFoundryAdapter(parentAdapter = null) {
     let generation = 12;
@@ -21,7 +23,11 @@ export function initializeFoundryAdapter(parentAdapter = null) {
         }
     }
 
-    const adapter = generation >= 14 ? new FoundryCurrentAdapter(parentAdapter) : new BaseFoundryAdapter(parentAdapter);
+    const adapter = generation >= 14
+        ? new FoundryV14Adapter(parentAdapter)
+        : (generation === 13
+            ? new FoundryV13Adapter(parentAdapter)
+            : new FoundryV12Adapter(parentAdapter));
     log.info(`Initialized Foundry Platform Adapter (v${adapter.generation})`);
     return adapter;
 }

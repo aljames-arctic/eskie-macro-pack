@@ -2,10 +2,10 @@ import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { template } from '../../src/lib/templates.js';
-import { adapter, FoundryCurrentAdapter } from '../../src/adapters/index.js';
+import { adapter, FoundryV14Adapter, FoundryV12Adapter } from '../../src/adapters/index.js';
 
 test('template.getPosition delegates to adapter.getTemplatePosition', async () => {
-    adapter.foundry = new FoundryCurrentAdapter();
+    adapter.foundry = new FoundryV14Adapter();
 
     const mockRegion = {
         documentName: 'Region',
@@ -28,8 +28,7 @@ test('template.getPosition delegates to adapter.getTemplatePosition', async () =
 });
 
 test('template.getPosition calculates secondary farpoint for AA templateData without ray', async () => {
-    const { BaseFoundryAdapter } = await import('../../src/adapters/index.js');
-    adapter.foundry = new BaseFoundryAdapter();
+    adapter.foundry = new FoundryV12Adapter();
 
     canvas.grid.size = 100;
     canvas.grid.distance = 5;
@@ -51,8 +50,7 @@ test('template.getPosition calculates secondary farpoint for AA templateData wit
 });
 
 test('template.getPosition resolves isSamePoint with token and returns error on unresolvable position', async () => {
-    const { BaseFoundryAdapter } = await import('../../src/adapters/index.js');
-    adapter.foundry = new BaseFoundryAdapter();
+    adapter.foundry = new FoundryV12Adapter();
 
     const token = {
         center: { x: 100, y: 100 },
@@ -81,8 +79,7 @@ test('template.getPosition resolves isSamePoint with token and returns error on 
 });
 
 test('template.getPosition preserves token edge primary and projects far end secondary in attached mode', async () => {
-    const { BaseFoundryAdapter } = await import('../../src/adapters/index.js');
-    adapter.foundry = new BaseFoundryAdapter();
+    adapter.foundry = new FoundryV12Adapter();
 
     const token = {
         center: { x: 100, y: 100 },

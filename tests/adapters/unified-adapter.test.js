@@ -1,7 +1,7 @@
 import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { adapter, Adapter, FoundryCurrentAdapter, Dnd5eSystemAdapter } from '../../src/adapters/index.js';
+import { adapter, Adapter, FoundryV14Adapter, Dnd5eSystemAdapter } from '../../src/adapters/index.js';
 
 test('Unified Adapter init initializes Foundry, System, and Module layers', async () => {
     game.release = { generation: 14 };
@@ -14,7 +14,7 @@ test('Unified Adapter init initializes Foundry, System, and Module layers', asyn
     const testAdapter = new Adapter();
     await testAdapter.init();
 
-    assert.ok(testAdapter.foundry instanceof FoundryCurrentAdapter);
+    assert.ok(testAdapter.foundry instanceof FoundryV14Adapter);
     assert.equal(testAdapter.foundry.generation, 14);
     assert.ok(testAdapter.system instanceof Dnd5eSystemAdapter);
     assert.equal(testAdapter.system.isSupported, true);

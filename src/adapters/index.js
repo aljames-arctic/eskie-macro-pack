@@ -1,4 +1,4 @@
-import { initializeFoundryAdapter, BaseFoundryAdapter, FoundryCurrentAdapter, USER_PERMISSION_TIERS } from './foundry/index.js';
+import { initializeFoundryAdapter, BaseFoundryAdapter, FoundryV12Adapter, FoundryV13Adapter, FoundryV14Adapter, USER_PERMISSION_TIERS } from './foundry/index.js';
 import { initializeSystemAdapter, BaseSystemAdapter, Dnd5eSystemAdapter, Pf2eSystemAdapter, GenericSystemAdapter, parseAndNormalizeAbility, BASE_ABILITY_MAP } from './system/index.js';
 import { initializeModuleAdapters, hasActiveModuleAdapters, MODULE_ADAPTERS, BaseModuleAdapter, MidiQolModuleAdapter, midiQolAdapter, AutoanimationsModuleAdapter, autoanimationsAdapter, autoanimations, EMP_AA_Menu, BlfxModuleAdapter, blfxAdapter, blfx, EMP_BLFX_Registry, buildBlfxPayload, mergeBlfxCustomAutoRec, SocketlibModuleAdapter, socketlibAdapter, socketlibapi, socket, socketlib, AutorecManager, autorecManager, autorec, promptDestinationDialog, CONCENTRATING, MassEditModuleAdapter, massEditAdapter, massEdit, TokenAttacherModuleAdapter, tokenAttacherAdapter, tokenAttacher } from './modules/index.js';
 import { log } from '../lib/logger.js';
@@ -304,7 +304,9 @@ export const adapter = new Adapter();
 
 export {
     BaseFoundryAdapter,
-    FoundryCurrentAdapter,
+    FoundryV12Adapter,
+    FoundryV13Adapter,
+    FoundryV14Adapter,
     USER_PERMISSION_TIERS,
     BaseSystemAdapter,
     Dnd5eSystemAdapter,

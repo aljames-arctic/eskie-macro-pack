@@ -1,96 +1,11 @@
-import { BaseFoundryAdapter } from './base-foundry-adapter.js';
+import { FoundryV13Adapter } from './foundry-v13-adapter.js';
 
 /**
  * Modern Foundry VTT platform adapter (Foundry V14+).
- * Overrides platform constructors, token combat helpers, tile anchor offsets, and Region geometry calculations.
+ * Extends FoundryV13Adapter and overrides centered tile anchor offsets, Region geometry calculations,
+ * Level/Environment background extraction, and ForcedDeletion operators.
  */
-export class FoundryCurrentAdapter extends BaseFoundryAdapter {
-    /**
-     * The active ContextMenu constructor in v14+.
-     */
-    get ContextMenu() {
-        return foundry.applications.ux.ContextMenu.implementation;
-    }
-
-    /**
-     * The active KeyboardManager constructor in v14+.
-     */
-    get KeyboardManager() {
-        return foundry.helpers.interaction.KeyboardManager.implementation;
-    }
-
-    /**
-     * The active Token placeable constructor in v14+.
-     */
-    get Token() {
-        return foundry.canvas.placeables.Token.implementation;
-    }
-
-    /**
-     * The active Tile placeable constructor in v14+.
-     */
-    get Tile() {
-        return foundry.canvas.placeables.Tile.implementation;
-    }
-
-    /**
-     * The active FilePicker constructor / implementation in v14+.
-     */
-    get FilePicker() {
-        return foundry.applications.apps.FilePicker.implementation;
-    }
-
-    /**
-     * The active TextEditor constructor / implementation in v14+.
-     */
-    get TextEditor() {
-        return foundry.applications.ux.TextEditor.implementation;
-    }
-
-    /**
-     * Safely resolve a document from UUID synchronously using standard V13+ foundry.utils.fromUuidSync.
-     * @param {string} uuid Document UUID
-     * @param {Object} [options={}] Resolution options
-     * @returns {Document|null}
-     */
-    fromUuidSync(uuid, options = {}) {
-        if (!uuid) return null;
-        try {
-            return foundry.utils.fromUuidSync(uuid, options) ?? null;
-        } catch (_) {
-            return null;
-        }
-    }
-
-    /**
-     * Safely resolve a document from UUID asynchronously using standard V13+ foundry.utils.fromUuid.
-     * @param {string} uuid Document UUID
-     * @param {Object} [options={}] Resolution options
-     * @returns {Promise<Document|null>}
-     */
-    async fromUuid(uuid, options = {}) {
-        if (!uuid) return null;
-        try {
-            return (await foundry.utils.fromUuid(uuid, options)) ?? null;
-        } catch (_) {
-            return null;
-        }
-    }
-
-    /**
-     * Retrieve all combatants associated with a token in combat using native modern Combat#getCombatantsByToken.
-     * @param {Combat} combat Target combat encounter
-     * @param {string|TokenDocument|Token} token Token ID or Document or Placeable
-     * @returns {Combatant[]}
-     */
-    getCombatantsByToken(combat, token) {
-        if (!combat) return [];
-        const tokenId = token?.id ?? token?.document?.id ?? token;
-        if (!tokenId) return [];
-
-        return combat.getCombatantsByToken(tokenId) ?? [];
-    }
-
+export class FoundryV14Adapter extends FoundryV13Adapter {
     /* -------------------------------------------- */
     /*  Tile Anchor & Coordinate Math (V14+)        */
     /* -------------------------------------------- */
@@ -131,20 +46,6 @@ export class FoundryCurrentAdapter extends BaseFoundryAdapter {
         const objX = object.x ?? doc.x ?? 0;
         const objY = object.y ?? doc.y ?? 0;
         return { x: objX, y: objY };
-    }
-
-    /**
-     * Unified tile offset resolver for Foundry V14+.
-     *
-     * @param {PlaceableObject|Document} object Token or Tile object/document
-     * @param {'reveal'|'shape'} type Offset type
-     * @param {number} [scale=1] Scale multiplier
-     * @returns {{x: number, y: number}} Resolved coordinates
-     */
-    getTileOffset(object, type, scale = 1) {
-        if (type === 'reveal') return this.getRevealOffset(object, scale);
-        if (type === 'shape') return this.getShapeOffset(object);
-        throw new Error(`Invalid offset type: ${type}`);
     }
 
     /* -------------------------------------------- */

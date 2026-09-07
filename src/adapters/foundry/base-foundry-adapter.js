@@ -17,8 +17,9 @@ export const USER_PERMISSION_TIERS = Object.freeze({
 });
 
 /**
- * Baseline Foundry VTT platform adapter (Foundry V12 / V13).
- * Abstract interface for versioned Foundry Application, placeable, tile math, template, and utility operations.
+ * Base abstract class for all Foundry platform adapters in Eskie Macro Pack.
+ * Defines strict contracts and encapsulates version-agnostic Application, interaction,
+ * permission, placeable lookup, and utility operations.
  */
 export class BaseFoundryAdapter {
     /**
@@ -63,31 +64,31 @@ export class BaseFoundryAdapter {
     }
 
     /**
-     * The active ContextMenu constructor (global in v12/v13 baseline).
+     * The active ContextMenu constructor.
      */
     get ContextMenu() {
-        return ContextMenu;
+        throw new Error('BaseFoundryAdapter.ContextMenu must be implemented by version subclass');
     }
 
     /**
-     * The active KeyboardManager constructor (global in v12/v13 baseline).
+     * The active KeyboardManager constructor.
      */
     get KeyboardManager() {
-        return KeyboardManager;
+        throw new Error('BaseFoundryAdapter.KeyboardManager must be implemented by version subclass');
     }
 
     /**
-     * The active Token placeable constructor (global in v12/v13 baseline).
+     * The active Token placeable constructor.
      */
     get Token() {
-        return Token;
+        throw new Error('BaseFoundryAdapter.Token must be implemented by version subclass');
     }
 
     /**
-     * The active Tile placeable constructor (global in v12/v13 baseline).
+     * The active Tile placeable constructor.
      */
     get Tile() {
-        return Tile;
+        throw new Error('BaseFoundryAdapter.Tile must be implemented by version subclass');
     }
 
     /**
@@ -141,17 +142,17 @@ export class BaseFoundryAdapter {
     }
 
     /**
-     * The active FilePicker constructor / implementation (global in v12 baseline).
+     * The active FilePicker constructor / implementation.
      */
     get FilePicker() {
-        return FilePicker;
+        throw new Error('BaseFoundryAdapter.FilePicker must be implemented by version subclass');
     }
 
     /**
-     * The active TextEditor constructor / implementation (global in v12 baseline).
+     * The active TextEditor constructor / implementation.
      */
     get TextEditor() {
-        return TextEditor;
+        throw new Error('BaseFoundryAdapter.TextEditor must be implemented by version subclass');
     }
 
     /**
@@ -162,7 +163,7 @@ export class BaseFoundryAdapter {
      * @returns {Promise<{ target: string, files: string[], dirs: string[] }>}
      */
     async browseDirectory(source, target, options = {}) {
-        return this.FilePicker?.browse(source, target, options);
+        return this.FilePicker.browse(source, target, options);
     }
 
     /**
@@ -172,12 +173,7 @@ export class BaseFoundryAdapter {
      * @returns {Document|null}
      */
     fromUuidSync(uuid, options = {}) {
-        if (!uuid) return null;
-        try {
-            return fromUuidSync(uuid, options) ?? null;
-        } catch (_) {
-            return null;
-        }
+        throw new Error('BaseFoundryAdapter.fromUuidSync must be implemented by version subclass');
     }
 
     /**
@@ -187,12 +183,7 @@ export class BaseFoundryAdapter {
      * @returns {Promise<Document|null>}
      */
     async fromUuid(uuid, options = {}) {
-        if (!uuid) return null;
-        try {
-            return (await fromUuid(uuid, options)) ?? null;
-        } catch (_) {
-            return null;
-        }
+        throw new Error('BaseFoundryAdapter.fromUuid must be implemented by version subclass');
     }
 
     /**
@@ -377,18 +368,13 @@ export class BaseFoundryAdapter {
     /* -------------------------------------------- */
 
     /**
-     * Retrieve all combatants associated with a token in combat using legacy V12 Combat#getCombatantByToken.
+     * Retrieve all combatants associated with a token in combat.
      * @param {Combat} combat Target combat encounter
      * @param {string|TokenDocument|Token} token Token ID or Document or Placeable
      * @returns {Combatant[]}
      */
     getCombatantsByToken(combat, token) {
-        if (!combat) return [];
-        const tokenId = token?.id ?? token?.document?.id ?? token;
-        if (!tokenId) return [];
-
-        const single = combat.getCombatantByToken?.(tokenId);
-        return single ? [single] : [];
+        throw new Error('BaseFoundryAdapter.getCombatantsByToken must be implemented by version subclass');
     }
 
     /**
@@ -533,53 +519,30 @@ export class BaseFoundryAdapter {
     }
 
     /* -------------------------------------------- */
-    /*  Tile Anchor & Coordinate Math (V12 / V13)   */
+    /*  Tile Anchor & Coordinate Math               */
     /* -------------------------------------------- */
 
     /**
-     * Calculate reveal tile placement offset for Foundry V12 / V13 (legacy top-left anchor (0, 0)).
-     * Compares token/tile size and scale to offset top-left origin.
-     *
+     * Calculate reveal tile placement offset.
      * @param {PlaceableObject|Document} object Token or Tile object/document
      * @param {number} [scale=1] Additional scale multiplier
      * @returns {{x: number, y: number}} Offset coordinates
      */
     getRevealOffset(object, scale = 1) {
-        if (!object) return { x: 0, y: 0 };
-        const doc = object.document ?? object;
-        const isToken = (doc.documentName === 'Token' || object.documentName === 'Token');
-        const widthAdjustment = isToken ? (canvas?.grid?.size ?? 100) : 1;
-        const scaleXY = doc.texture?.scaleX ?? 1;
-        const totalScale = scaleXY * scale;
-        const objX = object.x ?? doc.x ?? 0;
-        const objY = object.y ?? doc.y ?? 0;
-        const docWidth = doc.width ?? 1;
-        const docHeight = doc.height ?? 1;
-
-        return {
-            x: objX - (widthAdjustment * docWidth * (totalScale - 1) / 2),
-            y: objY - (widthAdjustment * docHeight * (totalScale - 1) / 2)
-        };
+        throw new Error('BaseFoundryAdapter.getRevealOffset must be implemented by version subclass');
     }
 
     /**
-     * Calculate shape tile placement offset for Foundry V12 / V13 (legacy top-left anchor (0, 0)).
-     *
+     * Calculate shape tile placement offset.
      * @param {PlaceableObject|Document} object Token or Tile object/document
      * @returns {{x: number, y: number}} Offset coordinates
      */
     getShapeOffset(object) {
-        if (!object) return { x: 0, y: 0 };
-        const doc = object.document ?? object;
-        return {
-            x: object.x ?? doc.x ?? 0,
-            y: object.y ?? doc.y ?? 0
-        };
+        throw new Error('BaseFoundryAdapter.getShapeOffset must be implemented by version subclass');
     }
 
     /**
-     * Unified tile offset resolver for Foundry V12 / V13.
-     *
+     * Unified tile offset resolver.
      * @param {PlaceableObject|Document} object Token or Tile object/document
      * @param {'reveal'|'shape'} type Offset type
      * @param {number} [scale=1] Scale multiplier
@@ -592,63 +555,17 @@ export class BaseFoundryAdapter {
     }
 
     /* -------------------------------------------- */
-    /*  Template Position Extraction (V12 / V13)    */
+    /*  Template Position Extraction                */
     /* -------------------------------------------- */
 
     /**
-     * Gets position coordinates from a legacy MeasuredTemplate document or placeable.
-     *
-     * @param {Document|PlaceableObject} template The MeasuredTemplate document or placeable
+     * Gets position coordinates from a template or region document.
+     * @param {Document|PlaceableObject} template The template or region document/placeable
      * @param {Object} [config={}] Configuration options
      * @returns {[ {x: number, y: number}, {x: number, y: number}, {x: number, y: number} ]} Array of [primary, secondary, center] coordinates
      */
     getTemplatePosition(template, config = {}) {
-        if (!template || typeof template !== 'object') return [];
-
-        const doc = template.document ?? template;
-        const placeable = template.object ?? (template.document ? template : null);
-        const farpoint = placeable?.ray?.B ?? doc.ray?.B;
-
-        let primary = {
-            x: doc.x ?? placeable?.x ?? 0,
-            y: doc.y ?? placeable?.y ?? 0
-        };
-
-        const distance = (doc.distance !== undefined && doc.distance > 0)
-            ? doc.distance
-            : ((placeable?.distance !== undefined && placeable.distance > 0) ? placeable.distance : (config.distance ?? 0));
-        const direction = doc.direction ?? placeable?.direction ?? config.direction ?? 0;
-        const gridSize = canvas?.grid?.size ?? canvas?.dimensions?.size ?? 100;
-        const gridDistance = canvas?.grid?.distance ?? canvas?.scene?.grid?.distance ?? canvas?.dimensions?.distance ?? 5;
-        const distancePx = (distance / gridDistance) * gridSize;
-        const rad = (direction * Math.PI) / 180;
-
-        let secondary;
-        if (farpoint && (farpoint.x !== primary.x || farpoint.y !== primary.y)) {
-            secondary = { x: farpoint.x, y: farpoint.y };
-        } else if (distancePx > 0) {
-            secondary = {
-                x: primary.x + Math.cos(rad) * distancePx,
-                y: primary.y + Math.sin(rad) * distancePx
-            };
-        } else {
-            const token = config.token ?? config.sourceToken;
-            const tokenCenter = token?.center ?? (token?.x !== undefined ? { x: token.x, y: token.y } : null);
-            if (tokenCenter && Math.hypot(primary.x - tokenCenter.x, primary.y - tokenCenter.y) >= 1) {
-                secondary = primary;
-                primary = { x: tokenCenter.x, y: tokenCenter.y };
-            }
-        }
-
-        const width = doc.width ?? placeable?.width ?? 0;
-        const height = Math.sqrt(Math.max(0, distance * distance - width * width));
-
-        const center = {
-            x: primary.x + (width / 2) * (gridSize / gridDistance),
-            y: primary.y + (height / 2) * (gridSize / gridDistance)
-        };
-
-        return [primary, secondary, center];
+        throw new Error('BaseFoundryAdapter.getTemplatePosition must be implemented by version subclass');
     }
 
     /**
@@ -717,24 +634,17 @@ export class BaseFoundryAdapter {
     }
 
     /* -------------------------------------------- */
-    /*  Scene & Environment Background (V12 / V13)  */
+    /*  Scene & Environment Background              */
     /* -------------------------------------------- */
 
     /**
-     * Retrieve the background texture and offsets for a scene on Foundry V12 / V13 (Scene#background).
+     * Retrieve the background texture and offsets for a scene.
      * @param {Scene} [scene=canvas.scene] Target scene document
-     * @param {Level|null} [_level=null] Unused in V12/V13
+     * @param {Level|null} [level=null] Target level document or placeable
      * @returns {{ src: string|null, offsetX: number, offsetY: number }}
      */
-    getSceneBackground(scene = canvas?.scene, _level = null) {
-        if (!scene) return { src: null, offsetX: 0, offsetY: 0 };
-        const bg = scene.background;
-        const src = typeof bg?.src === 'string' ? bg.src : (typeof bg === 'string' ? bg : null);
-        return {
-            src,
-            offsetX: Number(bg?.offsetX ?? 0),
-            offsetY: Number(bg?.offsetY ?? 0)
-        };
+    getSceneBackground(scene = canvas?.scene, level = null) {
+        throw new Error('BaseFoundryAdapter.getSceneBackground must be implemented by version subclass');
     }
 
     /* -------------------------------------------- */
@@ -754,7 +664,6 @@ export class BaseFoundryAdapter {
     /**
      * Test whether a target document or placeable matches a specific document type.
      * @param {PlaceableObject|Document|null} target Target document or placeable
-     * @param {string} type Target document name ('Token', 'Tile', 'MeasuredTemplate', 'Region')
      * @returns {boolean}
      */
     isDocumentOfType(target, type) {
@@ -978,14 +887,11 @@ export class BaseFoundryAdapter {
 
     /**
      * Format a document update payload to delete/remove a specific property key.
-     * In Foundry V12/V13, formats using legacy "-=<keyId>" deletion syntax.
-     *
      * @param {string} path Dot-delimited parent property path (e.g. "flags.eskie-macros.token-masks")
      * @param {string} keyId The property key to delete
      * @returns {Record<string, *>} Update dictionary
      */
     formatDeletionUpdate(path, keyId) {
-        const fullKey = path ? `${path}.-=${keyId}` : `-=${keyId}`;
-        return { [fullKey]: null };
+        throw new Error('BaseFoundryAdapter.formatDeletionUpdate must be implemented by version subclass');
     }
 }

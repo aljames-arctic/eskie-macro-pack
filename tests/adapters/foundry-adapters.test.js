@@ -1,21 +1,46 @@
 import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { initializeFoundryAdapter, BaseFoundryAdapter, FoundryCurrentAdapter, USER_PERMISSION_TIERS } from '../../src/adapters/foundry/index.js';
+import { initializeFoundryAdapter, BaseFoundryAdapter, FoundryV12Adapter, FoundryV13Adapter, FoundryV14Adapter, USER_PERMISSION_TIERS } from '../../src/adapters/foundry/index.js';
 import { adapter } from '../../src/adapters/index.js';
 
-test('initializeFoundryAdapter returns BaseFoundryAdapter on v12/v13 baseline and FoundryCurrentAdapter on v14+', () => {
+test('BaseFoundryAdapter enforces abstract contracts for version-specific properties and methods', async () => {
+    const base = new BaseFoundryAdapter();
+
+    // Abstract getters throw
+    assert.throws(() => base.ContextMenu, /BaseFoundryAdapter\.ContextMenu must be implemented/);
+    assert.throws(() => base.KeyboardManager, /BaseFoundryAdapter\.KeyboardManager must be implemented/);
+    assert.throws(() => base.Token, /BaseFoundryAdapter\.Token must be implemented/);
+    assert.throws(() => base.Tile, /BaseFoundryAdapter\.Tile must be implemented/);
+    assert.throws(() => base.FilePicker, /BaseFoundryAdapter\.FilePicker must be implemented/);
+    assert.throws(() => base.TextEditor, /BaseFoundryAdapter\.TextEditor must be implemented/);
+
+    // Abstract methods throw
+    assert.throws(() => base.fromUuidSync('Item.123'), /BaseFoundryAdapter\.fromUuidSync must be implemented/);
+    await assert.rejects(async () => base.fromUuid('Item.123'), /BaseFoundryAdapter\.fromUuid must be implemented/);
+    assert.throws(() => base.getCombatantsByToken({}, 'tok1'), /BaseFoundryAdapter\.getCombatantsByToken must be implemented/);
+    assert.throws(() => base.getRevealOffset({}), /BaseFoundryAdapter\.getRevealOffset must be implemented/);
+    assert.throws(() => base.getShapeOffset({}), /BaseFoundryAdapter\.getShapeOffset must be implemented/);
+    assert.throws(() => base.getTemplatePosition({}), /BaseFoundryAdapter\.getTemplatePosition must be implemented/);
+    assert.throws(() => base.getSceneBackground({}), /BaseFoundryAdapter\.getSceneBackground must be implemented/);
+    assert.throws(() => base.formatDeletionUpdate('flags', 'key'), /BaseFoundryAdapter\.formatDeletionUpdate must be implemented/);
+});
+
+test('initializeFoundryAdapter selects FoundryV12Adapter on v12, FoundryV13Adapter on v13, and FoundryV14Adapter on v14+', () => {
     // V12 baseline
     game.release = { generation: 12 };
     game.version = '12.331';
     const v12 = initializeFoundryAdapter();
+    assert.ok(v12 instanceof FoundryV12Adapter);
     assert.ok(v12 instanceof BaseFoundryAdapter);
     assert.equal(v12.generation, 12);
 
-    // V13 baseline
+    // V13
     game.release = { generation: 13 };
     game.version = '13.300';
     const v13 = initializeFoundryAdapter();
+    assert.ok(v13 instanceof FoundryV13Adapter);
+    assert.ok(v13 instanceof FoundryV12Adapter);
     assert.ok(v13 instanceof BaseFoundryAdapter);
     assert.equal(v13.generation, 13);
 
@@ -23,13 +48,15 @@ test('initializeFoundryAdapter returns BaseFoundryAdapter on v12/v13 baseline an
     game.release = { generation: 14 };
     game.version = '14.000';
     const v14 = initializeFoundryAdapter();
-    assert.ok(v14 instanceof FoundryCurrentAdapter);
+    assert.ok(v14 instanceof FoundryV14Adapter);
+    assert.ok(v14 instanceof FoundryV13Adapter);
+    assert.ok(v14 instanceof FoundryV12Adapter);
     assert.ok(v14 instanceof BaseFoundryAdapter);
     assert.equal(v14.generation, 14);
 });
 
-test('BaseFoundryAdapter and FoundryCurrentAdapter constructor getters contract', () => {
-    const v12 = new BaseFoundryAdapter();
+test('Constructor getters contracts across FoundryV12Adapter, FoundryV13Adapter, and FoundryV14Adapter', () => {
+    const v12 = new FoundryV12Adapter();
     assert.equal(v12.ContextMenu, globalThis.ContextMenu);
     assert.equal(v12.KeyboardManager, globalThis.KeyboardManager);
     assert.equal(v12.Token, globalThis.Token);
@@ -37,7 +64,16 @@ test('BaseFoundryAdapter and FoundryCurrentAdapter constructor getters contract'
     assert.equal(v12.FilePicker, globalThis.FilePicker);
     assert.equal(v12.TextEditor, globalThis.TextEditor);
 
-    const v14 = new FoundryCurrentAdapter();
+    const v13 = new FoundryV13Adapter();
+    assert.equal(v13.ContextMenu, globalThis.foundry.applications.ux.ContextMenu.implementation);
+    assert.equal(v13.KeyboardManager, globalThis.foundry.helpers.interaction.KeyboardManager.implementation);
+    assert.equal(v13.Token, globalThis.foundry.canvas.placeables.Token.implementation);
+    assert.equal(v13.Tile, globalThis.foundry.canvas.placeables.Tile.implementation);
+    assert.equal(v13.FilePicker, globalThis.foundry.applications.apps.FilePicker.implementation);
+    assert.equal(v13.TextEditor, globalThis.foundry.applications.ux.TextEditor.implementation);
+
+    const v14 = new FoundryV14Adapter();
+    // V14 inherits V13 constructors
     assert.equal(v14.ContextMenu, globalThis.foundry.applications.ux.ContextMenu.implementation);
     assert.equal(v14.KeyboardManager, globalThis.foundry.helpers.interaction.KeyboardManager.implementation);
     assert.equal(v14.Token, globalThis.foundry.canvas.placeables.Token.implementation);
@@ -61,8 +97,8 @@ test('Tile offset calculations: V12/V13 top-left origin math vs V14+ centered or
 
     canvas.grid.size = 100;
 
-    // V12/V13 BaseFoundryAdapter
-    const v12 = new BaseFoundryAdapter();
+    // V12 FoundryV12Adapter
+    const v12 = new FoundryV12Adapter();
     const v12Reveal = v12.getRevealOffset(mockToken, 1);
     // x = 500 - (100 * 1 * (1.2 - 1) / 2) = 500 - 10 = 490
     // y = 600 - (100 * 1 * (1.2 - 1) / 2) = 600 - 10 = 590
@@ -72,8 +108,15 @@ test('Tile offset calculations: V12/V13 top-left origin math vs V14+ centered or
     assert.deepEqual(v12.getTileOffset(mockToken, 'shape'), { x: 500, y: 600 });
     assert.throws(() => v12.getTileOffset(mockToken, 'unknown'), /Invalid offset type/);
 
-    // V14+ FoundryCurrentAdapter
-    const v14 = new FoundryCurrentAdapter();
+    // V13 FoundryV13Adapter inherits V12 top-left origin math
+    const v13 = new FoundryV13Adapter();
+    assert.deepEqual(v13.getRevealOffset(mockToken, 1), { x: 490, y: 590 });
+    assert.deepEqual(v13.getShapeOffset(mockToken), { x: 500, y: 600 });
+    assert.deepEqual(v13.getTileOffset(mockToken, 'reveal', 1), { x: 490, y: 590 });
+    assert.deepEqual(v13.getTileOffset(mockToken, 'shape'), { x: 500, y: 600 });
+
+    // V14+ FoundryV14Adapter overrides with centered origin math
+    const v14 = new FoundryV14Adapter();
     assert.deepEqual(v14.getRevealOffset(mockToken, 1), { x: 550, y: 650 });
     assert.deepEqual(v14.getShapeOffset(mockToken), { x: 550, y: 650 });
     assert.deepEqual(v14.getTileOffset(mockToken, 'reveal', 1), { x: 550, y: 650 });
@@ -82,7 +125,7 @@ test('Tile offset calculations: V12/V13 top-left origin math vs V14+ centered or
 
 test('Template position extraction: V12/V13 MeasuredTemplate vs V14+ Region shapes', () => {
     // V12 MeasuredTemplate
-    const v12 = new BaseFoundryAdapter();
+    const v12 = new FoundryV12Adapter();
     const mockTemplate = {
         x: 1000,
         y: 2000,
@@ -97,6 +140,11 @@ test('Template position extraction: V12/V13 MeasuredTemplate vs V14+ Region shap
     assert.equal(v12Pos.length, 3);
     assert.deepEqual(v12Pos[0], { x: 1000, y: 2000 }); // primary
     assert.deepEqual(v12Pos[1], { x: 1030, y: 2000 }); // secondary
+
+    // V13 inherits V12 MeasuredTemplate extraction
+    const v13 = new FoundryV13Adapter();
+    const v13Pos = v13.getTemplatePosition(mockTemplate);
+    assert.deepEqual(v13Pos, v12Pos);
 
     // Template without ray (e.g. Automated Animations templateData)
     const rawTemplateData = {
@@ -120,7 +168,7 @@ test('Template position extraction: V12/V13 MeasuredTemplate vs V14+ Region shap
     assert.equal(zeroPos[1], undefined);
 
     // V14 Region
-    const v14 = new FoundryCurrentAdapter();
+    const v14 = new FoundryV14Adapter();
     const mockRegion = {
         documentName: 'Region',
         shapes: [
@@ -156,6 +204,10 @@ test('Template position extraction: V12/V13 MeasuredTemplate vs V14+ Region shap
     assert.deepEqual(rayPos[0], { x: 150, y: 100 });
     assert.equal(rayPos[1].x, 2150); // 150 + (100 / 5) * 100 = 2150 px
     assert.equal(rayPos[1].y, 100);
+
+    // V14 delegates MeasuredTemplate to V13 super method
+    const v14TemplatePos = v14.getTemplatePosition(mockTemplate);
+    assert.deepEqual(v14TemplatePos, v12Pos);
 });
 
 test('Permission tiers and ownership evaluation on BaseFoundryAdapter', () => {
@@ -193,8 +245,8 @@ test('Permission tiers and ownership evaluation on BaseFoundryAdapter', () => {
 });
 
 test('getSceneBackground: V12/V13 Scene#background vs V14+ Level#background and Level#textures', () => {
-    // V12/V13 BaseFoundryAdapter
-    const v12 = new BaseFoundryAdapter();
+    // V12 FoundryV12Adapter
+    const v12 = new FoundryV12Adapter();
     const v12Scene = {
         background: {
             src: 'maps/dungeon-v12.webp',
@@ -213,8 +265,16 @@ test('getSceneBackground: V12/V13 Scene#background vs V14+ Level#background and 
         offsetY: 0
     });
 
-    // V14+ FoundryCurrentAdapter with Levels
-    const v14 = new FoundryCurrentAdapter();
+    // V13 inherits V12 Scene#background
+    const v13 = new FoundryV13Adapter();
+    assert.deepEqual(v13.getSceneBackground(v12Scene), {
+        src: 'maps/dungeon-v12.webp',
+        offsetX: 50,
+        offsetY: 75
+    });
+
+    // V14+ FoundryV14Adapter with Levels
+    const v14 = new FoundryV14Adapter();
     const v14SceneWithLevel = {
         activeLevel: 'lvl-1',
         levels: new Map([
@@ -299,7 +359,7 @@ test('getSceneBackground: V12/V13 Scene#background vs V14+ Level#background and 
 });
 
 test('DialogV2 and buttonDialog delegation on BaseFoundryAdapter', async () => {
-    const v12 = new BaseFoundryAdapter();
+    const v12 = new FoundryV12Adapter();
     assert.ok(v12.DialogV2);
 
     const buttonData = {
@@ -314,7 +374,7 @@ test('DialogV2 and buttonDialog delegation on BaseFoundryAdapter', async () => {
 });
 
 test('getDocumentName, isDocumentOfType, and getPlaceable resolution', () => {
-    const v12 = new BaseFoundryAdapter();
+    const v12 = new FoundryV12Adapter();
 
     const mockToken = { id: 'tok-1', documentName: 'Token' };
     const mockTile = { id: 'tile-1', document: { documentName: 'Tile' } };
@@ -336,7 +396,7 @@ test('getDocumentName, isDocumentOfType, and getPlaceable resolution', () => {
 });
 
 test('getSpeakerToken and getSpeakerActor resolution', () => {
-    const v12 = new BaseFoundryAdapter();
+    const v12 = new FoundryV12Adapter();
 
     const mockActor = { id: 'act-1', name: 'Hero' };
     const mockToken = { id: 'tok-1', name: 'Hero Token', actor: mockActor };
@@ -355,7 +415,7 @@ test('getSpeakerToken and getSpeakerActor resolution', () => {
 });
 
 test('getDistance and getNearestSquareCenter 3D math', () => {
-    const v12 = new BaseFoundryAdapter();
+    const v12 = new FoundryV12Adapter();
 
     canvas.grid.size = 100;
     canvas.grid.distance = 5;
@@ -384,7 +444,7 @@ test('getDistance and getNearestSquareCenter 3D math', () => {
 });
 
 test('getTokenOwners and placeable attachment contracts on BaseFoundryAdapter', async () => {
-    const v12 = new BaseFoundryAdapter();
+    const v12 = new FoundryV12Adapter();
 
     const p1 = { id: 'p1', isGM: false, active: true };
     const gm = { id: 'gm1', isGM: true, role: 4, active: true };
@@ -425,7 +485,7 @@ test('getTokenOwners and placeable attachment contracts on BaseFoundryAdapter', 
             detachElementsFromToken: async (elements, target) => ({ mockDetached: true, targetId: target.id })
         }
     };
-    const adapterWithParent = new BaseFoundryAdapter(mockParentAdapter);
+    const adapterWithParent = new FoundryV12Adapter(mockParentAdapter);
     assert.equal(adapterWithParent.adapter, mockParentAdapter);
     assert.equal(adapterWithParent.massEdit, mockParentAdapter.massEdit);
     assert.equal(adapterWithParent.tokenAttacher, mockParentAdapter.tokenAttacher);
@@ -490,21 +550,28 @@ test('BaseFoundryAdapter and UnifiedAdapter abstract all utility operations clea
     assert.equal(id.length, 16);
 });
 
-test('formatDeletionUpdate contracts across BaseFoundryAdapter (V12/V13 legacy -=) and FoundryCurrentAdapter (V14+ ForcedDeletion)', () => {
-    const bfa = new BaseFoundryAdapter();
-    const v14 = new FoundryCurrentAdapter();
+test('formatDeletionUpdate contracts across FoundryV12Adapter (legacy -=), FoundryV13Adapter (legacy -=), and FoundryV14Adapter (ForcedDeletion)', () => {
+    const v12 = new FoundryV12Adapter();
+    const v13 = new FoundryV13Adapter();
+    const v14 = new FoundryV14Adapter();
 
-    // V12/V13 BaseFoundryAdapter formats legacy -= deletion syntax
+    // V12 formats legacy -= deletion syntax
     assert.deepEqual(
-        bfa.formatDeletionUpdate('flags.eskie-macros.token-masks', 'anim-123'),
+        v12.formatDeletionUpdate('flags.eskie-macros.token-masks', 'anim-123'),
         { 'flags.eskie-macros.token-masks.-=anim-123': null }
     );
     assert.deepEqual(
-        bfa.formatDeletionUpdate('', 'anim-123'),
+        v12.formatDeletionUpdate('', 'anim-123'),
         { '-=anim-123': null }
     );
 
-    // V14+ FoundryCurrentAdapter formats modern ForcedDeletion operator
+    // V13 inherits legacy -= deletion syntax
+    assert.deepEqual(
+        v13.formatDeletionUpdate('flags.eskie-macros.token-masks', 'anim-123'),
+        { 'flags.eskie-macros.token-masks.-=anim-123': null }
+    );
+
+    // V14+ FoundryV14Adapter formats modern ForcedDeletion operator
     assert.deepEqual(
         v14.formatDeletionUpdate('flags.eskie-macros.token-masks', 'anim-123'),
         { 'flags.eskie-macros.token-masks.anim-123': foundry.data.operators.ForcedDeletion }
@@ -521,16 +588,17 @@ test('formatDeletionUpdate contracts across BaseFoundryAdapter (V12/V13 legacy -
         { 'flags.eskie-macros.token-masks.anim-123': foundry.data.operators.ForcedDeletion }
     );
 
-    adapter.foundry = bfa;
+    adapter.foundry = v12;
     assert.deepEqual(
         adapter.formatDeletionUpdate('flags.eskie-macros.token-masks', 'anim-123'),
         { 'flags.eskie-macros.token-masks.-=anim-123': null }
     );
 });
 
-test('fromUuidSync and fromUuid resolution across BaseFoundryAdapter (V12 global) and FoundryCurrentAdapter (V14+ foundry.utils)', async () => {
-    const bfa = new BaseFoundryAdapter();
-    const v14 = new FoundryCurrentAdapter();
+test('fromUuidSync and fromUuid resolution across FoundryV12Adapter (global) and FoundryV13Adapter / FoundryV14Adapter (foundry.utils)', async () => {
+    const v12 = new FoundryV12Adapter();
+    const v13 = new FoundryV13Adapter();
+    const v14 = new FoundryV14Adapter();
 
     globalThis.fromUuidSync = (uuid) => uuid === 'Item.123' ? { id: '123', name: 'Legacy Item' } : null;
     globalThis.fromUuid = async (uuid) => uuid === 'Item.123' ? { id: '123', name: 'Legacy Item' } : null;
@@ -538,10 +606,15 @@ test('fromUuidSync and fromUuid resolution across BaseFoundryAdapter (V12 global
     globalThis.foundry.utils.fromUuidSync = (uuid) => uuid === 'Item.456' ? { id: '456', name: 'Modern Item' } : null;
     globalThis.foundry.utils.fromUuid = async (uuid) => uuid === 'Item.456' ? { id: '456', name: 'Modern Item' } : null;
 
-    assert.equal(bfa.fromUuidSync('Item.123')?.name, 'Legacy Item');
-    assert.equal(bfa.fromUuidSync('Item.456'), null);
-    assert.equal((await bfa.fromUuid('Item.123'))?.name, 'Legacy Item');
-    assert.equal(await bfa.fromUuid('Item.456'), null);
+    assert.equal(v12.fromUuidSync('Item.123')?.name, 'Legacy Item');
+    assert.equal(v12.fromUuidSync('Item.456'), null);
+    assert.equal((await v12.fromUuid('Item.123'))?.name, 'Legacy Item');
+    assert.equal(await v12.fromUuid('Item.456'), null);
+
+    assert.equal(v13.fromUuidSync('Item.456')?.name, 'Modern Item');
+    assert.equal(v13.fromUuidSync('Item.123'), null);
+    assert.equal((await v13.fromUuid('Item.456'))?.name, 'Modern Item');
+    assert.equal(await v13.fromUuid('Item.123'), null);
 
     assert.equal(v14.fromUuidSync('Item.456')?.name, 'Modern Item');
     assert.equal(v14.fromUuidSync('Item.123'), null);
@@ -549,9 +622,10 @@ test('fromUuidSync and fromUuid resolution across BaseFoundryAdapter (V12 global
     assert.equal(await v14.fromUuid('Item.123'), null);
 });
 
-test('getCombatantsByToken and getCombatantByToken across BaseFoundryAdapter (V12 singular) and FoundryCurrentAdapter (V14+ plural)', () => {
-    const bfa = new BaseFoundryAdapter();
-    const v14 = new FoundryCurrentAdapter();
+test('getCombatantsByToken and getCombatantByToken across FoundryV12Adapter (singular) and FoundryV13Adapter / FoundryV14Adapter (plural)', () => {
+    const v12 = new FoundryV12Adapter();
+    const v13 = new FoundryV13Adapter();
+    const v14 = new FoundryV14Adapter();
 
     const mockCombatant1 = { id: 'c1', tokenId: 'tok1' };
     const mockCombatant2 = { id: 'c2', tokenId: 'tok1' };
@@ -564,14 +638,12 @@ test('getCombatantsByToken and getCombatantByToken across BaseFoundryAdapter (V1
         getCombatantsByToken: (tokenId) => tokenId === 'tok1' ? [mockCombatant1, mockCombatant2] : []
     };
 
-    assert.deepEqual(bfa.getCombatantsByToken(legacyCombat, 'tok1'), [mockCombatant1]);
-    assert.equal(bfa.getCombatantByToken(legacyCombat, 'tok1'), mockCombatant1);
+    assert.deepEqual(v12.getCombatantsByToken(legacyCombat, 'tok1'), [mockCombatant1]);
+    assert.equal(v12.getCombatantByToken(legacyCombat, 'tok1'), mockCombatant1);
+
+    assert.deepEqual(v13.getCombatantsByToken(modernCombat, 'tok1'), [mockCombatant1, mockCombatant2]);
+    assert.equal(v13.getCombatantByToken(modernCombat, 'tok1'), mockCombatant1);
 
     assert.deepEqual(v14.getCombatantsByToken(modernCombat, 'tok1'), [mockCombatant1, mockCombatant2]);
     assert.equal(v14.getCombatantByToken(modernCombat, 'tok1'), mockCombatant1);
 });
-
-
-
-
-

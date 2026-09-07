@@ -200,7 +200,7 @@ async function setup(animation, config = {}) {
 const tileDoc = tile.document ?? tile;
 
 // Get the specific Eskie Trap Animation Function if this tile is a trap tile
-const animation = tileDoc.getFlag?.('${MODULE_ID}', 'trap.animation');
+const animation = tileDoc.getFlag('${MODULE_ID}', 'trap.animation');
 const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter;
 if (animation) {
     try {
@@ -222,12 +222,11 @@ if (animation) {
 }
 
 // Manually activate any other linked trap tiles
-const originIds = (tileDoc.getFlag?.('${MODULE_ID}', 'trap.originIds') ?? []).filter(id => id !== tileDoc.id && id !== tile.id);
+const originIds = (tileDoc.getFlag('${MODULE_ID}', 'trap.originIds') ?? []).filter(id => id !== tileDoc.id);
 for (const id of originIds) {
     const originTile = canvas.tiles.get(id);
     if (!originTile) continue;
-    const originDoc = originTile.document ?? originTile;
-    await (originDoc.trigger?.({ token }) ?? originTile.trigger?.({ token }));
+    await originTile.document.trigger({ token });
 }
 `;
 

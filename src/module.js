@@ -8,7 +8,7 @@ import { MODULE_ID } from './lib/constants.js';
 import { crosshair } from './lib/crosshairs.js';
 import { standaloneMacros } from './lib/standalone-macros.js';
 import { template } from './lib/templates.js';
-import { adapter } from './adapters/index.js';
+import { adapter, Adapter } from './adapters/index.js';
 
 // Import module settings to also run its initialization code
 import './settings.js';
@@ -18,6 +18,50 @@ const status = {
     aaReady: false,
     ready: false,
 };
+
+export function setupApiCalls(exportedFunctions) {
+    globalThis.eskie = Object.assign(
+        globalThis.eskie ?? {},
+        exportedFunctions
+    );
+}
+
+export function setupModule() {
+    const { effect, mask, overlay, showcase, traps } = animation;
+
+    // Expose only active sequencer play/animation APIs, Adapter class, and adapter on globalThis.eskie
+    setupApiCalls({
+        Adapter,
+        adapter,
+        effect,
+        traps,
+        mask,
+        overlay,
+        showcase
+    });
+
+    // Attach module public API to game.modules.get('eskie-macros').api
+    const moduleRecord = game.modules.get(MODULE_ID);
+    if (moduleRecord) {
+        moduleRecord.api = {
+            Adapter,
+            adapter,
+            animation,
+            effect,
+            traps,
+            mask,
+            overlay,
+            showcase,
+            autorec,
+            autoanimations,
+            blfx,
+            crosshair,
+            socket,
+            standaloneMacros,
+            template
+        };
+    }
+}
 
 Hooks.once('init', async () => {
     // Initialize unified adapter layer across Foundry platform, game system, and active modules
@@ -33,42 +77,6 @@ Hooks.once('init', async () => {
         `modules/${MODULE_ID}/src/ui/recommended-modules/recommendedModulesMenu.html`,
         `modules/${MODULE_ID}/src/ui/world-scripts/worldScriptsMenu.html`
     ]);
-
-    function setupModule() {
-        function setupApiCalls(exportedFunctions) {
-            globalThis.eskie = adapter.mergeObject(
-                globalThis.eskie ?? {},
-                exportedFunctions
-            );
-        }
-
-        const { effect, mask, overlay, showcase, traps } = animation;
-
-        // Expose only active sequencer play/animation APIs and adapter on globalThis.eskie
-        setupApiCalls({
-            adapter,
-            effect,
-            traps,
-            mask,
-            overlay,
-            showcase
-        });
-
-        // Attach module internal utilities and tools to game.modules.get('eskie-macros').api
-        const moduleRecord = game.modules.get(MODULE_ID);
-        if (moduleRecord) {
-            moduleRecord.api = {
-                adapter,
-                autorec,
-                autoanimations,
-                blfx,
-                crosshair,
-                socket,
-                standaloneMacros,
-                template
-            };
-        }
-    }
 
     setupModule();
     log.info('Eskie Macro Pack module ready');

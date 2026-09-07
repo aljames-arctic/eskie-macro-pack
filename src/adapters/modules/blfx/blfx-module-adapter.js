@@ -254,7 +254,8 @@ const token = target || source || (typeof workflow !== 'undefined' && workflow?.
 if (typeof effect !== 'undefined' && effect) {
     config.activeEffect = effect;
 }
-const effectFn = (globalThis.eskie?.adapter ?? foundry.utils).getProperty(globalThis, '${animation}');
+const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter ?? foundry.utils;
+const effectFn = adapter.getProperty(globalThis, '${animation}');
 if (effectFn?.play) {
     if (source && target && source.id !== target.id) {
         await effectFn.play(source, target, config);
@@ -273,7 +274,8 @@ const template = (typeof templateDocument !== 'undefined' && templateDocument) |
 const targets = (typeof targetTokens !== 'undefined' && targetTokens) || (typeof targets !== 'undefined' && targets) || (typeof workflow !== 'undefined' && (workflow?.targets?.first?.() ? Array.from(workflow.targets) : [])) || [];
 if (template) config.template = template;
 if (targets?.length) config.targets = targets;
-const effect = (globalThis.eskie?.adapter ?? foundry.utils).getProperty(globalThis, '${animation}');
+const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter ?? foundry.utils;
+const effect = adapter.getProperty(globalThis, '${animation}');
 if (effect?.play) {
     await effect.play(token, config);
 }`;
@@ -286,7 +288,8 @@ const config = ${serializedConfig};
 const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
 const targets = (typeof targetTokens !== 'undefined' && targetTokens?.length) ? targetTokens : [];
 if (targets.length) config.targets = targets;
-const effect = (globalThis.eskie?.adapter ?? foundry.utils).getProperty(globalThis, '${animation}');
+const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter ?? foundry.utils;
+const effect = adapter.getProperty(globalThis, '${animation}');
 if (effect?.play && token) {
     await effect.play(token, config);
 }`;
@@ -298,7 +301,8 @@ const config = ${serializedConfig};
 
 const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
 const target = (typeof targetTokens !== 'undefined' && (targetTokens?.first?.() ?? Array.from(targetTokens ?? [])[0])) || (typeof workflow !== 'undefined' && (workflow?.targets?.first?.() ?? Array.from(workflow?.targets ?? [])[0])) || Array.from(game.user?.targets ?? [])[0] || null;
-const effect = (globalThis.eskie?.adapter ?? foundry.utils).getProperty(globalThis, '${animation}');
+const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter ?? foundry.utils;
+const effect = adapter.getProperty(globalThis, '${animation}');
 if (effect?.play) {
     if (target) {
         await effect.play(token, target, config);
@@ -312,7 +316,8 @@ if (effect?.play) {
 const config = ${serializedConfig};
 
 const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
-const effect = (globalThis.eskie?.adapter ?? foundry.utils).getProperty(globalThis, '${animation}');
+const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter ?? foundry.utils;
+const effect = adapter.getProperty(globalThis, '${animation}');
 if (effect?.play && token) {
     await effect.play(token, config);
 }`;

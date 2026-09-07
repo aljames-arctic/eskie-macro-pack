@@ -295,3 +295,35 @@ test('Unified Adapter delegates to module adapters through accessors', async () 
     assert.equal(adapter.hasModule('token-attacher'), true);
     assert.equal(adapter.hasModule('non-existent'), false);
 });
+
+test('setupModule deploys Adapter, adapter, and animations on game.modules.get(MODULE_ID).api and globalThis.eskie', async () => {
+    const { setupModule } = await import('../../src/module.js');
+    const { Adapter } = await import('../../src/adapters/index.js');
+    const { MODULE_ID } = await import('../../src/lib/constants.js');
+
+    const empRecord = { id: MODULE_ID };
+    game.modules.set(MODULE_ID, empRecord);
+
+    setupModule();
+
+    assert.ok(empRecord.api, 'EMP module record should have api object');
+    assert.equal(empRecord.api.Adapter, Adapter);
+    assert.equal(empRecord.api.adapter, adapter);
+    assert.ok(empRecord.api.animation);
+    assert.ok(empRecord.api.effect);
+    assert.ok(empRecord.api.traps);
+    assert.ok(empRecord.api.mask);
+    assert.ok(empRecord.api.overlay);
+    assert.ok(empRecord.api.showcase);
+    assert.ok(empRecord.api.autorec);
+    assert.ok(empRecord.api.autoanimations);
+    assert.ok(empRecord.api.blfx);
+    assert.ok(empRecord.api.crosshair);
+    assert.ok(empRecord.api.socket);
+    assert.ok(empRecord.api.standaloneMacros);
+    assert.ok(empRecord.api.template);
+
+    assert.equal(globalThis.eskie.Adapter, Adapter);
+    assert.equal(globalThis.eskie.adapter, adapter);
+});
+

@@ -53,9 +53,9 @@ test('matt.trap.setup configures tiles with MATT runcode action using standard f
     assert.equal(runcodeAction.action, 'runcode');
     assert.ok(typeof runcodeAction.data.code === 'string');
 
-    // Verify the code string does not reference 'adapter.' and uses 'foundry.utils.getProperty'
-    assert.ok(!runcodeAction.data.code.includes('adapter.getProperty'), 'Generated code should not reference module-scoped adapter');
-    assert.ok(runcodeAction.data.code.includes('foundry.utils.getProperty'), 'Generated code should reference foundry.utils.getProperty');
+    // Verify the code string resolves adapter via module API and foundry.utils fallback
+    assert.ok(runcodeAction.data.code.includes(`game.modules.get('${MODULE_ID}')?.api?.adapter ?? foundry.utils`), 'Generated code should resolve adapter from module API with fallback');
+    assert.ok(runcodeAction.data.code.includes('const trap = adapter.getProperty(globalThis, animation);'), 'Generated code should invoke getProperty on resolved adapter');
 
     // Verify evaluating the generated code does not throw ReferenceError
     let playCalled = false;
@@ -70,6 +70,7 @@ test('matt.trap.setup configures tiles with MATT runcode action using standard f
             }
         }
     };
+    globalThis.game.modules.set(MODULE_ID, { id: MODULE_ID, api: { adapter } });
 
     const mockTile = {
         getFlag: (mod, key) => {

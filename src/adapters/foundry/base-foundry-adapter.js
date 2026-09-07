@@ -294,7 +294,18 @@ export class BaseFoundryAdapter {
      * @returns {string} Slugified string
      */
     slugify(text, options = {}) {
-        return foundry.utils.slugify(text, options);
+        const str = String(text ?? '');
+        if (typeof str.slugify === 'function') {
+            return str.slugify(options);
+        }
+        const replacement = options.replacement ?? '-';
+        return str
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, replacement)
+            .replace(/^-+|-+$/g, '');
     }
 
     /**

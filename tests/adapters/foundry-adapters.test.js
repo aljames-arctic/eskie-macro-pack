@@ -537,6 +537,9 @@ test('BaseFoundryAdapter and UnifiedAdapter abstract all utility operations clea
     // slugify
     assert.equal(bfa.slugify('Fire Blast 01!'), 'fire-blast-01');
     assert.equal(adapter.slugify('Healing Word (Mass)'), 'healing-word-mass');
+    assert.equal(bfa.slugify('Épée Flamboyante'), 'epee-flamboyante');
+    assert.equal(bfa.slugify(null), '');
+    assert.equal(bfa.slugify(undefined), '');
 
     // hasProperty & getProperty & setProperty
     const obj = { foo: { bar: 42 } };

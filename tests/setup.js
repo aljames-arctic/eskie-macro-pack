@@ -57,6 +57,18 @@ globalThis.FilePicker = class FilePicker {
     }
 };
 globalThis.loadTemplates = (paths) => Promise.resolve(paths);
+if (typeof String.prototype.slugify !== 'function') {
+    String.prototype.slugify = function (options = {}) {
+        const replacement = options?.replacement ?? '-';
+        return this
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, replacement)
+            .replace(/^-+|-+$/g, '');
+    };
+}
 
 globalThis.CONST = {
     USER_ROLES: {
@@ -206,7 +218,6 @@ globalThis.foundry = {
             }
             return false;
         },
-        slugify: (str) => String(str ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
         hasProperty: (obj, path) => {
             if (!obj || !path) return false;
             return path.split('.').reduce((acc, part) => (acc && part in acc ? acc[part] : undefined), obj) !== undefined;

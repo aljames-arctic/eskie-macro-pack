@@ -187,8 +187,8 @@ export class Adapter {
         return this.foundry.getUserPermissionTier(user);
     }
 
-    isUserDocumentOwner(user, actor, tokenDoc) {
-        return this.foundry.isUserDocumentOwner(user, actor, tokenDoc);
+    isUserDocumentOwner(user, doc) {
+        return this.foundry.isUserDocumentOwner(user, doc);
     }
 
     isUserInCharge(token, user = game?.user) {

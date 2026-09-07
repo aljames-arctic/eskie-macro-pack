@@ -113,7 +113,9 @@ globalThis.foundry = {
             }
         },
         ux: {
-            ContextMenu: class ContextMenuV14 extends globalThis.ContextMenu {},
+            ContextMenu: {
+                implementation: class ContextMenuV14 extends globalThis.ContextMenu {}
+            },
             TextEditor: {
                 implementation: {
                     enrichHTML: async (content, _options = {}) => content ?? ""
@@ -128,13 +130,19 @@ globalThis.foundry = {
     },
     canvas: {
         placeables: {
-            Token: class TokenV14 extends globalThis.Token {},
-            Tile: class TileV14 extends globalThis.Tile {}
+            Token: {
+                implementation: class TokenV14 extends globalThis.Token {}
+            },
+            Tile: {
+                implementation: class TileV14 extends globalThis.Tile {}
+            }
         }
     },
     helpers: {
         interaction: {
-            KeyboardManager: class KeyboardManagerV14 extends globalThis.KeyboardManager {}
+            KeyboardManager: {
+                implementation: class KeyboardManagerV14 extends globalThis.KeyboardManager {}
+            }
         }
     },
     utils: {

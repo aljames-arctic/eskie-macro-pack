@@ -9,46 +9,76 @@ export class FoundryCurrentAdapter extends BaseFoundryAdapter {
      * The active ContextMenu constructor in v14+.
      */
     get ContextMenu() {
-        return foundry.applications?.ux?.ContextMenu ?? super.ContextMenu;
+        return foundry.applications.ux.ContextMenu.implementation;
     }
 
     /**
      * The active KeyboardManager constructor in v14+.
      */
     get KeyboardManager() {
-        return foundry.helpers?.interaction?.KeyboardManager ?? super.KeyboardManager;
+        return foundry.helpers.interaction.KeyboardManager.implementation;
     }
 
     /**
      * The active Token placeable constructor in v14+.
      */
     get Token() {
-        return foundry.canvas?.placeables?.Token ?? super.Token;
+        return foundry.canvas.placeables.Token.implementation;
     }
 
     /**
      * The active Tile placeable constructor in v14+.
      */
     get Tile() {
-        return foundry.canvas?.placeables?.Tile ?? super.Tile;
+        return foundry.canvas.placeables.Tile.implementation;
     }
 
     /**
      * The active FilePicker constructor / implementation in v14+.
      */
     get FilePicker() {
-        return foundry.applications?.apps?.FilePicker?.implementation ?? super.FilePicker;
+        return foundry.applications.apps.FilePicker.implementation;
     }
 
     /**
      * The active TextEditor constructor / implementation in v14+.
      */
     get TextEditor() {
-        return foundry.applications?.ux?.TextEditor?.implementation ?? super.TextEditor;
+        return foundry.applications.ux.TextEditor.implementation;
     }
 
     /**
-     * Retrieve all combatants associated with a token in combat using v14+ Combat#getCombatantsByToken.
+     * Safely resolve a document from UUID synchronously using standard V13+ foundry.utils.fromUuidSync.
+     * @param {string} uuid Document UUID
+     * @param {Object} [options={}] Resolution options
+     * @returns {Document|null}
+     */
+    fromUuidSync(uuid, options = {}) {
+        if (!uuid) return null;
+        try {
+            return foundry.utils.fromUuidSync(uuid, options) ?? null;
+        } catch (_) {
+            return null;
+        }
+    }
+
+    /**
+     * Safely resolve a document from UUID asynchronously using standard V13+ foundry.utils.fromUuid.
+     * @param {string} uuid Document UUID
+     * @param {Object} [options={}] Resolution options
+     * @returns {Promise<Document|null>}
+     */
+    async fromUuid(uuid, options = {}) {
+        if (!uuid) return null;
+        try {
+            return (await foundry.utils.fromUuid(uuid, options)) ?? null;
+        } catch (_) {
+            return null;
+        }
+    }
+
+    /**
+     * Retrieve all combatants associated with a token in combat using native modern Combat#getCombatantsByToken.
      * @param {Combat} combat Target combat encounter
      * @param {string|TokenDocument|Token} token Token ID or Document or Placeable
      * @returns {Combatant[]}
@@ -58,17 +88,7 @@ export class FoundryCurrentAdapter extends BaseFoundryAdapter {
         const tokenId = token?.id ?? token?.document?.id ?? token;
         if (!tokenId) return [];
 
-        return combat.getCombatantsByToken?.(tokenId) ?? super.getCombatantsByToken(combat, token);
-    }
-
-    /**
-     * Retrieve the primary combatant associated with a token in combat using v14+ Combat#getCombatantsByToken.
-     * @param {Combat} combat Target combat encounter
-     * @param {string|TokenDocument|Token} token Token ID or Document or Placeable
-     * @returns {Combatant|null}
-     */
-    getCombatantByToken(combat, token) {
-        return this.getCombatantsByToken(combat, token)[0] ?? null;
+        return combat.getCombatantsByToken(tokenId) ?? [];
     }
 
     /* -------------------------------------------- */

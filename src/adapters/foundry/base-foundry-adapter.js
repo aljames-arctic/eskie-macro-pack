@@ -141,17 +141,17 @@ export class BaseFoundryAdapter {
     }
 
     /**
-     * The active FilePicker constructor / implementation (global in v12/v13 baseline).
+     * The active FilePicker constructor / implementation (global in v12 baseline).
      */
     get FilePicker() {
-        return FilePicker?.implementation ?? FilePicker;
+        return FilePicker;
     }
 
     /**
-     * The active TextEditor constructor / implementation (global in v12/v13 baseline).
+     * The active TextEditor constructor / implementation (global in v12 baseline).
      */
     get TextEditor() {
-        return TextEditor?.implementation ?? TextEditor;
+        return TextEditor;
     }
 
     /**
@@ -174,7 +174,7 @@ export class BaseFoundryAdapter {
     fromUuidSync(uuid, options = {}) {
         if (!uuid) return null;
         try {
-            return foundry.utils?.fromUuidSync(uuid, options) ?? null;
+            return fromUuidSync(uuid, options) ?? null;
         } catch (_) {
             return null;
         }
@@ -189,7 +189,7 @@ export class BaseFoundryAdapter {
     async fromUuid(uuid, options = {}) {
         if (!uuid) return null;
         try {
-            return (await foundry.utils?.fromUuid(uuid, options)) ?? null;
+            return (await fromUuid(uuid, options)) ?? null;
         } catch (_) {
             return null;
         }
@@ -377,7 +377,7 @@ export class BaseFoundryAdapter {
     /* -------------------------------------------- */
 
     /**
-     * Retrieve all combatants associated with a token in combat for baseline v12/v13.
+     * Retrieve all combatants associated with a token in combat using legacy V12 Combat#getCombatantByToken.
      * @param {Combat} combat Target combat encounter
      * @param {string|TokenDocument|Token} token Token ID or Document or Placeable
      * @returns {Combatant[]}
@@ -392,17 +392,13 @@ export class BaseFoundryAdapter {
     }
 
     /**
-     * Retrieve the primary combatant associated with a token in combat for baseline v12/v13.
+     * Retrieve the primary combatant associated with a token in combat.
      * @param {Combat} combat Target combat encounter
      * @param {string|TokenDocument|Token} token Token ID or Document or Placeable
      * @returns {Combatant|null}
      */
     getCombatantByToken(combat, token) {
-        if (!combat) return null;
-        const tokenId = token?.id ?? token?.document?.id ?? token;
-        if (!tokenId) return null;
-
-        return combat.getCombatantByToken?.(tokenId) ?? null;
+        return this.getCombatantsByToken(combat, token)[0] ?? null;
     }
 
     /* -------------------------------------------- */
@@ -424,68 +420,53 @@ export class BaseFoundryAdapter {
      */
     getUserPermissionTier(user) {
         if (!user) return null;
-        const isGM = Boolean(user.isGM);
-        const userRole = user.role ?? null;
-        const assistantRole = CONST?.USER_ROLES?.ASSISTANT ?? 3;
-        const trustedRole = CONST?.USER_ROLES?.TRUSTED ?? 2;
-        const playerRole = CONST?.USER_ROLES?.PLAYER ?? 1;
+        if (user.isGM) return USER_PERMISSION_TIERS.GM;
 
-        if (isGM || (userRole !== null && userRole >= assistantRole)) {
+        const userRole = user.role;
+        if (userRole === 0) return null;
+
+        const assistantRole = CONST.USER_ROLES.ASSISTANT;
+        const trustedRole = CONST.USER_ROLES.TRUSTED;
+        const playerRole = CONST.USER_ROLES.PLAYER;
+
+        if (userRole != null && userRole >= assistantRole) {
             return USER_PERMISSION_TIERS.GM;
         }
-        if ((userRole !== null && userRole === trustedRole) || (Boolean(user.isTrusted) && !isGM)) {
+        if (userRole === trustedRole || Boolean(user.isTrusted)) {
             return USER_PERMISSION_TIERS.TRUSTED;
         }
-        if ((userRole !== null && userRole === playerRole) || (!isGM && !user.isTrusted && userRole !== 0)) {
+        if (userRole === playerRole || !user.isTrusted) {
             return USER_PERMISSION_TIERS.PLAYER;
         }
         return null;
     }
 
     /**
-     * Test whether a user possesses an ownership role for a given actor and token document.
+     * Test whether a user possesses an ownership role for a given document (Actor or TokenDocument).
      * @param {User} user Concrete User document
-     * @param {Actor|null} actor Concrete Actor document
-     * @param {Document|null} tokenDoc Concrete TokenDocument
+     * @param {Document|null} doc Concrete Document (Actor or TokenDocument)
      * @returns {boolean} True if the user has an ownership role
      */
-    isUserDocumentOwner(user, actor, tokenDoc) {
-        if (!user) return false;
+    isUserDocumentOwner(user, doc) {
+        if (!user || !doc) return false;
 
         // GM / Co-GM always has ownership over all documents in Foundry
         if (this.getUserPermissionTier(user) === USER_PERMISSION_TIERS.GM) {
             return true;
         }
 
-        const ownerLevel = CONST?.DOCUMENT_OWNERSHIP_LEVELS?.OWNER ?? 3;
-
-        // Test actor document permissions
-        if (actor) {
-            if (actor.testUserPermission?.(user, 'OWNER')) return true;
-            if (actor.getUserLevel?.(user) >= ownerLevel) return true;
-            if (actor.ownership) {
-                const level = actor.ownership[user.id] ?? actor.ownership.default ?? 0;
-                if (level >= ownerLevel) return true;
-            }
-            if ((user.id === game?.user?.id || user === game?.user) && Boolean(actor.isOwner)) {
-                return true;
-            }
+        const ownerLevel = CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER;
+        if (doc.testUserPermission) {
+            return Boolean(doc.testUserPermission(user, 'OWNER'));
         }
-
-        // Test token document permissions
-        if (tokenDoc) {
-            if (tokenDoc.testUserPermission?.(user, 'OWNER')) return true;
-            if (tokenDoc.getUserLevel?.(user) >= ownerLevel) return true;
-            if (tokenDoc.ownership) {
-                const level = tokenDoc.ownership[user.id] ?? tokenDoc.ownership.default ?? 0;
-                if (level >= ownerLevel) return true;
-            }
-            if ((user.id === game?.user?.id || user === game?.user) && Boolean(tokenDoc.isOwner)) {
-                return true;
-            }
+        if (doc.getUserLevel) {
+            return doc.getUserLevel(user) >= ownerLevel;
         }
-
-        return false;
+        if (doc.ownership) {
+            const level = doc.ownership[user.id] ?? doc.ownership.default ?? 0;
+            return level >= ownerLevel;
+        }
+        return (user.id === game.user?.id || user === game.user) && Boolean(doc.isOwner);
     }
 
     /**
@@ -504,13 +485,16 @@ export class BaseFoundryAdapter {
         const tokenDoc = token.document ?? token;
         const actor = token.actor ?? tokenDoc?.actor ?? null;
 
-        if (!this.isUserDocumentOwner(user, actor, tokenDoc)) {
+        const isOwner = (u) => this.isUserDocumentOwner(u, actor) || this.isUserDocumentOwner(u, tokenDoc);
+
+        if (!isOwner(user)) {
             return false;
         }
 
         const userTier = this.getUserPermissionTier(user);
         if (!userTier) return false;
 
+        // Tier 1 (Player) is the lowest permission tier; if they own it, they are in-charge.
         if (userTier === USER_PERMISSION_TIERS.PLAYER) {
             return true;
         }
@@ -520,24 +504,27 @@ export class BaseFoundryAdapter {
             ?? (usersCollection?.values ? Array.from(usersCollection.values()) : null)
             ?? (usersCollection ? Array.from(usersCollection) : [user]);
 
+        // Filter to only currently connected (active) other users
         const activeOtherUsers = allUsers.filter(otherUser => {
             if (otherUser.id === user.id || otherUser === user) return false;
             return Boolean(otherUser.active);
         });
 
+        // Tier 2 (Trusted Player): in-charge only if NO connected Tier 1 (Player) owns it
         if (userTier === USER_PERMISSION_TIERS.TRUSTED) {
             const hasConnectedPlayerOwner = activeOtherUsers.some(otherUser => {
                 return this.getUserPermissionTier(otherUser) === USER_PERMISSION_TIERS.PLAYER
-                    && this.isUserDocumentOwner(otherUser, actor, tokenDoc);
+                    && isOwner(otherUser);
             });
             return !hasConnectedPlayerOwner;
         }
 
+        // Tier 3 (GM / Co-GM): in-charge only if NO connected Tier 1 (Player) and NO connected Tier 2 (Trusted Player) owns it
         if (userTier === USER_PERMISSION_TIERS.GM) {
             const hasConnectedLowerTierOwner = activeOtherUsers.some(otherUser => {
                 const otherTier = this.getUserPermissionTier(otherUser);
                 return (otherTier === USER_PERMISSION_TIERS.PLAYER || otherTier === USER_PERMISSION_TIERS.TRUSTED)
-                    && this.isUserDocumentOwner(otherUser, actor, tokenDoc);
+                    && isOwner(otherUser);
             });
             return !hasConnectedLowerTierOwner;
         }
@@ -912,12 +899,14 @@ export class BaseFoundryAdapter {
         const doc = token.document ?? token;
         const actor = token.actor ?? doc?.actor ?? null;
 
+        const isOwner = (u) => this.isUserDocumentOwner(u, actor) || this.isUserDocumentOwner(u, doc);
+
         const usersCollection = game?.users;
         const allUsers = usersCollection?.contents
             ?? (usersCollection?.values ? Array.from(usersCollection.values()) : null)
             ?? (usersCollection ? Array.from(usersCollection) : []);
 
-        let matched = allUsers.filter(user => this.isUserDocumentOwner(user, actor, doc));
+        let matched = allUsers.filter(user => isOwner(user));
         if (!applyPC) matched = matched.filter(user => Boolean(user.isGM));
         if (!applyGM) matched = matched.filter(user => !user.isGM);
         return matched;

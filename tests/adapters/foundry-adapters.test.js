@@ -38,10 +38,10 @@ test('BaseFoundryAdapter and FoundryCurrentAdapter constructor getters contract'
     assert.equal(v12.TextEditor, globalThis.TextEditor);
 
     const v14 = new FoundryCurrentAdapter();
-    assert.equal(v14.ContextMenu, globalThis.foundry.applications.ux.ContextMenu);
-    assert.equal(v14.KeyboardManager, globalThis.foundry.helpers.interaction.KeyboardManager);
-    assert.equal(v14.Token, globalThis.foundry.canvas.placeables.Token);
-    assert.equal(v14.Tile, globalThis.foundry.canvas.placeables.Tile);
+    assert.equal(v14.ContextMenu, globalThis.foundry.applications.ux.ContextMenu.implementation);
+    assert.equal(v14.KeyboardManager, globalThis.foundry.helpers.interaction.KeyboardManager.implementation);
+    assert.equal(v14.Token, globalThis.foundry.canvas.placeables.Token.implementation);
+    assert.equal(v14.Tile, globalThis.foundry.canvas.placeables.Tile.implementation);
     assert.equal(v14.FilePicker, globalThis.foundry.applications.apps.FilePicker.implementation);
     assert.equal(v14.TextEditor, globalThis.foundry.applications.ux.TextEditor.implementation);
 });
@@ -183,9 +183,9 @@ test('Permission tiers and ownership evaluation on BaseFoundryAdapter', () => {
         document: { id: 'tok1', actor: mockActor }
     };
 
-    assert.equal(adapter.isUserDocumentOwner(gmUser, mockActor, mockToken.document), true);
-    assert.equal(adapter.isUserDocumentOwner(playerUser, mockActor, mockToken.document), true);
-    assert.equal(adapter.isUserDocumentOwner(trustedUser, mockActor, mockToken.document), false);
+    assert.equal(adapter.isUserDocumentOwner(gmUser, mockActor), true);
+    assert.equal(adapter.isUserDocumentOwner(playerUser, mockActor), true);
+    assert.equal(adapter.isUserDocumentOwner(trustedUser, mockActor), false);
 
     game.users = [gmUser, playerUser];
     assert.equal(adapter.isUserInCharge(mockToken, playerUser), true);
@@ -526,6 +526,49 @@ test('formatDeletionUpdate contracts across BaseFoundryAdapter (V12/V13 legacy -
         adapter.formatDeletionUpdate('flags.eskie-macros.token-masks', 'anim-123'),
         { 'flags.eskie-macros.token-masks.-=anim-123': null }
     );
+});
+
+test('fromUuidSync and fromUuid resolution across BaseFoundryAdapter (V12 global) and FoundryCurrentAdapter (V14+ foundry.utils)', async () => {
+    const bfa = new BaseFoundryAdapter();
+    const v14 = new FoundryCurrentAdapter();
+
+    globalThis.fromUuidSync = (uuid) => uuid === 'Item.123' ? { id: '123', name: 'Legacy Item' } : null;
+    globalThis.fromUuid = async (uuid) => uuid === 'Item.123' ? { id: '123', name: 'Legacy Item' } : null;
+
+    globalThis.foundry.utils.fromUuidSync = (uuid) => uuid === 'Item.456' ? { id: '456', name: 'Modern Item' } : null;
+    globalThis.foundry.utils.fromUuid = async (uuid) => uuid === 'Item.456' ? { id: '456', name: 'Modern Item' } : null;
+
+    assert.equal(bfa.fromUuidSync('Item.123')?.name, 'Legacy Item');
+    assert.equal(bfa.fromUuidSync('Item.456'), null);
+    assert.equal((await bfa.fromUuid('Item.123'))?.name, 'Legacy Item');
+    assert.equal(await bfa.fromUuid('Item.456'), null);
+
+    assert.equal(v14.fromUuidSync('Item.456')?.name, 'Modern Item');
+    assert.equal(v14.fromUuidSync('Item.123'), null);
+    assert.equal((await v14.fromUuid('Item.456'))?.name, 'Modern Item');
+    assert.equal(await v14.fromUuid('Item.123'), null);
+});
+
+test('getCombatantsByToken and getCombatantByToken across BaseFoundryAdapter (V12 singular) and FoundryCurrentAdapter (V14+ plural)', () => {
+    const bfa = new BaseFoundryAdapter();
+    const v14 = new FoundryCurrentAdapter();
+
+    const mockCombatant1 = { id: 'c1', tokenId: 'tok1' };
+    const mockCombatant2 = { id: 'c2', tokenId: 'tok1' };
+
+    const legacyCombat = {
+        getCombatantByToken: (tokenId) => tokenId === 'tok1' ? mockCombatant1 : null
+    };
+
+    const modernCombat = {
+        getCombatantsByToken: (tokenId) => tokenId === 'tok1' ? [mockCombatant1, mockCombatant2] : []
+    };
+
+    assert.deepEqual(bfa.getCombatantsByToken(legacyCombat, 'tok1'), [mockCombatant1]);
+    assert.equal(bfa.getCombatantByToken(legacyCombat, 'tok1'), mockCombatant1);
+
+    assert.deepEqual(v14.getCombatantsByToken(modernCombat, 'tok1'), [mockCombatant1, mockCombatant2]);
+    assert.equal(v14.getCombatantByToken(modernCombat, 'tok1'), mockCombatant1);
 });
 
 

@@ -832,7 +832,7 @@ export class BaseFoundryAdapter {
      * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number }}
      */
     getTileBounds(tile) {
-        if (!tile) return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0 };
+        if (!tile) return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0, y: 0 } };
         const doc = tile.document ?? tile;
         const x = doc.x ?? tile.x ?? 0;
         const y = doc.y ?? tile.y ?? 0;
@@ -846,7 +846,8 @@ export class BaseFoundryAdapter {
             maxY: y + height,
             center,
             width,
-            height
+            height,
+            anchor: { x: 0, y: 0 }
         };
     }
 

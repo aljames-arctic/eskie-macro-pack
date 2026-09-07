@@ -214,12 +214,12 @@ if (animation) {
             const isV14 = Number(String(game.release?.generation ?? game.version ?? '').split('.')[0]) >= 14;
             const rawX = tileDoc.x ?? tile.x ?? 0;
             const rawY = tileDoc.y ?? tile.y ?? 0;
-            const halfW = isV14 ? (tileWidth / 2) : 0;
-            const halfH = isV14 ? (tileHeight / 2) : 0;
-            const tileMinX = isV14 ? (rawX - halfW) : rawX;
-            const tileMaxX = isV14 ? (rawX + halfW) : (rawX + tileWidth);
-            const tileMinY = isV14 ? (rawY - halfH) : rawY;
-            const tileMaxY = isV14 ? (rawY + halfH) : (rawY + tileHeight);
+            const anchorX = isV14 ? (tileDoc.anchor?.x ?? tile.anchor?.x ?? tileDoc.texture?.anchorX ?? tile.texture?.anchorX ?? tileDoc.anchorX ?? 0.5) : 0;
+            const anchorY = isV14 ? (tileDoc.anchor?.y ?? tile.anchor?.y ?? tileDoc.texture?.anchorY ?? tile.texture?.anchorY ?? tileDoc.anchorY ?? 0.5) : 0;
+            const tileMinX = rawX - (anchorX * tileWidth);
+            const tileMaxX = tileMinX + tileWidth;
+            const tileMinY = rawY - (anchorY * tileHeight);
+            const tileMaxY = tileMinY + tileHeight;
             return !(t.x + tWidth <= tileMinX || t.x >= tileMaxX || t.y + tHeight <= tileMinY || t.y >= tileMaxY);
         });
 

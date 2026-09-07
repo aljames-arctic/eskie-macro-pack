@@ -146,7 +146,8 @@ test('Tile offset calculations: V12/V13 top-left origin math vs V14+ centered or
         maxY: 300,
         center: { x: 200, y: 200 },
         width: 200,
-        height: 200
+        height: 200,
+        anchor: { x: 0, y: 0 }
     });
 
     const v14Tile = { x: 200, y: 200, width: 200, height: 200, document: { x: 200, y: 200, width: 200, height: 200 } };
@@ -157,7 +158,34 @@ test('Tile offset calculations: V12/V13 top-left origin math vs V14+ centered or
         maxY: 300,
         center: { x: 200, y: 200 },
         width: 200,
-        height: 200
+        height: 200,
+        anchor: { x: 0.5, y: 0.5 }
+    });
+
+    // Custom V14 tile anchor: top-left anchor { x: 0, y: 0 }
+    const v14TopLeftTile = { x: 100, y: 100, width: 200, height: 200, document: { x: 100, y: 100, width: 200, height: 200, anchor: { x: 0, y: 0 } } };
+    assert.deepEqual(v14.getTileBounds(v14TopLeftTile), {
+        minX: 100,
+        maxX: 300,
+        minY: 100,
+        maxY: 300,
+        center: { x: 200, y: 200 },
+        width: 200,
+        height: 200,
+        anchor: { x: 0, y: 0 }
+    });
+
+    // Custom V14 tile anchor: bottom-right anchor { x: 1, y: 1 }
+    const v14BottomRightTile = { x: 300, y: 300, width: 200, height: 200, document: { x: 300, y: 300, width: 200, height: 200, anchor: { x: 1, y: 1 } } };
+    assert.deepEqual(v14.getTileBounds(v14BottomRightTile), {
+        minX: 100,
+        maxX: 300,
+        minY: 100,
+        maxY: 300,
+        center: { x: 200, y: 200 },
+        width: 200,
+        height: 200,
+        anchor: { x: 1, y: 1 }
     });
 
     // Token inside check with V14 centered origin tile
@@ -166,6 +194,8 @@ test('Tile offset calculations: V12/V13 top-left origin math vs V14+ centered or
     canvas.tokens = { placeables: [tokenInTile, tokenOutTile] };
 
     assert.deepEqual(v14.getTokensInTile(v14Tile).map(t => t.id), ['t-in']);
+    assert.deepEqual(v14.getTokensInTile(v14TopLeftTile).map(t => t.id), ['t-in']);
+    assert.deepEqual(v14.getTokensInTile(v14BottomRightTile).map(t => t.id), ['t-in']);
 });
 
 test('Template position extraction: V12/V13 MeasuredTemplate vs V14+ Region shapes', () => {

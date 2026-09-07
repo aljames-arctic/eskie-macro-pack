@@ -49,30 +49,38 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
     }
 
     /**
-     * Calculate bounding box and center for a Tile on Foundry V14+ (centered origin (0.5, 0.5)).
-     * In V14+, tile (x, y) is the centered origin.
+     * Calculate bounding box and center for a Tile on Foundry V14+.
+     * Evaluates V14 tile anchor configuration (defaulting to centered (0.5, 0.5)).
      * @override
      * @param {Tile|TileDocument} tile Target tile placeable or document
-     * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number }}
+     * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number, anchor: {x: number, y: number} }}
      */
     getTileBounds(tile) {
-        if (!tile) return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0 };
+        if (!tile) return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
         const doc = tile.document ?? tile;
         const x = doc.x ?? tile.x ?? 0;
         const y = doc.y ?? tile.y ?? 0;
         const width = doc.width ?? tile.width ?? 0;
         const height = doc.height ?? tile.height ?? 0;
-        const halfW = width / 2;
-        const halfH = height / 2;
-        const center = tile.center ?? doc.center ?? { x, y };
+
+        const anchorX = doc.anchor?.x ?? tile.anchor?.x ?? doc.texture?.anchorX ?? tile.texture?.anchorX ?? doc.anchorX ?? 0.5;
+        const anchorY = doc.anchor?.y ?? tile.anchor?.y ?? doc.texture?.anchorY ?? tile.texture?.anchorY ?? doc.anchorY ?? 0.5;
+
+        const minX = x - (anchorX * width);
+        const maxX = minX + width;
+        const minY = y - (anchorY * height);
+        const maxY = minY + height;
+        const center = tile.center ?? doc.center ?? { x: minX + width / 2, y: minY + height / 2 };
+
         return {
-            minX: x - halfW,
-            maxX: x + halfW,
-            minY: y - halfH,
-            maxY: y + halfH,
+            minX,
+            maxX,
+            minY,
+            maxY,
             center,
             width,
-            height
+            height,
+            anchor: { x: anchorX, y: anchorY }
         };
     }
 

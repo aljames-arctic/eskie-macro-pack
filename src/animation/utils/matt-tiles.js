@@ -208,8 +208,16 @@ if (animation) {
         // Collect all tokens contained within / overlapping this trap tile via adapter
         let targets = adapter.getTokensInTile(tile);
 
-        // If no tokens were found inside tile bounds (e.g. during pre-update or edge entry), fallback to the activating token
-        if (targets.length === 0 && token) {
+        // If this trap tile is also the trigger tile, ensure the activating token that stepped on it is included
+        const isTriggerTile = Boolean(tileDoc.getFlag('${MODULE_ID}', 'trap.isTriggerTile'));
+        if (isTriggerTile && token) {
+            const activatingTarget = token.object ?? token;
+            const activatingId = activatingTarget.id ?? token.id;
+            const isAlreadyTargeted = targets.some(t => (t.id ?? t.document?.id) === activatingId);
+            if (!isAlreadyTargeted) {
+                targets.push(activatingTarget);
+            }
+        } else if (targets.length === 0 && token) {
             targets = [token.object ?? token];
         }
 

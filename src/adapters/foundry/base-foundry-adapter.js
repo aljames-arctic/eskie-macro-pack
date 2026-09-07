@@ -865,14 +865,30 @@ export class BaseFoundryAdapter {
 
         return tokens.filter(token => {
             const tDoc = token.document ?? token;
-            const tWidth = token.w ?? ((tDoc.width ?? 1) * gridSize);
-            const tHeight = token.h ?? ((tDoc.height ?? 1) * gridSize);
-            const tMinX = token.x ?? tDoc.x ?? 0;
-            const tMaxX = tMinX + tWidth;
-            const tMinY = token.y ?? tDoc.y ?? 0;
-            const tMaxY = tMinY + tHeight;
+            const tWidth = (tDoc.width ?? 1) * gridSize;
+            const tHeight = (tDoc.height ?? 1) * gridSize;
 
-            return !(tMaxX <= tileMinX || tMinX >= tileMaxX || tMaxY <= tileMinY || tMinY >= tileMaxY);
+            // Check authoritative document bounds (where the token is logically placed in the database)
+            const docMinX = tDoc.x ?? token.x ?? 0;
+            const docMaxX = docMinX + tWidth;
+            const docMinY = tDoc.y ?? token.y ?? 0;
+            const docMaxY = docMinY + tHeight;
+            const docOverlaps = !(docMaxX <= tileMinX || docMinX >= tileMaxX || docMaxY <= tileMinY || docMinY >= tileMaxY);
+
+            if (docOverlaps) return true;
+
+            // Also check canvas placeable bounds if animating or rendering at a distinct location
+            if (token.x !== undefined && token.y !== undefined) {
+                const objWidth = token.w ?? tWidth;
+                const objHeight = token.h ?? tHeight;
+                const objMinX = token.x;
+                const objMaxX = objMinX + objWidth;
+                const objMinY = token.y;
+                const objMaxY = objMinY + objHeight;
+                return !(objMaxX <= tileMinX || objMinX >= tileMaxX || objMaxY <= tileMinY || objMinY >= tileMaxY);
+            }
+
+            return false;
         });
     }
 

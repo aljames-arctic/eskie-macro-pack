@@ -56,6 +56,9 @@ async function create(tile, targets, config = {}) {
 
     if (finalTargets.length > 0) {
         finalTargets.forEach(target => {
+            const targetDoc = target.document ?? target;
+            const targetRotation = targetDoc.rotation;
+
             seq = seq
                 // Blood splash effect on target
                 .effect()
@@ -69,7 +72,7 @@ async function create(tile, targets, config = {}) {
                 // Shaking token effect when struck by trap
                 .effect()
                 .copySprite(target)
-                .spriteRotation(-target.document.rotation)
+                .spriteRotation(-targetRotation)
                 .scaleToObject(1, { considerTokenScale: true })
                 .fadeIn(250)
                 .fadeOut(750)

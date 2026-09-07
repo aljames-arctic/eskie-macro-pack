@@ -25,13 +25,13 @@ Hooks.once('init', async () => {
 
     // Preload Handlebars templates
     await adapter.loadTemplates([
-        'modules/eskie-macros/src/ui/autoanimations/autorecUpdateMenu.html',
-        'modules/eskie-macros/src/ui/autorec/destinationDialog.html',
-        'modules/eskie-macros/src/ui/autorec/manageAutorecMenu.html',
-        'modules/eskie-macros/src/ui/blfx/autorecUpdateMenu.html',
-        'modules/eskie-macros/src/ui/blfx/enableUpdatesPrompt.html',
-        'modules/eskie-macros/src/ui/recommended-modules/recommendedModulesMenu.html',
-        'modules/eskie-macros/src/ui/world-scripts/worldScriptsMenu.html'
+        `modules/${MODULE_ID}/src/ui/autoanimations/autorecUpdateMenu.html`,
+        `modules/${MODULE_ID}/src/ui/autorec/destinationDialog.html`,
+        `modules/${MODULE_ID}/src/ui/autorec/manageAutorecMenu.html`,
+        `modules/${MODULE_ID}/src/ui/blfx/autorecUpdateMenu.html`,
+        `modules/${MODULE_ID}/src/ui/blfx/enableUpdatesPrompt.html`,
+        `modules/${MODULE_ID}/src/ui/recommended-modules/recommendedModulesMenu.html`,
+        `modules/${MODULE_ID}/src/ui/world-scripts/worldScriptsMenu.html`
     ]);
 
     function setupModule() {

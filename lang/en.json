@@ -58,7 +58,7 @@
             "generateCompendiums": {
                 "name": "Generate Macro Compendiums",
                 "label": "Generate Compendiums",
-                "hint": "Synchronizes all standalone macro files from src/standalone-macros/ into the module compendium."
+                "hint": "Synchronizes all standalone macros from src/standalone-macros/ and AA bootstrap macros from compendium-macros/ into module compendiums."
             },
             "logVerbosity": {
                 "name": "Log Verbosity Level",

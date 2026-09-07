@@ -22,7 +22,7 @@ Hooks.once('init', function() {
                 constructor(options = {}) {
                     super(options);
                     updateMacroCompendiums().then(() => {
-                        ui.notifications?.info("EMP: Standalone macros synced to compendium!");
+                        ui.notifications?.info("EMP: Macro compendiums synced successfully (Standalone & AA Bootstrap)!");
                     }).catch((err) => {
                         ui.notifications?.error(`EMP: Failed to sync compendiums: ${err.message}`);
                     });

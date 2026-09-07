@@ -1,4 +1,5 @@
 import { log } from './logger.js';
+import { MODULE_ID } from './constants.js';
 
 /**
  * Known standalone macro filenames in src/standalone-macros/
@@ -165,11 +166,35 @@ export const KNOWN_STANDALONE_MACROS = [
 ];
 
 /**
+ * Known Automated Animations bootstrap macro filenames and their compendium titles.
+ */
+export const KNOWN_AA_BOOTSTRAP_MACROS = [
+    { file: 'aa-effect.js', name: 'AA | Effect', img: 'icons/svg/aura.svg' },
+    { file: 'aa-target.js', name: 'AA | Target', img: 'icons/svg/target.svg' },
+    { file: 'aa-template.js', name: 'AA | Template', img: 'icons/svg/circle.svg' },
+    { file: 'aa-token.js', name: 'AA | Token', img: 'icons/svg/cowled.svg' }
+];
+
+const AA_MACRO_NAME_MAP = {
+    'aa-effect.js': 'AA | Effect',
+    'aa-target.js': 'AA | Target',
+    'aa-template.js': 'AA | Template',
+    'aa-token.js': 'AA | Token'
+};
+
+const AA_MACRO_ICON_MAP = {
+    'aa-effect.js': 'icons/svg/aura.svg',
+    'aa-target.js': 'icons/svg/target.svg',
+    'aa-template.js': 'icons/svg/circle.svg',
+    'aa-token.js': 'icons/svg/cowled.svg'
+};
+
+/**
  * Formats a kebab-case or snake-case filename into a clean Title Case macro name.
  * @param {string} filename - The script filename (e.g. "speak-with-dead.js").
  * @returns {string} The formatted Title Case name ("Speak With Dead").
  */
-function formatMacroTitle(filename) {
+export function formatMacroTitle(filename) {
     const baseName = filename.replace(/\.js$/i, '');
     return baseName
         .split(/[-_]+/)
@@ -201,15 +226,38 @@ async function discoverMacroFiles(modulePath) {
 }
 
 /**
- * Synchronizes `.js` files in `src/standalone-macros/` into the module's macro compendium.
+ * Discovers `.js` files in `compendium-macros/` using Foundry's FilePicker if possible,
+ * falling back to the canonical known AA bootstrap list.
+ * @param {string} modulePath - The relative module root directory.
+ * @returns {Promise<string[]>} List of JS filenames.
+ */
+async function discoverAaMacroFiles(modulePath) {
+    const dirPath = `${modulePath}/compendium-macros`;
+    const knownFiles = KNOWN_AA_BOOTSTRAP_MACROS.map((m) => m.file);
+    try {
+        const browseResult = await FilePicker.browse('data', dirPath);
+        const files = browseResult.files
+            .filter((filePath) => filePath.endsWith('.js'))
+            .map((filePath) => filePath.split('/').pop());
+        if (files.length > 0) {
+            return Array.from(new Set([...knownFiles, ...files]));
+        }
+    } catch (err) {
+        log.debug(`FilePicker browsing not available for ${dirPath}, using known manifest`, err);
+    }
+    return knownFiles;
+}
+
+/**
+ * Synchronizes `.js` files in `src/standalone-macros/` into the module's standalone macro compendium.
  * For each script, reads its content and creates or updates a corresponding Macro document.
  * @param {object} [options] - Optional sync parameters.
  * @param {string} [options.packName] - Full collection name of the target pack.
  * @returns {Promise<void>}
  */
-export async function updateMacroCompendiums(options = {}) {
-    const packName = options.packName ?? 'eskie-macros.eskie-standalone-macros';
-    const pack = game.packs.get(packName);
+export async function updateStandaloneMacroCompendium(options = {}) {
+    const packName = options.packName ?? `${MODULE_ID}.eskie-standalone-macros`;
+    const pack = game.packs?.get(packName);
 
     if (!pack) {
         log.error(`Standalone macro compendium '${packName}' not found`);
@@ -218,7 +266,7 @@ export async function updateMacroCompendiums(options = {}) {
 
     const moduleId = pack.metadata?.packageType === 'module'
         ? pack.metadata.packageName
-        : 'eskie-macros';
+        : MODULE_ID;
     const modulePath = `modules/${moduleId}`;
 
     const wasLocked = Boolean(pack.locked);
@@ -249,7 +297,7 @@ export async function updateMacroCompendiums(options = {}) {
                 command: commandContent,
                 img: 'icons/svg/lightning.svg',
                 flags: {
-                    'eskie-macros': {
+                    [MODULE_ID]: {
                         standaloneMacro: true,
                         sourceFile: filename
                     }
@@ -281,6 +329,101 @@ export async function updateMacroCompendiums(options = {}) {
     }
 }
 
+/**
+ * Synchronizes `.js` files in `compendium-macros/` into the module's Automated Animations integration compendium.
+ * For each bootstrap script, reads its content and creates or updates a corresponding Macro document.
+ * @param {object} [options] - Optional sync parameters.
+ * @param {string} [options.packName] - Full collection name of the target pack.
+ * @returns {Promise<void>}
+ */
+export async function updateAaIntegrationCompendium(options = {}) {
+    const packName = options.packName ?? `${MODULE_ID}.eskie-aa-integration`;
+    const pack = game.packs?.get(packName);
+
+    if (!pack) {
+        log.error(`AA integration macro compendium '${packName}' not found`);
+        return;
+    }
+
+    const moduleId = pack.metadata?.packageType === 'module'
+        ? pack.metadata.packageName
+        : MODULE_ID;
+    const modulePath = `modules/${moduleId}`;
+
+    const wasLocked = Boolean(pack.locked);
+    if (wasLocked) {
+        await pack.configure({ locked: false });
+    }
+
+    try {
+        const aaMacroFiles = await discoverAaMacroFiles(modulePath);
+        const existingIndex = await pack.getIndex({ fields: ['name', 'flags'] });
+
+        for (const filename of aaMacroFiles) {
+            const fileUrl = `${modulePath}/compendium-macros/${filename}`;
+            const response = await fetch(fileUrl);
+
+            if (!response.ok) {
+                log.warn(`Failed to fetch script content from ${fileUrl} (status: ${response.status})`);
+                continue;
+            }
+
+            const commandContent = await response.text();
+            const macroTitle = AA_MACRO_NAME_MAP[filename] ?? formatMacroTitle(filename);
+            const macroIcon = AA_MACRO_ICON_MAP[filename] ?? 'icons/svg/lightning.svg';
+            const existingEntry = existingIndex.find((entry) => entry.name === macroTitle);
+
+            const macroPayload = {
+                name: macroTitle,
+                type: 'script',
+                command: commandContent,
+                img: macroIcon,
+                flags: {
+                    [MODULE_ID]: {
+                        aaIntegration: true,
+                        sourceFile: filename
+                    }
+                }
+            };
+
+            if (existingEntry) {
+                const doc = await pack.getDocument(existingEntry._id);
+                if (doc) {
+                    await doc.update({
+                        command: commandContent,
+                        img: macroPayload.img,
+                        flags: macroPayload.flags
+                    });
+                    log.debug(`Updated AA bootstrap macro '${macroTitle}' in compendium '${packName}'`);
+                }
+            } else {
+                await Macro.create(macroPayload, { pack: pack.collection });
+                log.debug(`Created AA bootstrap macro '${macroTitle}' in compendium '${packName}'`);
+            }
+        }
+
+        log.info(`AA integration macros sync complete for compendium '${packName}'`);
+    } catch (err) {
+        log.error('Unexpected failure during AA integration macros compendium sync', err);
+    } finally {
+        if (wasLocked) {
+            await pack.configure({ locked: true });
+        }
+    }
+}
+
+/**
+ * Synchronizes all macro compendiums (both standalone macros and Automated Animations bootstrap integration macros).
+ * @param {object} [options] - Optional sync parameters.
+ * @returns {Promise<void>}
+ */
+export async function updateMacroCompendiums(options = {}) {
+    await updateStandaloneMacroCompendium(options);
+    await updateAaIntegrationCompendium(options);
+}
+
 export const standaloneMacros = {
-    sync: updateMacroCompendiums
+    sync: updateMacroCompendiums,
+    syncStandalone: updateStandaloneMacroCompendium,
+    syncAa: updateAaIntegrationCompendium
 };

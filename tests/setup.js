@@ -8,6 +8,24 @@ globalThis.Actor = class Actor {};
 globalThis.ChatMessage = class ChatMessage {};
 globalThis.Token = class Token {};
 globalThis.Tile = class Tile {};
+globalThis.Macro = class Macro {
+    constructor(data = {}, options = {}) {
+        Object.assign(this, data);
+        this._options = options;
+        this._id = data._id ?? (globalThis.foundry?.utils?.randomID?.() ?? 'macro-1');
+    }
+    static async create(data, options = {}) {
+        const instance = new Macro(data, options);
+        if (options?.pack && globalThis.game?.packs?.get(options.pack)) {
+            globalThis.game.packs.get(options.pack)._documents.set(instance._id, instance);
+        }
+        return instance;
+    }
+    async update(data) {
+        Object.assign(this, data);
+        return this;
+    }
+};
 globalThis.tokenAttacher = undefined;
 globalThis.MassEdit = undefined;
 globalThis.socketlib = undefined;
@@ -298,6 +316,7 @@ globalThis.game = {
     version: '12.331',
     system: { id: 'dnd5e', title: 'D&D 5e' },
     modules: new Map(),
+    packs: new Map(),
     user: {
         id: 'gm-user-1',
         name: 'Game Master',

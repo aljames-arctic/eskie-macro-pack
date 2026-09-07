@@ -13,8 +13,8 @@ Eskie Macro Pack maintains two dynamic Foundry VTT compendiums:
 
 ### Source Files vs. Packed Databases
 
-- Human-readable source macros live in `src/standalone-macros/*.js`.
-- Whenever a macro is added or edited in source files, dev environment maintainers can click **Generate Compendiums** under *Module Settings* (or call `updateMacroCompendiums()`) to update the dynamic compendium database.
+- Human-readable source macros live in `src/standalone-macros/*.js` and `compendium-macros/*.js`.
+- Whenever a macro is added or edited in source files, dev environment maintainers can click **Generate Compendiums** under *Module Settings* (or call `updateMacroCompendiums()`) to update the dynamic compendium databases (`eskie-standalone-macros` and `eskie-aa-integration`).
 
 ---
 

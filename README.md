@@ -351,7 +351,7 @@ When `setup()` completes, EMP writes MATT configuration flags to your tiles. The
 const playPath = tile.getFlag('eskie-macros', 'trap.playPath');
 const originTileIds = tile.getFlag('eskie-macros', 'trap.trapOriginTileIds') || [];
 if (playPath && typeof token !== 'undefined') {
-    const trap = eskie.adapter.getProperty(globalThis, playPath);
+    const trap = foundry.utils.getProperty(globalThis, playPath);
     if (trap && typeof trap.play === 'function') {
         originTileIds.forEach(id => {
             const originTile = canvas.tiles.get(id);

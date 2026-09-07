@@ -200,7 +200,7 @@ if (!token) return;
 // Get the specific Eskie Trap Animation Function
 const animation = tile.getFlag('${MODULE_ID}', 'trap.animation');
 if (!animation) return;
-const trap = adapter.getProperty(globalThis, animation);
+const trap = foundry.utils.getProperty(globalThis, animation);
 if (!trap?.play) return;
 
 // Play the trap animation for the token(s)

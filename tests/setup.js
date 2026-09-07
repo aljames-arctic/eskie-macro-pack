@@ -318,7 +318,15 @@ globalThis.game = {
         set: async (_module, _key, val) => val
     },
     i18n: {
-        localize: (key) => key
+        has: (key) => false,
+        localize: (key) => key,
+        format: (key, data = {}) => {
+            let str = key;
+            for (const [k, v] of Object.entries(data)) {
+                str = str.replace(`{${k}}`, v);
+            }
+            return str;
+        }
     }
 };
 

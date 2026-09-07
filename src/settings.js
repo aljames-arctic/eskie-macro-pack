@@ -75,7 +75,7 @@ Hooks.once('init', function() {
             'none': 'EMP.settings.autorecTarget.choices.none'
         },
         default: 'ask',
-        onChange: (value) => log.info(`EMP | Autorec target setting updated to "${value}"`)
+        onChange: (value) => log.info(`Autorec target setting updated to "${value}"`)
     });
 
     game.settings.register(MODULE_ID, 'enableSounds', {

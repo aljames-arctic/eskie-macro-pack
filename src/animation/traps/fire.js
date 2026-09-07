@@ -31,7 +31,7 @@ async function create(tile, targets, config = {}) {
     const targetLoc = targetTileBounds?.center ?? (targetList.length ? (targetList[0].center ?? targetList[0].object?.center) : null);
 
     if (!targetLoc) {
-        log.warn(`EMP | Fire Trap: Tile "${tileDoc.id}" has no configured target tile or targeted tokens.`);
+        log.warn(`Fire Trap: Tile "${tileDoc.id}" has no configured target tile or targeted tokens.`);
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;

@@ -35,7 +35,7 @@ async function create(tile, targets, config = {}) {
     const targetLoc = targetTileBounds?.center ?? (target ? (target.center ?? target.object?.center) : null);
 
     if (!targetLoc) {
-        log.warn(`EMP | Bull Rush Statue Trap: Tile "${tileDoc.id}" has no configured target tile or targeted tokens.`);
+        log.warn(`Bull Rush Statue Trap: Tile "${tileDoc.id}" has no configured target tile or targeted tokens.`);
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;

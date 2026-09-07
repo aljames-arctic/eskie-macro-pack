@@ -23,8 +23,11 @@ async function create(tile, targets, config = {}) {
     if (!tile) return new Sequence();
 
     // Find the door tile (the trigger tile that has this trap tile linked in its flags)
-    const triggerTile = canvas.tiles.placeables.find(t => t.document.getFlag(MODULE_ID, 'trap.originIds')?.includes(tile.id) || t.document.getFlag(MODULE_ID, 'trap.trapTileIds')?.includes(tile.id));
-    const doorTile = triggerTile || tile;
+    const triggerTile = canvas.tiles.placeables.find(t => {
+        const d = t.document ?? t;
+        return d.getFlag?.(MODULE_ID, 'trap.originIds')?.includes(tile.id) || d.getFlag?.(MODULE_ID, 'trap.trapTileIds')?.includes(tile.id);
+    });
+    const doorTile = triggerTile ?? tile;
 
     const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
 

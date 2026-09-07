@@ -30,14 +30,18 @@ async function create(tile, targets, config = {}) {
         if (triggerTile) targetTile = triggerTile;
     }
 
-    const tilePlaceable = tile.object || tile;
-    const targetTilePlaceable = targetTile?.object || targetTile;
-    const targetLoc = targetTilePlaceable?.center || (target ? (target.object?.center || target) : null);
+    const tileDoc = tile.document ?? tile;
+    const tilePlaceable = tile.object ?? tile;
+    const targetTileDoc = targetTile?.document ?? targetTile;
+    const targetTilePlaceable = targetTile?.object ?? targetTile;
+    const targetLoc = targetTilePlaceable?.center ?? (target ? (target.object?.center ?? target.center ?? target) : null);
 
     // Direct texture resolution from the Tile Document (Foundry VTT v10+)
-    const textureSrc = tile.document.texture.src;
-    const scaleX = tile.document.texture.scaleX ?? 1;
-    const scaleY = tile.document.texture.scaleY ?? 1;
+    const textureSrc = tileDoc.texture?.src ?? tile.texture?.src ?? '';
+    const scaleX = tileDoc.texture?.scaleX ?? 1;
+    const scaleY = tileDoc.texture?.scaleY ?? 1;
+    const tileWidth = tileDoc.width ?? tile.width ?? 0;
+    const tileHeight = tileDoc.height ?? tile.height ?? 0;
 
     if (!targetLoc) {
         log.warn("Bull Rush Statue: No target location resolved. Ensure that a target token is passed, or that the trap tile is linked to a target/trigger tile via flags.", {
@@ -52,9 +56,10 @@ async function create(tile, targets, config = {}) {
     applySound(seq, sound);
 
     if (targetLoc) {
+        const startCenter = tilePlaceable.center ?? { x: tileDoc.x ?? 0, y: tileDoc.y ?? 0 };
         const distance = {
-            x: targetLoc.x - tilePlaceable.center.x,
-            y: targetLoc.y - tilePlaceable.center.y
+            x: targetLoc.x - startCenter.x,
+            y: targetLoc.y - startCenter.y
         };
 
         const getDirection = (value) => {
@@ -84,8 +89,8 @@ async function create(tile, targets, config = {}) {
             .effect()
             .file(textureSrc)
             .atLocation(tilePlaceable)
-            .size({ width: tile.document.width * scaleX, height: tile.document.height * scaleY })
-            .spriteRotation(-(tile.document.rotation ?? 0))
+            .size({ width: tileWidth * scaleX, height: tileHeight * scaleY })
+            .spriteRotation(-(tileDoc.rotation ?? 0))
             .animateProperty('spriteContainer', 'position.x', { from: 0, to: slideDistance.x, duration: 500, ease: 'easeOutQuint', delay: 200 })
             .animateProperty('spriteContainer', 'position.y', { from: 0, to: slideDistance.y, duration: 500, ease: 'easeOutQuint', delay: 200 })
             .animateProperty('spriteContainer', 'position.x', { from: 0, to: -slideDistance.x, duration: 3000, ease: 'easeInOutQuad', delay: 700 })
@@ -103,7 +108,7 @@ async function create(tile, targets, config = {}) {
             .delay(200)
             .file(closest('eskie.smoke.01.white'))
             .atLocation(tile)
-            .size({ width: tile.document.width * 1.75, height: tile.document.height * 1.75 })
+            .size({ width: tileWidth * 1.75, height: tileHeight * 1.75 })
             .belowTokens()
             .opacity(0.5)
 
@@ -112,7 +117,7 @@ async function create(tile, targets, config = {}) {
             .delay(200)
             .file(closest('eskie.smoke.01.white'))
             .atLocation(tile)
-            .size({ width: tile.document.width * 1.75, height: tile.document.height * 1.75 })
+            .size({ width: tileWidth * 1.75, height: tileHeight * 1.75 })
             .mirrorX()
             .belowTokens()
             .opacity(0.5);

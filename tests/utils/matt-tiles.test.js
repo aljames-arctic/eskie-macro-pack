@@ -59,7 +59,7 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
     const triggerUpdate = updatedTiles.get('tile-trigger-1');
     assert.ok(triggerUpdate, 'Trigger tile should be updated with MATT configuration');
     assert.equal(triggerUpdate['flags.monks-active-tiles.active'], true);
-    assert.deepEqual(triggerUpdate['flags.monks-active-tiles.trigger'], ['enter']);
+    assert.equal(triggerUpdate['flags.monks-active-tiles.trigger'], 'enter');
     assert.deepEqual(triggerUpdate[`flags.${MODULE_ID}.trap.originIds`], ['tile-trap-1']);
     assert.equal(triggerUpdate[`flags.${MODULE_ID}.trap.isTriggerTile`], true);
 
@@ -69,9 +69,12 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
 
     // Test executing trigger action code
     const mockTriggerTile = {
-        getFlag: (mod, key) => {
-            if (mod === MODULE_ID && key === 'trap.originIds') return ['tile-trap-1'];
-            return null;
+        document: {
+            id: 'tile-trigger-1',
+            getFlag: (mod, key) => {
+                if (mod === MODULE_ID && key === 'trap.originIds') return ['tile-trap-1'];
+                return null;
+            }
         }
     };
     const mockActivatingToken = { id: 'tok-activating', document: { id: 'tok-activating' } };
@@ -85,7 +88,7 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
     const trapUpdate = updatedTiles.get('tile-trap-1');
     assert.ok(trapUpdate, 'Trap tile should be updated with MATT configuration');
     assert.equal(trapUpdate['flags.monks-active-tiles.active'], true);
-    assert.deepEqual(trapUpdate['flags.monks-active-tiles.trigger'], ['manual']);
+    assert.equal(trapUpdate['flags.monks-active-tiles.trigger'], 'manual');
     assert.equal(trapUpdate[`flags.${MODULE_ID}.trap.isTrapTile`], true);
     assert.equal(trapUpdate[`flags.${MODULE_ID}.trap.animation`], 'eskie.traps.spike');
 
@@ -123,15 +126,21 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
 
     const mockTrapTile = {
         id: 'tile-trap-1',
-        document: trapTileDoc,
+        document: {
+            id: 'tile-trap-1',
+            x: 100,
+            y: 100,
+            width: 100,
+            height: 100,
+            getFlag: (mod, key) => {
+                if (mod === MODULE_ID && key === 'trap.animation') return 'eskie.traps.spike';
+                return null;
+            }
+        },
         x: 100,
         y: 100,
         width: 100,
-        height: 100,
-        getFlag: (mod, key) => {
-            if (mod === MODULE_ID && key === 'trap.animation') return 'eskie.traps.spike';
-            return null;
-        }
+        height: 100
     };
 
     const trapExecFn = new Function('token', 'tile', 'canvas', `return (async () => { ${trapAction.data.code} })();`);
@@ -173,7 +182,7 @@ test('matt.trap.setup correctly handles when the trigger tile is the trap tile (
     const selfUpdate = updatedTiles.get('tile-self-1');
     assert.ok(selfUpdate, 'Single tile should be updated');
     assert.equal(selfUpdate['flags.monks-active-tiles.active'], true);
-    assert.deepEqual(selfUpdate['flags.monks-active-tiles.trigger'], ['enter', 'manual'], 'Combined tile should have both enter and manual triggers');
+    assert.equal(selfUpdate['flags.monks-active-tiles.trigger'], 'enter', 'Combined tile should have enter trigger');
     assert.equal(selfUpdate[`flags.${MODULE_ID}.trap.isTriggerTile`], true);
     assert.equal(selfUpdate[`flags.${MODULE_ID}.trap.isTrapTile`], true);
     assert.equal(selfUpdate[`flags.${MODULE_ID}.trap.animation`], 'eskie.traps.spike');
@@ -198,6 +207,7 @@ test('matt.trap.setup correctly handles when the trigger tile is the trap tile (
     };
     globalThis.game.modules.set(MODULE_ID, { id: MODULE_ID, api: { adapter } });
 
+    // Place tokens on canvas: tokenInside is on tile
     const tokenInside = { id: 'tok-on-tile', document: { id: 'tok-on-tile', x: 220, y: 220, width: 1, height: 1 }, x: 220, y: 220, w: 100, h: 100 };
     globalThis.canvas.tokens = {
         placeables: [tokenInside]
@@ -206,16 +216,22 @@ test('matt.trap.setup correctly handles when the trigger tile is the trap tile (
 
     const mockTile = {
         id: 'tile-self-1',
-        document: selfTileDoc,
+        document: {
+            id: 'tile-self-1',
+            x: 200,
+            y: 200,
+            width: 100,
+            height: 100,
+            getFlag: (mod, key) => {
+                if (mod === MODULE_ID && key === 'trap.animation') return 'eskie.traps.spike';
+                if (mod === MODULE_ID && key === 'trap.originIds') return ['tile-self-1'];
+                return null;
+            }
+        },
         x: 200,
         y: 200,
         width: 100,
-        height: 100,
-        getFlag: (mod, key) => {
-            if (mod === MODULE_ID && key === 'trap.animation') return 'eskie.traps.spike';
-            if (mod === MODULE_ID && key === 'trap.originIds') return ['tile-self-1'];
-            return null;
-        }
+        height: 100
     };
     const mockToken = { id: 'tok-on-tile', document: { id: 'tok-on-tile' } };
 
@@ -224,6 +240,15 @@ test('matt.trap.setup correctly handles when the trigger tile is the trap tile (
 
     assert.equal(playCalled, true, 'Trap play should be executed on the tile');
     assert.equal(playTargets.length, 1, 'Token on the tile should be targeted');
+    assert.equal(playTargets[0].id, 'tok-on-tile');
+
+    // Test fallback when no tokens on canvas overlap (e.g. pre-update movement entry)
+    playCalled = false;
+    playTargets = [];
+    globalThis.canvas.tokens = { placeables: [] };
+    await execFn(mockToken, mockTile, globalThis.canvas);
+    assert.equal(playCalled, true, 'Trap play should still execute with fallback activating token');
+    assert.equal(playTargets.length, 1);
     assert.equal(playTargets[0].id, 'tok-on-tile');
 });
 

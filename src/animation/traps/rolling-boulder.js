@@ -20,31 +20,33 @@ async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { boulderSpeed, boulderSize, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
+    const tileDoc = tile.document ?? tile;
+
     // Retrieve end tile from flags, falling back to legacy/Tagger search for backward compatibility
-    const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
+    const targetTileIds = tileDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
     let endTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
 
     if (!endTile) {
-        const endTileIds = tile.document?.getFlag(MODULE_ID, 'trap.boulderEndTileIds') ?? [];
+        const endTileIds = tileDoc.getFlag?.(MODULE_ID, 'trap.boulderEndTileIds') ?? [];
         endTile = endTileIds.length ? canvas.tiles.get(endTileIds[0]) : null;
     }
 
     if (!endTile && Tagger) {
         const tagged = await Tagger.getByTag('Rolling Boulder End');
-        endTile = tagged[0]?.object || tagged[0];
+        endTile = tagged[0]?.object ?? tagged[0];
     }
 
     if (!endTile) {
         ui.notifications.warn('EMP | Rolling Boulder Trap: No end tile found.');
         let seq = new Sequence();
-    applySound(seq, sound);
-    return seq;
+        applySound(seq, sound);
+        return seq;
     }
 
-    const tilePlaceable = tile.object || tile;
-    const endTilePlaceable = endTile.object || endTile;
-    const startLoc = tilePlaceable.center || tilePlaceable;
-    const endLoc = endTilePlaceable.center || endTilePlaceable;
+    const tilePlaceable = tile.object ?? tile;
+    const endTilePlaceable = endTile.object ?? endTile;
+    const startLoc = tilePlaceable.center ?? tilePlaceable;
+    const endLoc = endTilePlaceable.center ?? endTilePlaceable;
 
     let seq = new Sequence();
     applySound(seq, sound);

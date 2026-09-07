@@ -196,32 +196,37 @@ async function setup(animation, config = {}) {
     }
 
     const trapActionCode = `
+// Resolve the TileDocument safely from PlaceableObject or Document
+const tileDoc = tile.document ?? tile;
+
 // Get the specific Eskie Trap Animation Function if this tile is a trap tile
-const animation = tile.getFlag('${MODULE_ID}', 'trap.animation');
+const animation = tileDoc.getFlag?.('${MODULE_ID}', 'trap.animation') ?? tileDoc.flags?.['${MODULE_ID}']?.trap?.animation;
 const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter ?? foundry.utils;
 if (animation) {
     const trap = adapter.getProperty(globalThis, animation);
     if (trap?.play) {
         // Collect all tokens contained within / overlapping this trap tile
-        const targets = adapter.getTokensInTile?.(tile) ?? (canvas.tokens?.placeables ?? []).filter(t => {
+        let targets = adapter.getTokensInTile?.(tile) ?? (canvas.tokens?.placeables ?? []).filter(t => {
             const tDoc = t.document ?? t;
             const gridSize = canvas.grid?.size ?? 100;
             const tWidth = t.w ?? ((tDoc.width ?? 1) * gridSize);
             const tHeight = t.h ?? ((tDoc.height ?? 1) * gridSize);
-            const tileDoc = tile.document ?? tile;
-            const tileWidth = tileDoc.width ?? tile.width ?? 0;
-            const tileHeight = tileDoc.height ?? tile.height ?? 0;
             const isV14 = Number(String(game.release?.generation ?? game.version ?? '').split('.')[0]) >= 14;
             const rawX = tileDoc.x ?? tile.x ?? 0;
             const rawY = tileDoc.y ?? tile.y ?? 0;
             const anchorX = isV14 ? (tileDoc.anchor?.x ?? tile.anchor?.x ?? tileDoc.texture?.anchorX ?? tile.texture?.anchorX ?? tileDoc.anchorX ?? 0.5) : 0;
             const anchorY = isV14 ? (tileDoc.anchor?.y ?? tile.anchor?.y ?? tileDoc.texture?.anchorY ?? tile.texture?.anchorY ?? tileDoc.anchorY ?? 0.5) : 0;
-            const tileMinX = rawX - (anchorX * tileWidth);
-            const tileMaxX = tileMinX + tileWidth;
-            const tileMinY = rawY - (anchorY * tileHeight);
-            const tileMaxY = tileMinY + tileHeight;
+            const tileMinX = rawX - (anchorX * (tileDoc.width ?? tile.width ?? 0));
+            const tileMaxX = tileMinX + (tileDoc.width ?? tile.width ?? 0);
+            const tileMinY = rawY - (anchorY * (tileDoc.height ?? tile.height ?? 0));
+            const tileMaxY = tileMinY + (tileDoc.height ?? tile.height ?? 0);
             return !(t.x + tWidth <= tileMinX || t.x >= tileMaxX || t.y + tHeight <= tileMinY || t.y >= tileMaxY);
         });
+
+        // If no tokens were found inside tile bounds (e.g. during pre-update or edge entry), fallback to the activating token
+        if ((!targets || targets.length === 0) && token) {
+            targets = [token.object ?? token];
+        }
 
         // Play the trap animation with the contained tokens as targets
         await trap.play(tile.object ?? tile, targets);
@@ -229,12 +234,12 @@ if (animation) {
 }
 
 // Manually activate any other linked trap tiles
-const originIds = (tile.getFlag('${MODULE_ID}', 'trap.originIds') ?? []).filter(id => id !== tile.id);
+const originIds = (tileDoc.getFlag?.('${MODULE_ID}', 'trap.originIds') ?? tileDoc.flags?.['${MODULE_ID}']?.trap?.originIds ?? []).filter(id => id !== tileDoc.id && id !== tile.id);
 for (const id of originIds) {
     const originTile = canvas.tiles.get(id);
     if (!originTile) continue;
-    const doc = originTile.document ?? originTile;
-    await (doc.trigger?.({ token }) ?? originTile.trigger?.({ token }));
+    const originDoc = originTile.document ?? originTile;
+    await (originDoc.trigger?.({ token }) ?? originTile.trigger?.({ token }));
 }
 `;
 
@@ -282,12 +287,13 @@ for (const id of originIds) {
         }
 
         if (isTrigger || isTrap) {
-            const triggers = isTrigger
-                ? (isTrap ? Array.from(new Set([...(config.trigger ?? ['enter']), 'manual'])) : (config.trigger ?? ['enter']))
-                : ['manual'];
+            const rawTrigger = config.trigger ?? 'enter';
+            const trigger = isTrigger
+                ? (Array.isArray(rawTrigger) ? (rawTrigger[0] ?? 'enter') : rawTrigger)
+                : 'manual';
 
             updateData['flags.monks-active-tiles.active'] = true;
-            updateData['flags.monks-active-tiles.trigger'] = triggers;
+            updateData['flags.monks-active-tiles.trigger'] = trigger;
             updateData['flags.monks-active-tiles.actions'] = [{
                 id: adapter.randomID(),
                 action: 'runcode',

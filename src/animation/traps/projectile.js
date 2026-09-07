@@ -23,20 +23,25 @@ async function create(tile, targets, config = {}) {
     const { sound, repeats, repeatDelay, splashScale } = mConfig;
     const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInTile(tile);
 
+    const tileDoc = tile.document ?? tile;
+
     // Retrieve projectile type from flags, defaulting to arrow
-    const projectileType = tile.document?.getFlag(MODULE_ID, 'trap.projectileType') ?? mConfig.projectileType ?? 'arrow';
+    const projectileType = tileDoc.getFlag?.(MODULE_ID, 'trap.projectileType') ?? mConfig.projectileType ?? 'arrow';
 
     // Retrieve target/landing tile from flags, falling back to legacy trigger lookup
-    const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
+    const targetTileIds = tileDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
     let targetTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
 
     if (!targetTile) {
-        const triggerTile = canvas.tiles.placeables.find(t => t.document.getFlag(MODULE_ID, 'trap.originIds')?.includes(tile.id) || t.document.getFlag(MODULE_ID, 'trap.trapTileIds')?.includes(tile.id));
+        const triggerTile = canvas.tiles.placeables.find(t => {
+            const d = t.document ?? t;
+            return d.getFlag?.(MODULE_ID, 'trap.originIds')?.includes(tile.id) || d.getFlag?.(MODULE_ID, 'trap.trapTileIds')?.includes(tile.id);
+        });
         if (triggerTile) targetTile = triggerTile;
     }
 
-    const targetTilePlaceable = targetTile?.object || targetTile;
-    const targetLoc = targetTilePlaceable?.center || (targetList.length ? (targetList[0].object?.center || targetList[0]) : null);
+    const targetTilePlaceable = targetTile?.object ?? targetTile;
+    const targetLoc = targetTilePlaceable?.center ?? (targetList.length ? (targetList[0].object?.center ?? targetList[0].center ?? targetList[0]) : null);
 
     let seq = new Sequence();
     applySound(seq, sound);

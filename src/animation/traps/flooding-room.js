@@ -19,13 +19,15 @@ async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { fadeTime, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
+    const tileDoc = tile.document ?? tile;
+
     // Retrieve water spray origin tiles from flags, falling back to tag search for backward compatibility
-    const originIds = tile.document?.getFlag(MODULE_ID, 'trap.floodingRoomSplashOrigins') ?? [];
-    let splashOrigins = originIds.map(id => canvas.tiles.get(id)).filter(t => t);
+    const originIds = tileDoc.getFlag?.(MODULE_ID, 'trap.floodingRoomSplashOrigins') ?? [];
+    let splashOrigins = originIds.map(id => canvas.tiles.get(id)).filter(Boolean);
     
     if (splashOrigins.length === 0 && Tagger) {
         const taggedOrigins = await Tagger.getByTag('Flooding Room Trap Origin');
-        splashOrigins = taggedOrigins.map(t => t.object || t).filter(t => t);
+        splashOrigins = taggedOrigins.map(t => t.object ?? t).filter(Boolean);
     }
 
     let seq = new Sequence();
@@ -38,15 +40,19 @@ async function create(tile, targets, config = {}) {
     // Spawn persistent water splashes at each origin tile pointing towards the water tile
     if (splashOrigins.length > 0) {
         splashOrigins.forEach(origin => {
+            const originDoc = origin.document ?? origin;
+            const originWidth = originDoc.width ?? origin.width ?? 0;
+            const originHeight = originDoc.height ?? origin.height ?? 0;
+
             seq = seq
                 .effect()
                 .name(`flooding-room-splash-${tile.id}`)
                 .file(closest('jb2a.water_splash.cone.01.blue'))
                 .atLocation(origin)
                 .rotateTowards(tile)
-                .size({ width: 2 * (origin.width || origin.document.width), height: 2 * (origin.height || origin.document.height) })
+                .size({ width: 2 * originWidth, height: 2 * originHeight })
                 .fadeIn(1000, { ease: 'easeOutCubic' })
-                .elevation(origin.document?.elevation ?? origin.elevation ?? 0)
+                .elevation(originDoc.elevation ?? origin.elevation ?? 0)
                 .persist()
                 .belowTokens();
         });

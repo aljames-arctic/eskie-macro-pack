@@ -11,19 +11,21 @@ import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
     delay: 500,
+    sizeMultiplier: 1.4,
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { delay, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { delay, sizeMultiplier, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     if (!tile) return new Sequence();
 
     const tileBounds = adapter.getTileBounds(tile);
     const tileCenter = tileBounds.center;
-    const tileWidth = tileBounds.width;
-    const tileHeight = tileBounds.height;
+    const mult = sizeMultiplier ?? 1.4;
+    const effectWidth = tileBounds.width * mult;
+    const effectHeight = tileBounds.height * mult;
 
     const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
 
@@ -38,13 +40,13 @@ async function create(tile, targets, config = {}) {
         .fadeOut(250)
         .duration(4000)
         .belowTokens()
-        .size({ width: tileWidth, height: tileHeight })
+        .size({ width: effectWidth, height: effectHeight })
 
         // The spike trap snapping/firing above tokens
         .effect()
         .file(closest('jb2a.spike_trap.10x10ft.top.no_base.normal.01.01'))
         .atLocation(tileCenter)
-        .size({ width: tileWidth, height: tileHeight })
+        .size({ width: effectWidth, height: effectHeight })
         .zIndex(1)
 
         .wait(delay);

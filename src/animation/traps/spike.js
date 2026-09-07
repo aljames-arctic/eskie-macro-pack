@@ -20,29 +20,7 @@ async function create(tile, targets, config = {}) {
 
     if (!tile) return new Sequence();
 
-    // Target all tokens currently overlapping the trap tile bounds
-    const tileX = tile.document?.x ?? tile.x;
-    const tileY = tile.document?.y ?? tile.y;
-    const tileWidth = tile.document?.width ?? tile.width;
-    const tileHeight = tile.document?.height ?? tile.height;
-
-    const tileMinX = tileX;
-    const tileMaxX = tileX + tileWidth;
-    const tileMinY = tileY;
-    const tileMaxY = tileY + tileHeight;
-
-    const targetList = (targets && targets.length > 0) ? targets : canvas.tokens.placeables;
-    const finalTargets = targetList.filter(t => {
-        const tWidth = (t.document?.width ?? t.width ?? 1) * canvas.grid.size;
-        const tHeight = (t.document?.height ?? t.height ?? 1) * canvas.grid.size;
-        const tMinX = t.document?.x ?? t.x;
-        const tMaxX = tMinX + tWidth;
-        const tMinY = t.document?.y ?? t.y;
-        const tMaxY = tMinY + tHeight;
-
-        // Bounding-box intersection check
-        return !(tMaxX <= tileMinX || tMinX >= tileMaxX || tMaxY <= tileMinY || tMinY >= tileMaxY);
-    });
+    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
 
     let seq = new Sequence();
     applySound(seq, sound);

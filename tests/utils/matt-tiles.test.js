@@ -5,10 +5,13 @@ import { adapter } from '../../src/adapters/index.js';
 import { matt } from '../../src/animation/utils/matt-tiles.js';
 import { MODULE_ID } from '../../src/lib/constants.js';
 
-test('matt.trap.setup configures tiles with MATT runcode action using standard foundry.utils.getProperty', async () => {
+test('matt.trap.setup configures trigger tiles to manually activate trap tiles and trap tiles to target contained tokens', async () => {
     const updatedTiles = new Map();
     globalThis.game.user = { isGM: true, id: 'gm-user-1' };
     globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', active: true });
+
+    let trapTileTriggered = false;
+    let trapTileTriggerArg = null;
 
     const triggerTileDoc = {
         id: 'tile-trigger-1',
@@ -21,6 +24,14 @@ test('matt.trap.setup configures tiles with MATT runcode action using standard f
     const trapTileDoc = {
         id: 'tile-trap-1',
         flags: {},
+        x: 100,
+        y: 100,
+        width: 100,
+        height: 100,
+        trigger: async (args) => {
+            trapTileTriggered = true;
+            trapTileTriggerArg = args;
+        },
         update: async (data) => {
             updatedTiles.set('tile-trap-1', data);
             return trapTileDoc;
@@ -44,47 +55,113 @@ test('matt.trap.setup configures tiles with MATT runcode action using standard f
 
     await matt.trap.setup('eskie.traps.spike', { tileCount: 2 });
 
+    // 1. Verify Trigger Tile configuration
     const triggerUpdate = updatedTiles.get('tile-trigger-1');
     assert.ok(triggerUpdate, 'Trigger tile should be updated with MATT configuration');
     assert.equal(triggerUpdate['flags.monks-active-tiles.active'], true);
-    assert.ok(Array.isArray(triggerUpdate['flags.monks-active-tiles.actions']));
+    assert.deepEqual(triggerUpdate['flags.monks-active-tiles.trigger'], ['enter']);
+    assert.deepEqual(triggerUpdate[`flags.${MODULE_ID}.trap.originIds`], ['tile-trap-1']);
+    assert.equal(triggerUpdate[`flags.${MODULE_ID}.trap.isTriggerTile`], true);
 
-    const runcodeAction = triggerUpdate['flags.monks-active-tiles.actions'][0];
-    assert.equal(runcodeAction.action, 'runcode');
-    assert.ok(typeof runcodeAction.data.code === 'string');
+    const triggerAction = triggerUpdate['flags.monks-active-tiles.actions'][0];
+    assert.equal(triggerAction.action, 'runcode');
+    assert.ok(typeof triggerAction.data.code === 'string');
+
+    // Test executing trigger action code
+    const mockTriggerTile = {
+        getFlag: (mod, key) => {
+            if (mod === MODULE_ID && key === 'trap.originIds') return ['tile-trap-1'];
+            return null;
+        }
+    };
+    const mockActivatingToken = { id: 'tok-activating', document: { id: 'tok-activating' } };
+    const triggerExecFn = new Function('token', 'tile', 'canvas', `return (async () => { ${triggerAction.data.code} })();`);
+    await triggerExecFn(mockActivatingToken, mockTriggerTile, globalThis.canvas);
+
+    assert.equal(trapTileTriggered, true, 'Trigger tile execution should manually trigger the linked trap tile');
+    assert.equal(trapTileTriggerArg.token.id, 'tok-activating', 'Activating token should be passed to trap tile trigger');
+
+    // 2. Verify Trap Tile configuration
+    const trapUpdate = updatedTiles.get('tile-trap-1');
+    assert.ok(trapUpdate, 'Trap tile should be updated with MATT configuration');
+    assert.equal(trapUpdate['flags.monks-active-tiles.active'], true);
+    assert.deepEqual(trapUpdate['flags.monks-active-tiles.trigger'], ['manual']);
+    assert.equal(trapUpdate[`flags.${MODULE_ID}.trap.isTrapTile`], true);
+    assert.equal(trapUpdate[`flags.${MODULE_ID}.trap.animation`], 'eskie.traps.spike');
+
+    const trapAction = trapUpdate['flags.monks-active-tiles.actions'][0];
+    assert.equal(trapAction.action, 'runcode');
+    assert.ok(typeof trapAction.data.code === 'string');
 
     // Verify the code string resolves adapter via module API and foundry.utils fallback
-    assert.ok(runcodeAction.data.code.includes(`game.modules.get('${MODULE_ID}')?.api?.adapter ?? foundry.utils`), 'Generated code should resolve adapter from module API with fallback');
-    assert.ok(runcodeAction.data.code.includes('const trap = adapter.getProperty(globalThis, animation);'), 'Generated code should invoke getProperty on resolved adapter');
+    assert.ok(trapAction.data.code.includes(`game.modules.get('${MODULE_ID}')?.api?.adapter ?? foundry.utils`), 'Generated code should resolve adapter from module API with fallback');
+    assert.ok(trapAction.data.code.includes('const trap = adapter.getProperty(globalThis, animation);'), 'Generated code should invoke getProperty on resolved adapter');
 
-    // Verify evaluating the generated code does not throw ReferenceError
+    // Test executing trap action code
     let playCalled = false;
+    let playTargets = [];
     globalThis.eskie = {
         traps: {
             spike: {
                 play: (originTile, tokens) => {
                     playCalled = true;
+                    playTargets = tokens;
                     assert.equal(originTile.id, 'tile-trap-1');
-                    assert.equal(tokens[0].id, 'tok-1');
                 }
             }
         }
     };
     globalThis.game.modules.set(MODULE_ID, { id: MODULE_ID, api: { adapter } });
 
-    const mockTile = {
+    // Place tokens on canvas: tokenInside is inside the trap tile (100, 100, 100, 100), tokenOutside is outside (300, 300)
+    const tokenInside = { id: 'tok-inside', document: { id: 'tok-inside', x: 120, y: 120, width: 1, height: 1 }, x: 120, y: 120, w: 100, h: 100 };
+    const tokenOutside = { id: 'tok-outside', document: { id: 'tok-outside', x: 300, y: 300, width: 1, height: 1 }, x: 300, y: 300, w: 100, h: 100 };
+    globalThis.canvas.tokens = {
+        placeables: [tokenInside, tokenOutside]
+    };
+    globalThis.canvas.grid = { size: 100 };
+
+    const mockTrapTile = {
+        id: 'tile-trap-1',
+        document: trapTileDoc,
+        x: 100,
+        y: 100,
+        width: 100,
+        height: 100,
         getFlag: (mod, key) => {
             if (mod === MODULE_ID && key === 'trap.animation') return 'eskie.traps.spike';
-            if (mod === MODULE_ID && key === 'trap.originIds') return ['tile-trap-1'];
             return null;
         }
     };
-    const mockToken = { id: 'tok-1', object: { id: 'tok-1' } };
 
-    // Execute in an isolated function mimicking MATT _executeCode
-    const execFn = new Function('token', 'tile', 'canvas', runcodeAction.data.code);
-    assert.doesNotThrow(() => {
-        execFn(mockToken, mockTile, globalThis.canvas);
-    });
-    assert.equal(playCalled, true, 'Trap play should be invoked successfully without ReferenceError');
+    const trapExecFn = new Function('token', 'tile', 'canvas', `return (async () => { ${trapAction.data.code} })();`);
+    await trapExecFn(mockActivatingToken, mockTrapTile, globalThis.canvas);
+
+    assert.equal(playCalled, true, 'Trap play should be invoked successfully');
+    assert.equal(playTargets.length, 1, 'Only tokens contained within the trap tile should be targeted');
+    assert.equal(playTargets[0].id, 'tok-inside', 'Contained token should be the target');
+});
+
+test('adapter.getTokensInTile returns only overlapping tokens', () => {
+    const tile = {
+        x: 100,
+        y: 100,
+        width: 200,
+        height: 200,
+        document: { x: 100, y: 100, width: 200, height: 200 }
+    };
+
+    const token1 = { id: 't1', x: 150, y: 150, w: 100, h: 100, document: { x: 150, y: 150, width: 1, height: 1 } };
+    const token2 = { id: 't2', x: 50, y: 50, w: 100, h: 100, document: { x: 50, y: 50, width: 1, height: 1 } }; // Overlaps top-left
+    const token3 = { id: 't3', x: 300, y: 300, w: 100, h: 100, document: { x: 300, y: 300, width: 1, height: 1 } }; // Outside
+    const token4 = { id: 't4', x: 100, y: 300, w: 100, h: 100, document: { x: 100, y: 300, width: 1, height: 1 } }; // Touching edge (no overlap)
+
+    globalThis.canvas.tokens = {
+        placeables: [token1, token2, token3, token4]
+    };
+    globalThis.canvas.grid = { size: 100 };
+
+    const contained = adapter.getTokensInTile(tile);
+    assert.deepEqual(contained.map(t => t.id), ['t1', 't2']);
+    assert.deepEqual(adapter.getTokensInTile(null), []);
 });

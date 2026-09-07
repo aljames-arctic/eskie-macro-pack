@@ -194,9 +194,18 @@ async function setup(animation, config = {}) {
         }
     }
 
-    const code = `
-if (!token) return;
+    const triggerCode = `
+// Manually activate linked trap tiles
+const originIds = tile.getFlag('${MODULE_ID}', 'trap.originIds') ?? [];
+for (const id of originIds) {
+    const originTile = canvas.tiles.get(id);
+    if (!originTile) continue;
+    const doc = originTile.document ?? originTile;
+    await (doc.trigger?.({ token }) ?? originTile.trigger?.({ token }));
+}
+`;
 
+    const trapCode = `
 // Get the specific Eskie Trap Animation Function
 const animation = tile.getFlag('${MODULE_ID}', 'trap.animation');
 if (!animation) return;
@@ -204,18 +213,27 @@ const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter ?? foundry.utils;
 const trap = adapter.getProperty(globalThis, animation);
 if (!trap?.play) return;
 
-// Play the trap animation for the token(s)
-const originIds = tile.getFlag('${MODULE_ID}', 'trap.originIds') ?? [];
-originIds.forEach(id => {
-    const originTile = canvas.tiles.get(id);
-    if (originTile) trap.play(originTile, [token.object ?? token]);
+// Collect all tokens contained within / overlapping this trap tile
+const targets = adapter.getTokensInTile?.(tile) ?? (canvas.tokens.placeables || []).filter(t => {
+    const tDoc = t.document ?? t;
+    const gridSize = canvas.grid?.size ?? 100;
+    const tWidth = t.w ?? ((tDoc.width ?? 1) * gridSize);
+    const tHeight = t.h ?? ((tDoc.height ?? 1) * gridSize);
+    const tileDoc = tile.document ?? tile;
+    const tileX = tileDoc.x ?? tile.x ?? 0;
+    const tileY = tileDoc.y ?? tile.y ?? 0;
+    const tileWidth = tileDoc.width ?? tile.width ?? 0;
+    const tileHeight = tileDoc.height ?? tile.height ?? 0;
+    return !(t.x + tWidth <= tileX || t.x >= tileX + tileWidth || t.y + tHeight <= tileY || t.y >= tileY + tileHeight);
 });
+
+// Play the trap animation with the contained tokens as targets
+await trap.play(tile.object ?? tile, targets);
 `;
 
     // Update trigger tiles
     for (const triggerTile of triggerTiles) {
         const updateData = {
-            [`flags.${MODULE_ID}.trap.animation`]: animation,
             [`flags.${MODULE_ID}.trap.originIds`]: originTiles.map(t => t.id),
             [`flags.${MODULE_ID}.trap.isTriggerTile`]: true,
             'flags.monks-active-tiles.active': true,
@@ -223,7 +241,7 @@ originIds.forEach(id => {
             'flags.monks-active-tiles.actions': [{
                 id: adapter.randomID(),
                 action: 'runcode',
-                data: { code },
+                data: { code: triggerCode },
             }],
             'flags.monks-active-tiles.controlled': config.controlled ?? 'gm',
         };
@@ -233,7 +251,16 @@ originIds.forEach(id => {
     // Update trap tiles
     for (const originTile of originTiles) {
         const updateData = {
+            [`flags.${MODULE_ID}.trap.animation`]: animation,
             [`flags.${MODULE_ID}.trap.isTrapTile`]: true,
+            'flags.monks-active-tiles.active': true,
+            'flags.monks-active-tiles.trigger': ['manual'],
+            'flags.monks-active-tiles.actions': [{
+                id: adapter.randomID(),
+                action: 'runcode',
+                data: { code: trapCode },
+            }],
+            'flags.monks-active-tiles.controlled': config.controlled ?? 'gm',
         };
         if (tileCount === 3) {
             updateData[`flags.${MODULE_ID}.trap.trapTargetTileIds`] = targetTiles.map(t => t.id);

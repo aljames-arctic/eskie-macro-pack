@@ -22,64 +22,29 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { reveal, smokeSize, startScale, fallenScale, randomDelay, color } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { reveal, smokeSize, startScale, fallenScale, randomDelay, color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Target selection:
     // 1. Look for tokens on target tiles
     // 2. Look for tokens on the trap tile itself
-    // 3. Fallback to targets passed (triggering tokens)
-    const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') || [];
+    // 3. Fallback to targets passed
+    const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
     let finalTargets = [];
 
     if (targetTileIds.length > 0) {
         targetTileIds.forEach(id => {
             const targetTile = canvas.tiles.get(id);
             if (targetTile) {
-                const tileX = targetTile.document?.x ?? targetTile.x;
-                const tileY = targetTile.document?.y ?? targetTile.y;
-                const tileWidth = targetTile.document?.width ?? targetTile.width;
-                const tileHeight = targetTile.document?.height ?? targetTile.height;
-
-                const tMinX = tileX;
-                const tMaxX = tileX + tileWidth;
-                const tMinY = tileY;
-                const tMaxY = tileY + tileHeight;
-
-                const tokens = canvas.tokens.placeables.filter(t => {
-                    const w = (t.document?.width ?? t.width ?? 1) * canvas.grid.size;
-                    const h = (t.document?.height ?? t.height ?? 1) * canvas.grid.size;
-                    const tx = t.document?.x ?? t.x;
-                    const ty = t.document?.y ?? t.y;
-                    return !(tx + w <= tMinX || tx >= tMaxX || ty + h <= tMinY || ty >= tMaxY);
-                });
-                finalTargets.push(...tokens);
+                finalTargets.push(...adapter.getTokensInTile(targetTile));
             }
         });
     }
 
     if (finalTargets.length === 0) {
-        const tileX = tile.document?.x ?? tile.x;
-        const tileY = tile.document?.y ?? tile.y;
-        const tileWidth = tile.document?.width ?? tile.width;
-        const tileHeight = tile.document?.height ?? tile.height;
-
-        const tMinX = tileX;
-        const tMaxX = tileX + tileWidth;
-        const tMinY = tileY;
-        const tMaxY = tileY + tileHeight;
-
-        finalTargets = canvas.tokens.placeables.filter(t => {
-            const w = (t.document?.width ?? t.width ?? 1) * canvas.grid.size;
-            const h = (t.document?.height ?? t.height ?? 1) * canvas.grid.size;
-            const tx = t.document?.x ?? t.x;
-            const ty = t.document?.y ?? t.y;
-            return !(tx + w <= tMinX || tx >= tMaxX || ty + h <= tMinY || ty >= tMaxY);
-        });
+        finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
     }
 
     finalTargets = Array.from(new Set(finalTargets));
-
-    if (finalTargets.length === 0 && targets && targets.length > 0) finalTargets = targets;
 
     let seq = new Sequence();
     applySound(seq, sound);

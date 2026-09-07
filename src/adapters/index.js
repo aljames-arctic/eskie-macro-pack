@@ -267,6 +267,10 @@ export class Adapter {
         return this.foundry.getTokenOwners(token, config);
     }
 
+    getTokensInTile(tile) {
+        return this.foundry.getTokensInTile(tile);
+    }
+
     attachPlaceableElements(elements, target) {
         return this.foundry.attachPlaceableElements(elements, target);
     }

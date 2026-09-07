@@ -22,28 +22,7 @@ async function create(tile, targets, config = {}) {
 
     if (!tile) return new Sequence();
 
-    // Dynamically detect all overlapping tokens on the trap tile from the entire canvas
-    const tileX = tile.document?.x ?? tile.x;
-    const tileY = tile.document?.y ?? tile.y;
-    const tileWidth = tile.document?.width ?? tile.width;
-    const tileHeight = tile.document?.height ?? tile.height;
-
-    const tileMinX = tileX;
-    const tileMaxX = tileX + tileWidth;
-    const tileMinY = tileY;
-    const tileMaxY = tileY + tileHeight;
-
-    const finalTargets = canvas.tokens.placeables.filter(t => {
-        const tWidth = t.w ?? ((t.document?.width ?? 1) * canvas.grid.size);
-        const tHeight = t.h ?? ((t.document?.height ?? 1) * canvas.grid.size);
-        const tMinX = t.document?.x ?? t.x;
-        const tMaxX = tMinX + tWidth;
-        const tMinY = t.document?.y ?? t.y;
-        const tMaxY = tMinY + tHeight;
-
-        // Bounding-box intersection check
-        return !(tMaxX <= tileMinX || tMinX >= tileMaxX || tMaxY <= tileMinY || tMinY >= tileMaxY);
-    });
+    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -128,29 +107,11 @@ async function play(tile, targets, config = {}) {
 
 async function stop(tile, config = {}) {
     config = settingsOverride(config);
+    const { sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    // Target all tokens currently overlapping the trap tile bounds to restore them
-    const tileX = tile.document?.x ?? tile.x;
-    const tileY = tile.document?.y ?? tile.y;
-    const tileWidth = tile.document?.width ?? tile.width;
-    const tileHeight = tile.document?.height ?? tile.height;
+    if (!tile) return;
 
-    const tileMinX = tileX;
-    const tileMaxX = tileX + tileWidth;
-    const tileMinY = tileY;
-    const tileMaxY = tileY + tileHeight;
-
-    const finalTargets = canvas.tokens.placeables.filter(t => {
-        const tWidth = t.w ?? ((t.document?.width ?? 1) * canvas.grid.size);
-        const tHeight = t.h ?? ((t.document?.height ?? 1) * canvas.grid.size);
-        const tMinX = t.document?.x ?? t.x;
-        const tMaxX = tMinX + tWidth;
-        const tMinY = t.document?.y ?? t.y;
-        const tMaxY = tMinY + tHeight;
-
-        // Bounding-box intersection check
-        return !(tMaxX <= tileMinX || tMinX >= tileMaxX || tMaxY <= tileMinY || tMinY >= tileMaxY);
-    });
+    const finalTargets = adapter.getTokensInTile(tile);
 
     let seq = new Sequence();
     applySound(seq, sound);

@@ -18,13 +18,13 @@ const DEFAULT_CONFIG = {
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { size, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const targetList = [targets].flat().filter(Boolean);
+    const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInTile(tile);
 
-    const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') || [];
+    const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
     let targetTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
 
     if (!targetTile) {
-        const triggerTile = canvas.tiles.placeables.find(t => t.document.getFlag(MODULE_ID, 'trap.trapTileIds')?.includes(tile.id));
+        const triggerTile = canvas.tiles.placeables.find(t => t.document.getFlag(MODULE_ID, 'trap.originIds')?.includes(tile.id) || t.document.getFlag(MODULE_ID, 'trap.trapTileIds')?.includes(tile.id));
         if (triggerTile) targetTile = triggerTile;
     }
 

@@ -822,6 +822,44 @@ export class BaseFoundryAdapter {
     }
 
     /* -------------------------------------------- */
+    /*  Tile & Token Containment Operations         */
+    /* -------------------------------------------- */
+
+    /**
+     * Retrieve all tokens overlapping or contained within a tile.
+     * @param {Tile|TileDocument} tile Target Tile placeable or Tile document
+     * @returns {Token[]} Array of matching Token placeables
+     */
+    getTokensInTile(tile) {
+        if (!tile) return [];
+        const tileDoc = tile.document ?? tile;
+        const tileX = tileDoc.x ?? tile.x ?? 0;
+        const tileY = tileDoc.y ?? tile.y ?? 0;
+        const tileWidth = tileDoc.width ?? tile.width ?? 0;
+        const tileHeight = tileDoc.height ?? tile.height ?? 0;
+
+        const tileMinX = tileX;
+        const tileMaxX = tileX + tileWidth;
+        const tileMinY = tileY;
+        const tileMaxY = tileY + tileHeight;
+
+        const gridSize = canvas?.grid?.size ?? canvas?.dimensions?.size ?? 100;
+        const tokens = canvas?.tokens?.placeables ?? [];
+
+        return tokens.filter(token => {
+            const tDoc = token.document ?? token;
+            const tWidth = token.w ?? ((tDoc.width ?? 1) * gridSize);
+            const tHeight = token.h ?? ((tDoc.height ?? 1) * gridSize);
+            const tMinX = token.x ?? tDoc.x ?? 0;
+            const tMaxX = tMinX + tWidth;
+            const tMinY = token.y ?? tDoc.y ?? 0;
+            const tMaxY = tMinY + tHeight;
+
+            return !(tMaxX <= tileMinX || tMinX >= tileMaxX || tMaxY <= tileMinY || tMinY >= tileMaxY);
+        });
+    }
+
+    /* -------------------------------------------- */
     /*  Placeable Element Attachment Operations     */
     /* -------------------------------------------- */
 

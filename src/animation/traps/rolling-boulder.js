@@ -21,11 +21,11 @@ async function create(tile, targets, config = {}) {
     const { boulderSpeed, boulderSize, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Retrieve end tile from flags, falling back to legacy/Tagger search for backward compatibility
-    const targetTileIds = tile.document.getFlag(MODULE_ID, 'trap.trapTargetTileIds') || [];
+    const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
     let endTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
 
     if (!endTile) {
-        const endTileIds = tile.document.getFlag(MODULE_ID, 'trap.boulderEndTileIds') || [];
+        const endTileIds = tile.document?.getFlag(MODULE_ID, 'trap.boulderEndTileIds') ?? [];
         endTile = endTileIds.length ? canvas.tiles.get(endTileIds[0]) : null;
     }
 

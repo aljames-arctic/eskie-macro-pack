@@ -20,7 +20,7 @@ async function create(tile, targets, config = {}) {
     const { fadeTime, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Retrieve water spray origin tiles from flags, falling back to tag search for backward compatibility
-    const originIds = tile.document.getFlag(MODULE_ID, 'trap.floodingRoomSplashOrigins') || [];
+    const originIds = tile.document?.getFlag(MODULE_ID, 'trap.floodingRoomSplashOrigins') ?? [];
     let splashOrigins = originIds.map(id => canvas.tiles.get(id)).filter(t => t);
     
     if (splashOrigins.length === 0 && Tagger) {

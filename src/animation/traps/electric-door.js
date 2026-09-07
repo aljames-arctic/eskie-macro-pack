@@ -23,31 +23,10 @@ async function create(tile, targets, config = {}) {
     if (!tile) return new Sequence();
 
     // Find the door tile (the trigger tile that has this trap tile linked in its flags)
-    const triggerTile = canvas.tiles.placeables.find(t => t.document.getFlag(MODULE_ID, 'trap.trapTileIds')?.includes(tile.id));
+    const triggerTile = canvas.tiles.placeables.find(t => t.document.getFlag(MODULE_ID, 'trap.originIds')?.includes(tile.id) || t.document.getFlag(MODULE_ID, 'trap.trapTileIds')?.includes(tile.id));
     const doorTile = triggerTile || tile;
 
-    // Detect all tokens currently overlapping the trap tile bounds
-    const tileX = tile.document?.x ?? tile.x;
-    const tileY = tile.document?.y ?? tile.y;
-    const tileWidth = tile.document?.width ?? tile.width;
-    const tileHeight = tile.document?.height ?? tile.height;
-
-    const tileMinX = tileX;
-    const tileMaxX = tileX + tileWidth;
-    const tileMinY = tileY;
-    const tileMaxY = tileY + tileHeight;
-
-    const finalTargets = canvas.tokens.placeables.filter(t => {
-        const tWidth = t.w ?? ((t.document?.width ?? 1) * canvas.grid.size);
-        const tHeight = t.h ?? ((t.document?.height ?? 1) * canvas.grid.size);
-        const tMinX = t.document?.x ?? t.x;
-        const tMaxX = tMinX + tWidth;
-        const tMinY = t.document?.y ?? t.y;
-        const tMaxY = tMinY + tHeight;
-
-        // Bounding-box intersection check
-        return !(tMaxX <= tileMinX || tMinX >= tileMaxX || tMaxY <= tileMinY || tMinY >= tileMaxY);
-    });
+    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
 
     let seq = new Sequence();
     applySound(seq, sound);

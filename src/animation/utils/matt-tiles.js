@@ -200,31 +200,16 @@ async function setup(animation, config = {}) {
 const tileDoc = tile.document ?? tile;
 
 // Get the specific Eskie Trap Animation Function if this tile is a trap tile
-const animation = tileDoc.getFlag?.('${MODULE_ID}', 'trap.animation') ?? tileDoc.flags?.['${MODULE_ID}']?.trap?.animation;
-const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter ?? foundry.utils;
-if (animation) {
+const animation = tileDoc.getFlag?.('${MODULE_ID}', 'trap.animation');
+const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter;
+if (animation && adapter) {
     const trap = adapter.getProperty(globalThis, animation);
     if (trap?.play) {
-        // Collect all tokens contained within / overlapping this trap tile
-        let targets = adapter.getTokensInTile?.(tile) ?? (canvas.tokens?.placeables ?? []).filter(t => {
-            const tDoc = t.document ?? t;
-            const gridSize = canvas.grid?.size ?? 100;
-            const tWidth = t.w ?? ((tDoc.width ?? 1) * gridSize);
-            const tHeight = t.h ?? ((tDoc.height ?? 1) * gridSize);
-            const isV14 = Number(String(game.release?.generation ?? game.version ?? '').split('.')[0]) >= 14;
-            const rawX = tileDoc.x ?? tile.x ?? 0;
-            const rawY = tileDoc.y ?? tile.y ?? 0;
-            const anchorX = isV14 ? (tileDoc.anchor?.x ?? tile.anchor?.x ?? tileDoc.texture?.anchorX ?? tile.texture?.anchorX ?? tileDoc.anchorX ?? 0.5) : 0;
-            const anchorY = isV14 ? (tileDoc.anchor?.y ?? tile.anchor?.y ?? tileDoc.texture?.anchorY ?? tile.texture?.anchorY ?? tileDoc.anchorY ?? 0.5) : 0;
-            const tileMinX = rawX - (anchorX * (tileDoc.width ?? tile.width ?? 0));
-            const tileMaxX = tileMinX + (tileDoc.width ?? tile.width ?? 0);
-            const tileMinY = rawY - (anchorY * (tileDoc.height ?? tile.height ?? 0));
-            const tileMaxY = tileMinY + (tileDoc.height ?? tile.height ?? 0);
-            return !(t.x + tWidth <= tileMinX || t.x >= tileMaxX || t.y + tHeight <= tileMinY || t.y >= tileMaxY);
-        });
+        // Collect all tokens contained within / overlapping this trap tile via adapter
+        let targets = adapter.getTokensInTile(tile);
 
         // If no tokens were found inside tile bounds (e.g. during pre-update or edge entry), fallback to the activating token
-        if ((!targets || targets.length === 0) && token) {
+        if (targets.length === 0 && token) {
             targets = [token.object ?? token];
         }
 
@@ -234,7 +219,7 @@ if (animation) {
 }
 
 // Manually activate any other linked trap tiles
-const originIds = (tileDoc.getFlag?.('${MODULE_ID}', 'trap.originIds') ?? tileDoc.flags?.['${MODULE_ID}']?.trap?.originIds ?? []).filter(id => id !== tileDoc.id && id !== tile.id);
+const originIds = (tileDoc.getFlag?.('${MODULE_ID}', 'trap.originIds') ?? []).filter(id => id !== tileDoc.id && id !== tile.id);
 for (const id of originIds) {
     const originTile = canvas.tiles.get(id);
     if (!originTile) continue;

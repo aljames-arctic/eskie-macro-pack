@@ -96,9 +96,10 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
     assert.equal(trapAction.action, 'runcode');
     assert.ok(typeof trapAction.data.code === 'string');
 
-    // Verify the code string resolves adapter via module API and foundry.utils fallback
-    assert.ok(trapAction.data.code.includes(`game.modules.get('${MODULE_ID}')?.api?.adapter ?? foundry.utils`), 'Generated code should resolve adapter from module API with fallback');
+    // Verify the code string resolves adapter via module API
+    assert.ok(trapAction.data.code.includes(`const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter;`), 'Generated code should resolve adapter from module API');
     assert.ok(trapAction.data.code.includes('const trap = adapter.getProperty(globalThis, animation);'), 'Generated code should invoke getProperty on resolved adapter');
+    assert.ok(trapAction.data.code.includes('let targets = adapter.getTokensInTile(tile);'), 'Generated code should delegate token containment lookup directly to adapter.getTokensInTile');
 
     // Test executing trap action code
     let playCalled = false;

@@ -29,10 +29,8 @@ export function setupApiCalls(exportedFunctions) {
 export function setupModule() {
     const { effect, mask, overlay, showcase, traps } = animation;
 
-    // Expose only active sequencer play/animation APIs, Adapter class, and adapter on globalThis.eskie
+    // Expose only active sequencer play/animation namespaces on globalThis.eskie
     setupApiCalls({
-        Adapter,
-        adapter,
         effect,
         traps,
         mask,

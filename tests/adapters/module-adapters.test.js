@@ -296,7 +296,7 @@ test('Unified Adapter delegates to module adapters through accessors', async () 
     assert.equal(adapter.hasModule('non-existent'), false);
 });
 
-test('setupModule deploys Adapter, adapter, and animations on game.modules.get(MODULE_ID).api and globalThis.eskie', async () => {
+test('setupModule deploys Adapter and adapter exclusively on game.modules.get(MODULE_ID).api and not globalThis.eskie', async () => {
     const { setupModule } = await import('../../src/module.js');
     const { Adapter } = await import('../../src/adapters/index.js');
     const { MODULE_ID } = await import('../../src/lib/constants.js');
@@ -323,7 +323,10 @@ test('setupModule deploys Adapter, adapter, and animations on game.modules.get(M
     assert.ok(empRecord.api.standaloneMacros);
     assert.ok(empRecord.api.template);
 
-    assert.equal(globalThis.eskie.Adapter, Adapter);
-    assert.equal(globalThis.eskie.adapter, adapter);
+    // Adapter and adapter must not leak into globalThis.eskie
+    assert.equal(globalThis.eskie.Adapter, undefined);
+    assert.equal(globalThis.eskie.adapter, undefined);
+    assert.ok(globalThis.eskie.effect);
+    assert.ok(globalThis.eskie.traps);
 });
 

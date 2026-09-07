@@ -642,6 +642,7 @@ test('getCombatantsByToken and getCombatantByToken across FoundryV12Adapter (sin
     const v13 = new FoundryV13Adapter();
     const v14 = new FoundryV14Adapter();
 
+    const mockToken = { id: 'tok1' };
     const mockCombatant1 = { id: 'c1', tokenId: 'tok1' };
     const mockCombatant2 = { id: 'c2', tokenId: 'tok1' };
 
@@ -650,15 +651,15 @@ test('getCombatantsByToken and getCombatantByToken across FoundryV12Adapter (sin
     };
 
     const modernCombat = {
-        getCombatantsByToken: (tokenId) => tokenId === 'tok1' ? [mockCombatant1, mockCombatant2] : []
+        getCombatantsByToken: (token) => (token === mockToken || token?.id === 'tok1') ? [mockCombatant1, mockCombatant2] : []
     };
 
-    assert.deepEqual(v12.getCombatantsByToken(legacyCombat, 'tok1'), [mockCombatant1]);
-    assert.equal(v12.getCombatantByToken(legacyCombat, 'tok1'), mockCombatant1);
+    assert.deepEqual(v12.getCombatantsByToken(legacyCombat, mockToken), [mockCombatant1]);
+    assert.equal(v12.getCombatantByToken(legacyCombat, mockToken), mockCombatant1);
 
-    assert.deepEqual(v13.getCombatantsByToken(modernCombat, 'tok1'), [mockCombatant1, mockCombatant2]);
-    assert.equal(v13.getCombatantByToken(modernCombat, 'tok1'), mockCombatant1);
+    assert.deepEqual(v13.getCombatantsByToken(modernCombat, mockToken), [mockCombatant1, mockCombatant2]);
+    assert.equal(v13.getCombatantByToken(modernCombat, mockToken), mockCombatant1);
 
-    assert.deepEqual(v14.getCombatantsByToken(modernCombat, 'tok1'), [mockCombatant1, mockCombatant2]);
-    assert.equal(v14.getCombatantByToken(modernCombat, 'tok1'), mockCombatant1);
+    assert.deepEqual(v14.getCombatantsByToken(modernCombat, mockToken), [mockCombatant1, mockCombatant2]);
+    assert.equal(v14.getCombatantByToken(modernCombat, mockToken), mockCombatant1);
 });

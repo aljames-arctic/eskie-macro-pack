@@ -23,12 +23,6 @@
             "name": "English",
             "path": "lang/en.json",
             "flags": {}
-        },
-        {
-            "lang": "pt-BR",
-            "name": "Português (Brasil)",
-            "path": "lang/pt-BR.json",
-            "flags": {}
         }
     ],
     "url": "#{URL}#",

@@ -243,6 +243,10 @@ export class Adapter {
         return this.foundry.getPlaceable(id);
     }
 
+    async loadTemplates(paths) {
+        return this.foundry.loadTemplates(paths);
+    }
+
     getSpeakerToken(message, extractedTokenId = null) {
         return this.foundry.getSpeakerToken(message, extractedTokenId);
     }

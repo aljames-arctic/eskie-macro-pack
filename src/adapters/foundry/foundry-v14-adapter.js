@@ -14,7 +14,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * Calculate reveal tile placement offset for Foundry V14+ (centered anchor (0.5, 0.5)).
      * Centered origin matches token center directly.
      *
-     * @param {PlaceableObject|Document} object Token or Tile object/document
+     * @param {PlaceableObject} object Token or Tile placeable
      * @param {number} [_scale=1] Additional scale multiplier (unused in V14 centered origin)
      * @returns {{x: number, y: number}} Offset coordinates
      */
@@ -33,7 +33,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
     /**
      * Calculate shape tile placement offset for Foundry V14+ (centered anchor (0.5, 0.5)).
      *
-     * @param {PlaceableObject|Document} object Token or Tile object/document
+     * @param {PlaceableObject} object Token or Tile placeable
      * @returns {{x: number, y: number}} Offset coordinates
      */
     getShapeOffset(object) {
@@ -55,7 +55,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
     /**
      * Gets position coordinates from a Region or MeasuredTemplate document.
      *
-     * @param {Document|PlaceableObject} template The Region or MeasuredTemplate document or placeable
+     * @param {Region|MeasuredTemplate} template The Region or MeasuredTemplate placeable or document
      * @param {Object} [config={}] Configuration options
      * @returns {[ {x: number, y: number}, {x: number, y: number}, {x: number, y: number} ]} Array of [primary, secondary, center] coordinates
      */

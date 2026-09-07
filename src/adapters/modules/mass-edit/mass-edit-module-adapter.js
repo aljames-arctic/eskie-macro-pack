@@ -22,8 +22,8 @@ export class MassEditModuleAdapter extends BaseModuleAdapter {
 
     /**
      * Links elements to a target PlaceableObject (Token, Tile, etc.).
-     * @param {Array<PlaceableObject|Document>|PlaceableObject|Document} elements Elements to link
-     * @param {PlaceableObject|Document} target Target parent object
+     * @param {Array<PlaceableObject>|PlaceableObject} elements Elements to link
+     * @param {PlaceableObject} target Target parent placeable
      * @returns {Promise<unknown>}
      */
     async link(elements, target) {
@@ -39,8 +39,8 @@ export class MassEditModuleAdapter extends BaseModuleAdapter {
 
     /**
      * Removes link connections between elements and a target PlaceableObject.
-     * @param {Array<PlaceableObject|Document>|PlaceableObject|Document} elements Elements to unlink
-     * @param {PlaceableObject|Document} target Target parent object
+     * @param {Array<PlaceableObject>|PlaceableObject} elements Elements to unlink
+     * @param {PlaceableObject} target Target parent placeable
      * @returns {Promise<unknown>}
      */
     async removeLinks(elements, target) {

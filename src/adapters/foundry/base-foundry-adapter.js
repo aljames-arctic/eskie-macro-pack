@@ -39,17 +39,21 @@ export class BaseFoundryAdapter {
     }
 
     /**
-     * Access the Mass Edit module adapter via parent adapter navigation.
+     * Access the Mass Edit module adapter via parent adapter navigation or ambient API.
      */
     get massEdit() {
-        return this.adapter?.massEdit ?? null;
+        if (this.adapter?.massEdit) return this.adapter.massEdit;
+        if (typeof MassEdit !== 'undefined' && MassEdit?.linker) return MassEdit.linker;
+        return null;
     }
 
     /**
-     * Access the Token Attacher module adapter via parent adapter navigation.
+     * Access the Token Attacher module adapter via parent adapter navigation or ambient API.
      */
     get tokenAttacher() {
-        return this.adapter?.tokenAttacher ?? null;
+        if (this.adapter?.tokenAttacher) return this.adapter.tokenAttacher;
+        if (typeof tokenAttacher !== 'undefined') return tokenAttacher;
+        return null;
     }
 
     /**
@@ -280,10 +284,7 @@ export class BaseFoundryAdapter {
      * @returns {boolean}
      */
     hasProperty(obj, path) {
-        if (typeof foundry !== 'undefined' && foundry.utils?.hasProperty) {
-            return foundry.utils.hasProperty(obj, path);
-        }
-        return this.getProperty(obj, path) !== undefined;
+        return foundry.utils.hasProperty(obj, path);
     }
 
     /**
@@ -293,11 +294,7 @@ export class BaseFoundryAdapter {
      * @returns {string} Slugified string
      */
     slugify(text, options = {}) {
-        if (typeof foundry !== 'undefined' && foundry.utils?.slugify) {
-            return foundry.utils.slugify(text, options);
-        }
-        const str = String(text ?? '').toLowerCase();
-        return str.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        return foundry.utils.slugify(text, options);
     }
 
     /**
@@ -532,7 +529,7 @@ export class BaseFoundryAdapter {
 
     /**
      * Calculate reveal tile placement offset.
-     * @param {PlaceableObject|Document} object Token or Tile object/document
+     * @param {PlaceableObject} object Token or Tile placeable
      * @param {number} [scale=1] Additional scale multiplier
      * @returns {{x: number, y: number}} Offset coordinates
      */
@@ -542,7 +539,7 @@ export class BaseFoundryAdapter {
 
     /**
      * Calculate shape tile placement offset.
-     * @param {PlaceableObject|Document} object Token or Tile object/document
+     * @param {PlaceableObject} object Token or Tile placeable
      * @returns {{x: number, y: number}} Offset coordinates
      */
     getShapeOffset(object) {
@@ -551,7 +548,7 @@ export class BaseFoundryAdapter {
 
     /**
      * Unified tile offset resolver.
-     * @param {PlaceableObject|Document} object Token or Tile object/document
+     * @param {PlaceableObject} object Token or Tile placeable
      * @param {'reveal'|'shape'} type Offset type
      * @param {number} [scale=1] Scale multiplier
      * @returns {{x: number, y: number}} Resolved coordinates
@@ -568,7 +565,7 @@ export class BaseFoundryAdapter {
 
     /**
      * Gets position coordinates from a template or region document.
-     * @param {Document|PlaceableObject} template The template or region document/placeable
+     * @param {MeasuredTemplate|Region} template The template or region placeable or document
      * @param {Object} [config={}] Configuration options
      * @returns {[ {x: number, y: number}, {x: number, y: number}, {x: number, y: number} ]} Array of [primary, secondary, center] coordinates
      */
@@ -837,8 +834,8 @@ export class BaseFoundryAdapter {
      * Attaches elements to a target PlaceableObject (Token or Tile).
      * If the target is a Tile, uses Baileywiki Mass Edit if active.
      * If the target is a Token, falls back to Token Attacher or Mass Edit.
-     * @param {Array} elements Elements to attach
-     * @param {PlaceableObject|Document} target Target Token or Tile
+     * @param {Array<PlaceableObject>|PlaceableObject} elements Elements to attach
+     * @param {PlaceableObject} target Target Token or Tile placeable
      * @returns {Promise<unknown>}
      */
     async attachPlaceableElements(elements, target) {
@@ -849,10 +846,6 @@ export class BaseFoundryAdapter {
                 { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
             ]);
             if (this.massEdit?.link) return this.massEdit.link(elements, target);
-            if (typeof MassEdit !== 'undefined' && MassEdit?.linker?.link) {
-                const items = [elements].flat().filter(Boolean);
-                return MassEdit.linker.link(items, target);
-            }
             return null;
         }
 
@@ -861,15 +854,8 @@ export class BaseFoundryAdapter {
             if (this.tokenAttacher?.attachElementsToToken) {
                 return this.tokenAttacher.attachElementsToToken(elements, target, true);
             }
-            if (typeof tokenAttacher !== 'undefined' && tokenAttacher?.attachElementsToToken) {
-                return tokenAttacher.attachElementsToToken(elements, target, true);
-            }
         } else if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
             if (this.massEdit?.link) return this.massEdit.link(elements, target);
-            if (typeof MassEdit !== 'undefined' && MassEdit?.linker?.link) {
-                const items = [elements].flat().filter(Boolean);
-                return MassEdit.linker.link(items, target);
-            }
         }
 
         dependency.someRequired([
@@ -880,8 +866,8 @@ export class BaseFoundryAdapter {
 
     /**
      * Detaches elements from a target PlaceableObject (Token or Tile).
-     * @param {Array} elements Elements to detach
-     * @param {PlaceableObject|Document} target Target Token or Tile
+     * @param {Array<PlaceableObject>|PlaceableObject} elements Elements to detach
+     * @param {PlaceableObject} target Target Token or Tile placeable
      * @returns {Promise<unknown>}
      */
     async detachPlaceableElements(elements, target) {
@@ -892,10 +878,6 @@ export class BaseFoundryAdapter {
                 { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
             ]);
             if (this.massEdit?.removeLinks) return this.massEdit.removeLinks(elements, target);
-            if (typeof MassEdit !== 'undefined' && MassEdit?.linker?.removeLinks) {
-                const items = [elements].flat().filter(Boolean);
-                return MassEdit.linker.removeLinks(items, target);
-            }
             return null;
         }
 
@@ -904,15 +886,8 @@ export class BaseFoundryAdapter {
             if (this.tokenAttacher?.detachElementsFromToken) {
                 return this.tokenAttacher.detachElementsFromToken(elements, target, true);
             }
-            if (typeof tokenAttacher !== 'undefined' && tokenAttacher?.detachElementsFromToken) {
-                return tokenAttacher.detachElementsFromToken(elements, target, true);
-            }
         } else if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
             if (this.massEdit?.removeLinks) return this.massEdit.removeLinks(elements, target);
-            if (typeof MassEdit !== 'undefined' && MassEdit?.linker?.removeLinks) {
-                const items = [elements].flat().filter(Boolean);
-                return MassEdit.linker.removeLinks(items, target);
-            }
         }
 
         dependency.someRequired([

@@ -98,7 +98,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * Calculate reveal tile placement offset for Foundry V12 (legacy top-left anchor (0, 0)).
      * Compares token/tile size and scale to offset top-left origin.
      *
-     * @param {PlaceableObject|Document} object Token or Tile object/document
+     * @param {PlaceableObject} object Token or Tile placeable
      * @param {number} [scale=1] Additional scale multiplier
      * @returns {{x: number, y: number}} Offset coordinates
      */
@@ -123,7 +123,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
     /**
      * Calculate shape tile placement offset for Foundry V12 (legacy top-left anchor (0, 0)).
      *
-     * @param {PlaceableObject|Document} object Token or Tile object/document
+     * @param {PlaceableObject} object Token or Tile placeable
      * @returns {{x: number, y: number}} Offset coordinates
      */
     getShapeOffset(object) {
@@ -142,7 +142,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
     /**
      * Gets position coordinates from a legacy MeasuredTemplate document or placeable.
      *
-     * @param {Document|PlaceableObject} template The MeasuredTemplate document or placeable
+     * @param {MeasuredTemplate} template The MeasuredTemplate placeable or document
      * @param {Object} [config={}] Configuration options
      * @returns {[ {x: number, y: number}, {x: number, y: number}, {x: number, y: number} ]} Array of [primary, secondary, center] coordinates
      */

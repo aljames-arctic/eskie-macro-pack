@@ -23,6 +23,17 @@ Hooks.once('init', async () => {
     // Initialize unified adapter layer across Foundry platform, game system, and active modules
     await adapter.init();
 
+    // Preload Handlebars templates
+    await adapter.loadTemplates([
+        'modules/eskie-macros/src/ui/autoanimations/autorecUpdateMenu.html',
+        'modules/eskie-macros/src/ui/autorec/destinationDialog.html',
+        'modules/eskie-macros/src/ui/autorec/manageAutorecMenu.html',
+        'modules/eskie-macros/src/ui/blfx/autorecUpdateMenu.html',
+        'modules/eskie-macros/src/ui/blfx/enableUpdatesPrompt.html',
+        'modules/eskie-macros/src/ui/recommended-modules/recommendedModulesMenu.html',
+        'modules/eskie-macros/src/ui/world-scripts/worldScriptsMenu.html'
+    ]);
+
     function setupModule() {
         function setupApiCalls(exportedFunctions) {
             globalThis.eskie = adapter.mergeObject(

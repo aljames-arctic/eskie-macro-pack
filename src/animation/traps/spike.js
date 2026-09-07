@@ -11,21 +11,25 @@ import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
     delay: 500,
-    xScale: 1.4,
-    yScale: 1.4,
+    spike: {
+        xScale: 1.4,
+        yScale: 1.4,
+    },
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { delay, xScale, yScale, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { delay, spike: spikeConfig, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     if (!tile) return new Sequence();
 
     const tileBounds = adapter.getTileBounds(tile);
     const tileCenter = tileBounds.center;
-    const effectWidth = tileBounds.width * (xScale ?? config.sizeMultiplier ?? 1.4);
-    const effectHeight = tileBounds.height * (yScale ?? config.sizeMultiplier ?? 1.4);
+    const xScale = spikeConfig?.xScale ?? config.xScale ?? 1.4;
+    const yScale = spikeConfig?.yScale ?? config.yScale ?? 1.4;
+    const effectWidth = tileBounds.width * xScale;
+    const effectHeight = tileBounds.height * yScale;
 
     const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
 

@@ -12,8 +12,8 @@ import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
     delay: 500,
     spike: {
-        xScale: 1.4,
-        yScale: 1.4,
+        xScale: 1.5,
+        yScale: 1.5,
     },
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
@@ -26,8 +26,8 @@ async function create(tile, targets, config = {}) {
 
     const tileBounds = adapter.getTileBounds(tile);
     const tileCenter = tileBounds.center;
-    const xScale = spikeConfig?.xScale ?? config.xScale ?? 1.4;
-    const yScale = spikeConfig?.yScale ?? config.yScale ?? 1.4;
+    const xScale = spikeConfig?.xScale ?? config.xScale ?? 1.5;
+    const yScale = spikeConfig?.yScale ?? config.yScale ?? 1.5;
     const effectWidth = tileBounds.width * xScale;
     const effectHeight = tileBounds.height * yScale;
 

@@ -136,6 +136,36 @@ test('Tile offset calculations: V12/V13 top-left origin math vs V14+ centered or
     assert.deepEqual(v14.getShapeOffset(mockToken), { x: 550, y: 650 });
     assert.deepEqual(v14.getTileOffset(mockToken, 'reveal', 1), { x: 550, y: 650 });
     assert.deepEqual(v14.getTileOffset(mockToken, 'shape'), { x: 550, y: 650 });
+
+    // Tile bounding box: V12/V13 top-left origin (100, 100) vs V14 centered origin (200, 200) for a 200x200 tile
+    const v12Tile = { x: 100, y: 100, width: 200, height: 200, document: { x: 100, y: 100, width: 200, height: 200 } };
+    assert.deepEqual(v12.getTileBounds(v12Tile), {
+        minX: 100,
+        maxX: 300,
+        minY: 100,
+        maxY: 300,
+        center: { x: 200, y: 200 },
+        width: 200,
+        height: 200
+    });
+
+    const v14Tile = { x: 200, y: 200, width: 200, height: 200, document: { x: 200, y: 200, width: 200, height: 200 } };
+    assert.deepEqual(v14.getTileBounds(v14Tile), {
+        minX: 100,
+        maxX: 300,
+        minY: 100,
+        maxY: 300,
+        center: { x: 200, y: 200 },
+        width: 200,
+        height: 200
+    });
+
+    // Token inside check with V14 centered origin tile
+    const tokenInTile = { id: 't-in', x: 120, y: 120, w: 100, h: 100, document: { x: 120, y: 120, width: 1, height: 1 } };
+    const tokenOutTile = { id: 't-out', x: 350, y: 350, w: 100, h: 100, document: { x: 350, y: 350, width: 1, height: 1 } };
+    canvas.tokens = { placeables: [tokenInTile, tokenOutTile] };
+
+    assert.deepEqual(v14.getTokensInTile(v14Tile).map(t => t.id), ['t-in']);
 });
 
 test('Template position extraction: V12/V13 MeasuredTemplate vs V14+ Region shapes', () => {

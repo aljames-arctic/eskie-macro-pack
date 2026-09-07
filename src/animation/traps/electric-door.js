@@ -103,16 +103,7 @@ async function setup(config = {}) {
         const doors = canvas.walls.placeables.filter(w => {
             if (w.document.door === 0) return false; // Not a door
             
-            const tileX = triggerTile.x;
-            const tileY = triggerTile.y;
-            const tileWidth = triggerTile.width;
-            const tileHeight = triggerTile.height;
-
-            const minX = tileX;
-            const maxX = tileX + tileWidth;
-            const minY = tileY;
-            const maxY = tileY + tileHeight;
-
+            const { minX, maxX, minY, maxY } = adapter.getTileBounds(triggerTile);
             const [x1, y1, x2, y2] = w.document.c;
 
             // Bounding box intersection check for wall segment endpoints

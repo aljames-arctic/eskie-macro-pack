@@ -48,6 +48,34 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
         return { x: objX, y: objY };
     }
 
+    /**
+     * Calculate bounding box and center for a Tile on Foundry V14+ (centered origin (0.5, 0.5)).
+     * In V14+, tile (x, y) is the centered origin.
+     * @override
+     * @param {Tile|TileDocument} tile Target tile placeable or document
+     * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number }}
+     */
+    getTileBounds(tile) {
+        if (!tile) return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0 };
+        const doc = tile.document ?? tile;
+        const x = doc.x ?? tile.x ?? 0;
+        const y = doc.y ?? tile.y ?? 0;
+        const width = doc.width ?? tile.width ?? 0;
+        const height = doc.height ?? tile.height ?? 0;
+        const halfW = width / 2;
+        const halfH = height / 2;
+        const center = tile.center ?? doc.center ?? { x, y };
+        return {
+            minX: x - halfW,
+            maxX: x + halfW,
+            minY: y - halfH,
+            maxY: y + halfH,
+            center,
+            width,
+            height
+        };
+    }
+
     /* -------------------------------------------- */
     /*  Template Position Extraction (V14+ Regions) */
     /* -------------------------------------------- */

@@ -826,22 +826,38 @@ export class BaseFoundryAdapter {
     /* -------------------------------------------- */
 
     /**
+     * Calculate bounding box and center for a Tile.
+     * In V12/V13 baseline, tile origin (x, y) is top-left (0, 0).
+     * @param {Tile|TileDocument} tile Target tile placeable or document
+     * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number }}
+     */
+    getTileBounds(tile) {
+        if (!tile) return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0 };
+        const doc = tile.document ?? tile;
+        const x = doc.x ?? tile.x ?? 0;
+        const y = doc.y ?? tile.y ?? 0;
+        const width = doc.width ?? tile.width ?? 0;
+        const height = doc.height ?? tile.height ?? 0;
+        const center = tile.center ?? doc.center ?? { x: x + width / 2, y: y + height / 2 };
+        return {
+            minX: x,
+            maxX: x + width,
+            minY: y,
+            maxY: y + height,
+            center,
+            width,
+            height
+        };
+    }
+
+    /**
      * Retrieve all tokens overlapping or contained within a tile.
      * @param {Tile|TileDocument} tile Target Tile placeable or Tile document
      * @returns {Token[]} Array of matching Token placeables
      */
     getTokensInTile(tile) {
         if (!tile) return [];
-        const tileDoc = tile.document ?? tile;
-        const tileX = tileDoc.x ?? tile.x ?? 0;
-        const tileY = tileDoc.y ?? tile.y ?? 0;
-        const tileWidth = tileDoc.width ?? tile.width ?? 0;
-        const tileHeight = tileDoc.height ?? tile.height ?? 0;
-
-        const tileMinX = tileX;
-        const tileMaxX = tileX + tileWidth;
-        const tileMinY = tileY;
-        const tileMaxY = tileY + tileHeight;
+        const { minX: tileMinX, maxX: tileMaxX, minY: tileMinY, maxY: tileMaxY } = this.getTileBounds(tile);
 
         const gridSize = canvas?.grid?.size ?? canvas?.dimensions?.size ?? 100;
         const tokens = canvas?.tokens?.placeables ?? [];

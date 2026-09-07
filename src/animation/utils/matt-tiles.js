@@ -8,9 +8,9 @@ const DEFAULT_CONFIG = {
     id: 'generic-tile-movement',
 };
 
-//Determine movement direction
+//Determine movement direction and center point
 function getCenter(tile) {
-    return {x: tile.x + tile.width/2, y: tile.y + tile.height/2};
+    return adapter.getTileBounds(tile).center;
 }
 
 function getLabel(id, token) {
@@ -25,13 +25,14 @@ async function start(token, code, config = {}) {
     const { id } = mergedConfig;
     const { info, ...nonInfoConfig } = mergedConfig;
     const label = getLabel(id, token);
+    const tileOffset = adapter.getShapeOffset(token);
 
     const initialData = {
         "texture.src": "icons/svg/d6-grey.svg", 
         "alpha": 0,
         "hidden": true,
-        "x": token.x,
-        "y": token.y,
+        "x": tileOffset.x,
+        "y": tileOffset.y,
         "width": canvas.grid.size * token.document.width,
         "height": canvas.grid.size * token.document.width,
     };
@@ -208,11 +209,18 @@ if (animation) {
             const tWidth = t.w ?? ((tDoc.width ?? 1) * gridSize);
             const tHeight = t.h ?? ((tDoc.height ?? 1) * gridSize);
             const tileDoc = tile.document ?? tile;
-            const tileX = tileDoc.x ?? tile.x ?? 0;
-            const tileY = tileDoc.y ?? tile.y ?? 0;
             const tileWidth = tileDoc.width ?? tile.width ?? 0;
             const tileHeight = tileDoc.height ?? tile.height ?? 0;
-            return !(t.x + tWidth <= tileX || t.x >= tileX + tileWidth || t.y + tHeight <= tileY || t.y >= tileY + tileHeight);
+            const isV14 = Number(String(game.release?.generation ?? game.version ?? '').split('.')[0]) >= 14;
+            const rawX = tileDoc.x ?? tile.x ?? 0;
+            const rawY = tileDoc.y ?? tile.y ?? 0;
+            const halfW = isV14 ? (tileWidth / 2) : 0;
+            const halfH = isV14 ? (tileHeight / 2) : 0;
+            const tileMinX = isV14 ? (rawX - halfW) : rawX;
+            const tileMaxX = isV14 ? (rawX + halfW) : (rawX + tileWidth);
+            const tileMinY = isV14 ? (rawY - halfH) : rawY;
+            const tileMaxY = isV14 ? (rawY + halfH) : (rawY + tileHeight);
+            return !(t.x + tWidth <= tileMinX || t.x >= tileMaxX || t.y + tHeight <= tileMinY || t.y >= tileMaxY);
         });
 
         // Play the trap animation with the contained tokens as targets

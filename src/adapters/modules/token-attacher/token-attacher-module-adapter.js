@@ -28,8 +28,8 @@ export class TokenAttacherModuleAdapter extends BaseModuleAdapter {
 
     /**
      * Attaches elements to a target Token.
-     * @param {Array<PlaceableObject|Document>|PlaceableObject|Document} elements Elements to attach
-     * @param {Token|TokenDocument} targetToken Target token
+     * @param {Array<PlaceableObject>|PlaceableObject} elements Elements to attach
+     * @param {Token} targetToken Target token
      * @param {boolean} [suppressNotification=true] Whether to suppress UI notification
      * @returns {Promise<unknown>}
      */
@@ -46,8 +46,8 @@ export class TokenAttacherModuleAdapter extends BaseModuleAdapter {
 
     /**
      * Detaches elements from a target Token.
-     * @param {Array<PlaceableObject|Document>|PlaceableObject|Document} elements Elements to detach
-     * @param {Token|TokenDocument} targetToken Target token
+     * @param {Array<PlaceableObject>|PlaceableObject} elements Elements to detach
+     * @param {Token} targetToken Target token
      * @param {boolean} [suppressNotification=true] Whether to suppress UI notification
      * @returns {Promise<unknown>}
      */

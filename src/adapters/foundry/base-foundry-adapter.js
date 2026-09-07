@@ -378,7 +378,7 @@ export class BaseFoundryAdapter {
     /**
      * Retrieve all combatants associated with a token in combat.
      * @param {Combat} combat Target combat encounter
-     * @param {string|TokenDocument|Token} token Token ID or Document or Placeable
+     * @param {Token} token Target Token placeable
      * @returns {Combatant[]}
      */
     getCombatantsByToken(combat, token) {
@@ -388,7 +388,7 @@ export class BaseFoundryAdapter {
     /**
      * Retrieve the primary combatant associated with a token in combat.
      * @param {Combat} combat Target combat encounter
-     * @param {string|TokenDocument|Token} token Token ID or Document or Placeable
+     * @param {Token} token Target Token placeable
      * @returns {Combatant|null}
      */
     getCombatantByToken(combat, token) {
@@ -469,7 +469,7 @@ export class BaseFoundryAdapter {
      * 1. The user has an ownership role of the token.
      * 2. There is no other currently connected user with fewer permissions (lower tier) who also has an ownership role of that token.
      *
-     * @param {Token|TokenDocument} token Token placeable or TokenDocument
+     * @param {Token} token Target token placeable
      * @param {User} [user=game.user] Target user to evaluate (defaults to active client user)
      * @returns {boolean} True if the user is in-charge of the token
      */
@@ -803,7 +803,7 @@ export class BaseFoundryAdapter {
     /**
      * Returns an array of users who are owners of a given token.
      * Evaluates document ownership permissions via user permission tiers and ownership levels.
-     * @param {Token|TokenDocument} token Token placeable or document
+     * @param {Token} token Target token placeable
      * @param {object} [config={}] Configuration options
      * @param {boolean} [config.applyPC=true] Whether to include player characters
      * @param {boolean} [config.applyGM=true] Whether to include Game Masters

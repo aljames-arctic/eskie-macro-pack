@@ -1,6 +1,4 @@
 import { dependency } from '../../lib/dependency.js';
-import { massEditAdapter } from '../modules/mass-edit/mass-edit-module-adapter.js';
-import { tokenAttacherAdapter } from '../modules/token-attacher/token-attacher-module-adapter.js';
 import { log } from '../../lib/logger.js';
 
 /**
@@ -41,17 +39,17 @@ export class BaseFoundryAdapter {
     }
 
     /**
-     * Access the Mass Edit module adapter via parent adapter navigation, falling back to singleton.
+     * Access the Mass Edit module adapter via parent adapter navigation.
      */
     get massEdit() {
-        return this.adapter?.massEdit ?? massEditAdapter;
+        return this.adapter?.massEdit ?? null;
     }
 
     /**
-     * Access the Token Attacher module adapter via parent adapter navigation, falling back to singleton.
+     * Access the Token Attacher module adapter via parent adapter navigation.
      */
     get tokenAttacher() {
-        return this.adapter?.tokenAttacher ?? tokenAttacherAdapter;
+        return this.adapter?.tokenAttacher ?? null;
     }
 
     /**
@@ -840,14 +838,28 @@ export class BaseFoundryAdapter {
             dependency.required([
                 { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
             ]);
-            return this.massEdit?.link(elements, target);
+            if (this.massEdit?.link) return this.massEdit.link(elements, target);
+            if (typeof MassEdit !== 'undefined' && MassEdit?.linker?.link) {
+                const items = [elements].flat().filter(Boolean);
+                return MassEdit.linker.link(items, target);
+            }
+            return null;
         }
 
         // Default Token behavior
         if (dependency.isActivated({ id: 'token-attacher', ref: "Token Attacher" })) {
-            return this.tokenAttacher?.attachElementsToToken(elements, target, true);
+            if (this.tokenAttacher?.attachElementsToToken) {
+                return this.tokenAttacher.attachElementsToToken(elements, target, true);
+            }
+            if (typeof tokenAttacher !== 'undefined' && tokenAttacher?.attachElementsToToken) {
+                return tokenAttacher.attachElementsToToken(elements, target, true);
+            }
         } else if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
-            return this.massEdit?.link(elements, target);
+            if (this.massEdit?.link) return this.massEdit.link(elements, target);
+            if (typeof MassEdit !== 'undefined' && MassEdit?.linker?.link) {
+                const items = [elements].flat().filter(Boolean);
+                return MassEdit.linker.link(items, target);
+            }
         }
 
         dependency.someRequired([
@@ -869,14 +881,28 @@ export class BaseFoundryAdapter {
             dependency.required([
                 { id: 'multi-token-edit', ref: "Baileywiki Mass Edit" }
             ]);
-            return this.massEdit?.removeLinks(elements, target);
+            if (this.massEdit?.removeLinks) return this.massEdit.removeLinks(elements, target);
+            if (typeof MassEdit !== 'undefined' && MassEdit?.linker?.removeLinks) {
+                const items = [elements].flat().filter(Boolean);
+                return MassEdit.linker.removeLinks(items, target);
+            }
+            return null;
         }
 
         // Default Token behavior
         if (dependency.isActivated({ id: 'token-attacher', ref: "Token Attacher" })) {
-            return this.tokenAttacher?.detachElementsFromToken(elements, target, true);
+            if (this.tokenAttacher?.detachElementsFromToken) {
+                return this.tokenAttacher.detachElementsFromToken(elements, target, true);
+            }
+            if (typeof tokenAttacher !== 'undefined' && tokenAttacher?.detachElementsFromToken) {
+                return tokenAttacher.detachElementsFromToken(elements, target, true);
+            }
         } else if (dependency.isActivated({ id: 'multi-token-edit', ref: "Baileywiki Mass Edit" })) {
-            return this.massEdit?.removeLinks(elements, target);
+            if (this.massEdit?.removeLinks) return this.massEdit.removeLinks(elements, target);
+            if (typeof MassEdit !== 'undefined' && MassEdit?.linker?.removeLinks) {
+                const items = [elements].flat().filter(Boolean);
+                return MassEdit.linker.removeLinks(items, target);
+            }
         }
 
         dependency.someRequired([

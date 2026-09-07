@@ -1,8 +1,15 @@
 import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { initializeModuleAdapters, hasActiveModuleAdapters, MidiQolModuleAdapter, AutoanimationsModuleAdapter, BlfxModuleAdapter, SocketlibModuleAdapter, AutorecManager, MassEditModuleAdapter, TokenAttacherModuleAdapter } from '../../src/adapters/modules/index.js';
+import { initializeModuleAdapters, hasActiveModuleAdapters, BaseModuleAdapter, MidiQolModuleAdapter, AutoanimationsModuleAdapter, BlfxModuleAdapter, SocketlibModuleAdapter, AutorecManager, MassEditModuleAdapter, TokenAttacherModuleAdapter } from '../../src/adapters/modules/index.js';
 import { adapter } from '../../src/adapters/index.js';
+
+test('BaseModuleAdapter provides standard isActive and extractRolls base interface', () => {
+    const baseMod = new BaseModuleAdapter('custom-mod');
+    assert.equal(baseMod.moduleId, 'custom-mod');
+    assert.equal(baseMod.isActive(), false);
+    assert.deepEqual(baseMod.extractRolls({}), { rolls: [], outcome: 'indeterminant' });
+});
 
 test('initializeModuleAdapters and hasActiveModuleAdapters detect active modules', () => {
     game.modules = new Map([

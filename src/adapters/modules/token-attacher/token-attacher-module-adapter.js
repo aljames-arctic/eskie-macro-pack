@@ -14,10 +14,16 @@ export class TokenAttacherModuleAdapter extends BaseModuleAdapter {
     }
 
     /**
-     * Access the active tokenAttacher global API instance.
+     * Access the active external tokenAttacher library API instance.
      */
     get api() {
-        return globalThis.tokenAttacher;
+        if (typeof window !== 'undefined' && window.tokenAttacher && window.tokenAttacher !== tokenAttacher) {
+            return window.tokenAttacher;
+        }
+        if (typeof global !== 'undefined' && global.tokenAttacher && global.tokenAttacher !== tokenAttacher) {
+            return global.tokenAttacher;
+        }
+        return null;
     }
 
     /**

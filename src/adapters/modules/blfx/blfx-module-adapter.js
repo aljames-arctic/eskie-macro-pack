@@ -423,9 +423,9 @@ export function mergeBlfxCustomAutoRec(existingData, empRegistry = EMP_BLFX_Regi
  * internal registry storage, and hook submission.
  */
 export class BlfxModuleAdapter extends BaseModuleAdapter {
-    constructor() {
+    constructor(registry = null) {
         super("blfx");
-        this.registry = EMP_BLFX_Registry;
+        this.registry = registry ?? EMP_BLFX_Registry;
     }
 
     /**

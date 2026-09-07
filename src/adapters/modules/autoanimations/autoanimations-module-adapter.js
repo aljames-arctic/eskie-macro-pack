@@ -1,4 +1,5 @@
 import { BaseModuleAdapter } from "../base-module-adapter.js";
+import { BaseFoundryAdapter } from "../../foundry/index.js";
 import { MODULE_ID } from "../../../lib/constants.js";
 import { dependency } from "../../../lib/dependency.js";
 import { defaultMenuSettings } from "./defaultMenuSettings.js";
@@ -6,6 +7,8 @@ import { autorecUpdateFormApplication, generateAutorecUpdate } from "../../../ui
 import { blfxAdapter } from "../blfx/blfx-module-adapter.js";
 import { log } from '../../../lib/logger.js';
 import { localize, format } from "../../../lib/utils.js";
+
+const foundryPlatform = new BaseFoundryAdapter();
 
 export const EMP_AA_Menu = {
     melee: [],
@@ -123,9 +126,7 @@ export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
     createAutorecEntry(key, trigger, animation, config, version = "0.0.0", fallback = key) {
         const stdTrigger = this.standardizeTrigger(trigger);
         const defaultMenu = defaultMenuSettings[stdTrigger];
-        const defaultEntry = this.foundry.deepClone
-            ? this.foundry.deepClone(defaultMenu[0])
-            : (typeof structuredClone === 'function' ? structuredClone(defaultMenu[0]) : JSON.parse(JSON.stringify(defaultMenu[0])));
+        const defaultEntry = foundryPlatform.deepClone(defaultMenu[0]);
         const compendium = `Compendium.${MODULE_ID}.eskie-aa-integration`;
 
         const localizedLabel = (typeof key === 'string' && (key.includes(":") || key.includes(" "))) ? key : localize(`EMP.effects.${key}`, fallback);
@@ -154,7 +155,7 @@ export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
         const effectConfig = { ...(config ?? {}), animation };
 
         const entry = {
-            id: this.foundry.randomID(),
+            id: foundryPlatform.randomID(),
             label: localizedLabel,
             macro: {
                 enable: true,
@@ -170,7 +171,7 @@ export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
             }
         };
 
-        return this.foundry.mergeObject(defaultEntry, entry, { inplace: false });
+        return foundryPlatform.mergeObject(defaultEntry, entry, { inplace: false });
     }
 
     /**
@@ -206,7 +207,7 @@ export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
         const developmentVersion = "#{VERSION}#";
         const moduleVersion = game?.modules?.get(MODULE_ID)?.version ?? "1.0.0";
         const lastUpdate = game?.settings?.get(MODULE_ID, "autorecVersion") ?? "0.0.0";
-        const shouldUpdate = moduleVersion === developmentVersion || this.foundry.isNewerVersion(moduleVersion, lastUpdate);
+        const shouldUpdate = moduleVersion === developmentVersion || foundryPlatform.isNewerVersion(moduleVersion, lastUpdate);
         if (!shouldUpdate) return;
 
         if (!dependency.isActivated({ id: "autoanimations", min: "6.5.1" }, localize("EMP.autoanimations.skipped", "EMP | Automated Animations integration skipped."))) {

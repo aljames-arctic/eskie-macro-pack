@@ -37,20 +37,23 @@ async function create(tile, targets, config = {}) {
         .shake({ duration: 500, strength: 2, rotation: false })
         .wait(500);
 
+    const tileBounds = adapter.getTileBounds(tile);
+    const tileCenter = tileBounds.center;
+
     // Spawn persistent water splashes at each origin tile pointing towards the water tile
     if (splashOrigins.length > 0) {
         splashOrigins.forEach(origin => {
             const originDoc = origin.document ?? origin;
-            const originWidth = originDoc.width ?? origin.width ?? 0;
-            const originHeight = originDoc.height ?? origin.height ?? 0;
+            const originBounds = adapter.getTileBounds(origin);
+            const originCenter = originBounds.center;
 
             seq = seq
                 .effect()
                 .name(`flooding-room-splash-${tile.id}`)
                 .file(closest('jb2a.water_splash.cone.01.blue'))
-                .atLocation(origin)
-                .rotateTowards(tile)
-                .size({ width: 2 * originWidth, height: 2 * originHeight })
+                .atLocation(originCenter)
+                .rotateTowards(tileCenter)
+                .size({ width: 2 * originBounds.width, height: 2 * originBounds.height })
                 .fadeIn(1000, { ease: 'easeOutCubic' })
                 .elevation(originDoc.elevation ?? origin.elevation ?? 0)
                 .persist()

@@ -70,7 +70,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
         const maxX = minX + width;
         const minY = y - (anchorY * height);
         const maxY = minY + height;
-        const center = tile.center ?? doc.center ?? { x: minX + width / 2, y: minY + height / 2 };
+        const center = { x: minX + width / 2, y: minY + height / 2 };
 
         return {
             minX,

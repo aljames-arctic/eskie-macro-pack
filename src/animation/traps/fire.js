@@ -21,6 +21,9 @@ async function create(tile, targets, config = {}) {
     const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInTile(tile);
 
     const tileDoc = tile.document ?? tile;
+    const tileBounds = adapter.getTileBounds(tile);
+    const tileCenter = tileBounds.center;
+
     const targetTileIds = tileDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
     let targetTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
 
@@ -32,8 +35,8 @@ async function create(tile, targets, config = {}) {
         if (triggerTile) targetTile = triggerTile;
     }
 
-    const targetTilePlaceable = targetTile?.object ?? targetTile;
-    const targetLoc = targetTilePlaceable?.center ?? (targetList.length ? (targetList[0].object?.center ?? targetList[0].center ?? targetList[0]) : null);
+    const targetTileBounds = targetTile ? adapter.getTileBounds(targetTile) : null;
+    const targetLoc = targetTileBounds?.center ?? (targetList.length ? (targetList[0].object?.center ?? targetList[0].center ?? targetList[0]) : null);
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -43,7 +46,7 @@ async function create(tile, targets, config = {}) {
             // Cone fire breath weapon
             .effect()
             .file(closest('jb2a.breath_weapons02.burst.cone.fire.orange.02'))
-            .atLocation(tile)
+            .atLocation(tileCenter)
             .size(size, { gridUnits: true })
             .stretchTo(targetLoc)
             .zIndex(1);

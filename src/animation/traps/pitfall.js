@@ -22,6 +22,11 @@ async function create(tile, targets, config = {}) {
 
     if (!tile) return new Sequence();
 
+    const tileBounds = adapter.getTileBounds(tile);
+    const tileCenter = tileBounds.center;
+    const tileWidth = tileBounds.width;
+    const tileHeight = tileBounds.height;
+
     const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
 
     let seq = new Sequence();
@@ -30,9 +35,9 @@ async function create(tile, targets, config = {}) {
         // Dust puff when trap opens
         .effect()
         .file(closest('jb2a.smoke.puff.ring.01.white.1'))
-        .atLocation(tile)
+        .atLocation(tileCenter)
         .opacity(1)
-        .size({ width: tile.width * smokeSize, height: tile.height * smokeSize })
+        .size({ width: tileWidth * smokeSize, height: tileHeight * smokeSize })
         .belowTokens();
 
     if (reveal) {

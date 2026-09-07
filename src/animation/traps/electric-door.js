@@ -29,6 +29,11 @@ async function create(tile, targets, config = {}) {
     });
     const doorTile = triggerTile ?? tile;
 
+    const tileBounds = adapter.getTileBounds(tile);
+    const tileCenter = tileBounds.center;
+    const doorBounds = adapter.getTileBounds(doorTile);
+    const doorCenter = doorBounds.center;
+
     const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
 
     let seq = new Sequence();
@@ -39,9 +44,9 @@ async function create(tile, targets, config = {}) {
             // Electricity burst at the door tile
             .effect()
             .file(closest('eskie.lightning.03.blue'))
-            .atLocation(doorTile)
+            .atLocation(doorCenter)
             .size(1.25, { gridUnits: true })
-            .rotateTowards(tile)
+            .rotateTowards(tileCenter)
             .zIndex(1)
 
             .wait(250);

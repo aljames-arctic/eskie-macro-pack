@@ -25,8 +25,10 @@ async function create(tile, targets, config = {}) {
     const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
 
     const tileDoc = tile.document ?? tile;
-    const tileWidth = tileDoc.width ?? tile.width ?? 0;
-    const tileHeight = tileDoc.height ?? tile.height ?? 0;
+    const tileBounds = adapter.getTileBounds(tile);
+    const tileCenter = tileBounds.center;
+    const tileWidth = tileBounds.width;
+    const tileHeight = tileBounds.height;
 
     const num = Math.floor(Math.random() * 2);
     const mirrorX = Math.random() >= 0.5;
@@ -41,7 +43,7 @@ async function create(tile, targets, config = {}) {
         // Falling rocks animation
         .effect()
         .file(closest(`jb2a.falling_rocks.top.1x1.grey.${num}`))
-        .atLocation(tile)
+        .atLocation(tileCenter)
         .size({ width: tileWidth * 2.5, height: tileHeight * 2.5 })
         .mirrorX(mirrorX)
         .mirrorY(mirrorY)
@@ -53,7 +55,7 @@ async function create(tile, targets, config = {}) {
         .name(`${label}-${tile.id}`)
         .delay(3500)
         .file(closest(`jb2a.falling_rocks.endframe.top.1x1.grey.${num}`))
-        .atLocation(tile)
+        .atLocation(tileCenter)
         .size({ width: tileWidth * 2.5, height: tileHeight * 2.5 })
         .belowTokens()
         .mirrorX(mirrorX)
@@ -64,7 +66,7 @@ async function create(tile, targets, config = {}) {
         // Impact shockwave
         .effect()
         .file(closest('jb2a.impact.white.01'))
-        .atLocation(tile)
+        .atLocation(tileCenter)
         .scaleIn(0, 500, { ease: 'easeOutCubic' })
         .belowTokens()
         .size({ width: tileWidth * 1.5, height: tileHeight * 1.5 })
@@ -74,7 +76,7 @@ async function create(tile, targets, config = {}) {
         .effect()
         .delay(100)
         .file(closest('jb2a.smoke.puff.centered.grey'))
-        .atLocation(tile)
+        .atLocation(tileCenter)
         .playbackRate(0.65)
         .fadeIn(250)
         .fadeOut(1500)

@@ -43,10 +43,10 @@ async function create(tile, targets, config = {}) {
         return seq;
     }
 
-    const tilePlaceable = tile.object ?? tile;
-    const endTilePlaceable = endTile.object ?? endTile;
-    const startLoc = tilePlaceable.center ?? tilePlaceable;
-    const endLoc = endTilePlaceable.center ?? endTilePlaceable;
+    const tileBounds = adapter.getTileBounds(tile);
+    const endTileBounds = adapter.getTileBounds(endTile);
+    const startLoc = tileBounds.center;
+    const endLoc = endTileBounds.center;
 
     let seq = new Sequence();
     applySound(seq, sound);

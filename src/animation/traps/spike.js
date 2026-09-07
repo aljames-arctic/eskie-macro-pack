@@ -20,6 +20,11 @@ async function create(tile, targets, config = {}) {
 
     if (!tile) return new Sequence();
 
+    const tileBounds = adapter.getTileBounds(tile);
+    const tileCenter = tileBounds.center;
+    const tileWidth = tileBounds.width;
+    const tileHeight = tileBounds.height;
+
     const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
 
     let seq = new Sequence();
@@ -28,18 +33,18 @@ async function create(tile, targets, config = {}) {
         // Hidden/still frame base of the spike trap below tokens
         .effect()
         .file(closest('jb2a.spike_trap.10x10ft.top.base.still_frame.hidden'))
-        .atLocation(tile)
+        .atLocation(tileCenter)
         .fadeIn(250)
         .fadeOut(250)
         .duration(4000)
         .belowTokens()
-        .size({ width: tile.width, height: tile.height })
+        .size({ width: tileWidth, height: tileHeight })
 
         // The spike trap snapping/firing above tokens
         .effect()
         .file(closest('jb2a.spike_trap.10x10ft.top.no_base.normal.01.01'))
-        .atLocation(tile)
-        .size({ width: tile.width, height: tile.height })
+        .atLocation(tileCenter)
+        .size({ width: tileWidth, height: tileHeight })
         .zIndex(1)
 
         .wait(delay);

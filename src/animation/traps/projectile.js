@@ -24,6 +24,8 @@ async function create(tile, targets, config = {}) {
     const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInTile(tile);
 
     const tileDoc = tile.document ?? tile;
+    const tileBounds = adapter.getTileBounds(tile);
+    const tileCenter = tileBounds.center;
 
     // Retrieve projectile type from flags, defaulting to arrow
     const projectileType = tileDoc.getFlag?.(MODULE_ID, 'trap.projectileType') ?? mConfig.projectileType ?? 'arrow';
@@ -40,8 +42,8 @@ async function create(tile, targets, config = {}) {
         if (triggerTile) targetTile = triggerTile;
     }
 
-    const targetTilePlaceable = targetTile?.object ?? targetTile;
-    const targetLoc = targetTilePlaceable?.center ?? (targetList.length ? (targetList[0].object?.center ?? targetList[0].center ?? targetList[0]) : null);
+    const targetTileBounds = targetTile ? adapter.getTileBounds(targetTile) : null;
+    const targetLoc = targetTileBounds?.center ?? (targetList.length ? (targetList[0].object?.center ?? targetList[0].center ?? targetList[0]) : null);
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -51,20 +53,20 @@ async function create(tile, targets, config = {}) {
 
     if (targetLoc) {
         if (projectileType === 'javelin') {
-            const offset = targetLoc.x < tile.x ? -0.15 : 0.15;
+            const offset = targetLoc.x < tileCenter.x ? -0.15 : 0.15;
             seq = seq
                 .effect()
                 .file(closest('jb2a.javelin.01.throw'))
-                .atLocation(tile, { offset: { y: offset }, gridUnits: true })
+                .atLocation(tileCenter, { offset: { y: offset }, gridUnits: true })
                 .stretchTo(targetLoc)
                 .startTime(750)
                 .waitUntilFinished(-1500);
         } else if (projectileType === 'dart') {
-            const offset = targetLoc.x < tile.x ? -0.15 : 0.15;
+            const offset = targetLoc.x < tileCenter.x ? -0.15 : 0.15;
             seq = seq
                 .effect()
                 .file(closest('jb2a.dart.01.throw.physical.white'))
-                .atLocation(tile, { offset: { y: offset }, gridUnits: true })
+                .atLocation(tileCenter, { offset: { y: offset }, gridUnits: true })
                 .stretchTo(targetLoc, { randomOffset: 0.85, gridUnits: true })
                 .startTime(750)
                 .repeats(repeats, repeatDelay, repeatDelay);
@@ -72,7 +74,7 @@ async function create(tile, targets, config = {}) {
             seq = seq
                 .effect()
                 .file(closest('jb2a.arrow.physical.white.01'))
-                .atLocation(tile)
+                .atLocation(tileCenter)
                 .stretchTo(targetLoc, { randomOffset: 0.65, gridUnits: true })
                 .startTime(350)
                 .repeats(repeats, repeatDelay, repeatDelay);
@@ -89,7 +91,7 @@ async function create(tile, targets, config = {}) {
                     // Shaking copy sprite for target hit feedback
                     .effect()
                     .copySprite(target)
-                    .spriteRotation(-target.document.rotation)
+                    .spriteRotation(-(target.document?.rotation ?? target.rotation ?? 0))
                     .attachTo(target)
                     .scaleToObject(1, { considerTokenScale: true })
                     .fadeIn(250)
@@ -104,13 +106,13 @@ async function create(tile, targets, config = {}) {
                     .atLocation(target)
                     .size(splashScale * targetWidth * targetScaleX, { gridUnits: true })
                     .spriteOffset({ x: -0.25 }, { gridUnits: true })
-                    .rotateTowards(tile);
+                    .rotateTowards(tileCenter);
             } else if (projectileType === 'dart') {
                 seq = seq
                     // Green poison tint effect
                     .effect()
                     .copySprite(target)
-                    .spriteRotation(-target.document.rotation)
+                    .spriteRotation(-(target.document?.rotation ?? target.rotation ?? 0))
                     .delay(250)
                     .attachTo(target)
                     .scaleToObject(1, { considerTokenScale: true })

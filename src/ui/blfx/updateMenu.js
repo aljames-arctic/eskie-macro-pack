@@ -30,7 +30,7 @@ export function readExistingBlfxData() {
                     }
                 }
             } catch (err) {
-                log.debug(`EMP | Could not read ${settingKey}:`, err);
+                log.debug(`Could not read ${settingKey}:`, err);
             }
         }
     }
@@ -415,7 +415,7 @@ export class BlfxAutorecUpdateApp extends foundryPlatform.HandlebarsApplicationM
         const { newPayload } = appInstance?.settings ? await appInstance.settings(excludedKeys) : await generateBlfxAutorecUpdate(EMP_BLFX_Registry, excludedKeys);
 
         if (!newPayload?.customAutoRecognition || Object.keys(newPayload.customAutoRecognition).length === 0) {
-            log.debug("EMP | Nothing to update in Boss Loot FX!");
+            log.debug("Nothing to update in Boss Loot FX!");
             const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
             if (rawVersion !== "#{VERSION}#" && game.settings) {
                 await game.settings.set(MODULE_ID, "blfxAutorecVersion", rawVersion);
@@ -431,10 +431,10 @@ export class BlfxAutorecUpdateApp extends foundryPlatform.HandlebarsApplicationM
                 try {
                     if (game.settings?.settings?.has?.(settingKey)) {
                         await game.settings.set(mod, key, newPayload);
-                        log.info(`EMP | Directly saved custom auto-recognition payload to ${settingKey}`);
+                        log.info(`Directly saved custom auto-recognition payload to ${settingKey}`);
                     }
                 } catch (err) {
-                    log.debug(`EMP | Could not directly write to ${settingKey}:`, err);
+                    log.debug(`Could not directly write to ${settingKey}:`, err);
                 }
             }
         }
@@ -453,7 +453,7 @@ export class BlfxAutorecUpdateApp extends foundryPlatform.HandlebarsApplicationM
             await game.settings.set(MODULE_ID, "blfxAutorecVersion", effectiveVersion);
         }
 
-        log.info("EMP | Custom animations have been updated in Boss Loot FX.");
+        log.info("Custom animations have been updated in Boss Loot FX.");
         log.groupEnd();
     }
 

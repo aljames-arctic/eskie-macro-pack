@@ -202,9 +202,9 @@ const tileDoc = tile.document ?? tile;
 // Get the specific Eskie Trap Animation Function if this tile is a trap tile
 const animation = tileDoc.getFlag?.('${MODULE_ID}', 'trap.animation');
 const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter;
-if (animation && adapter) {
-    const trap = adapter.getProperty(globalThis, animation);
-    if (trap?.play) {
+if (animation) {
+    try {
+        const trap = adapter.getProperty(globalThis, animation);
         // Collect all tokens contained within / overlapping this trap tile via adapter
         let targets = adapter.getTokensInTile(tile);
 
@@ -215,6 +215,9 @@ if (animation && adapter) {
 
         // Play the trap animation with the contained tokens as targets
         await trap.play(tile.object ?? tile, targets);
+    } catch (err) {
+        console.error('Eskie Macro Pack | Failed to play trap animation "' + animation + '" on tile "' + tileDoc.id + '":', err);
+        throw err;
     }
 }
 
@@ -290,7 +293,7 @@ for (const id of originIds) {
         await socket.tile.edit(tileId, updateData);
     }
 
-    ui.notifications.info(`EMP | Successfully setup ${trapKey} trap links for ${triggerTiles.length} trigger tile(s) and ${originTiles.length} trap tile(s).`);
+    ui.notifications.info(`Successfully setup ${trapKey} trap links for ${triggerTiles.length} trigger tile(s) and ${originTiles.length} trap tile(s).`);
     return { triggerTiles, originTiles, targetTiles };
 }
 

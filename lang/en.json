@@ -159,7 +159,7 @@
             }
         },
         "autoanimations": {
-            "skipped": "EMP | Automated Animations integration skipped."
+            "skipped": "Automated Animations integration skipped."
         },
         "updateMenu": {
             "menuTitle": "Automated Animations Integration",
@@ -354,28 +354,28 @@
             "setup": {
                 "chooseTrapTitle": "Trap Setup: Choose Trap",
                 "chooseTrapContent": "<p>Choose a trap to configure and set up on the canvas.</p>",
-                "noTrapChosen": "EMP | No trap chosen. Trap setup cancelled.",
-                "noSetupMethod": "EMP | Trap \"{name}\" has no setup configuration method.",
-                "onlyGm": "EMP | Only a GM can setup traps.",
+                "noTrapChosen": "No trap chosen. Trap setup cancelled.",
+                "noSetupMethod": "Trap \"{name}\" has no setup configuration method.",
+                "onlyGm": "Only a GM can setup traps.",
                 "step1Title": "Trap Setup - {name}: Step 1 (Trigger Tiles)",
                 "step1Content": "<p>Select the **Trigger Tile(s)** on the canvas (which tokens step on to trigger the trap).</p><p>Click <strong>Continue</strong> once selected.</p>",
-                "noTriggerTiles": "EMP | No trigger tiles selected. Trap setup cancelled.",
+                "noTriggerTiles": "No trigger tiles selected. Trap setup cancelled.",
                 "step2OriginTitle": "Trap Setup - {name}: Step 2 (Trap Origin/Launcher Tiles)",
                 "step2OriginContent": "<p>Select the **Trap Origin Tile(s)** on the canvas (where the trap starts or shoots from).</p><p>Click <strong>Continue</strong> once selected.</p>",
-                "noOriginTiles": "EMP | No trap origin tiles selected. Trap setup cancelled.",
+                "noOriginTiles": "No trap origin tiles selected. Trap setup cancelled.",
                 "step3TargetTitle": "Trap Setup - {name}: Step 3 (Trap Target/Landing Tiles)",
                 "step3TargetContent": "<p>Select the **Trap Target Tile** on the canvas (where the trap shoots towards or lands).</p><p>Click <strong>Continue</strong> once selected.</p>",
-                "noTargetTiles": "EMP | No trap target tiles selected. Defaulting to use Trigger Tiles.",
+                "noTargetTiles": "No trap target tiles selected. Defaulting to use Trigger Tiles.",
                 "step2AnimTitle": "Trap Setup - {name}: Step 2 (Animation Tiles)",
                 "step2AnimContent": "<p>Select the **Trap Animation Tile(s)** where the visual effect will play.</p><p>Click <strong>Continue</strong> once selected.</p>",
-                "noAnimTiles": "EMP | No trap animation tiles selected. Defaulting to use Trigger Tiles.",
+                "noAnimTiles": "No trap animation tiles selected. Defaulting to use Trigger Tiles.",
                 "extraTitle": "Trap Setup - {name}",
-                "noExtraTiles": "EMP | No {name} selected. Trap setup cancelled."
+                "noExtraTiles": "No {name} selected. Trap setup cancelled."
             },
             "projectile": {
                 "chooseTypeTitle": "Projectile Trap Setup: Choose Type",
                 "chooseTypeContent": "<p>Choose the projectile type for this trap.</p>",
-                "noTypeChosen": "EMP | No projectile type chosen. Setup cancelled.",
+                "noTypeChosen": "No projectile type chosen. Setup cancelled.",
                 "arrow": "Arrow",
                 "dart": "Dart",
                 "javelin": "Javelin"

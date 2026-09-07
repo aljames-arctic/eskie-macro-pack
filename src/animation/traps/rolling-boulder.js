@@ -29,7 +29,7 @@ async function create(tile, targets, config = {}) {
 
     if (!endTile) {
         log.warn(`Rolling Boulder Trap: Tile "${tileDoc.id}" has no configured end tile.`);
-        ui.notifications?.warn?.(game.i18n.format('EMP.traps.rollingBoulder.noEndTile', { id: tileDoc.id }) ?? 'EMP | Rolling Boulder Trap: No end tile found.');
+        ui.notifications?.warn?.(game.i18n.format('EMP.traps.rollingBoulder.noEndTile', { id: tileDoc.id }) ?? 'Rolling Boulder Trap: No end tile found.');
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;

@@ -7,7 +7,7 @@
  */
 
 const source = canvas.tokens.controlled[0];
-if (!source) return ui.notifications.warn('EMP | Please select a token!');
+if (!source) return ui.notifications.warn('Please select a token!');
 
 const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 

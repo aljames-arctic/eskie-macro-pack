@@ -210,7 +210,7 @@ export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
         const shouldUpdate = moduleVersion === developmentVersion || foundryPlatform.isNewerVersion(moduleVersion, lastUpdate);
         if (!shouldUpdate) return;
 
-        if (!dependency.isActivated({ id: "autoanimations", min: "6.5.1" }, localize("EMP.autoanimations.skipped", "EMP | Automated Animations integration skipped."))) {
+        if (!dependency.isActivated({ id: "autoanimations", min: "6.5.1" }, localize("EMP.autoanimations.skipped", "Automated Animations integration skipped."))) {
             return;
         }
 

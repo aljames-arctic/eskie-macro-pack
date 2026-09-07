@@ -55,12 +55,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @returns {Document|null}
      */
     fromUuidSync(uuid, options = {}) {
-        if (!uuid) return null;
-        try {
-            return fromUuidSync(uuid, options) ?? null;
-        } catch (_) {
-            return null;
-        }
+        return fromUuidSync(uuid, options);
     }
 
     /**
@@ -70,12 +65,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @returns {Promise<Document|null>}
      */
     async fromUuid(uuid, options = {}) {
-        if (!uuid) return null;
-        try {
-            return (await fromUuid(uuid, options)) ?? null;
-        } catch (_) {
-            return null;
-        }
+        return fromUuid(uuid, options);
     }
 
     /**

@@ -316,10 +316,7 @@ export class BaseFoundryAdapter {
      * @returns {Object} Difference object
      */
     diffObject(original, other, options = {}) {
-        if (typeof foundry !== 'undefined' && foundry.utils?.diffObject) {
-            return foundry.utils.diffObject(original, other, options);
-        }
-        return {};
+        return foundry.utils.diffObject(original, other, options);
     }
 
     /**
@@ -329,10 +326,7 @@ export class BaseFoundryAdapter {
      * @returns {Object} Flattened object
      */
     flattenObject(obj, d = 0) {
-        if (typeof foundry !== 'undefined' && foundry.utils?.flattenObject) {
-            return foundry.utils.flattenObject(obj, d);
-        }
-        return { ...obj };
+        return foundry.utils.flattenObject(obj, d);
     }
 
     /**
@@ -342,10 +336,7 @@ export class BaseFoundryAdapter {
      * @returns {Object} Expanded nested object
      */
     expandObject(obj, d = 0) {
-        if (typeof foundry !== 'undefined' && foundry.utils?.expandObject) {
-            return foundry.utils.expandObject(obj, d);
-        }
-        return { ...obj };
+        return foundry.utils.expandObject(obj, d);
     }
 
     /**
@@ -355,14 +346,7 @@ export class BaseFoundryAdapter {
      * @returns {Function} Debounced function
      */
     debounce(fn, delay) {
-        if (typeof foundry !== 'undefined' && foundry.utils?.debounce) {
-            return foundry.utils.debounce(fn, delay);
-        }
-        let timeoutId;
-        return function (...args) {
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => fn.apply(this, args), delay);
-        };
+        return foundry.utils.debounce(fn, delay);
     }
 
     /**

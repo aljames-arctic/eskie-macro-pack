@@ -86,7 +86,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      */
     getCombatantsByToken(combat, token) {
         if (!combat || !token?.id) return [];
-        const single = combat.getCombatantByToken?.(token.id);
+        const single = combat.getCombatantByToken(token.id);
         return single ? [single] : [];
     }
 

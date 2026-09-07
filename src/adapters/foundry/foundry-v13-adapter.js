@@ -17,21 +17,21 @@ export class FoundryV13Adapter extends FoundryV12Adapter {
      * The active KeyboardManager constructor in v13+.
      */
     get KeyboardManager() {
-        return foundry.helpers.interaction.KeyboardManager.implementation ?? foundry.helpers.interaction.KeyboardManager;
+        return foundry.helpers.interaction.KeyboardManager.implementation;
     }
 
     /**
      * The active Token placeable constructor in v13+.
      */
     get Token() {
-        return foundry.canvas.placeables.Token.implementation ?? foundry.canvas.placeables.Token;
+        return foundry.canvas.placeables.Token.implementation;
     }
 
     /**
      * The active Tile placeable constructor in v13+.
      */
     get Tile() {
-        return foundry.canvas.placeables.Tile.implementation ?? foundry.canvas.placeables.Tile;
+        return foundry.canvas.placeables.Tile.implementation;
     }
 
     /**
@@ -85,11 +85,8 @@ export class FoundryV13Adapter extends FoundryV12Adapter {
      * @returns {Combatant[]}
      */
     getCombatantsByToken(combat, token) {
-        if (!combat) return [];
-        const tokenId = token?.id ?? token?.document?.id ?? token;
-        if (!tokenId) return [];
-
-        return combat.getCombatantsByToken?.(tokenId) ?? [];
+        if (!combat || !token) return [];
+        return combat.getCombatantsByToken?.(token.id ?? token) ?? [];
     }
 
     /**

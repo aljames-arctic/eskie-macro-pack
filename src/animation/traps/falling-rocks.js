@@ -96,7 +96,9 @@ async function create(tile, targets, config = {}) {
         await tileDoc.setFlag?.(MODULE_ID, `${label} - pinned`, [...currentPinnedIds, ...finalTargetIds]);
         
         finalTargets.forEach(target => {
-            const targetName = target.name ?? target.document?.name ?? 'Token';
+            const targetDoc = target.document ?? target;
+            const targetName = targetDoc.name;
+            const targetRotation = targetDoc.rotation;
             const buryEffectName = `${label}-${targetName}-${target.id}`;
 
             seq = seq
@@ -105,7 +107,7 @@ async function create(tile, targets, config = {}) {
                 .name(buryEffectName)
                 .copySprite(target)
                 .attachTo(target, { bindAlpha: false })
-                .spriteRotation(-(target.document?.rotation ?? target.rotation ?? 0))
+                .spriteRotation(-targetRotation)
                 .scaleToObject(1, { considerTokenScale: true })
                 .fadeOut(750, { ease: 'easeOutCubic' })
                 .persist()

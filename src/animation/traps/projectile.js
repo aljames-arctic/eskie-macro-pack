@@ -7,6 +7,7 @@ import { MODULE_ID } from '../../lib/constants.js';
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
+import { log } from '../../lib/logger.js';
 import { adapter } from '../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../utils/sound.js';
 
@@ -30,20 +31,18 @@ async function create(tile, targets, config = {}) {
     // Retrieve projectile type from flags, defaulting to arrow
     const projectileType = tileDoc.getFlag?.(MODULE_ID, 'trap.projectileType') ?? mConfig.projectileType ?? 'arrow';
 
-    // Retrieve target/landing tile from flags, falling back to legacy trigger lookup
+    // Retrieve target/landing tile from flags
     const targetTileIds = tileDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
-    let targetTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
-
-    if (!targetTile) {
-        const triggerTile = canvas.tiles.placeables.find(t => {
-            const d = t.document ?? t;
-            return d.getFlag?.(MODULE_ID, 'trap.originIds')?.includes(tile.id) || d.getFlag?.(MODULE_ID, 'trap.trapTileIds')?.includes(tile.id);
-        });
-        if (triggerTile) targetTile = triggerTile;
-    }
-
+    const targetTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
     const targetTileBounds = targetTile ? adapter.getTileBounds(targetTile) : null;
-    const targetLoc = targetTileBounds?.center ?? (targetList.length ? (targetList[0].object?.center ?? targetList[0].center ?? targetList[0]) : null);
+    const targetLoc = targetTileBounds?.center ?? (targetList.length ? (targetList[0].center ?? targetList[0].object?.center) : null);
+
+    if (!targetLoc) {
+        log.warn(`EMP | Projectile Trap: Tile "${tileDoc.id}" has no configured target tile or targeted tokens.`);
+        let seq = new Sequence();
+        applySound(seq, sound);
+        return seq;
+    }
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -51,47 +50,47 @@ async function create(tile, targets, config = {}) {
         seq = seq.wait(500);
     }
 
-    if (targetLoc) {
-        if (projectileType === 'javelin') {
-            const offset = targetLoc.x < tileCenter.x ? -0.15 : 0.15;
-            seq = seq
-                .effect()
-                .file(closest('jb2a.javelin.01.throw'))
-                .atLocation(tileCenter, { offset: { y: offset }, gridUnits: true })
-                .stretchTo(targetLoc)
-                .startTime(750)
-                .waitUntilFinished(-1500);
-        } else if (projectileType === 'dart') {
-            const offset = targetLoc.x < tileCenter.x ? -0.15 : 0.15;
-            seq = seq
-                .effect()
-                .file(closest('jb2a.dart.01.throw.physical.white'))
-                .atLocation(tileCenter, { offset: { y: offset }, gridUnits: true })
-                .stretchTo(targetLoc, { randomOffset: 0.85, gridUnits: true })
-                .startTime(750)
-                .repeats(repeats, repeatDelay, repeatDelay);
-        } else {
-            seq = seq
-                .effect()
-                .file(closest('jb2a.arrow.physical.white.01'))
-                .atLocation(tileCenter)
-                .stretchTo(targetLoc, { randomOffset: 0.65, gridUnits: true })
-                .startTime(350)
-                .repeats(repeats, repeatDelay, repeatDelay);
-        }
+    if (projectileType === 'javelin') {
+        const offset = targetLoc.x < tileCenter.x ? -0.15 : 0.15;
+        seq = seq
+            .effect()
+            .file(closest('jb2a.javelin.01.throw'))
+            .atLocation(tileCenter, { offset: { y: offset }, gridUnits: true })
+            .stretchTo(targetLoc)
+            .startTime(750)
+            .waitUntilFinished(-1500);
+    } else if (projectileType === 'dart') {
+        const offset = targetLoc.x < tileCenter.x ? -0.15 : 0.15;
+        seq = seq
+            .effect()
+            .file(closest('jb2a.dart.01.throw.physical.white'))
+            .atLocation(tileCenter, { offset: { y: offset }, gridUnits: true })
+            .stretchTo(targetLoc, { randomOffset: 0.85, gridUnits: true })
+            .startTime(750)
+            .repeats(repeats, repeatDelay, repeatDelay);
+    } else {
+        seq = seq
+            .effect()
+            .file(closest('jb2a.arrow.physical.white.01'))
+            .atLocation(tileCenter)
+            .stretchTo(targetLoc, { randomOffset: 0.65, gridUnits: true })
+            .startTime(350)
+            .repeats(repeats, repeatDelay, repeatDelay);
     }
 
     if (targetList.length > 0) {
         targetList.forEach(target => {
-            if (projectileType === 'javelin') {
-                const targetWidth = target.document?.width ?? target.width ?? 1;
-                const targetScaleX = target.document?.texture?.scaleX ?? target.texture?.scaleX ?? 1;
+            const targetDoc = target.document ?? target;
+            const targetWidth = targetDoc.width;
+            const targetScaleX = targetDoc.texture.scaleX;
+            const targetRotation = targetDoc.rotation;
 
+            if (projectileType === 'javelin') {
                 seq = seq
                     // Shaking copy sprite for target hit feedback
                     .effect()
                     .copySprite(target)
-                    .spriteRotation(-(target.document?.rotation ?? target.rotation ?? 0))
+                    .spriteRotation(-targetRotation)
                     .attachTo(target)
                     .scaleToObject(1, { considerTokenScale: true })
                     .fadeIn(250)
@@ -112,7 +111,7 @@ async function create(tile, targets, config = {}) {
                     // Green poison tint effect
                     .effect()
                     .copySprite(target)
-                    .spriteRotation(-(target.document?.rotation ?? target.rotation ?? 0))
+                    .spriteRotation(-targetRotation)
                     .delay(250)
                     .attachTo(target)
                     .scaleToObject(1, { considerTokenScale: true })
@@ -125,7 +124,7 @@ async function create(tile, targets, config = {}) {
                     // Poison hit token shake
                     .effect()
                     .copySprite(target)
-                    .spriteRotation(-target.document.rotation)
+                    .spriteRotation(-targetRotation)
                     .delay(250)
                     .attachTo(target)
                     .scaleToObject(1, { considerTokenScale: true })
@@ -145,7 +144,7 @@ async function create(tile, targets, config = {}) {
                 seq = seq
                     .effect()
                     .copySprite(target)
-                    .spriteRotation(-target.document.rotation)
+                    .spriteRotation(-targetRotation)
                     .delay(250)
                     .attachTo(target)
                     .scaleToObject(1, { considerTokenScale: true })

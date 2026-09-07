@@ -8,6 +8,7 @@ import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
 
+import { log } from '../../lib/logger.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
@@ -22,22 +23,13 @@ async function create(tile, targets, config = {}) {
 
     const tileDoc = tile.document ?? tile;
 
-    // Retrieve end tile from flags, falling back to legacy/Tagger search for backward compatibility
+    // Retrieve end tile from flags
     const targetTileIds = tileDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
-    let endTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
+    const endTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
 
     if (!endTile) {
-        const endTileIds = tileDoc.getFlag?.(MODULE_ID, 'trap.boulderEndTileIds') ?? [];
-        endTile = endTileIds.length ? canvas.tiles.get(endTileIds[0]) : null;
-    }
-
-    if (!endTile && Tagger) {
-        const tagged = await Tagger.getByTag('Rolling Boulder End');
-        endTile = tagged[0]?.object ?? tagged[0];
-    }
-
-    if (!endTile) {
-        ui.notifications.warn('EMP | Rolling Boulder Trap: No end tile found.');
+        log.warn(`EMP | Rolling Boulder Trap: Tile "${tileDoc.id}" has no configured end tile.`);
+        ui.notifications?.warn?.(game.i18n.format('EMP.traps.rollingBoulder.noEndTile', { id: tileDoc.id }) ?? 'EMP | Rolling Boulder Trap: No end tile found.');
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;

@@ -8,6 +8,7 @@ import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { matt } from '../utils/matt-tiles.js';
 
+import { log } from '../../lib/logger.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
@@ -25,40 +26,39 @@ async function create(tile, targets, config = {}) {
     const tileCenter = tileBounds.center;
 
     const targetTileIds = tileDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
-    let targetTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
-
-    if (!targetTile) {
-        const triggerTile = canvas.tiles.placeables.find(t => {
-            const d = t.document ?? t;
-            return d.getFlag?.(MODULE_ID, 'trap.originIds')?.includes(tile.id) || d.getFlag?.(MODULE_ID, 'trap.trapTileIds')?.includes(tile.id);
-        });
-        if (triggerTile) targetTile = triggerTile;
-    }
-
+    const targetTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
     const targetTileBounds = targetTile ? adapter.getTileBounds(targetTile) : null;
-    const targetLoc = targetTileBounds?.center ?? (targetList.length ? (targetList[0].object?.center ?? targetList[0].center ?? targetList[0]) : null);
+    const targetLoc = targetTileBounds?.center ?? (targetList.length ? (targetList[0].center ?? targetList[0].object?.center) : null);
+
+    if (!targetLoc) {
+        log.warn(`EMP | Fire Trap: Tile "${tileDoc.id}" has no configured target tile or targeted tokens.`);
+        let seq = new Sequence();
+        applySound(seq, sound);
+        return seq;
+    }
 
     let seq = new Sequence();
     applySound(seq, sound);
 
-    if (targetLoc) {
-        seq = seq
-            // Cone fire breath weapon
-            .effect()
-            .file(closest('jb2a.breath_weapons02.burst.cone.fire.orange.02'))
-            .atLocation(tileCenter)
-            .size(size, { gridUnits: true })
-            .stretchTo(targetLoc)
-            .zIndex(1);
-    }
+    seq = seq
+        // Cone fire breath weapon
+        .effect()
+        .file(closest('jb2a.breath_weapons02.burst.cone.fire.orange.02'))
+        .atLocation(tileCenter)
+        .size(size, { gridUnits: true })
+        .stretchTo(targetLoc)
+        .zIndex(1);
 
     if (targetList.length > 0) {
         targetList.forEach(target => {
+            const targetDoc = target.document ?? target;
+            const targetRotation = targetDoc.rotation;
+
             seq = seq
                 // Burning token shake effect
                 .effect()
                 .copySprite(target)
-                .spriteRotation(-target.document.rotation)
+                .spriteRotation(-targetRotation)
                 .delay(2000)
                 .attachTo(target)
                 .scaleToObject(1, { considerTokenScale: true })

@@ -21,11 +21,11 @@ async function create(tile, targets, config = {}) {
 
     const tileDoc = tile.document ?? tile;
 
-    // Retrieve water spray origin tiles from flags, falling back to tag search for backward compatibility
+    // Retrieve water spray origin tiles from flags
     const originIds = tileDoc.getFlag?.(MODULE_ID, 'trap.floodingRoomSplashOrigins') ?? [];
     let splashOrigins = originIds.map(id => canvas.tiles.get(id)).filter(Boolean);
     
-    if (splashOrigins.length === 0 && Tagger) {
+    if (splashOrigins.length === 0 && game.modules.get('tagger')?.active) {
         const taggedOrigins = await Tagger.getByTag('Flooding Room Trap Origin');
         splashOrigins = taggedOrigins.map(t => t.object ?? t).filter(Boolean);
     }
@@ -55,7 +55,7 @@ async function create(tile, targets, config = {}) {
                 .rotateTowards(tileCenter)
                 .size({ width: 2 * originBounds.width, height: 2 * originBounds.height })
                 .fadeIn(1000, { ease: 'easeOutCubic' })
-                .elevation(originDoc.elevation ?? origin.elevation ?? 0)
+                .elevation(originDoc.elevation)
                 .persist()
                 .belowTokens();
         });

@@ -28,7 +28,8 @@ async function create(tile, targets, config = {}) {
     // 1. Look for tokens on target tiles
     // 2. Look for tokens on the trap tile itself
     // 3. Fallback to targets passed
-    const targetTileIds = tile.document?.getFlag(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
+    const tileDoc = tile.document ?? tile;
+    const targetTileIds = tileDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
     let finalTargets = [];
 
     if (targetTileIds.length > 0) {
@@ -60,8 +61,10 @@ async function create(tile, targets, config = {}) {
     if (finalTargets.length > 0) {
         const targetSeqs = [];
         finalTargets.forEach(target => {
-            const targetWidth = target.document?.width ?? target.width ?? 1;
-            const targetHeight = target.document?.height ?? target.height ?? 1;
+            const targetDoc = target.document ?? target;
+            const targetWidth = targetDoc.width;
+            const targetHeight = targetDoc.height;
+            const targetRotation = targetDoc.rotation;
             const staggerDelay = Math.random() * (randomDelay);
 
             const targetSeq = new Sequence()
@@ -79,7 +82,7 @@ async function create(tile, targets, config = {}) {
                 .attachTo(target, { offset: { y: -0.4 * targetWidth }, gridUnits: true, bindAlpha: false })
                 .scaleToObject(fallenScale, { considerTokenScale: false })
                 .scaleIn(0, 500, { ease: 'easeOutBack' })
-                .spriteRotation(-target.document.rotation)
+                .spriteRotation(-targetRotation)
                 .opacity(0.9)
                 .aboveLighting()
                 .zIndex(1)
@@ -103,7 +106,7 @@ async function create(tile, targets, config = {}) {
                 .attachTo(target, { bindAlpha: false })
                 .scaleToObject(1, { considerTokenScale: true })
                 .scaleIn(startScale, 1000, { ease: 'easeInQuad' })
-                .spriteRotation(-target.document.rotation)
+                .spriteRotation(-targetRotation)
                 .fadeIn(250)
                 .duration(1000)
                 .waitUntilFinished()

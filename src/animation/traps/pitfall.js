@@ -50,14 +50,16 @@ async function create(tile, targets, config = {}) {
 
     if (finalTargets.length > 0) {
         finalTargets.forEach(target => {
-            const targetWidth = target.document?.width ?? target.width ?? 1;
+            const targetDoc = target.document ?? target;
+            const targetWidth = targetDoc.width;
+            const targetRotation = targetDoc.rotation;
             const fallenEffectName = `pitfall-fallen-${target.id}`;
 
             seq = seq
                 // Visual transition representing token falling down
                 .effect()
                 .copySprite(target)
-                .spriteRotation(-(target.document?.rotation ?? target.rotation ?? 0))
+                .spriteRotation(-targetRotation)
                 .attachTo(target, { bindAlpha: false })
                 .scaleToObject(1, { considerTokenScale: true })
                 .fadeOut(750, { ease: 'easeOutCubic' })
@@ -75,7 +77,7 @@ async function create(tile, targets, config = {}) {
                 .effect()
                 .name(fallenEffectName)
                 .copySprite(target)
-                .spriteRotation(-(target.document?.rotation ?? target.rotation ?? 0))
+                .spriteRotation(-targetRotation)
                 .attachTo(target, { offset: { y: -0.4 * targetWidth }, gridUnits: true, bindAlpha: false })
                 .scaleToObject(fallenScale, { considerTokenScale: false })
                 .scaleIn(0, 500, { ease: 'easeOutBack' })

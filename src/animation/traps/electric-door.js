@@ -22,11 +22,9 @@ async function create(tile, targets, config = {}) {
 
     if (!tile) return new Sequence();
 
-    // Find the door tile (the trigger tile that has this trap tile linked in its flags)
-    const triggerTile = canvas.tiles.placeables.find(t => {
-        const d = t.document ?? t;
-        return d.getFlag?.(MODULE_ID, 'trap.originIds')?.includes(tile.id) || d.getFlag?.(MODULE_ID, 'trap.trapTileIds')?.includes(tile.id);
-    });
+    const tileDoc = tile.document ?? tile;
+    const triggerTileIds = tileDoc.getFlag?.(MODULE_ID, 'trap.originIds') ?? [];
+    const triggerTile = triggerTileIds.length ? canvas.tiles.get(triggerTileIds[0]) : null;
     const doorTile = triggerTile ?? tile;
 
     const tileBounds = adapter.getTileBounds(tile);
@@ -52,6 +50,9 @@ async function create(tile, targets, config = {}) {
             .wait(250);
 
         finalTargets.forEach(t => {
+            const targetDoc = t.document ?? t;
+            const targetRotation = targetDoc.rotation;
+
             seq = seq
                 // Shocking electricity on target
                 .effect()
@@ -67,7 +68,7 @@ async function create(tile, targets, config = {}) {
                 // Shaking copy sprite representing electrocution
                 .effect()
                 .copySprite(t)
-                .spriteRotation(-(t.document?.rotation ?? t.rotation ?? 0))
+                .spriteRotation(-targetRotation)
                 .attachTo(t)
                 .scaleToObject(1, { considerTokenScale: true })
                 .fadeIn(250)

@@ -212,9 +212,7 @@ if (animation) {
         const isTriggerTile = Boolean(tileDoc.getFlag('${MODULE_ID}', 'trap.isTriggerTile'));
         if (isTriggerTile && token) {
             const activatingTarget = token.object ?? token;
-            const activatingId = activatingTarget.id ?? token.id;
-            const isAlreadyTargeted = targets.some(t => (t.id ?? t.document?.id) === activatingId);
-            if (!isAlreadyTargeted) {
+            if (!targets.some(t => t.id === token.id)) {
                 targets.push(activatingTarget);
             }
         } else if (targets.length === 0 && token) {

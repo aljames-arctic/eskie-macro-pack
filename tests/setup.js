@@ -56,6 +56,7 @@ globalThis.FilePicker = class FilePicker {
         return { target, files: [], dirs: [] };
     }
 };
+globalThis.loadTemplates = (paths) => Promise.resolve(paths);
 
 globalThis.CONST = {
     USER_ROLES: {
@@ -81,6 +82,9 @@ globalThis.foundry = {
         }
     },
     applications: {
+        handlebars: {
+            loadTemplates: (paths) => Promise.resolve(paths)
+        },
         api: {
             ApplicationV2: class ApplicationV2 {
                 constructor(options = {}) {

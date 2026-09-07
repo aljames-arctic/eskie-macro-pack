@@ -24,6 +24,7 @@ test('BaseFoundryAdapter enforces abstract contracts for version-specific proper
     assert.throws(() => base.getTemplatePosition({}), /BaseFoundryAdapter\.getTemplatePosition must be implemented/);
     assert.throws(() => base.getSceneBackground({}), /BaseFoundryAdapter\.getSceneBackground must be implemented/);
     assert.throws(() => base.formatDeletionUpdate('flags', 'key'), /BaseFoundryAdapter\.formatDeletionUpdate must be implemented/);
+    await assert.rejects(async () => base.loadTemplates([]), /BaseFoundryAdapter\.loadTemplates must be implemented/);
 });
 
 test('initializeFoundryAdapter selects FoundryV12Adapter on v12, FoundryV13Adapter on v13, and FoundryV14Adapter on v14+', () => {
@@ -80,6 +81,20 @@ test('Constructor getters contracts across FoundryV12Adapter, FoundryV13Adapter,
     assert.equal(v14.Tile, globalThis.foundry.canvas.placeables.Tile.implementation);
     assert.equal(v14.FilePicker, globalThis.foundry.applications.apps.FilePicker.implementation);
     assert.equal(v14.TextEditor, globalThis.foundry.applications.ux.TextEditor.implementation);
+});
+
+test('loadTemplates contract across FoundryV12Adapter, FoundryV13Adapter, and FoundryV14Adapter', async () => {
+    const v12 = new FoundryV12Adapter();
+    const resV12 = await v12.loadTemplates(['templates/test.html']);
+    assert.deepEqual(resV12, ['templates/test.html']);
+
+    const v13 = new FoundryV13Adapter();
+    const resV13 = await v13.loadTemplates(['templates/test.html']);
+    assert.deepEqual(resV13, ['templates/test.html']);
+
+    const v14 = new FoundryV14Adapter();
+    const resV14 = await v14.loadTemplates(['templates/test.html']);
+    assert.deepEqual(resV14, ['templates/test.html']);
 });
 
 test('Tile offset calculations: V12/V13 top-left origin math vs V14+ centered origin math', () => {

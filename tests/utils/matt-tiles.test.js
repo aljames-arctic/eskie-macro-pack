@@ -275,4 +275,14 @@ test('adapter.getTokensInTile returns only overlapping tokens', () => {
     const contained = adapter.getTokensInTile(tile);
     assert.deepEqual(contained.map(t => t.id), ['t1', 't2']);
     assert.deepEqual(adapter.getTokensInTile(null), []);
+
+    // Direct TileDocument (MATT script scope where tile is already a TileDocument without .document)
+    const tileDocument = { id: 'td-1', x: 100, y: 100, width: 200, height: 200 };
+    const containedFromDoc = adapter.getTokensInTile(tileDocument);
+    assert.deepEqual(containedFromDoc.map(t => t.id), ['t1', 't2']);
+    const bounds = adapter.foundry.getTileBounds(tileDocument);
+    assert.equal(bounds.minX, 100);
+    assert.equal(bounds.maxX, 300);
+    assert.equal(bounds.center.x, 200);
+    assert.equal(bounds.center.y, 200);
 });

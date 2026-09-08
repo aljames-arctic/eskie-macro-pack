@@ -77,10 +77,7 @@ Sequencer.Database.getPathsUnder = (path) => {
 };
 
 test('rollingBoulder.default_config defines boulder attribute with default values', () => {
-    assert.ok(rollingBoulder.default_config.tile, 'DEFAULT_CONFIG must define tile');
-    assert.equal(rollingBoulder.default_config.tile.triggerId, null);
-    assert.equal(rollingBoulder.default_config.tile.sourceId, null);
-    assert.equal(rollingBoulder.default_config.tile.targetId, null);
+    assert.equal(rollingBoulder.default_config.targetTile, null, 'DEFAULT_CONFIG must define targetTile as null');
     assert.ok(rollingBoulder.default_config.boulder, 'DEFAULT_CONFIG must define boulder');
     assert.equal(rollingBoulder.default_config.boulder.speed, 200, 'boulder.speed must default to 200');
     assert.equal(rollingBoulder.default_config.boulder.size, 4.25, 'boulder.size must default to 4.25');
@@ -131,7 +128,7 @@ test('rollingBoulder.create dynamically calculates duration from tile distance a
 
     // Distance between (150, 150) and (750, 950) is Math.hypot(600, 800) = 1000px
     // At default speed = 200 px/s: duration = (1000 / 200) * 1000 = 5000 ms
-    const seq = await rollingBoulder.create(startTile, [], { tile: { targetId: 'tile-end-1' } });
+    const seq = await rollingBoulder.create(startTile, [], { targetTile: 'tile-end-1' });
     assert.ok(seq instanceof MockSequence || seq instanceof MockSequenceEffect);
 
     // Find main rolling boulder loop effect
@@ -191,9 +188,7 @@ test('rollingBoulder.create respects custom boulder speed, size, playbackRate, a
     // Distance between (50, 50) and (650, 850) is Math.hypot(600, 800) = 1000px
     // With speed = 500 px/s: duration = (1000 / 500) * 1000 = 2000 ms
     const customConfig = {
-        tile: {
-            targetId: 'tile-end-2'
-        },
+        targetTile: 'tile-end-2',
         boulder: {
             speed: 500,
             size: 6.0,
@@ -259,7 +254,7 @@ test('rollingBoulder.create respects custom tile and boulder config overrides', 
     // Distance between (50, 50) and (450, 350) is Math.hypot(400, 300) = 500px
     // At speed = 400 px/s: duration = (500 / 400) * 1000 = 1250 ms
     const seq = await rollingBoulder.create(startTile, [], {
-        tile: { targetId: 'tile-end-3', sourceId: 'tile-start-3' },
+        targetTile: 'tile-end-3',
         boulder: { speed: 400, size: 5.0, playbackRate: 2.0 }
     });
     const mainBoulder = seq.effects.find(eff =>
@@ -347,6 +342,6 @@ test('rollingBoulder.setup embeds tile and boulder config in MATT action code', 
     const trapUpdate = updatedTiles.get('t-trap');
     assert.ok(trapUpdate, 'Trap tile should be updated with MATT actions');
     const trapAction = trapUpdate['flags.monks-active-tiles.actions'][0];
-    assert.ok(trapAction.data.code.includes('"tile":{"triggerId":"t-trigger","sourceId":"t-trap","targetId":"t-target"}'), 'Trap action code should include tile IDs in config');
+    assert.ok(trapAction.data.code.includes('"targetTile":"t-target"'), 'Trap action code should include targetTile in config');
     assert.ok(trapAction.data.code.includes('"speed":300'), 'Trap action code should include boulder speed in config');
 });

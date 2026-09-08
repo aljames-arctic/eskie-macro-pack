@@ -12,31 +12,27 @@ import { log } from '../../lib/logger.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
-    tile: {
-        triggerId: null,
-        sourceId: null,
-        targetId: null,
-    },
+    targetTile: null,
     size: 3.5,
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { tile: tileConfig, size, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { targetTile, size, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInTile(tile);
 
-    const tileDoc = tile?.document ?? tile;
-
-    const targetTile = adapter.getPlaceable(tileConfig.targetId);
-    const targetLoc = adapter.getCenter(targetTile);
+    const targetTileObj = adapter.getPlaceable(targetTile);
+    const targetLoc = adapter.getCenter(targetTileObj);
 
     if (!targetLoc) {
-        log.warn(`Fire Trap: Tile "${tileDoc?.id ?? 'unknown'}" has no configured target tile.`);
+        log.warn(`Fire Trap: Tile "${tile.id}" has no configured target tile.`);
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;
     }
+
+    const tileCenter = adapter.getCenter(tile);
 
     let seq = new Sequence();
     applySound(seq, sound);

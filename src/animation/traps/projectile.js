@@ -12,11 +12,7 @@ import { adapter } from '../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../utils/sound.js';
 
 const DEFAULT_CONFIG = {
-    tile: {
-        triggerId: null,
-        sourceId: null,
-        targetId: null,
-    },
+    targetTile: null,
     projectileType: 'arrow',
     repeats: 10,
     repeatDelay: 50,
@@ -26,19 +22,18 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { tile: tileConfig, projectileType, sound, repeats, repeatDelay, splashScale } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { targetTile, projectileType, sound, repeats, repeatDelay, splashScale } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInTile(tile);
 
-    const tileDoc = tile?.document ?? tile;
     const tileBounds = adapter.getTileBounds(tile);
     const tileCenter = tileBounds.center;
 
     // Retrieve target/landing tile from config
-    const targetTile = adapter.getPlaceable(tileConfig.targetId);
-    const targetLoc = adapter.getCenter(targetTile);
+    const targetTileObj = adapter.getPlaceable(targetTile);
+    const targetLoc = adapter.getCenter(targetTileObj);
 
     if (!targetLoc) {
-        log.warn(`Projectile Trap: Tile "${tileDoc?.id ?? 'unknown'}" has no configured target tile.`);
+        log.warn(`Projectile Trap: Tile "${tile.id}" has no configured target tile.`);
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;

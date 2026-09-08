@@ -11,11 +11,6 @@ import { matt } from '../utils/matt-tiles.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
-    tile: {
-        triggerId: null,
-        sourceId: null,
-        targetId: null,
-    },
     repeats: 5,
     repeatDelay: 300,
     sound: { ...DEFAULT_SOUND_CONFIG },
@@ -23,17 +18,12 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { tile: tileConfig, repeats, repeatDelay, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { repeats, repeatDelay, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     if (!tile) return new Sequence();
 
-    const triggerTile = adapter.getPlaceable(tileConfig.triggerId);
-    const doorTile = triggerTile ?? tile;
-
     const tileBounds = adapter.getTileBounds(tile);
     const tileCenter = tileBounds.center;
-    const doorBounds = adapter.getTileBounds(doorTile);
-    const doorCenter = doorBounds.center;
 
     const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
 
@@ -42,12 +32,11 @@ async function create(tile, targets, config = {}) {
 
     if (finalTargets.length > 0) {
         seq = seq
-            // Electricity burst at the door tile
+            // Electricity burst at the trap tile
             .effect()
             .file(closest('eskie.lightning.03.blue'))
-            .atLocation(doorCenter)
+            .atLocation(tileCenter)
             .size(1.25, { gridUnits: true })
-            .rotateTowards(tileCenter)
             .zIndex(1)
 
             .wait(250);

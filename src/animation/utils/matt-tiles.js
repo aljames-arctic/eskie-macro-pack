@@ -248,20 +248,15 @@ async function setup(animation, config = {}) {
             const { tileCount: _tc, extraFlags: _ef, extraTiles: _et, trigger: _tr, controlled: _co, playPath: _pp, ...trapOptions } = config;
             const trapConfig = {
                 ...trapOptions,
-                tile: {
-                    triggerId: triggerTiles[0]?.id ?? null,
-                    sourceId: tileId,
-                    targetId: tileCount === 3 ? (targetTiles[0]?.id ?? null) : null,
-                },
+                ...(tileCount === 3 ? { targetTile: targetTiles[0]?.id ?? trapOptions.targetTile ?? null } : {}),
             };
 
             const trapActionCode = `
-// Resolve the TileDocument and concrete Tile placeable from MATT execution scope
-const tileDoc = tile.document ?? tile;
-const tilePlaceable = tile.object ?? canvas.tiles?.get?.(tileDoc.id) ?? tile;
+// Resolve the concrete Tile placeable from MATT execution scope
+const tilePlaceable = tile.object ?? canvas.tiles.get(tile.id);
 
 // Get the specific Eskie Trap Animation Function if this tile is a trap tile
-const animation = tileDoc.getFlag('${MODULE_ID}', 'trap.animation');
+const animation = tile.getFlag('${MODULE_ID}', 'trap.animation');
 const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter;
 if (animation) {
     try {
@@ -270,7 +265,7 @@ if (animation) {
         let targets = adapter.getTokensInTile(tilePlaceable);
 
         // If this trap tile is also the trigger tile, ensure the activating token that stepped on it is included
-        const isTriggerTile = Boolean(tileDoc.getFlag('${MODULE_ID}', 'trap.isTriggerTile'));
+        const isTriggerTile = Boolean(tile.getFlag('${MODULE_ID}', 'trap.isTriggerTile'));
         if (isTriggerTile && token) {
             const activatingTarget = token.object ?? canvas.tokens?.get?.(token.id) ?? token;
             if (!targets.some(t => t.id === token.id)) {
@@ -283,15 +278,15 @@ if (animation) {
         // Play the trap animation with the contained tokens as targets
         await trap.play(tilePlaceable, targets, ${JSON.stringify(trapConfig)});
     } catch (err) {
-        console.error('Eskie Macro Pack | Failed to play trap animation "' + animation + '" on tile "' + tileDoc.id + '":', err);
+        console.error('Eskie Macro Pack | Failed to play trap animation "' + animation + '" on tile "' + tile.id + '":', err);
         throw err;
     }
 }
 
 // Manually activate any other linked trap tiles
-const originIds = (tileDoc.getFlag('${MODULE_ID}', 'trap.originIds') ?? []).filter(id => id !== tileDoc.id);
+const originIds = (tile.getFlag('${MODULE_ID}', 'trap.originIds') ?? []).filter(id => id !== tile.id);
 for (const id of originIds) {
-    const originTile = canvas.tiles?.get?.(id);
+    const originTile = canvas.tiles.get(id);
     if (!originTile) continue;
     await originTile.document.trigger({ token });
 }

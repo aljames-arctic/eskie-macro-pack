@@ -69,12 +69,10 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
 
     // Test executing trigger action code
     const mockTriggerTile = {
-        document: {
-            id: 'tile-trigger-1',
-            getFlag: (mod, key) => {
-                if (mod === MODULE_ID && key === 'trap.originIds') return ['tile-trap-1'];
-                return null;
-            }
+        id: 'tile-trigger-1',
+        getFlag: (mod, key) => {
+            if (mod === MODULE_ID && key === 'trap.originIds') return ['tile-trap-1'];
+            return null;
         }
     };
     const mockActivatingToken = { id: 'tok-activating', document: { id: 'tok-activating' } };
@@ -163,11 +161,7 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
     assert.equal(playCalled, true, 'Trap play should be invoked successfully');
     assert.equal(playTargets.length, 1, 'Only tokens contained within the trap tile should be targeted');
     assert.equal(playTargets[0].id, 'tok-inside', 'Contained token should be the target');
-    assert.deepEqual(playConfig.tile, {
-        triggerId: 'tile-trigger-1',
-        sourceId: 'tile-trap-1',
-        targetId: null
-    }, 'Trap play should receive tile configuration');
+    assert.equal(playConfig.targetTile, undefined, 'Trap without target tile should not receive targetTile');
 });
 
 test('matt.trap.setup correctly handles when the trigger tile is the trap tile (single tile)', async () => {
@@ -234,29 +228,29 @@ test('matt.trap.setup correctly handles when the trigger tile is the trap tile (
     };
     globalThis.canvas.grid = { size: 100 };
 
-    const mockTile = {
+    const mockTilePlaceable = {
         id: 'tile-self-1',
-        document: {
-            id: 'tile-self-1',
-            x: 200,
-            y: 200,
-            width: 100,
-            height: 100,
-            getFlag: (mod, key) => {
-                if (mod === MODULE_ID && key === 'trap.animation') return 'eskie.traps.spike';
-                if (mod === MODULE_ID && key === 'trap.originIds') return ['tile-self-1'];
-                return null;
-            }
-        },
         x: 200,
         y: 200,
         width: 100,
         height: 100
     };
+    const mockTileDoc = {
+        id: 'tile-self-1',
+        object: mockTilePlaceable,
+        getFlag: (mod, key) => {
+            if (mod === MODULE_ID && key === 'trap.animation') return 'eskie.traps.spike';
+            if (mod === MODULE_ID && key === 'trap.originIds') return ['tile-self-1'];
+            return null;
+        }
+    };
+    mockTilePlaceable.document = mockTileDoc;
+    globalThis.canvas.tiles.get = (id) => (id === 'tile-self-1' ? mockTilePlaceable : null);
+
     const mockToken = { id: 'tok-on-tile', document: { id: 'tok-on-tile' } };
 
     const execFn = new Function('token', 'tile', 'canvas', `return (async () => { ${action.data.code} })();`);
-    await execFn(mockToken, mockTile, globalThis.canvas);
+    await execFn(mockToken, mockTileDoc, globalThis.canvas);
 
     assert.equal(playCalled, true, 'Trap play should be executed on the tile');
     assert.equal(playTargets.length, 1, 'Token on the tile should be targeted');
@@ -269,7 +263,7 @@ test('matt.trap.setup correctly handles when the trigger tile is the trap tile (
         placeables: [],
         get: (id) => (id === 'tok-on-tile' ? mockToken : null)
     };
-    await execFn(mockToken, mockTile, globalThis.canvas);
+    await execFn(mockToken, mockTileDoc, globalThis.canvas);
     assert.equal(playCalled, true, 'Trap play should still execute with fallback activating token');
     assert.equal(playTargets.length, 1);
     assert.equal(playTargets[0].id, 'tok-on-tile');
@@ -297,4 +291,77 @@ test('adapter.getTokensInTile returns only overlapping tokens', () => {
     const contained = adapter.getTokensInTile(tile);
     assert.deepEqual(contained.map(t => t.id), ['t1', 't2']);
     assert.deepEqual(adapter.getTokensInTile(null), []);
+});
+
+test('matt.trap.setup configures targetTile in trap config for 3-tile setups', async () => {
+    const updatedTiles = new Map();
+    globalThis.game.user = { isGM: true, id: 'gm-user-1' };
+    globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', active: true });
+
+    const createTile = (id) => {
+        const doc = {
+            id,
+            flags: {},
+            update: async (data) => {
+                updatedTiles.set(id, data);
+                return doc;
+            }
+        };
+        return { id, document: doc };
+    };
+
+    const triggerTile = createTile('tile-trigger-3');
+    const trapTile = createTile('tile-trap-3');
+    const targetTile = createTile('tile-target-3');
+
+    globalThis.canvas.tiles = {
+        controlled: [triggerTile],
+        get: (id) => (id === 'tile-trigger-3' ? triggerTile : id === 'tile-trap-3' ? trapTile : id === 'tile-target-3' ? targetTile : null)
+    };
+
+    let step = 0;
+    adapter.buttonDialog = async () => {
+        step++;
+        if (step === 1) globalThis.canvas.tiles.controlled = [triggerTile];
+        else if (step === 2) globalThis.canvas.tiles.controlled = [trapTile];
+        else if (step === 3) globalThis.canvas.tiles.controlled = [targetTile];
+        return 'continue';
+    };
+
+    await matt.trap.setup('eskie.traps.rollingBoulder', { tileCount: 3 });
+
+    const trapUpdate = updatedTiles.get('tile-trap-3');
+    assert.ok(trapUpdate, 'Trap tile should be updated');
+    const trapAction = trapUpdate['flags.monks-active-tiles.actions'][0];
+    assert.ok(trapAction.data.code.includes('"targetTile":"tile-target-3"'), 'Generated action code must contain targetTile: "tile-target-3"');
+    assert.ok(!trapAction.data.code.includes('"triggerId"'), 'Generated action code must not contain triggerId');
+    assert.ok(!trapAction.data.code.includes('"sourceId"'), 'Generated action code must not contain sourceId');
+
+    let playConfigReceived = null;
+    globalThis.eskie = {
+        traps: {
+            rollingBoulder: {
+                play: (_origin, _targets, config) => {
+                    playConfigReceived = config;
+                }
+            }
+        }
+    };
+    globalThis.game.modules.set(MODULE_ID, { id: MODULE_ID, api: { adapter } });
+
+    const trapTilePlaceable = { id: 'tile-trap-3' };
+    const mockTrapDoc = {
+        id: 'tile-trap-3',
+        object: trapTilePlaceable,
+        getFlag: (mod, key) => (mod === MODULE_ID && key === 'trap.animation' ? 'eskie.traps.rollingBoulder' : null)
+    };
+    trapTilePlaceable.document = mockTrapDoc;
+    globalThis.canvas.tiles.get = (id) => (id === 'tile-trap-3' ? trapTilePlaceable : null);
+
+    const execFn = new Function('token', 'tile', 'canvas', `return (async () => { ${trapAction.data.code} })();`);
+    await execFn(null, mockTrapDoc, globalThis.canvas);
+
+    assert.ok(playConfigReceived, 'Play function should be called');
+    assert.equal(playConfigReceived.targetTile, 'tile-target-3', 'Play config must receive targetTile');
+    assert.equal(playConfigReceived.tile, undefined, 'Play config must not contain nested tile object');
 });

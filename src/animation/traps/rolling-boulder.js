@@ -12,11 +12,7 @@ import { log } from '../../lib/logger.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
-    tile: {
-        triggerId: null,
-        sourceId: null,
-        targetId: null,
-    },
+    targetTile: null,
     boulder: {
         src: 'jb2a.rolling_boulder.loop.01.rock.brown',
         speed: 200,
@@ -28,22 +24,20 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { tile: tileConfig, boulder, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { targetTile, boulder, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Retrieve destination tile from config
-    const endTile = adapter.getPlaceable(tileConfig.targetId);
+    const endTile = adapter.getPlaceable(targetTile);
 
     if (!endTile) {
-        const id = tileConfig.sourceId ?? tile?.document?.id ?? tile?.id ?? 'unknown';
-        log.warn(`Rolling Boulder Trap: Tile "${id}" has no configured end tile.`);
-        ui.notifications.warn(game.i18n.format('EMP.traps.rollingBoulder.noEndTile', { id }));
+        log.warn(`Rolling Boulder Trap: Tile "${tile.id}" has no configured end tile.`);
+        ui.notifications.warn(game.i18n.format('EMP.traps.rollingBoulder.noEndTile', { id: tile.id }));
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;
     }
 
-    const startTile = adapter.getPlaceable(tileConfig.sourceId) ?? tile;
-    const startLoc = adapter.getCenter(startTile);
+    const startLoc = adapter.getCenter(tile);
     const endLoc = adapter.getCenter(endTile);
 
     if (!startLoc || !endLoc) {

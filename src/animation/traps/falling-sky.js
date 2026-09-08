@@ -11,11 +11,7 @@ import { matt } from '../utils/matt-tiles.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
-    tile: {
-        triggerId: null,
-        sourceId: null,
-        targetId: null,
-    },
+    targetTile: null,
     reveal: true,
     smokeSize: 2,
     startScale: 3,
@@ -27,7 +23,7 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { tile: tileConfig, reveal, smokeSize, startScale, fallenScale, randomDelay, color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { targetTile, reveal, smokeSize, startScale, fallenScale, randomDelay, color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Target selection:
     // 1. Look for tokens on target tile
@@ -35,9 +31,9 @@ async function create(tile, targets, config = {}) {
     // 3. Fallback to targets passed
     let finalTargets = [];
 
-    const targetTile = adapter.getPlaceable(tileConfig.targetId);
-    if (targetTile) {
-        finalTargets.push(...adapter.getTokensInTile(targetTile));
+    const targetTileObj = adapter.getPlaceable(targetTile);
+    if (targetTileObj) {
+        finalTargets.push(...adapter.getTokensInTile(targetTileObj));
     }
 
     if (finalTargets.length === 0) {

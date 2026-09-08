@@ -10,11 +10,6 @@ import { matt } from '../utils/matt-tiles.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
-    tile: {
-        triggerId: null,
-        sourceId: null,
-        targetId: null,
-    },
     reveal: true,
     smokeSize: 2,
     fallenScale: 0.3,

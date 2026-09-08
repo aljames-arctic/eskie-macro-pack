@@ -30,7 +30,7 @@ async function create(tile, targets, config = {}) {
     const tileWidth = tileBounds.width;
     const tileHeight = tileBounds.height;
 
-    const targetTileObj = adapter.getPlaceable(targetTile);
+    const targetTileObj = (targetTile?.document || targetTile?.center) ? targetTile : adapter.getPlaceable(targetTile);
     const targetLoc = adapter.getCenter(targetTileObj);
 
     if (!targetLoc) {

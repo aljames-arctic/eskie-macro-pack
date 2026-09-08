@@ -27,7 +27,7 @@ async function create(tile, targets, config = {}) {
     const { targetTile, boulder, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Retrieve destination tile from config
-    const endTile = adapter.getPlaceable(targetTile);
+    const endTile = (targetTile?.document || targetTile?.center) ? targetTile : adapter.getPlaceable(targetTile);
 
     if (!endTile) {
         log.warn(`Rolling Boulder Trap: Tile "${tile.id}" has no configured end tile.`);

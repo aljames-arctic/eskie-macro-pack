@@ -22,7 +22,7 @@ async function create(tile, targets, config = {}) {
     const { targetTile, size, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInTile(tile);
 
-    const targetTileObj = adapter.getPlaceable(targetTile);
+    const targetTileObj = (targetTile?.document || targetTile?.center) ? targetTile : adapter.getPlaceable(targetTile);
     const targetLoc = adapter.getCenter(targetTileObj);
 
     if (!targetLoc) {

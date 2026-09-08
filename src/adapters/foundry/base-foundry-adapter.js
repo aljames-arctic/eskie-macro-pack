@@ -725,7 +725,6 @@ export class BaseFoundryAdapter {
      */
     getPlaceable(id) {
         if (!id) return null;
-        if (id.document || id.center) return id;
         return canvas?.tokens?.get(id)
             ?? canvas?.tiles?.get(id)
             ?? canvas?.walls?.get(id)

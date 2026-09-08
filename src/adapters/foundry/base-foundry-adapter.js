@@ -1172,4 +1172,133 @@ export class BaseFoundryAdapter {
     formatDeletionUpdate(path, keyId) {
         throw new Error('BaseFoundryAdapter.formatDeletionUpdate must be implemented by version subclass');
     }
+
+    /* -------------------------------------------- */
+    /*  Region & Region Behavior Operations (V14+)  */
+    /* -------------------------------------------- */
+
+    /**
+     * Whether the active Foundry platform version supports native RegionBehaviors (V14+).
+     * @type {boolean}
+     */
+    get supportsRegionBehaviors() {
+        return false;
+    }
+
+    /**
+     * Retrieve currently controlled Region documents or placeables.
+     * Legacy baseline returns an empty array.
+     * @returns {RegionDocument[]}
+     */
+    getControlledRegions() {
+        return [];
+    }
+
+    /**
+     * Calculate bounding box and center for a Region.
+     * Legacy baseline returns default zero-bound structure.
+     * @param {Region|RegionDocument} _region Target Region
+     * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number, anchor: {x: number, y: number} }}
+     */
+    getRegionBounds(_region) {
+        return {
+            minX: 0,
+            maxX: 0,
+            minY: 0,
+            maxY: 0,
+            center: { x: 0, y: 0 },
+            width: 0,
+            height: 0,
+            anchor: { x: 0.5, y: 0.5 }
+        };
+    }
+
+    /**
+     * Retrieve all tokens overlapping or contained within a Region.
+     * Legacy baseline returns an empty array.
+     * @param {Region|RegionDocument} _region Target Region
+     * @returns {Token[]}
+     */
+    getTokensInRegion(_region) {
+        return [];
+    }
+
+    /**
+     * Create an embedded RegionBehavior on a RegionDocument.
+     * Legacy baseline NOP returning null.
+     * @param {Region|RegionDocument} _region Target Region
+     * @param {object} _behaviorData Behavior configuration data
+     * @returns {Promise<RegionBehavior|null>}
+     */
+    async createRegionBehavior(_region, _behaviorData) {
+        return null;
+    }
+
+    /**
+     * Format a RegionBehavior data payload for creation.
+     * Legacy baseline returns an empty object.
+     * @param {object} _config Behavior creation options
+     * @returns {object}
+     */
+    formatRegionBehaviorData(_config) {
+        return {};
+    }
+
+    /**
+     * Extract the active image texture filepath from a placeable or document.
+     * @param {PlaceableObject|Document|null} placeable Target placeable or document
+     * @returns {string|null}
+     */
+    getPlaceableTexture(placeable) {
+        if (!placeable) return null;
+        const doc = placeable.document ?? placeable;
+        return doc.texture?.src ?? doc.src ?? null;
+    }
+
+    /**
+     * Resolve the bounding box and center coordinates for a placeable or document (Tile or Region).
+     * Inspects whether the target is a Tile or Region and delegates to the appropriate bound checking method.
+     * @param {PlaceableObject|Document|null} object Target placeable or document
+     * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number, anchor: {x: number, y: number} }}
+     */
+    getBounds(object) {
+        if (!object) {
+            return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
+        }
+        const doc = object.document ?? object;
+        const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(object.shapes) || (Boolean(doc.bounds) && !doc.texture);
+        if (isRegion) {
+            return this.getRegionBounds(object);
+        }
+        return this.getTileBounds(object);
+    }
+
+    /**
+     * Retrieve all tokens overlapping or contained within a placeable or document (Tile or Region).
+     * Inspects whether the target is a Tile or Region and delegates to the appropriate token query method.
+     * @param {PlaceableObject|Document|null} object Target placeable or document
+     * @returns {Token[]} Array of matching Token placeables
+     */
+    getTokensInPlaceable(object) {
+        if (!object) return [];
+        const doc = object.document ?? object;
+        const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(object.shapes) || (Boolean(doc.bounds) && !doc.texture);
+        if (isRegion) {
+            return this.getTokensInRegion(object);
+        }
+        return this.getTokensInTile(object);
+    }
+
+    /**
+     * Test whether a 2D point is contained within a placeable or document (Tile or Region).
+     * Baseline performs bounding-box containment.
+     * @param {PlaceableObject|Document|null} object Target placeable or document
+     * @param {{ x: number, y: number }} point Point coordinates
+     * @returns {boolean}
+     */
+    containsPoint(object, point) {
+        if (!object || !point) return false;
+        const { minX, maxX, minY, maxY } = this.getBounds(object);
+        return point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY;
+    }
 }

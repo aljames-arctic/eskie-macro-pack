@@ -308,6 +308,10 @@ globalThis.canvas = {
     tiles: {
         get: (id) => null,
         controlled: []
+    },
+    regions: {
+        get: (id) => null,
+        controlled: []
     }
 };
 

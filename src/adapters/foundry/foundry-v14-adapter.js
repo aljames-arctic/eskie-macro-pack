@@ -1,4 +1,5 @@
 import { FoundryV13Adapter } from './foundry-v13-adapter.js';
+import { MODULE_ID } from '../../lib/constants.js';
 
 /**
  * Modern Foundry VTT platform adapter (Foundry V14+).
@@ -43,11 +44,11 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      */
     getTileBounds(tile) {
         if (!tile) return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
-        const doc = tile.document;
-        const x = doc.x;
-        const y = doc.y;
-        const width = doc.width;
-        const height = doc.height;
+        const doc = tile.document ?? tile;
+        const x = doc.x ?? 0;
+        const y = doc.y ?? 0;
+        const width = doc.width ?? 0;
+        const height = doc.height ?? 0;
 
         const anchorX = doc.anchor?.x ?? tile.anchor?.x ?? doc.texture?.anchorX ?? 0.5;
         const anchorY = doc.anchor?.y ?? tile.anchor?.y ?? doc.texture?.anchorY ?? 0.5;
@@ -213,5 +214,245 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
         const fullKey = path ? `${path}.${keyId}` : keyId;
         const operator = foundry.data?.operators?.ForcedDeletion;
         return { [fullKey]: operator };
+    }
+
+    /* -------------------------------------------- */
+    /*  Region & Region Behavior Operations (V14+)  */
+    /* -------------------------------------------- */
+
+    /**
+     * Whether the active Foundry platform version supports native RegionBehaviors (V14+).
+     * @override
+     * @type {boolean}
+     */
+    get supportsRegionBehaviors() {
+        return true;
+    }
+
+    /**
+     * Retrieve currently controlled Region documents or placeables on Foundry V14+.
+     * @override
+     * @returns {RegionDocument[]}
+     */
+    getControlledRegions() {
+        const controlled = canvas?.regions?.controlled ?? [];
+        return controlled.map(r => r.document ?? r);
+    }
+
+    /**
+     * Calculate bounding box and center for a Region on Foundry V14+.
+     * Handles arbitrary non-square geometries (polygons, circles, ellipses, rectangles, and compound shapes).
+     * @override
+     * @param {Region|RegionDocument} region Target Region placeable or document
+     * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number, anchor: {x: number, y: number} }}
+     */
+    getRegionBounds(region) {
+        if (!region) {
+            return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
+        }
+
+        const doc = region.document ?? region;
+        const placeable = region.object ?? doc.object ?? region;
+
+        // Authoritative PIXI.Rectangle bounding box computed by Foundry canvas
+        const bounds = placeable.bounds ?? doc.bounds;
+        if (bounds && (bounds.width > 0 || bounds.height > 0 || bounds.right !== undefined)) {
+            const minX = bounds.x ?? bounds.left ?? 0;
+            const minY = bounds.y ?? bounds.top ?? 0;
+            const width = bounds.width ?? ((bounds.right !== undefined) ? (bounds.right - minX) : 0);
+            const height = bounds.height ?? ((bounds.bottom !== undefined) ? (bounds.bottom - minY) : 0);
+            const maxX = minX + width;
+            const maxY = minY + height;
+            const center = placeable.center ?? doc.center ?? { x: minX + width / 2, y: minY + height / 2 };
+            return { minX, maxX, minY, maxY, center, width, height, anchor: { x: 0.5, y: 0.5 } };
+        }
+
+        // Fallback: Compute bounding box from all Region shapes (polygons, circles, ellipses, rectangles)
+        const shapes = doc.shapes?.contents ?? doc.shapes ?? placeable.shapes ?? [];
+        const shapeList = Array.isArray(shapes) ? shapes : (shapes.values ? Array.from(shapes.values()) : []);
+
+        if (shapeList.length > 0) {
+            let minX = Infinity;
+            let maxX = -Infinity;
+            let minY = Infinity;
+            let maxY = -Infinity;
+
+            for (const shape of shapeList) {
+                if (shape.hole) continue;
+                const type = shape.type;
+
+                if (type === 'polygon' || Array.isArray(shape.points)) {
+                    const points = shape.points ?? [];
+                    for (let i = 0; i < points.length; i += 2) {
+                        const px = points[i];
+                        const py = points[i + 1];
+                        if (px < minX) minX = px;
+                        if (px > maxX) maxX = px;
+                        if (py < minY) minY = py;
+                        if (py > maxY) maxY = py;
+                    }
+                } else if (type === 'circle' || (shape.radius !== undefined && shape.width === undefined)) {
+                    const cx = shape.x ?? 0;
+                    const cy = shape.y ?? 0;
+                    const r = shape.radius ?? 0;
+                    minX = Math.min(minX, cx - r);
+                    maxX = Math.max(maxX, cx + r);
+                    minY = Math.min(minY, cy - r);
+                    maxY = Math.max(maxY, cy + r);
+                } else if (type === 'ellipse' || shape.radiusX !== undefined) {
+                    const cx = shape.x ?? 0;
+                    const cy = shape.y ?? 0;
+                    const rx = shape.radiusX ?? shape.radius ?? 0;
+                    const ry = shape.radiusY ?? shape.radius ?? 0;
+                    minX = Math.min(minX, cx - rx);
+                    maxX = Math.max(maxX, cx + rx);
+                    minY = Math.min(minY, cy - ry);
+                    maxY = Math.max(maxY, cy + ry);
+                } else {
+                    const sx = shape.x ?? 0;
+                    const sy = shape.y ?? 0;
+                    const sw = shape.width ?? 0;
+                    const sh = shape.height ?? 0;
+                    minX = Math.min(minX, sx);
+                    maxX = Math.max(maxX, sx + sw);
+                    minY = Math.min(minY, sy);
+                    maxY = Math.max(maxY, sy + sh);
+                }
+            }
+
+            if (minX !== Infinity && maxX !== -Infinity && minY !== Infinity && maxY !== -Infinity) {
+                const width = maxX - minX;
+                const height = maxY - minY;
+                const center = { x: minX + width / 2, y: minY + height / 2 };
+                return { minX, maxX, minY, maxY, center, width, height, anchor: { x: 0.5, y: 0.5 } };
+            }
+        }
+
+        const fallbackX = doc.x ?? placeable.x ?? 0;
+        const fallbackY = doc.y ?? placeable.y ?? 0;
+        return {
+            minX: fallbackX,
+            maxX: fallbackX,
+            minY: fallbackY,
+            maxY: fallbackY,
+            center: { x: fallbackX, y: fallbackY },
+            width: 0,
+            height: 0,
+            anchor: { x: 0.5, y: 0.5 }
+        };
+    }
+
+    /**
+     * Retrieve all tokens contained within or overlapping a Region on Foundry V14+.
+     * Resolves token placeables directly from the RegionDocument's tokens collection.
+     * @override
+     * @param {Region|RegionDocument} region Target Region placeable or document
+     * @returns {Token[]}
+     */
+    getTokensInRegion(region) {
+        if (!region) return [];
+        const doc = region.document ?? region;
+        const tokens = doc.tokens ?? region.tokens ?? [];
+        return Array.from(tokens, t => t.object ?? t).filter(Boolean);
+    }
+
+    /**
+     * Create an embedded RegionBehavior on a RegionDocument in Foundry V14+.
+     * @override
+     * @param {Region|RegionDocument} region Target Region placeable or document
+     * @param {object} behaviorData Formatted behavior configuration data
+     * @returns {Promise<RegionBehavior|null>}
+     */
+    async createRegionBehavior(region, behaviorData) {
+        if (!region) return null;
+        const doc = region.document ?? region;
+        if (!doc.createEmbeddedDocuments) return null;
+        const [created] = await doc.createEmbeddedDocuments('RegionBehavior', [behaviorData]);
+        return created ?? null;
+    }
+
+    /**
+     * Format a RegionBehavior data payload for Foundry V14+ executeScript behaviors.
+     * Conforms strictly to ExecuteScriptRegionBehaviorType schema.
+     * @override
+     * @param {object} config Behavior creation options
+     * @param {string} config.name Display name of the behavior
+     * @param {string|string[]} [config.events=['tokenEnter']] Triggering event names
+     * @param {string} config.source Script source code
+     * @param {boolean} [config.disabled=false] Initial disabled state
+     * @param {object} [config.flags={}] Custom flags
+     * @returns {object} Formatted RegionBehavior creation payload
+     */
+    formatRegionBehaviorData({ name, events = ['tokenEnter'], source, disabled = false, flags = {} }) {
+        return {
+            name,
+            type: 'executeScript',
+            system: {
+                events: Array.isArray(events) ? events : [events],
+                source,
+            },
+            disabled: Boolean(disabled),
+            flags,
+        };
+    }
+
+    /**
+     * Resolve a PlaceableObject by its unique identifier across primary canvas layers (including regions).
+     * @override
+     * @param {string} id Target placeable ID
+     * @returns {PlaceableObject|null}
+     */
+    getPlaceable(id) {
+        if (!id) return null;
+        return super.getPlaceable(id)
+            ?? canvas?.regions?.get?.(id)
+            ?? null;
+    }
+
+    /**
+     * Extract the active image texture filepath from a placeable or document on Foundry V14+.
+     * If placeable is a Region, evaluates linked tile flags if present.
+     * @override
+     * @param {PlaceableObject|Document|null} placeable Target placeable or document
+     * @returns {string|null}
+     */
+    getPlaceableTexture(placeable) {
+        if (!placeable) return null;
+        const directTexture = super.getPlaceableTexture(placeable);
+        if (directTexture) return directTexture;
+
+        const doc = placeable.document ?? placeable;
+        const isRegion = doc.documentName === 'Region' || placeable.documentName === 'Region' || Boolean(doc.shapes) || Boolean(placeable.shapes);
+        if (isRegion) {
+            const tileId = doc.getFlag?.(MODULE_ID, 'trap.tileId')
+                ?? doc.flags?.[MODULE_ID]?.trap?.tileId
+                ?? doc.getFlag?.(MODULE_ID, 'trap.tileIds')?.[0]
+                ?? doc.flags?.[MODULE_ID]?.trap?.tileIds?.[0];
+            if (tileId) {
+                const linkedTile = canvas?.tiles?.get?.(tileId);
+                if (linkedTile) return super.getPlaceableTexture(linkedTile);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Test whether a 2D point is contained within a placeable or document on Foundry V14+.
+     * Leverages native Region#testPoint for exact polygonal containment if available.
+     * @override
+     * @param {PlaceableObject|Document|null} object Target placeable or document
+     * @param {{ x: number, y: number }} point Point coordinates
+     * @returns {boolean}
+     */
+    containsPoint(object, point) {
+        if (!object || !point) return false;
+        const doc = object.document ?? object;
+        const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(object.shapes);
+        if (isRegion) {
+            const placeable = object.object ?? doc.object ?? object;
+            const testResult = placeable.testPoint?.(point);
+            if (testResult !== undefined) return Boolean(testResult);
+        }
+        return super.containsPoint(object, point);
     }
 }

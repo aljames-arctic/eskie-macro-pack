@@ -344,6 +344,55 @@ class Adapter {
     }
 
     /* -------------------------------------------- */
+    /*  Region & Region Behavior Delegates          */
+    /* -------------------------------------------- */
+
+    get supportsRegionBehaviors() {
+        return this.foundry.supportsRegionBehaviors;
+    }
+
+    getControlledRegions() {
+        return this.foundry.getControlledRegions();
+    }
+
+    getRegionBounds(region) {
+        return this.foundry.getRegionBounds(region);
+    }
+
+    getTokensInRegion(region) {
+        return this.foundry.getTokensInRegion(region);
+    }
+
+    createRegionBehavior(region, behaviorData) {
+        return this.foundry.createRegionBehavior(region, behaviorData);
+    }
+
+    formatRegionBehaviorData(config) {
+        return this.foundry.formatRegionBehaviorData(config);
+    }
+
+    getPlaceableTexture(placeable) {
+        return this.foundry.getPlaceableTexture(placeable);
+    }
+
+    getBounds(object) {
+        return this.foundry.getBounds(object);
+    }
+
+    getTokensInPlaceable(object) {
+        return this.foundry.getTokensInPlaceable(object);
+    }
+
+    containsPoint(object, point) {
+        return this.foundry.containsPoint(object, point);
+    }
+
+    async executeTrapTrigger(context, ...args) {
+        const { executeTrapTrigger: runner } = await import('../animation/traps/trap-manager.js');
+        return runner(context, ...args);
+    }
+
+    /* -------------------------------------------- */
     /*  System Layer Delegates                      */
     /* -------------------------------------------- */
 

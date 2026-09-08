@@ -73,24 +73,6 @@ class Adapter {
         return this.modules.has(moduleId);
     }
 
-    /**
-     * Property-based accessor for instantiated module adapters.
-     * Supports bracket and dot notation: e.g. adapter.module['midi-qol'] or adapter.module.autoanimations.
-     * @type {Record<string, BaseModuleAdapter>}
-     */
-    get module() {
-        return new Proxy(this.modules, {
-            get: (target, prop) => {
-                if (typeof prop === 'string') {
-                    if (prop in target && typeof target[prop] === 'function') {
-                        return target[prop].bind(target);
-                    }
-                    return target.get(prop) ?? this[prop];
-                }
-                return Reflect.get(target, prop);
-            }
-        });
-    }
 
     get autoanimations() {
         return this.modules.get('autoanimations') ?? autoanimationsAdapter;

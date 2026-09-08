@@ -61,17 +61,26 @@ globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', ac
 globalThis.game.user = { isGM: true, id: 'gm-user-1' };
 
 const origEntryExists = Sequencer.Database.entryExists;
-Sequencer.Database.entryExists = (path) => String(path).includes('rolling_boulder') || origEntryExists(path);
+Sequencer.Database.entryExists = (path) => String(path).includes('rolling_boulder') || String(path).includes('smoke.puff') || String(path).includes('explosion.shrapnel') || origEntryExists(path);
 const origGetEntry = Sequencer.Database.getEntry;
-Sequencer.Database.getEntry = (path) => String(path).includes('rolling_boulder') ? { file: path } : origGetEntry(path);
+Sequencer.Database.getEntry = (path) => (String(path).includes('rolling_boulder') || String(path).includes('smoke.puff') || String(path).includes('explosion.shrapnel')) ? { file: path } : origGetEntry(path);
 const origGetPathsUnder = Sequencer.Database.getPathsUnder;
 Sequencer.Database.getPathsUnder = (path) => {
     const str = String(path);
     if (str === 'jb2a') {
-        return ['rolling_boulder', ...(origGetPathsUnder ? origGetPathsUnder(path) : [])];
+        return ['rolling_boulder', 'smoke', 'explosion', 'impact', ...(origGetPathsUnder ? origGetPathsUnder(path) : [])];
     }
     if (str.includes('rolling_boulder')) {
         return ['loop', '01', 'rock', 'brown', 'magma', 'mossy'];
+    }
+    if (str.includes('smoke')) {
+        return ['puff', 'centered', 'grey'];
+    }
+    if (str.includes('explosion')) {
+        return ['shrapnel', 'grenade', '02', 'black'];
+    }
+    if (str.includes('impact')) {
+        return ['white', '01'];
     }
     return origGetPathsUnder ? origGetPathsUnder(path) : [];
 };
@@ -148,6 +157,29 @@ test('rollingBoulder.create dynamically calculates duration from tile distance a
 
     const fileCall = mainBoulder.calls.find(c => c.method === 'file');
     assert.equal(fileCall?.value, 'jb2a.rolling_boulder.loop.01.rock.brown');
+
+    const waitCall = mainBoulder.calls.find(c => c.method === 'waitUntilFinished');
+    assert.ok(waitCall, 'Main boulder must call waitUntilFinished');
+    assert.equal(waitCall.value, undefined, 'Main boulder must wait until fully finished without premature negative duration offset');
+
+    const smokePuff = seq.effects.find(eff =>
+        eff.calls.some(c => c.method === 'file' && String(c.value).includes('smoke.puff.centered'))
+    );
+    assert.ok(smokePuff, 'Smoke puff effect must exist');
+    assert.equal(smokePuff.calls.some(c => c.method === 'delay'), false, 'Smoke puff must trigger immediately as boulder finishes');
+
+    const grenadeExplosion = seq.effects.find(eff =>
+        eff.calls.some(c => c.method === 'file' && String(c.value).includes('explosion.shrapnel.grenade'))
+    );
+    assert.ok(grenadeExplosion, 'Grenade explosion effect must exist');
+    assert.equal(grenadeExplosion.calls.some(c => c.method === 'delay'), false, 'Grenade explosion must trigger immediately as boulder finishes');
+
+    const impactFlashes = seq.effects.filter(eff =>
+        eff.calls.some(c => c.method === 'file' && String(c.value).includes('impact.white'))
+    );
+    assert.equal(impactFlashes.length, 2, 'Two impact flash effects should exist (start and end)');
+    const targetImpactFlash = impactFlashes[1];
+    assert.equal(targetImpactFlash.calls.some(c => c.method === 'delay'), false, 'Target impact flash must trigger immediately as boulder finishes');
 });
 
 test('rollingBoulder.create respects custom boulder speed, size, playbackRate, and src config overrides', async () => {

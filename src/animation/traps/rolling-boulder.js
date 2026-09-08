@@ -93,11 +93,10 @@ async function create(tile, targets, config = {}) {
         .playbackRate(playbackRate)
         .spriteRotation(-90)
         .zIndex(3)
-        .waitUntilFinished(-Math.round(duration / 8))
+        .waitUntilFinished()
 
         // Impact flash at target/crash point
         .effect()
-        .delay(250)
         .file(closest('jb2a.impact.white.01'))
         .atLocation(endLoc)
         .size(boulder.size * 1.15, { gridUnits: true })
@@ -113,7 +112,6 @@ async function create(tile, targets, config = {}) {
 
         // Explosion smoke cloud
         .effect()
-        .delay(100)
         .file(closest('jb2a.smoke.puff.centered.grey'))
         .atLocation(endLoc)
         .playbackRate(0.65)

@@ -84,7 +84,7 @@ The following modules are optional but unlock additional features when installed
 | [Boss Loot Assets (Patreon)](https://www.patreon.com/cw/BossLoot) | Premium asset pack used by select effects (or the free variant) |
 | [Tagger](https://foundryvtt.com/packages/tagger) | Tag-based tile and token lookup; used by some trap and movement effects |
 | [Token Attacher](https://foundryvtt.com/packages/token-attacher) | Attaches tokens to tiles for movement-based trap and tile effects |
-| [Monk's Active Tile Triggers (MATT)](https://foundryvtt.com/packages/monks-active-tiles) | **Required for the Traps API.** Automates trap playback when tokens enter tiles |
+| [Monk's Active Tile Triggers (MATT)](https://foundryvtt.com/packages/monks-active-tiles) | **Optional on V14+ / Required on V12-V13 for Traps.** Automates tile trap playback when tokens enter tiles (Foundry V14+ supports native Regions) |
 
 ---
 
@@ -209,9 +209,10 @@ await eskie.showcase.vnDialog.play({ speaker: token, text: 'Hello, adventurer!' 
 
 ### Traps — `eskie.traps`
 
-Automated tile-based traps powered by [Monk's Active Tile Triggers](https://foundryvtt.com/packages/monks-active-tiles). Once set up, traps fire automatically whenever a token enters a designated trigger tile — no macro required.
+Automated traps triggered by **Foundry V14+ Regions** (native `executeScript` RegionBehaviors) or [Monk's Active Tile Triggers](https://foundryvtt.com/packages/monks-active-tiles) (MATT). Once set up, traps fire automatically whenever a token enters a designated trigger region or tile — no macro invocation required.
 
-> ⚠️ **Requires:** Monk's Active Tile Triggers must be installed and active to use the setup wizard.
+> ℹ️ **Foundry V14+:** Native Regions are used by default without requiring external modules. If MATT is also installed, the setup wizard will prompt you to choose between Regions and Tiles.
+> ⚠️ **Foundry V12–V13:** Requires Monk's Active Tile Triggers (MATT).
 
 #### Quick Start — Unified Setup Wizard
 

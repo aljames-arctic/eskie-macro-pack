@@ -370,7 +370,20 @@
                 "step2AnimContent": "<p>Select the **Trap Animation Tile(s)** where the visual effect will play.</p><p>Click <strong>Continue</strong> once selected.</p>",
                 "noAnimTiles": "No trap animation tiles selected. Defaulting to use Trigger Tiles.",
                 "extraTitle": "Trap Setup - {name}",
-                "noExtraTiles": "No {name} selected. Trap setup cancelled."
+                "noExtraTiles": "No {name} selected. Trap setup cancelled.",
+                "modeDialogTitle": "Trap Setup: Trigger Mechanism",
+                "modeDialogContent": "<p>Select how you want this trap to be triggered on the canvas:</p>",
+                "modeRegion": "Foundry V14 Regions (Native)",
+                "modeMatt": "Monk's Active Tiles (MATT)",
+                "step1RegionTitle": "Trap Setup - {name}: Step 1 (Trigger Regions)",
+                "step1RegionContent": "<p>Select the <strong>Trigger Region(s)</strong> on the canvas (which tokens enter to trigger the trap).</p><p>Click <strong>Continue</strong> once selected.</p>",
+                "noTriggerRegions": "No trigger regions selected. Trap setup cancelled.",
+                "step2OriginRegionTitle": "Trap Setup - {name}: Step 2 (Trap Origin/Launcher Placeables)",
+                "step2OriginRegionContent": "<p>Select the <strong>Trap Origin Tile(s) or Region(s)</strong> on the canvas (where the trap starts or shoots from).</p><p>Click <strong>Continue</strong> once selected.</p>",
+                "step3TargetRegionTitle": "Trap Setup - {name}: Step 3 (Trap Target/Landing Placeables)",
+                "step3TargetRegionContent": "<p>Select the <strong>Trap Target Tile or Region</strong> on the canvas (where the trap shoots towards or lands).</p><p>Click <strong>Continue</strong> once selected.</p>",
+                "step2AnimRegionTitle": "Trap Setup - {name}: Step 2 (Animation Placeables)",
+                "step2AnimRegionContent": "<p>Select the <strong>Trap Animation Tile(s) or Region(s)</strong> where the visual effect will play.</p><p>Click <strong>Continue</strong> once selected.</p>"
             },
             "projectile": {
                 "chooseTypeTitle": "Projectile Trap Setup: Choose Type",
@@ -378,10 +391,56 @@
                 "noTypeChosen": "No projectile type chosen. Setup cancelled.",
                 "arrow": "Arrow",
                 "dart": "Dart",
-                "javelin": "Javelin"
+                "javelin": "Javelin",
+                "step2Title": "Trap Setup - Projectile: Step 2 (Launcher / Origin)",
+                "step2Content": "<p>Select the <strong>Projectile Origin Tile or Region</strong> (arrow slit, pipe, or wall launcher where missiles fire from).</p><p>💡 <em>Can be a Region or Tile.</em></p><p>Click <strong>Continue</strong> once selected.</p>",
+                "step3Title": "Trap Setup - Projectile: Step 3 (Target / Impact Area)",
+                "step3Content": "<p>Select the <strong>Target Tile or Region</strong> (where missiles land or aim towards).</p><p>💡 <em>Can be a Region or Tile.</em></p><p>Click <strong>Continue</strong> once selected.</p>"
             },
             "rollingBoulder": {
-                "noEndTile": "Rolling Boulder Trap: Tile \"{id}\" has no configured end tile."
+                "noEndTile": "Rolling Boulder Trap: Tile \"{id}\" has no configured end tile.",
+                "step2Title": "Trap Setup - Rolling Boulder: Step 2 (Boulder Spawn Point)",
+                "step2Content": "<p>Select the <strong>Boulder Origin Tile or Region</strong> (where the boulder spawns and begins rolling).</p><p>💡 <em>Can be a Region or Tile.</em></p><p>Click <strong>Continue</strong> once selected.</p>",
+                "step3Title": "Trap Setup - Rolling Boulder: Step 3 (Crash / Destination Point)",
+                "step3Content": "<p>Select the <strong>Target Tile or Region</strong> (where the boulder rolls towards and crashes).</p><p>💡 <em>Can be a Region or Tile.</em></p><p>Click <strong>Continue</strong> once selected.</p>"
+            },
+            "bullRushStatue": {
+                "step2Title": "Trap Setup - Bull Rush Statue: Step 2 (Statue Tile)",
+                "step2Content": "<p>Select the <strong>Statue Tile</strong> on the canvas (the physical statue that will charge across the room).</p><p>⚠️ <strong>A Tile is required</strong> to provide the statue image.</p><p>Click <strong>Continue</strong> once selected.</p>",
+                "noTile": "Bull Rush Statue requires a Tile placeable on the canvas for the statue graphic. Trap setup cancelled.",
+                "step3Title": "Trap Setup - Bull Rush Statue: Step 3 (Target / Destination)",
+                "step3Content": "<p>Select the <strong>Target Tile or Region</strong> on the canvas where the statue will charge towards.</p><p>Click <strong>Continue</strong> once selected.</p>"
+            },
+            "floodingRoom": {
+                "step2Title": "Trap Setup - Flooding Room: Step 2 (Water Floor Tile)",
+                "step2Content": "<p>Select the <strong>Water Floor Tile</strong> on the canvas (the tile covering the floor that will flood the room).</p><p>⚠️ <strong>A Tile is required</strong> for the water graphic to fade in and tint blue.</p><p>Click <strong>Continue</strong> once selected.</p>",
+                "noTile": "Flooding Room requires a Tile placeable on the canvas for the water graphic. Trap setup cancelled."
+            },
+            "pitfall": {
+                "step2Title": "Trap Setup - Pitfall: Step 2 (Pit Hole Tile - Optional)",
+                "step2Content": "<p>Select the <strong>Pit Hole Tile (Optional)</strong> on the canvas if you have a hidden pit graphic to reveal when triggered.</p><p>💡 <em>If you do not have a pit tile, simply click <strong>Continue</strong> with your Trigger Region selected to use pure animation.</em></p>"
+            },
+            "fallingSky": {
+                "step2Title": "Trap Setup - Falling from the Sky: Step 2 (Crater Tile - Optional)",
+                "step2Content": "<p>Select the <strong>Crater / Landing Tile (Optional)</strong> on the canvas if you have a crater decal to reveal on impact.</p><p>💡 <em>If you do not have a crater tile, leave your Trigger Region selected and click <strong>Continue</strong>.</em></p>",
+                "step3Title": "Trap Setup - Falling from the Sky: Step 3 (Target Area)",
+                "step3Content": "<p>Select the <strong>Target Tile or Region</strong> on the canvas where tokens will crash.</p><p>Click <strong>Continue</strong> once selected.</p>"
+            },
+            "spike": {
+                "step2Content": "<p>Select the <strong>Spike Zone</strong> where spikes will emerge.</p><p>💡 <em>No tiles required. Leave your Trigger Region selected to play spikes over the trigger area.</em></p>"
+            },
+            "fallingRocks": {
+                "step2Content": "<p>Select the <strong>Rock Fall Zone</strong> where rocks fall from the ceiling.</p><p>💡 <em>No tiles required. Leave your Trigger Region selected to drop rocks over the trigger area.</em></p>"
+            },
+            "electricDoor": {
+                "step1Title": "Trap Setup - Electric Door: Doorway Region",
+                "step1Content": "<p>Select the <strong>Doorway Region</strong> on the canvas (covering the door opening). Tokens entering this region will trigger the electric trap.</p><p>💡 <em>No tiles required.</em></p><p>Click <strong>Continue</strong> once selected.</p>"
+            },
+            "fire": {
+                "step2Title": "Trap Setup - Fire: Step 2 (Flame Nozzle / Origin)",
+                "step2Content": "<p>Select the <strong>Fire Origin Tile or Region</strong> (wall nozzle or grate where flames shoot from).</p><p>💡 <em>Can be a Region or Tile.</em></p><p>Click <strong>Continue</strong> once selected.</p>",
+                "step3Title": "Trap Setup - Fire: Step 3 (Flame Target / Direction)",
+                "step3Content": "<p>Select the <strong>Target Tile or Region</strong> (where the flame cone shoots towards).</p><p>💡 <em>Can be a Region or Tile.</em></p><p>Click <strong>Continue</strong> once selected.</p>"
             }
         }
     }

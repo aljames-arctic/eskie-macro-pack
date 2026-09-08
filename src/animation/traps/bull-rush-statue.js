@@ -12,29 +12,33 @@ import { log } from '../../lib/logger.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
+    tile: {
+        triggerId: null,
+        sourceId: null,
+        targetId: null,
+    },
     pushDistance: 1,
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { pushDistance, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { tile: tileConfig, pushDistance, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const targetList = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
     const target = targetList.length ? targetList[0] : null;
 
-    const tileDoc = tile.document;
+    const tileDoc = tile?.document ?? tile;
     const tileBounds = adapter.getTileBounds(tile);
     const tileCenter = tileBounds.center;
     const tileWidth = tileBounds.width;
     const tileHeight = tileBounds.height;
 
-    const targetTileIds = tileDoc.getFlag(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
-    const targetTile = adapter.getPlaceable(targetTileIds[0]);
+    const targetTile = adapter.getPlaceable(tileConfig.targetId);
     const targetLoc = adapter.getCenter(targetTile);
 
     if (!targetLoc) {
-        log.warn(`Bull Rush Statue Trap: Tile "${tileDoc.id}" has no configured target tile.`);
+        log.warn(`Bull Rush Statue Trap: Tile "${tileDoc?.id ?? 'unknown'}" has no configured target tile.`);
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;

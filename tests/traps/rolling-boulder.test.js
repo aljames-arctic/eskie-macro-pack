@@ -77,6 +77,10 @@ Sequencer.Database.getPathsUnder = (path) => {
 };
 
 test('rollingBoulder.default_config defines boulder attribute with default values', () => {
+    assert.ok(rollingBoulder.default_config.tile, 'DEFAULT_CONFIG must define tile');
+    assert.equal(rollingBoulder.default_config.tile.triggerId, null);
+    assert.equal(rollingBoulder.default_config.tile.sourceId, null);
+    assert.equal(rollingBoulder.default_config.tile.targetId, null);
     assert.ok(rollingBoulder.default_config.boulder, 'DEFAULT_CONFIG must define boulder');
     assert.equal(rollingBoulder.default_config.boulder.speed, 200, 'boulder.speed must default to 200');
     assert.equal(rollingBoulder.default_config.boulder.size, 4.25, 'boulder.size must default to 4.25');
@@ -105,10 +109,6 @@ test('rollingBoulder.create dynamically calculates duration from tile distance a
             y: 100,
             width: 100,
             height: 100,
-            getFlag: (mod, key) => {
-                if (mod === MODULE_ID && key === 'trap.trapTargetTileIds') return ['tile-end-1'];
-                return null;
-            }
         }
     };
 
@@ -131,7 +131,7 @@ test('rollingBoulder.create dynamically calculates duration from tile distance a
 
     // Distance between (150, 150) and (750, 950) is Math.hypot(600, 800) = 1000px
     // At default speed = 200 px/s: duration = (1000 / 200) * 1000 = 5000 ms
-    const seq = await rollingBoulder.create(startTile, []);
+    const seq = await rollingBoulder.create(startTile, [], { tile: { targetId: 'tile-end-1' } });
     assert.ok(seq instanceof MockSequence || seq instanceof MockSequenceEffect);
 
     // Find main rolling boulder loop effect
@@ -168,10 +168,6 @@ test('rollingBoulder.create respects custom boulder speed, size, playbackRate, a
             y: 0,
             width: 100,
             height: 100,
-            getFlag: (mod, key) => {
-                if (mod === MODULE_ID && key === 'trap.trapTargetTileIds') return ['tile-end-2'];
-                return null;
-            }
         }
     };
 
@@ -195,6 +191,9 @@ test('rollingBoulder.create respects custom boulder speed, size, playbackRate, a
     // Distance between (50, 50) and (650, 850) is Math.hypot(600, 800) = 1000px
     // With speed = 500 px/s: duration = (1000 / 500) * 1000 = 2000 ms
     const customConfig = {
+        tile: {
+            targetId: 'tile-end-2'
+        },
         boulder: {
             speed: 500,
             size: 6.0,
@@ -222,7 +221,7 @@ test('rollingBoulder.create respects custom boulder speed, size, playbackRate, a
     assert.equal(fileCall?.value, 'jb2a.rolling_boulder.loop.01.magma');
 });
 
-test('rollingBoulder.create respects tile MATT flag boulder overrides', async () => {
+test('rollingBoulder.create respects custom tile and boulder config overrides', async () => {
     globalThis.Sequence = MockSequence;
 
     const startTile = {
@@ -237,11 +236,6 @@ test('rollingBoulder.create respects tile MATT flag boulder overrides', async ()
             y: 0,
             width: 100,
             height: 100,
-            getFlag: (mod, key) => {
-                if (mod === MODULE_ID && key === 'trap.trapTargetTileIds') return ['tile-end-3'];
-                if (mod === MODULE_ID && key === 'trap.boulder') return { speed: 400, size: 5.0, playbackRate: 2.0 };
-                return null;
-            }
         }
     };
 
@@ -263,70 +257,23 @@ test('rollingBoulder.create respects tile MATT flag boulder overrides', async ()
     globalThis.canvas.tiles.get = (id) => (id === 'tile-end-3' ? endTile : null);
 
     // Distance between (50, 50) and (450, 350) is Math.hypot(400, 300) = 500px
-    // At speed = 400 px/s from tile flag: duration = (500 / 400) * 1000 = 1250 ms
-    const seq = await rollingBoulder.create(startTile, []);
-    const mainBoulder = seq.effects.find(eff =>
-        eff.calls.some(c => c.method === 'moveTowards')
-    );
-
-    const durationCall = mainBoulder.calls.find(c => c.method === 'duration');
-    assert.equal(durationCall?.value, 1250, 'Duration should be calculated using tile flag speed');
-
-    const sizeCall = mainBoulder.calls.find(c => c.method === 'size');
-    assert.equal(sizeCall?.size, 5.0 - 0.4, 'Size should be calculated using tile flag size');
-
-    const rateCall = mainBoulder.calls.find(c => c.method === 'playbackRate');
-    assert.equal(rateCall?.value, 2.0, 'Playback rate should be set from tile flag');
-});
-
-test('rollingBoulder.create accepts animationSpeed as an alias for playbackRate', async () => {
-    globalThis.Sequence = MockSequence;
-
-    const startTile = {
-        id: 'tile-start-4',
-        x: 0,
-        y: 0,
-        width: 100,
-        height: 100,
-        document: {
-            id: 'tile-start-4',
-            x: 0,
-            y: 0,
-            width: 100,
-            height: 100,
-            getFlag: (mod, key) => {
-                if (mod === MODULE_ID && key === 'trap.trapTargetTileIds') return ['tile-end-4'];
-                return null;
-            }
-        }
-    };
-
-    const endTile = {
-        id: 'tile-end-4',
-        x: 300,
-        y: 400,
-        width: 100,
-        height: 100,
-        document: {
-            id: 'tile-end-4',
-            x: 300,
-            y: 400,
-            width: 100,
-            height: 100
-        }
-    };
-
-    globalThis.canvas.tiles.get = (id) => (id === 'tile-end-4' ? endTile : null);
-
+    // At speed = 400 px/s: duration = (500 / 400) * 1000 = 1250 ms
     const seq = await rollingBoulder.create(startTile, [], {
-        boulder: { animationSpeed: 1.75 }
+        tile: { targetId: 'tile-end-3', sourceId: 'tile-start-3' },
+        boulder: { speed: 400, size: 5.0, playbackRate: 2.0 }
     });
     const mainBoulder = seq.effects.find(eff =>
         eff.calls.some(c => c.method === 'moveTowards')
     );
 
+    const durationCall = mainBoulder.calls.find(c => c.method === 'duration');
+    assert.equal(durationCall?.value, 1250, 'Duration should be calculated using config speed');
+
+    const sizeCall = mainBoulder.calls.find(c => c.method === 'size');
+    assert.equal(sizeCall?.size, 5.0 - 0.4, 'Size should be calculated using config size');
+
     const rateCall = mainBoulder.calls.find(c => c.method === 'playbackRate');
-    assert.equal(rateCall?.value, 1.75, 'animationSpeed should map to playbackRate');
+    assert.equal(rateCall?.value, 2.0, 'Playback rate should be set from config');
 });
 
 test('rollingBoulder.create warns and returns early when end tile is missing', async () => {
@@ -341,7 +288,6 @@ test('rollingBoulder.create warns and returns early when end tile is missing', a
         id: 'tile-no-end',
         document: {
             id: 'tile-no-end',
-            getFlag: () => []
         }
     };
 
@@ -350,7 +296,7 @@ test('rollingBoulder.create warns and returns early when end tile is missing', a
     assert.equal(seq.effects.length, 0, 'No boulder effects should be created');
 });
 
-test('rollingBoulder.setup stores boulder config in extraFlags for MATT setup', async () => {
+test('rollingBoulder.setup embeds tile and boulder config in MATT action code', async () => {
     const updatedTiles = new Map();
     const createMockTile = (id) => {
         const tileDoc = {
@@ -399,10 +345,8 @@ test('rollingBoulder.setup stores boulder config in extraFlags for MATT setup', 
 
     assert.ok(result, 'setup should complete successfully');
     const trapUpdate = updatedTiles.get('t-trap');
-    assert.ok(trapUpdate, 'Trap tile should be updated with flags');
-    assert.deepEqual(trapUpdate[`flags.${MODULE_ID}.trap.boulder`], {
-        speed: 300,
-        size: 5.5,
-        src: 'jb2a.rolling_boulder.loop.01.rock.mossy'
-    }, 'Trap tile should store boulder config flag');
+    assert.ok(trapUpdate, 'Trap tile should be updated with MATT actions');
+    const trapAction = trapUpdate['flags.monks-active-tiles.actions'][0];
+    assert.ok(trapAction.data.code.includes('"tile":{"triggerId":"t-trigger","sourceId":"t-trap","targetId":"t-target"}'), 'Trap action code should include tile IDs in config');
+    assert.ok(trapAction.data.code.includes('"speed":300'), 'Trap action code should include boulder speed in config');
 });

@@ -10,6 +10,11 @@ import { matt } from '../utils/matt-tiles.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
+    tile: {
+        triggerId: null,
+        sourceId: null,
+        targetId: null,
+    },
     delay: 500,
     spike: {
         xScale: 1.5,

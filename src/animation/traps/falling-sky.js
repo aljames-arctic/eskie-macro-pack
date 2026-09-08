@@ -11,6 +11,11 @@ import { matt } from '../utils/matt-tiles.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
+    tile: {
+        triggerId: null,
+        sourceId: null,
+        targetId: null,
+    },
     reveal: true,
     smokeSize: 2,
     startScale: 3,
@@ -22,23 +27,17 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { reveal, smokeSize, startScale, fallenScale, randomDelay, color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { tile: tileConfig, reveal, smokeSize, startScale, fallenScale, randomDelay, color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Target selection:
-    // 1. Look for tokens on target tiles
+    // 1. Look for tokens on target tile
     // 2. Look for tokens on the trap tile itself
     // 3. Fallback to targets passed
-    const tileDoc = tile.document;
-    const targetTileIds = tileDoc.getFlag(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
     let finalTargets = [];
 
-    if (targetTileIds.length > 0) {
-        targetTileIds.forEach(id => {
-            const targetTile = adapter.getPlaceable(id);
-            if (targetTile) {
-                finalTargets.push(...adapter.getTokensInTile(targetTile));
-            }
-        });
+    const targetTile = adapter.getPlaceable(tileConfig.targetId);
+    if (targetTile) {
+        finalTargets.push(...adapter.getTokensInTile(targetTile));
     }
 
     if (finalTargets.length === 0) {
@@ -165,7 +164,7 @@ async function stop(tile, config = {}) {
 }
 
 async function setup(config = {}) {
-    return matt.trap.setup('eskie.traps.fallingSky', config);
+    return matt.trap.setup('eskie.traps.fallingSky', { tileCount: 3, ...config });
 }
 
 export const fallingSky = {

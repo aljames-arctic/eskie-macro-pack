@@ -12,6 +12,12 @@ import { adapter } from '../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../utils/sound.js';
 
 const DEFAULT_CONFIG = {
+    tile: {
+        triggerId: null,
+        sourceId: null,
+        targetId: null,
+    },
+    projectileType: 'arrow',
     repeats: 10,
     repeatDelay: 50,
     splashScale: 1.5,
@@ -20,24 +26,19 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { sound, repeats, repeatDelay, splashScale } = mConfig;
+    const { tile: tileConfig, projectileType, sound, repeats, repeatDelay, splashScale } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInTile(tile);
 
-    const tileDoc = tile.document;
+    const tileDoc = tile?.document ?? tile;
     const tileBounds = adapter.getTileBounds(tile);
     const tileCenter = tileBounds.center;
 
-    // Retrieve projectile type from flags, defaulting to arrow
-    const projectileType = tileDoc.getFlag(MODULE_ID, 'trap.projectileType') ?? mConfig.projectileType ?? 'arrow';
-
-    // Retrieve target/landing tile from flags
-    const targetTileIds = tileDoc.getFlag(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
-    const targetTile = adapter.getPlaceable(targetTileIds[0]);
+    // Retrieve target/landing tile from config
+    const targetTile = adapter.getPlaceable(tileConfig.targetId);
     const targetLoc = adapter.getCenter(targetTile);
 
     if (!targetLoc) {
-        log.warn(`Projectile Trap: Tile "${tileDoc.id}" has no configured target tile.`);
+        log.warn(`Projectile Trap: Tile "${tileDoc?.id ?? 'unknown'}" has no configured target tile.`);
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;
@@ -188,9 +189,7 @@ async function setup(config = {}) {
 
     const setupConfig = {
         tileCount: 3,
-        extraFlags: {
-            projectileType: projectileType
-        },
+        projectileType: projectileType,
         ...config
     };
 

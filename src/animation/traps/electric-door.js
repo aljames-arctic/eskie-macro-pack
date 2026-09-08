@@ -11,6 +11,11 @@ import { matt } from '../utils/matt-tiles.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
+    tile: {
+        triggerId: null,
+        sourceId: null,
+        targetId: null,
+    },
     repeats: 5,
     repeatDelay: 300,
     sound: { ...DEFAULT_SOUND_CONFIG },
@@ -18,13 +23,11 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { repeats, repeatDelay, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { tile: tileConfig, repeats, repeatDelay, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     if (!tile) return new Sequence();
 
-    const tileDoc = tile.document;
-    const triggerTileIds = tileDoc.getFlag(MODULE_ID, 'trap.originIds') ?? [];
-    const triggerTile = adapter.getPlaceable(triggerTileIds[0]);
+    const triggerTile = adapter.getPlaceable(tileConfig.triggerId);
     const doorTile = triggerTile ?? tile;
 
     const tileBounds = adapter.getTileBounds(tile);

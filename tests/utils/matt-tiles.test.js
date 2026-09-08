@@ -104,12 +104,14 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
     // Test executing trap action code
     let playCalled = false;
     let playTargets = [];
+    let playConfig = null;
     globalThis.eskie = {
         traps: {
             spike: {
-                play: (originTile, tokens) => {
+                play: (originTile, tokens, config) => {
                     playCalled = true;
                     playTargets = tokens;
+                    playConfig = config;
                     assert.equal(originTile.id, 'tile-trap-1');
                 }
             }
@@ -161,6 +163,11 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
     assert.equal(playCalled, true, 'Trap play should be invoked successfully');
     assert.equal(playTargets.length, 1, 'Only tokens contained within the trap tile should be targeted');
     assert.equal(playTargets[0].id, 'tok-inside', 'Contained token should be the target');
+    assert.deepEqual(playConfig.tile, {
+        triggerId: 'tile-trigger-1',
+        sourceId: 'tile-trap-1',
+        targetId: null
+    }, 'Trap play should receive tile configuration');
 });
 
 test('matt.trap.setup correctly handles when the trigger tile is the trap tile (single tile)', async () => {

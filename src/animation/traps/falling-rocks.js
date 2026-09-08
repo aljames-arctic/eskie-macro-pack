@@ -11,6 +11,11 @@ import { MODULE_ID } from '../../lib/constants.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
+    tile: {
+        triggerId: null,
+        sourceId: null,
+        targetId: null,
+    },
     label: 'Falling Rocks',
     dustBrightness: 0.8,
     sound: { ...DEFAULT_SOUND_CONFIG },

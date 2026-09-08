@@ -12,6 +12,11 @@ import { log } from '../../lib/logger.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
+    tile: {
+        triggerId: null,
+        sourceId: null,
+        targetId: null,
+    },
     boulder: {
         src: 'jb2a.rolling_boulder.loop.01.rock.brown',
         speed: 200,
@@ -23,31 +28,22 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const tileDoc = tile.document;
+    const { tile: tileConfig, boulder, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    // Check for tile-level trap.boulder overrides from MATT flags
-    const tileBoulder = tileDoc.getFlag(MODULE_ID, 'trap.boulder');
-    const tileOverrides = tileBoulder ? { boulder: tileBoulder } : {};
-    const overrides = adapter.mergeObject(tileOverrides, config);
-    if (overrides.boulder?.animationSpeed !== undefined && overrides.boulder?.playbackRate === undefined) {
-        overrides.boulder.playbackRate = overrides.boulder.animationSpeed;
-    }
-
-    const { boulder, sound } = adapter.mergeObject(DEFAULT_CONFIG, overrides);
-
-    // Retrieve end tile from flags
-    const targetTileIds = tileDoc.getFlag(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
-    const endTile = adapter.getPlaceable(targetTileIds[0]);
+    // Retrieve destination tile from config
+    const endTile = adapter.getPlaceable(tileConfig.targetId);
 
     if (!endTile) {
-        log.warn(`Rolling Boulder Trap: Tile "${tileDoc.id}" has no configured end tile.`);
-        ui.notifications.warn(game.i18n.format('EMP.traps.rollingBoulder.noEndTile', { id: tileDoc.id }));
+        const id = tileConfig.sourceId ?? tile?.document?.id ?? tile?.id ?? 'unknown';
+        log.warn(`Rolling Boulder Trap: Tile "${id}" has no configured end tile.`);
+        ui.notifications.warn(game.i18n.format('EMP.traps.rollingBoulder.noEndTile', { id }));
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;
     }
 
-    const startLoc = adapter.getCenter(tile);
+    const startTile = adapter.getPlaceable(tileConfig.sourceId) ?? tile;
+    const startLoc = adapter.getCenter(startTile);
     const endLoc = adapter.getCenter(endTile);
 
     if (!startLoc || !endLoc) {
@@ -147,11 +143,7 @@ async function stop(tile, config = {}) {
 }
 
 async function setup(config = {}) {
-    const extraFlags = { ...config.extraFlags };
-    if (config.boulder) {
-        extraFlags.boulder = config.boulder;
-    }
-    return matt.trap.setup('eskie.traps.rollingBoulder', { tileCount: 3, ...config, extraFlags });
+    return matt.trap.setup('eskie.traps.rollingBoulder', { tileCount: 3, ...config });
 }
 
 export const rollingBoulder = {

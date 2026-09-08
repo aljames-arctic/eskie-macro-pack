@@ -12,16 +12,29 @@ import { log } from '../../lib/logger.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
-    boulderSpeed: 2500,
-    boulderSize: 4.25,
+    boulder: {
+        src: 'jb2a.rolling_boulder.loop.01.rock.brown',
+        speed: 200,
+        size: 4.25,
+    },
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { boulderSpeed, boulderSize, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
-
     const tileDoc = tile.document;
+
+    // Check for tile-level trap.boulder overrides from MATT flags
+    const tileBoulder = tileDoc.getFlag(MODULE_ID, 'trap.boulder') ?? {};
+    const baseConfig = adapter.mergeObject(DEFAULT_CONFIG, { boulder: tileBoulder });
+    const mConfig = adapter.mergeObject(baseConfig, config);
+
+    const boulder = {
+        src: mConfig.boulder?.src ?? DEFAULT_CONFIG.boulder.src,
+        speed: mConfig.boulder?.speed ?? DEFAULT_CONFIG.boulder.speed,
+        size: mConfig.boulder?.size ?? DEFAULT_CONFIG.boulder.size,
+    };
+    const sound = mConfig.sound;
 
     // Retrieve end tile from flags
     const targetTileIds = tileDoc.getFlag(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
@@ -38,6 +51,18 @@ async function create(tile, targets, config = {}) {
     const startLoc = adapter.getCenter(tile);
     const endLoc = adapter.getCenter(endTile);
 
+    if (!startLoc || !endLoc) {
+        log.warn(`Rolling Boulder Trap: Could not resolve coordinates for start or end tile.`);
+        let seq = new Sequence();
+        applySound(seq, sound);
+        return seq;
+    }
+
+    // Dynamically calculate duration from distance between source and destination tile and speed
+    const distancePx = Math.hypot(endLoc.x - startLoc.x, endLoc.y - startLoc.y);
+    const speed = boulder.speed > 0 ? boulder.speed : DEFAULT_CONFIG.boulder.speed;
+    const duration = Math.max(100, Math.round((distancePx / speed) * 1000));
+
     let seq = new Sequence();
     applySound(seq, sound);
     return seq
@@ -47,11 +72,11 @@ async function create(tile, targets, config = {}) {
 
         // Pre-boulder loop shadow/ground rumble effect
         .effect()
-        .file(closest('jb2a.rolling_boulder.loop.01.rock.brown'))
+        .file(closest(boulder.src))
         .atLocation(startLoc)
-        .scaleIn(0, boulderSpeed / 3, { ease: 'easeOutCubic' })
-        .fadeIn(boulderSpeed / 6)
-        .size(boulderSize - 0.5, { gridUnits: true })
+        .scaleIn(0, Math.min(500, Math.round(duration / 3)), { ease: 'easeOutCubic' })
+        .fadeIn(Math.min(500, Math.round(duration / 6)))
+        .size(Math.max(0.1, boulder.size - 0.5), { gridUnits: true })
         .duration(500)
         .filter('ColorMatrix', { brightness: 0 })
         .filter('Blur', { blurX: 5, blurY: 10 })
@@ -60,33 +85,33 @@ async function create(tile, targets, config = {}) {
 
         // Impact smoke wave at start location
         .effect()
-        .delay(boulderSpeed / 6)
+        .delay(Math.round(duration / 6))
         .file(closest('jb2a.impact.white.01'))
         .atLocation(startLoc)
-        .size(boulderSize * 1.15, { gridUnits: true })
+        .size(boulder.size * 1.15, { gridUnits: true })
         .belowTokens()
         .randomRotation()
 
         // Main rolling boulder loop travelling from start to end tile
         .effect()
         .delay(200)
-        .file(closest('jb2a.rolling_boulder.loop.01.rock.brown'))
+        .file(closest(boulder.src))
         .atLocation(startLoc)
-        .scaleIn(1, boulderSpeed / 3, { ease: 'easeOutCubic' })
-        .fadeIn(boulderSpeed / 6)
-        .size(boulderSize - 0.4, { gridUnits: true })
+        .scaleIn(1, Math.round(duration / 3), { ease: 'easeOutCubic' })
+        .fadeIn(Math.round(duration / 6))
+        .size(Math.max(0.1, boulder.size - 0.4), { gridUnits: true })
         .moveTowards(endLoc, { ease: 'easeInSine' })
-        .duration(boulderSpeed)
+        .duration(duration)
         .spriteRotation(-90)
         .zIndex(3)
-        .waitUntilFinished(-boulderSpeed / 8)
+        .waitUntilFinished(-Math.round(duration / 8))
 
         // Impact flash at target/crash point
         .effect()
         .delay(250)
         .file(closest('jb2a.impact.white.01'))
         .atLocation(endLoc)
-        .size(boulderSize * 1.15, { gridUnits: true })
+        .size(boulder.size * 1.15, { gridUnits: true })
         .belowTokens()
         .randomRotation()
 
@@ -94,7 +119,7 @@ async function create(tile, targets, config = {}) {
         .effect()
         .file(closest('jb2a.explosion.shrapnel.grenade.02.black'))
         .atLocation(endLoc)
-        .size(boulderSize * 1.25, { gridUnits: true })
+        .size(boulder.size * 1.25, { gridUnits: true })
         .zIndex(4)
 
         // Explosion smoke cloud
@@ -104,7 +129,7 @@ async function create(tile, targets, config = {}) {
         .atLocation(endLoc)
         .playbackRate(0.65)
         .fadeOut(1500)
-        .size(boulderSize * 2.2, { gridUnits: true })
+        .size(boulder.size * 2.2, { gridUnits: true })
         .filter('ColorMatrix', { brightness: 0.65 })
         .zIndex(4);
 }
@@ -120,7 +145,11 @@ async function stop(tile, config = {}) {
 }
 
 async function setup(config = {}) {
-    return matt.trap.setup('eskie.traps.rollingBoulder', { tileCount: 3, ...config });
+    const extraFlags = { ...config.extraFlags };
+    if (config.boulder) {
+        extraFlags.boulder = config.boulder;
+    }
+    return matt.trap.setup('eskie.traps.rollingBoulder', { tileCount: 3, ...config, extraFlags });
 }
 
 export const rollingBoulder = {

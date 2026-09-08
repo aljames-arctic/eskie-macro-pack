@@ -379,6 +379,9 @@
                 "arrow": "Arrow",
                 "dart": "Dart",
                 "javelin": "Javelin"
+            },
+            "rollingBoulder": {
+                "noEndTile": "Rolling Boulder Trap: Tile \"{id}\" has no configured end tile."
             }
         }
     }

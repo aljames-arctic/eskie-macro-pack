@@ -158,7 +158,6 @@ async function play(token, target, config = {}) {
 
 function stop(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { sound } = mConfig;
     const { id } = mConfig;
     return Sequencer.EffectManager.endEffects({ name: `${token.name} ${id}`, object: token });
 }

@@ -92,7 +92,7 @@ if (anyActive) {
         .fadeIn(500)
         .fadeOut(500)
         .shape("circle", {
-            lineSize: (canvas.grid.size ?? 100) * 5.2,
+            lineSize: canvas.grid.size * 5.2,
             lineColor: "#FF0000",
             radius: 8.85,
             gridUnits: true,
@@ -114,7 +114,7 @@ if (anyActive) {
         .fadeOut(500)
         .delay(1200)
         .shape("circle", {
-            lineSize: (canvas.grid.size ?? 100) * 0.24,
+            lineSize: canvas.grid.size * 0.24,
             lineColor: "#FFFFFF",
             radius: 6.175,
             gridUnits: true,

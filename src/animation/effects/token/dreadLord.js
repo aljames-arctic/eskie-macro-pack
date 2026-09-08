@@ -47,11 +47,12 @@ async function create(token, config = {}) {
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
+        const dims = adapter.getSceneDimensions(canvas?.scene);
         seq = seq.effect()
             .file(closest(bg.src))
             .filter("ColorMatrix", { brightness: 0.3 })
-            .atLocation({ x: (canvas.dimensions.width) / 2, y: (canvas.dimensions.height) / 2 })
-            .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
+            .atLocation(adapter.getSceneCenter(canvas?.scene))
+            .size({ width: dims.width / dims.size, height: dims.height / dims.size }, { gridUnits: true })
             .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY })
             .duration(7000)
             .fadeIn(500)
@@ -59,10 +60,12 @@ async function create(token, config = {}) {
             .belowTokens();
     }
 
+    const { widthUnits: tokenWidth } = adapter.getTokenDimensions(token);
+
     seq = seq.effect()
         .file(closest(`jb2a.particles.outward.red.01.03`))
         .attachTo(token, { offset: { y: 0.1 }, gridUnits: true, bindRotation: false })
-        .size(0.5 * token.document.width, { gridUnits: true })
+        .size(0.5 * tokenWidth, { gridUnits: true })
         .duration(1000)
         .fadeOut(800)
         .scaleIn(0, 1000, { ease: "easeOutCubic" })
@@ -191,7 +194,7 @@ async function play(token, config = {}) {
     const seq = await create(token, config);
     if (seq) {
         if (form.change && form.dreadForm) {
-            await token.document.update({ img: config.dreadForm });
+            await token.document.update({ img: form.dreadForm });
         }
         return seq.play();
     }
@@ -203,7 +206,7 @@ async function stop(token, config = {}) {
 
     Sequencer.EffectManager.endEffects({ name: id, object: token });
     if (form.change && form.baseForm) {
-        await token.document.update({ img: config.baseForm });
+        await token.document.update({ img: form.baseForm });
     }
 }
 

@@ -22,9 +22,9 @@ async function create(tile, targets, config = {}) {
 
     if (!tile) return new Sequence();
 
-    const tileDoc = tile.document ?? tile;
-    const triggerTileIds = tileDoc.getFlag?.(MODULE_ID, 'trap.originIds') ?? [];
-    const triggerTile = triggerTileIds.length ? canvas.tiles.get(triggerTileIds[0]) : null;
+    const tileDoc = tile.document;
+    const triggerTileIds = tileDoc.getFlag(MODULE_ID, 'trap.originIds') ?? [];
+    const triggerTile = adapter.getPlaceable(triggerTileIds[0]);
     const doorTile = triggerTile ?? tile;
 
     const tileBounds = adapter.getTileBounds(tile);
@@ -50,8 +50,7 @@ async function create(tile, targets, config = {}) {
             .wait(250);
 
         finalTargets.forEach(t => {
-            const targetDoc = t.document ?? t;
-            const targetRotation = targetDoc.rotation;
+            const targetRotation = adapter.getTokenRotation(t);
 
             seq = seq
                 // Shocking electricity on target

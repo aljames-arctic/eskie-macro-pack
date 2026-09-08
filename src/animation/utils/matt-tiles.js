@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
 
 //Determine movement direction and center point
 function getCenter(tile) {
-    return adapter.getTileBounds(tile).center;
+    return adapter.getCenter(tile);
 }
 
 function getLabel(id, token) {
@@ -26,6 +26,7 @@ async function start(token, code, config = {}) {
     const { info, ...nonInfoConfig } = mergedConfig;
     const label = getLabel(id, token);
     const tileOffset = adapter.getShapeOffset(token);
+    const { widthPx, heightPx } = adapter.getTokenDimensions(token);
 
     const initialData = {
         "texture.src": "icons/svg/d6-grey.svg", 
@@ -33,8 +34,8 @@ async function start(token, code, config = {}) {
         "hidden": true,
         "x": tileOffset.x,
         "y": tileOffset.y,
-        "width": canvas.grid.size * token.document.width,
-        "height": canvas.grid.size * token.document.width,
+        "width": widthPx,
+        "height": heightPx,
     };
     
     const [tile] = await socket.tile.create(initialData);
@@ -83,7 +84,7 @@ async function configure(token, tile, config = {}) {
     const angleRadians = Math.atan2(dy, dx);
     const distance = Math.hypot(tileOrigin.x - tilePosition.x, tileOrigin.y - tilePosition.y);
     const tokenSpeed = token._getAnimationMovementSpeed();
-    const speed = (tokenSpeed * canvas.grid.size) / (1 * SECONDS);
+    const speed = (tokenSpeed * adapter.getSceneDimensions().size) / (1 * SECONDS);
     const rotation = angleRadians * (180 / Math.PI);
     const travelTime = (distance / speed) - latency;
 

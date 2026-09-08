@@ -111,7 +111,7 @@ export class ConfigureAutorecApp extends foundryPlatform.HandlebarsApplicationMi
             await game.settings.set(MODULE_ID, 'autorecTarget', target);
             log.info(`Autorec integration destination updated: "${target}"`);
             const msg = game.i18n?.localize?.("EMP.configureAutorec.savedNotify") ?? "Auto-recognition settings saved.";
-            ui.notifications?.info?.(msg);
+            ui.notifications.info(msg);
         }
 
         const appInstance = this;

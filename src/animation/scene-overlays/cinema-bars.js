@@ -19,12 +19,14 @@ function create(config = {}) {
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (dim && bg?.src) {
+        const sceneCenter = adapter.getSceneCenter(canvas?.scene);
+        const sceneDims = adapter.getSceneDimensions(canvas?.scene);
         sequence.effect()
             .file(bg.src)
             .name(id)
             .filter("ColorMatrix", { brightness: 0.3 })
-            .atLocation({ x: (canvas?.dimensions?.width ?? 0) / 2, y: (canvas?.dimensions?.height ?? 0) / 2 })
-            .size({ width: (canvas?.scene?.width ?? 100) / (canvas?.grid?.size ?? 100), height: (canvas?.scene?.height ?? 100) / (canvas?.grid?.size ?? 100) }, { gridUnits: true })
+            .atLocation(sceneCenter)
+            .size({ width: sceneDims.sceneRect.width / sceneDims.size, height: sceneDims.sceneRect.height / sceneDims.size }, { gridUnits: true })
             .duration(3000)
             .fadeIn(500)
             .fadeOut(500)

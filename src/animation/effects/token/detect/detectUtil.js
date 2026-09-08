@@ -93,9 +93,10 @@ async function _createDetectionEffects(target, config = {}) {
  */
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const gridDistance = adapter.getSceneDimensions(canvas?.scene).distance;
     const targets = canvas.tokens.placeables.filter((t) => {
         if (t.id === token.id) return false;
-        const targetDistance = canvas.grid.measurePath([token, t]).euclidean ?? 0;
+        const targetDistance = adapter.getDistance(token, t);
         return targetDistance <= mConfig.distance;
     });
 
@@ -111,8 +112,8 @@ async function create(token, config = {}) {
         .belowTokens();
 
     for (const target of targets) {
-        const targetDistance = canvas.grid.measurePath([token, target]).euclidean ?? 0;
-        const delay = (targetDistance / canvas.grid.size) * 125;
+        const targetDistance = adapter.getDistance(token, target);
+        const delay = (targetDistance / gridDistance) * 125;
         let targetSequence = new Sequence().wait(delay);
         targetSequence.addSequence(await _createDetectionEffects(target, mConfig));
         sequence.addSequence(targetSequence);

@@ -1,6 +1,6 @@
 import { closest } from "../../../lib/filemanager.js";
 import { template as templatelib } from '../../../lib/templates.js';
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { autorec } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
@@ -23,9 +23,10 @@ async function createStarwardSword(token, config = {}, options = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { size, darkMap, cameraZoom, sound } = mConfig;
     let { targets } = mConfig;
+    const gridSize = adapter.getGridSize();
 
     const cfg = {
-        radius: size * canvas.grid.size,
+        radius: size * gridSize,
         max: 150,
         icon: 'icons/svg/sword.svg',
         label: 'Starward Sword'
@@ -34,15 +35,15 @@ async function createStarwardSword(token, config = {}, options = {}) {
     if (!position) { return; }
 
     if (!targets || targets.length === 0) {
-        targets = Array.from(game.user.targets);
+        targets = Array.from(game.user?.targets ?? []);
     }
 
     // Define the center of the circle
-    let centerX = position.x + (canvas.grid.size / 2);
-    let centerY = position.y + (canvas.grid.size / 2);
+    let centerX = position.x + (gridSize / 2);
+    let centerY = position.y + (gridSize / 2);
 
     // Define the radius of the circle
-    let radius = (size / 2) * canvas.grid.size;
+    let radius = (size / 2) * gridSize;
 
     // Declare an array to hold the points
     let initialPoints = [];
@@ -91,14 +92,18 @@ async function createStarwardSword(token, config = {}, options = {}) {
     const mainSequence = new Sequence();
     applySound(mainSequence, sound.cast);
     const bg = adapter.getSceneBackground(canvas?.scene);
+    const sceneDimensions = adapter.getSceneDimensions(canvas?.scene);
+    const sceneCenter = adapter.getSceneCenter(canvas?.scene);
+    const tokenCenter = adapter.getCenter(token);
+
     if (darkMap && bg?.src) {
         mainSequence
             .effect()
             .file(bg.src)
             .name("Starward Sword")
             .filter("ColorMatrix", { brightness: 0.3 })
-            .atLocation({ x: (canvas.dimensions.width) / 2, y: (canvas.dimensions.height) / 2 })
-            .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
+            .atLocation(sceneCenter)
+            .size({ width: sceneDimensions.width / sceneDimensions.size, height: sceneDimensions.height / sceneDimensions.size }, { gridUnits: true })
             .persist()
             .fadeIn(500)
             .fadeOut(1000)
@@ -108,7 +113,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
     if (cameraZoom) {
         mainSequence.thenDo(function () {
-            canvas.animatePan({ duration: 250, x: token.center.x, y: token.center.y, scale: 1.620 });
+            canvas?.animatePan?.({ duration: 250, x: tokenCenter.x, y: tokenCenter.y, scale: 1.620 });
         });
     }
 
@@ -117,7 +122,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
         .file(closest("eskie.damage.electricity.01.purple"))
         .atLocation(token, { offset: { x: 0, y: 0 }, gridUnits: true })
         .attachTo(token)
-        .scaleToObject(token.document.texture.scaleX * 1.4)
+        .scaleToObject((token?.document?.texture?.scaleX ?? 1) * 1.4)
         .filter("ColorMatrix", { hue: 175 })
         .mirrorX()
         .waitUntilFinished(-300)
@@ -126,7 +131,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
         .file(closest("eskie.smoke.07.white"))
         .atLocation(token)
         .attachTo(token)
-        .scaleToObject(token.document.texture.scaleX * 1.5)
+        .scaleToObject((token?.document?.texture?.scaleX ?? 1) * 1.5)
         .filter("ColorMatrix", { saturate: 1, hue: 100 })
         .belowTokens()
         .zIndex(0)
@@ -137,7 +142,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
         .effect()
         .copySprite(token)
-        .spriteRotation(-token.document.rotation)
+        .spriteRotation(-adapter.getTokenRotation(token))
         .atLocation(token)
         .scaleToObject(1.1, { considerTokenScale: true })
         .filter("ColorMatrix", { saturate: -1, brightness: 10 })
@@ -168,7 +173,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
         .thenDo(function () {
             if (cameraZoom == true) {
-                canvas.animatePan({ duration: 50, x: token.center.x, y: token.center.y, scale: 0.420 })
+                canvas?.animatePan?.({ duration: 50, x: tokenCenter.x, y: tokenCenter.y, scale: 0.420 });
             }
         });
     //Slashes
@@ -196,7 +201,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
                         .effect()
                         .copySprite(token)
-                        .spriteRotation(-token.document.rotation)
+                        .spriteRotation(-adapter.getTokenRotation(token))
                         .atLocation(initialPoints[u])
                         .scaleToObject(0.95, { considerTokenScale: true })
                         .tint("#e305ff")
@@ -213,7 +218,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
                         .effect()
                         .copySprite(token)
-                        .spriteRotation(-token.document.rotation)
+                        .spriteRotation(-adapter.getTokenRotation(token))
                         .atLocation(initialPoints[u])
                         .scaleToObject(0.95, { considerTokenScale: true })
                         .tint("#e305ff")
@@ -245,7 +250,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
                                     .effect()
                                     .copySprite(target)
-                                    .spriteRotation(-target.document.rotation)
+                                    .spriteRotation(-adapter.getTokenRotation(target))
                                     .atLocation(target)
                                     .scaleToObject(1, { considerTokenScale: true })
                                     .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.1, duration: 60, gridUnits: true, fromEnd: false })
@@ -272,7 +277,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
                         .file(closest("eskie.smoke.07.white"))
                         .atLocation(token)
                         .attachTo(token)
-                        .scaleToObject(token.document.texture.scaleX * 1.5)
+                        .scaleToObject((token?.document?.texture?.scaleX ?? 1) * 1.5)
                         .mirrorX()
                         .filter("ColorMatrix", { saturate: 1, hue: 100 })
                         .belowTokens()
@@ -306,7 +311,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
                         .effect()
                         .copySprite(token)
-                        .spriteRotation(-token.document.rotation)
+                        .spriteRotation(-adapter.getTokenRotation(token))
                         .atLocation(initialPoints[u])
                         .scaleToObject(0.95, { considerTokenScale: true })
                         .tint("#e305ff")
@@ -323,7 +328,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
                         .effect()
                         .copySprite(token)
-                        .spriteRotation(-token.document.rotation)
+                        .spriteRotation(-adapter.getTokenRotation(token))
                         .atLocation(initialPoints[u])
                         .scaleToObject(0.95, { considerTokenScale: true })
                         .tint("#e305ff")
@@ -350,7 +355,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
                                     .effect()
                                     .copySprite(target)
-                                    .spriteRotation(-target.document.rotation)
+                                    .spriteRotation(-adapter.getTokenRotation(target))
                                     .atLocation(target)
                                     .scaleToObject(1, { considerTokenScale: true })
                                     .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.1, duration: 60, gridUnits: true, fromEnd: false })
@@ -394,7 +399,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
                             .effect()
                             .copySprite(target)
-                            .spriteRotation(-target.document.rotation)
+                            .spriteRotation(-adapter.getTokenRotation(target))
                             .atLocation(target)
                             .scaleToObject(1, { considerTokenScale: true })
                             .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.1, duration: 60, gridUnits: true, fromEnd: false })
@@ -419,7 +424,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
                             .effect()
                             .copySprite(target)
-                            .spriteRotation(-target.document.rotation)
+                            .spriteRotation(-adapter.getTokenRotation(target))
                             .atLocation(target, { local: true })
                             .scaleToObject(1, { considerTokenScale: true })
                             .filter("ColorMatrix", { brightness: -1 })
@@ -433,7 +438,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
                             .effect()
                             .copySprite(target)
-                            .spriteRotation(-target.document.rotation)
+                            .spriteRotation(-adapter.getTokenRotation(target))
                             .atLocation(target, { local: true })
                             .scaleToObject(1, { considerTokenScale: true })
                             .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.25, duration: 500, gridUnits: true, ease: "easeOutCubic" })
@@ -521,7 +526,7 @@ async function createStarwardSword(token, config = {}, options = {}) {
 
                             .effect()
                             .copySprite(target)
-                            .spriteRotation(-target.document.rotation)
+                            .spriteRotation(-adapter.getTokenRotation(target))
                             .atLocation(target)
                             .scaleToObject(1, { considerTokenScale: true })
                             .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.1, duration: 60, gridUnits: true, fromEnd: false })
@@ -560,7 +565,10 @@ async function playStarwardSword(token, config = {}, options = {}) {
 }
 
 function stopStarwardSword(token, { id = DEFAULT_CONFIG.id } = {}) {
-    Sequencer.EffectManager.endEffects({ name: `Starward Sword ${token.document.name} ${id}` });
+    Sequencer.EffectManager.endEffects({ name: "Starward Sword" });
+    if (token) {
+        Sequencer.EffectManager.endEffects({ name: `Starward Sword ${token.name} ${id}` });
+    }
 }
 
 export const starwardSword = {

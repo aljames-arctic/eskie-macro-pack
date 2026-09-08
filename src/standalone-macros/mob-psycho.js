@@ -39,7 +39,7 @@ const startNumber = 80;
 const endNumber = 100;
 const baseDuration = 80;
 const finalDuration = 250;
-const gridSize = canvas.grid.size ?? 100;
+const gridSize = canvas.grid.size;
 const totalSteps = Math.abs(endNumber - startNumber) || 1;
 
 for (let n = startNumber, i = 0; n <= endNumber; n++, i++) {

@@ -23,11 +23,12 @@ async function play(token, config = {}) {
 
 function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, color, flight } = mConfig;
+    const { id, color, flight, sound } = mConfig;
     const { wingSize, flaps, sway } = flight;
     const label = `${id} - ${token.id}`;
 
     let seq = new Sequence();
+    applySound(seq, sound);
 
     seq = seq.animation()
       .delay(100)
@@ -143,4 +144,5 @@ export const eagleAttunement = {
     create,
     play,
     stop,
+    default_config: DEFAULT_CONFIG,
 };

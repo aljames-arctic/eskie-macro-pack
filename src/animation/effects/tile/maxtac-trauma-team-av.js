@@ -17,9 +17,8 @@ async function create(tile, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { effectNameFly, effectNameLanding, sound } = mConfig;
 
-    const tileRotation = tile.document.rotation || 0;
-    const w = tile.document.width;
-    const h = tile.document.height;
+    const tileRotation = adapter.getTokenRotation(tile);
+    const { width: w, height: h } = adapter.getTileBounds(tile);
 
     const cautionstyle = {
         'fill': '#fffed6',
@@ -266,9 +265,8 @@ async function stop(tile, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { flyingTag, effectNameFly, effectNameLanding } = mConfig;
 
-    const tileRotation = tile.document.rotation || 0;
-    const w = tile.document.width;
-    const h = tile.document.height;
+    const tileRotation = adapter.getTokenRotation(tile);
+    const { width: w, height: h } = adapter.getTileBounds(tile);
 
     // End landing indicators immediately
     await Sequencer.EffectManager.endEffects({ name: effectNameLanding, object: tile });

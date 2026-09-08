@@ -22,9 +22,9 @@ Hooks.once('init', function() {
                 constructor(options = {}) {
                     super(options);
                     updateMacroCompendiums().then(() => {
-                        ui.notifications?.info("EMP: Macro compendiums synced successfully (Standalone & AA Bootstrap)!");
+                        ui.notifications.info("EMP: Macro compendiums synced successfully (Standalone & AA Bootstrap)!");
                     }).catch((err) => {
-                        ui.notifications?.error(`EMP: Failed to sync compendiums: ${err.message}`);
+                        ui.notifications.error(`EMP: Failed to sync compendiums: ${err.message}`);
                     });
                 }
                 render() { return this; }

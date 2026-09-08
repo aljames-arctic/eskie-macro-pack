@@ -14,7 +14,8 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token, config = {}) {
+async function create(token, config = {}, options = {}) {
+    if (options?.type == "aefx") return;
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { distance, sound, template } = mConfig;
@@ -30,7 +31,8 @@ async function create(token, config = {}) {
 
     const sequence = new Sequence();
     applySound(sequence, sound);
-    const label = `${token?.name ?? 'Token'} Web`;
+    const tokenName = token.name;
+    const label = `${tokenName} Web`;
 
     sequence
         .effect()
@@ -135,15 +137,20 @@ async function create(token, config = {}) {
     return sequence;
 }
 
-async function play(token, config = {}) {
-    const sequence = await create(token, config);
+async function play(token, config = {}, options = {}) {
+    if (options?.type == "aefx") return;
+    const sequence = await create(token, config, options);
     if (sequence) return sequence.play();
 }
 
-function stop(token) {
-    const label = `${token?.name ?? 'Token'} Web`;
-    Sequencer.EffectManager.endEffects({ name: label });
-    Sequencer.EffectManager.endEffects({ name: `${label} Casting` });
+function stop(token, { id = DEFAULT_CONFIG.id } = {}) {
+    if (token) {
+        const tokenName = token.name;
+        const label = `${tokenName} Web`;
+        Sequencer.EffectManager.endEffects({ name: label });
+        Sequencer.EffectManager.endEffects({ name: `${label} ${id}` });
+        Sequencer.EffectManager.endEffects({ name: `${label} Casting` });
+    }
 }
 
 export const web = {

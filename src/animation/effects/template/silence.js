@@ -5,10 +5,10 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { template as templatelib } from '../../../lib/templates.js';
+import { adapter } from "../../../adapters/index.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'silence',
     size: 9,
@@ -19,9 +19,8 @@ const DEFAULT_CONFIG = {
  * Creates a Sequencer effect for a Silence spell at a specific location.
  *
  * @param {Token} token The token casting the spell (used for effect naming).
- * @param {object} position The target position (x, y coordinates) for the effect.
  * @param {object} config Configuration options for the animation.
- * @returns {Sequence} The created Sequence object.
+ * @returns {Promise<Sequence|undefined>} The created Sequence object.
  */
 async function createSilence(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
@@ -36,7 +35,9 @@ async function createSilence(token, config = {}) {
         label: 'Silence'
     };
     let [position, _] = await templatelib.getPosition(template, cfg);
-    if (!position) { return; }
+    if (!position || position.cancelled) { return; }
+
+    const tokenName = token.name;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
@@ -78,7 +79,7 @@ async function createSilence(token, config = {}) {
         .waitUntilFinished(-1000)
 
         .effect()
-        .name(`Silence ${token.document.name} ${id}`) // Unique name for stopping
+        .name(`Silence ${tokenName} ${id}`) // Unique name for stopping
         .file(closest("jb2a.markers.bubble.01.complete.blue"))
         .atLocation(position)
         .size(size, { gridUnits: true })
@@ -92,7 +93,7 @@ async function createSilence(token, config = {}) {
         .persist()
 
         .effect()
-        .name(`Silence ${token.document.name} ${id}`) // Unique name for stopping
+        .name(`Silence ${tokenName} ${id}`) // Unique name for stopping
         .file(closest("jb2a.wall_of_force.sphere.blue"))
         .atLocation(position)
         .size(size, { gridUnits: true })
@@ -107,7 +108,7 @@ async function createSilence(token, config = {}) {
         .persist()
 
         .effect()
-        .name(`Silence ${token.document.name} ${id}`) // Unique name for stopping
+        .name(`Silence ${tokenName} ${id}`) // Unique name for stopping
         .file(closest("jb2a.template_circle.symbol.normal.runes.blue"))
         .atLocation(position)
         .size(2, { gridUnits: true })
@@ -144,7 +145,9 @@ async function playSilence(token, config = {}, options = {}) {
  * @param {object} options Options for stopping effects.
  */
 function stopSilence(token, { id = DEFAULT_CONFIG.id } = {}) {
-    Sequencer.EffectManager.endEffects({ name: `Silence ${token.document.name} ${id}` });
+    if (token) {
+        Sequencer.EffectManager.endEffects({ name: `Silence ${token.name} ${id}` });
+    }
 }
 
 export const silence = {

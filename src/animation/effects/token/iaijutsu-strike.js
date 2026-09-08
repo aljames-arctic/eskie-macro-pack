@@ -58,10 +58,13 @@ function deathAnimation(target, sound) {
         .on(target)
         .opacity(0)
 
+    const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);
+    const gridSize = adapter.getGridSize();
+
     sequence.effect()
         .name(`IaijutsuStrike ${target.name} Top`)
         .copySprite(target)
-        .spriteRotation(-target.document.rotation)
+        .spriteRotation(-adapter.getTokenRotation(target))
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .shape("polygon", {
@@ -74,7 +77,7 @@ function deathAnimation(target, sound) {
             isMask: true,
             name: "test"
         })
-        .moveTowards({ x: target.x + canvas.grid.size * target.document.width + 0.1, y: target.y + canvas.grid.size * target.document.width + 0.1 }, { rotate: false })
+        .moveTowards({ x: target.x + gridSize * targetWidth + 0.1, y: target.y + gridSize * targetWidth + 0.1 }, { rotate: false })
         .moveSpeed(100)
         .persist()
         .extraEndDuration(1000)
@@ -83,7 +86,7 @@ function deathAnimation(target, sound) {
     sequence.effect()
         .name(`IaijutsuStrike ${target.name} Bottom`)
         .copySprite(target)
-        .spriteRotation(-target.document.rotation)
+        .spriteRotation(-adapter.getTokenRotation(target))
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .shape("polygon", {
@@ -139,8 +142,9 @@ async function create(source, target, config = {}) {
     applySound(sequence, mConfig.sound);
 
     if (cameraFocus.enable) {
+        const targetCenter = adapter.getCenter(target);
         sequence.addSequence(cinemaBars.create({ dim: true }));
-        sequence.canvasPan({ duration: 250, x: target.center.x, y: target.center.y, scale: cameraFocus.scale })
+        sequence.canvasPan({ duration: 250, x: targetCenter.x, y: targetCenter.y, scale: cameraFocus.scale })
     }
 
     sequence.effect()

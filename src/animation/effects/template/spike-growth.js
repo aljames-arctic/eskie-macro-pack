@@ -5,10 +5,10 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { template as templatelib } from '../../../lib/templates.js';
+import { adapter } from "../../../adapters/index.js";
 import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'spikeGrowth',
     size: 8, // Default size for crosshairs and initial effect
@@ -72,7 +72,7 @@ async function createPersistentSpikes(token, centralPosition, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, tint } = mConfig;
 
-    const gridSize = canvas.grid.size;
+    const gridSize = adapter.getGridSize();
     const locations = [
         //{ x: centralPosition.x, y: centralPosition.y },
         { x: centralPosition.x, y: centralPosition.y - gridSize * 2 },
@@ -85,13 +85,14 @@ async function createPersistentSpikes(token, centralPosition, config = {}) {
         //{ x: centralPosition.x - gridSize * 2, y: centralPosition.y - gridSize * 2 },
     ];
 
+    const tokenName = token.name;
     const persistentSpikeSequences = [];
 
     for (let i = 0; i < locations.length; i++) {
         const sequence = new Sequence();
         sequence
             .effect()
-            .name(`Spike Growth ${token.document.name} ${id}`) // Unique name for stopping
+            .name(`Spike Growth ${tokenName} ${id}`) // Unique name for stopping
             .delay(550)
             .file(closest("jb2a.plant_growth.02.round.4x4.loop.greenred"))
             .atLocation(locations[i])
@@ -106,7 +107,7 @@ async function createPersistentSpikes(token, centralPosition, config = {}) {
             .zIndex(1)
 
             .effect()
-            .name(`Spike Growth ${token.document.name} ${id}`) // Unique name for stopping
+            .name(`Spike Growth ${tokenName} ${id}`) // Unique name for stopping
             .delay(30)
             .file(closest("jb2a.ice_spikes.radial.burst.grey"))
             .size(7.5, { gridUnits: true })
@@ -149,7 +150,7 @@ async function createSpikeGrowth(token, config = {}, options = {}) {
         label: 'Spike Growth'
     };
     let [position, _] = await templatelib.getPosition(template, cfg);
-    if (!position) { return; }
+    if (!position || position.cancelled) { return; }
 
     const initialSequence = await createInitialSpikeGrowth(position, config);
     const persistentSpikeSequences = await createPersistentSpikes(token, position, config);
@@ -175,7 +176,9 @@ async function playSpikeGrowth(token, config = {}, options = {}) {
  * @param {object} options Options for stopping effects.
  */
 function stopSpikeGrowth(token, { id = DEFAULT_CONFIG.id } = {}) {
-    Sequencer.EffectManager.endEffects({ name: `Spike Growth ${token.document.name} ${id}` });
+    if (token) {
+        Sequencer.EffectManager.endEffects({ name: `Spike Growth ${token.name} ${id}` });
+    }
 }
 
 export const spikeGrowth = {

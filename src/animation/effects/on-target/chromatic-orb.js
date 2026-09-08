@@ -2,10 +2,9 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { adapter, autorec, CONCENTRATING } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: "chromatic-orb",
     damageType: "fire",
@@ -28,22 +27,24 @@ async function create(token, target, config = {}) {
         thunder: {color: "white", orb: "white", hue: 0, impact: "blue"},
     };
 
-    const {color, orb, hue, impact} = colorMapping[damageType];
+    const {color, orb, hue, impact} = colorMapping[damageType] ?? colorMapping.fire;
 
-    // Calculate distance in pixels
-    const dx = target.center.x - token.center.x;
-    const dy = target.center.y - token.center.y;
-    const distance = (Math.sqrt(dx * dx + dy * dy))/canvas.grid.size;
+    const srcCenter = adapter.getCenter(token);
+    const tgtCenter = adapter.getCenter(target);
+    const gridSize = adapter.getGridSize();
 
-    const effectDuration = 800 + (100 * distance)
-    const effectOffsetX = Math.round((Math.random() - 0.5) * (canvas.grid.size/2));
-    const effectOffsetY = Math.round((Math.random() - 0.5) * (canvas.grid.size/2));
+    // Calculate distance in grid units
+    const distance = Math.hypot(tgtCenter.x - srcCenter.x, tgtCenter.y - srcCenter.y) / gridSize;
+
+    const effectDuration = 800 + (100 * distance);
+    const effectOffsetX = Math.round((Math.random() - 0.5) * (gridSize / 2));
+    const effectOffsetY = Math.round((Math.random() - 0.5) * (gridSize / 2));
 
     let seq = new Sequence();
     applySound(seq, sound.cast);
     applySound(seq, sound.impact, effectDuration + 2000);
     seq = seq
-        .addNamedLocation("position", { x: target.center.x + effectOffsetX, y: target.center.y + effectOffsetY })
+        .addNamedLocation("position", { x: tgtCenter.x + effectOffsetX, y: tgtCenter.y + effectOffsetY })
 
         .effect()
             .file(closest("jb2a.aura_themed.01.orbit.complete.metal.01.grey"))

@@ -42,7 +42,7 @@ async function create(token, config = {}) {
     // TODO(bakanabaka): Utilizes old mergeObject
     let { id, duration, effect , sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    const tokenWidth = token.document.width;
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
     let surprisedEffect = new Sequence();
     applySound(surprisedEffect, sound);

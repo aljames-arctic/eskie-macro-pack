@@ -3,10 +3,9 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { adapter, autorec, CONCENTRATING } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'Flurry Of Blows',
     color: "yellow",
@@ -33,6 +32,7 @@ const DEFAULT_CONFIG = {
 async function create(token, target, config = {}) {
     config = settingsOverride(config);
     const { color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
     let seq = new Sequence();
 
     applySound(seq, sound.punch1);
@@ -43,7 +43,7 @@ async function create(token, target, config = {}) {
         .rotateTowards(target,{randomOffset:0.15})
         .scaleToObject(2.5)
         .playbackRate(2.5)
-        .spriteOffset({x:-0.05-(token.document.width-1) , y:-0.18*token.document.width}, {gridUnits:true})
+        .spriteOffset({x:-0.05-(tokenWidth-1) , y:-0.18*tokenWidth}, {gridUnits:true})
         .repeats(7,250,250)
         .zIndex(1);
 
@@ -55,7 +55,7 @@ async function create(token, target, config = {}) {
         .rotateTowards(target,{randomOffset:0.15})
         .scaleToObject(2.5)
         .playbackRate(2.5)
-        .spriteOffset({x:-0.05-(token.document.width-1) , y:0.18*token.document.width}, {gridUnits:true})
+        .spriteOffset({x:-0.05-(tokenWidth-1) , y:0.18*tokenWidth}, {gridUnits:true})
         .repeats(7,250,250)
         .mirrorY()
         .zIndex(1);
@@ -65,13 +65,13 @@ async function create(token, target, config = {}) {
     seq = seq.effect()
         .file(closest("jb2a.impact.009.orange"))
         .atLocation(target,{randomOffset:1})
-        .size(token.document.width*1.25, {gridUnits:true})
+        .size(tokenWidth * 1.25, {gridUnits:true})
         .repeats(14,125,125)
         .randomRotation();
 
     seq = seq.effect()
         .copySprite(target)
-        .spriteRotation(-target.document.rotation)
+        .spriteRotation(-adapter.getTokenRotation(target))
         .atLocation(target)
         .scaleToObject(1, { considerTokenScale: true })
         .fadeIn(200)

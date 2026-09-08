@@ -30,7 +30,6 @@ export const DEFAULT_CONFIG = {
     msPerImage: 50,
     imageDuration: 2500,
     sound: { ...DEFAULT_SOUND_CONFIG },
-    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function create(token, config = {}) {

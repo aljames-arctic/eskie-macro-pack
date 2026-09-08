@@ -19,8 +19,8 @@ async function create(token, targets = [], config = {}) {
     const targetList = [targets].flat().filter(Boolean);
 
     const allPoints = [
-        token.center,
-        ...targetList.map(t => t.center)
+        adapter.getCenter(token),
+        ...targetList.map(t => adapter.getCenter(t))
     ];
 
     const minX = Math.min(...allPoints.map(p => p.x));
@@ -38,12 +38,13 @@ async function create(token, targets = [], config = {}) {
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
+        const dims = adapter.getSceneDimensions(canvas?.scene);
         sequence.effect()
             .name(`${id} - ${token.id}`)
             .file(closest(bg.src))
             .filter('ColorMatrix', { brightness: 0 })
-            .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
-            .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
+            .atLocation(adapter.getSceneCenter(canvas?.scene))
+            .size({ width: dims.width / dims.size, height: dims.height / dims.size }, { gridUnits: true })
             .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY })
             .duration(4000)
             .fadeIn(750)
@@ -89,9 +90,10 @@ async function create(token, targets = [], config = {}) {
         let closestIndex = 0;
         let closestDistance = Infinity;
 
+        const sourceCenter = adapter.getCenter(source);
         for (let i = 0; i < remaining.length; i++) {
-            const t = remaining[i];
-            const dist = Math.hypot(t.center.x - source.center.x, t.center.y - source.center.y);
+            const tCenter = adapter.getCenter(remaining[i]);
+            const dist = Math.hypot(tCenter.x - sourceCenter.x, tCenter.y - sourceCenter.y);
             if (dist < closestDistance) {
                 closestDistance = dist;
                 closestIndex = i;
@@ -99,7 +101,7 @@ async function create(token, targets = [], config = {}) {
         }
 
         const target = remaining.splice(closestIndex, 1)[0];
-        const scale = closestDistance <= canvas.grid.size ? 1 : 0.5;
+        const scale = closestDistance <= adapter.getGridSize() ? 1 : 0.5;
 
         const chainSeq = new Sequence()
             .effect()

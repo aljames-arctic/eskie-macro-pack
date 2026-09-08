@@ -3,8 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { adapter } from '../../../adapters/index.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { adapter, autorec } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -26,9 +25,9 @@ async function create(token, target, config = {}) {
     const effectSize = 2 + (0.25 * weightIndex);
     const effectOffset = -0.75 - (0.25 * weightIndex);
 
-    const targetSquare = adapter.getNearestSquareCenter(token, target) ?? target.center ?? { x: target.x ?? 0, y: target.y ?? 0 };
-    const tokenWidth = token.document?.width ?? token.width ?? 1;
-    const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
+    const targetSquare = adapter.getNearestSquareCenter(token, target) ?? adapter.getCenter(target);
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
+    const targetRotation = adapter.getTokenRotation(target);
 
     const sequence = new Sequence();
     applySound(sequence, sound);

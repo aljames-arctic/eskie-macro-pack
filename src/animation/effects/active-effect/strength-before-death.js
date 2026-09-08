@@ -9,22 +9,24 @@ import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: "Strength Before Death",
     tintMap: true,      //Set Map Tint
-    cinemaBars: true    //Set Cinema Bars
-}
+    cinemaBars: true,   //Set Cinema Bars
+    sound: { ...DEFAULT_SOUND_CONFIG },
+};
 
 function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, tintMap, cinemaBars } = mConfig;
+    const { id, tintMap, cinemaBars, sound } = mConfig;
 
     // Scene bounds in canvas coords (handles scenes that don't start at 0,0)
-    const rect = canvas.dimensions.sceneRect; // { x, y, width, height }
+    const dimensions = adapter.getSceneDimensions();
+    const rect = dimensions.sceneRect; // { x, y, width, height }
     const left   = rect.x;
     const top    = rect.y;
     const right  = rect.x + rect.width;
     const bottom = rect.y + rect.height;
 
     // Token center in canvas coords
-    const { x: cx, y: cy } = token.center;
+    const { x: cx, y: cy } = adapter.getCenter(token);
 
     // Max distance (in pixels) from token center to any edge
     const maxPx = Math.max(
@@ -35,7 +37,7 @@ function create(token, config = {}) {
     );
 
     // Convert pixels -> grid units (squares). Sequencer uses gridUnits when gridUnits:true
-    const radiusGU = maxPx / canvas.grid.size;
+    const radiusGU = maxPx / dimensions.size;
 
     const seq = new Sequence();
     applySound(seq, sound);
@@ -294,7 +296,6 @@ export const strengthBeforeDeath = {
     play,
     stop,
     default_config: DEFAULT_CONFIG,
-    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-autorec.register("strengthBeforeDeath", "effect", "eskie.effect.strengthBeforeDeath", DEFAULT_CONFIG, "0.0.1", "Strength Before Death");
+autorec.register("strengthBeforeDeath", "effect", "eskie.effect.strengthBeforeDeath", DEFAULT_CONFIG, "0.0.2", "Strength Before Death");

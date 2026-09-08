@@ -1,7 +1,6 @@
-import { adapter } from '../../../adapters/index.js';
+import { adapter, autorec } from '../../../adapters/index.js';
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from "../../../lib/settings.js";
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -16,28 +15,29 @@ const DEFAULT_CONFIG = {
         volume: 0.5,
         file: 'psfx.impacts.slashing'
     }
-}
+};
 
 function create(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { type, weight, color, attacks, sound } = mConfig;
 
     //Determine Attack Size
-    const weightIndex = { light: 0, medium: 1, heavy: 2 }[weight];
-    let effectSize = 2 + (0.25 * weightIndex);
-    let effectOffset = -0.75 - (0.25 * weightIndex);
-    let targetSquare = adapter.getNearestSquareCenter(token, target);
+    const weightIndex = { light: 0, medium: 1, heavy: 2 }[weight] ?? 2;
+    const effectSize = 2 + (0.25 * weightIndex);
+    const effectOffset = -0.75 - (0.25 * weightIndex);
+    const targetSquare = adapter.getNearestSquareCenter(token, target) ?? adapter.getCenter(target);
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
     function attackAnimation(token, target, config) {
         const seq = new Sequence();
-        applySound(seq, { ...sound, file: sound.file || `psfx.impacts.${type}` });
+        applySound(seq, { ...sound, file: sound.file ?? `psfx.impacts.${type}` });
 
         seq.effect()
                 .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.slow`))
                 .atLocation(token)
                 .rotateTowards(targetSquare,{randomOffset:0.25})
                 .scaleToObject(effectSize)
-                .spriteOffset({ x: effectOffset * token.document.width }, { gridUnits: true })
+                .spriteOffset({ x: effectOffset * tokenWidth }, { gridUnits: true })
                 .randomizeMirrorY()
                 .fadeOut(750, {ease:"easeOutQuint"})
                 .zIndex(1)
@@ -45,7 +45,7 @@ function create(token, target, config = {}) {
             .effect()
                 .delay(150)
                 .file(closest("jb2a.impact.003.yellow"))
-                .size(1.75 * token.document.width, { gridUnits: true })
+                .size(1.75 * tokenWidth, { gridUnits: true })
                 .atLocation(targetSquare)
                 .randomRotation()
                 .playbackRate(1)
@@ -55,7 +55,7 @@ function create(token, target, config = {}) {
             .effect()
                 .delay(150)
                 .file(closest(`jb2a.impact.008.${color}`))
-                .size(0.75 * token.document.width, { gridUnits: true })
+                .size(0.75 * tokenWidth, { gridUnits: true })
                 .atLocation(targetSquare)
                 .randomRotation()
                 .playbackRate(1.25)
@@ -64,7 +64,7 @@ function create(token, target, config = {}) {
             .effect()
                 .delay(150)
                 .file(closest(`eskie.slice.01.color.${color}`))
-                .size(1.25 * token.document.width, { gridUnits: true })
+                .size(1.25 * tokenWidth, { gridUnits: true })
                 .atLocation(targetSquare)
                 .randomRotation()
                 .playbackRate(1)
@@ -74,7 +74,7 @@ function create(token, target, config = {}) {
             .effect()
                 .delay(150)
                 .file(closest("eskie.slice.01.black.colorless"))
-                .size(1.25 * token.document.width, { gridUnits: true })
+                .size(1.25 * tokenWidth, { gridUnits: true })
                 .atLocation(targetSquare)
                 .randomRotation()
                 .playbackRate(1)
@@ -88,7 +88,7 @@ function create(token, target, config = {}) {
                 .copySprite(target)
                 .attachTo(target)
                 .scaleToObject(1, { considerTokenScale: true })
-                .spriteRotation(-target.document.rotation)
+                .spriteRotation(-adapter.getTokenRotation(target))
                 .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true})
                 .opacity(0.25)
                 .duration(1000)

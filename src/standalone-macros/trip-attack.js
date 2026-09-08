@@ -16,16 +16,16 @@ const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.
 
 const getNearestSquareCenter = (srcToken, tgtToken) => {
     if (!srcToken || !tgtToken) return null;
-    const gs = canvas?.grid?.size ?? 100;
-    const srcCenter = srcToken.center ?? { x: srcToken.x ?? 0, y: srcToken.y ?? 0 };
-    const w = tgtToken.document?.width ?? tgtToken.width ?? 1;
-    const h = tgtToken.document?.height ?? tgtToken.height ?? 1;
+    const gs = canvas.grid.size;
+    const srcCenter = srcToken.center;
+    const w = tgtToken.document.width;
+    const h = tgtToken.document.height;
     let bestPoint = null;
     let bestDist2 = Infinity;
     for (let gx = 0; gx < w; gx++) {
         for (let gy = 0; gy < h; gy++) {
-            const cx = (tgtToken.x ?? 0) + (gx + 0.5) * gs;
-            const cy = (tgtToken.y ?? 0) + (gy + 0.5) * gs;
+            const cx = tgtToken.x + (gx + 0.5) * gs;
+            const cy = tgtToken.y + (gy + 0.5) * gs;
             const dx = cx - srcCenter.x;
             const dy = cy - srcCenter.y;
             const d2 = dx * dx + dy * dy;
@@ -46,9 +46,9 @@ const weightIndex = { light: 0, medium: 1, heavy: 2 }[weight] ?? 2;
 const effectSize = 2 + (0.25 * weightIndex);
 const effectOffset = -0.75 - (0.25 * weightIndex);
 
-const targetSquare = getNearestSquareCenter(token, target) ?? target.center ?? { x: target.x ?? 0, y: target.y ?? 0 };
-const tokenWidth = token.document?.width ?? token.width ?? 1;
-const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
+const targetSquare = getNearestSquareCenter(token, target);
+const tokenWidth = token.document.width;
+const targetRotation = target.document.rotation;
 
 const sequence = new Sequence();
 

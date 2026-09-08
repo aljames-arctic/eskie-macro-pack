@@ -13,15 +13,14 @@ const DEFAULT_CONFIG = {
 };
 
 function getSceneCoverSizeGU(target) {
-    const gs = canvas?.grid?.size ?? 100;
-    const rect = canvas?.dimensions?.sceneRect ?? { x: 0, y: 0, width: 4000, height: 4000 };
+    const { size: gs, sceneRect: rect } = adapter.getSceneDimensions(canvas?.scene);
     const corners = [
         { x: rect.x, y: rect.y },
         { x: rect.x + rect.width, y: rect.y },
         { x: rect.x, y: rect.y + rect.height },
         { x: rect.x + rect.width, y: rect.y + rect.height },
     ];
-    const c = target.center ?? { x: target.x ?? 0, y: target.y ?? 0 };
+    const c = adapter.getCenter(target);
     let maxDist = 0;
     for (const p of corners) {
         const d = Math.hypot(p.x - c.x, p.y - c.y);
@@ -37,9 +36,9 @@ async function create(token, target, config = {}) {
 
     if (!token || !target) return;
 
-    const targetSquare = adapter.getNearestSquareCenter(token, target) ?? target.center ?? { x: target.x ?? 0, y: target.y ?? 0 };
+    const targetSquare = adapter.getNearestSquareCenter(token, target) ?? adapter.getCenter(target);
     const sceneCoverGU = getSceneCoverSizeGU(target);
-    const tokenWidth = token.document?.width ?? token.width ?? 1;
+    const { widthUnits: tokenWidth } = adapter.getTokenDimensions(token);
 
     const sequence = new Sequence();
     applySound(sequence, sound);

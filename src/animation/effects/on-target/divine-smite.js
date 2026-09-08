@@ -2,10 +2,9 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { adapter, autorec, CONCENTRATING } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: "divineSmite",
     color: "yellowwhite",
@@ -14,6 +13,7 @@ const DEFAULT_CONFIG = {
 
 async function create(token, target, config = {}) {
     const { id, color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -54,7 +54,7 @@ async function create(token, target, config = {}) {
         .delay(300)
         .file(closest("jb2a.impact.ground_crack.01.blue"))
         .atLocation(target)
-        .size(2.3*token.document.width, {gridUnits:true})
+        .size(2.3 * tokenWidth, {gridUnits:true})
         .filter("ColorMatrix", { saturate:-0.5, hue: -160 })
         .belowTokens()
         .playbackRate(0.85)
@@ -65,7 +65,7 @@ async function create(token, target, config = {}) {
         .atLocation(target)
         .rotateTowards(token)
         .scaleToObject(3)
-        .spriteOffset({x:-1.5*token.document.width, y:-0*token.document.width},{gridUnits:true})
+        .spriteOffset({x: -1.5 * tokenWidth, y: 0}, {gridUnits:true})
         .mirrorY()
         .rotate(90)
         .zIndex(2);

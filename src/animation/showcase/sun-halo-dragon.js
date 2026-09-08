@@ -11,10 +11,11 @@ async function getPositions(token) {
 
 // (HACKY) This is annoying... Crosshair.show returns .center(.x, .y)
 // But all other Sequencer effects seem to use the token(.x, .y) not token.center(.x, .y)
-function adjustTeleport(coorinates) {
+function adjustTeleport(coordinates) {
+    const size = adapter.getSceneDimensions().size;
     return {
-        x: coorinates.x - canvas.grid.size / 2,
-        y: coorinates.y - canvas.grid.size / 2
+        x: coordinates.x - size / 2,
+        y: coordinates.y - size / 2
     };
 }
 
@@ -38,11 +39,13 @@ const DEFAULT_CONFIG = {
 };
 
 function xdelta(p1, p2) {
-    return (p2.x - p1.x) / canvas.grid.size;
+    const size = adapter.getSceneDimensions().size;
+    return (p2.x - p1.x) / size;
 }
 
 function ydelta(p1, p2) {
-    return (p2.y - p1.y) / canvas.grid.size;
+    const size = adapter.getSceneDimensions().size;
+    return (p2.y - p1.y) / size;
 }
 
 async function create(token, targets = [], config = {}) {
@@ -139,20 +142,22 @@ async function create(token, targets = [], config = {}) {
             
         const bg = adapter.getSceneBackground(canvas?.scene);
         if (bg?.src) {
+            const sceneCenter = adapter.getSceneCenter(canvas?.scene);
+            const sceneDims = adapter.getSceneDimensions(canvas?.scene);
             seq.effect()
                 .delay(2100)
                 .name(`Casting ${token.name}`)
                 .file(closest(bg.src))
-                .filter("ColorMatrix", {saturate: 1, brightness: 0.6})
-                .atLocation({x:(canvas.dimensions.width)/2,y:(canvas.dimensions.height)/2})
-                .size({width:canvas.scene.width/canvas.grid.size, height:canvas.scene.height/canvas.grid.size}, {gridUnits: true})
+                .filter("ColorMatrix", { saturate: 1, brightness: 0.6 })
+                .atLocation(sceneCenter)
+                .size({ width: sceneDims.sceneRect.width / sceneDims.size, height: sceneDims.sceneRect.height / sceneDims.size }, { gridUnits: true })
                 .duration(250)
-                .filter("ColorMatrix", { brightness:0 })
+                .filter("ColorMatrix", { brightness: 0 })
                 .belowTiles()
                 .fadeOut(125)
                 .fadeIn(125)
                 .opacity(1)
-                .spriteOffset({x:-bg.offsetX,y:-bg.offsetY})
+                .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY })
                 .playIf(impact);
         }
 

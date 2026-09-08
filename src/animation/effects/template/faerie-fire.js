@@ -3,10 +3,10 @@
 
 import { closest, absolutePath } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
+import { adapter } from '../../../adapters/index.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'faerieFire',
     color: 'green', // 'blue', 'green', 'purple'
@@ -61,7 +61,7 @@ async function createCloud(token, config = {}) {
 
     if (token) {
         sequence.effect()
-            .name(`${id} - ${token.id}`)
+            .name(`${id} - ${token?.id ?? 'token'}`)
             .file(closest('eskie.casting.nature.01.side.one_shot.white'))
             .attachTo(token)
             .rotateTowards(targetPos)
@@ -146,11 +146,14 @@ function createEffect(token, config = {}) {
     const sequence = new Sequence();
     applySound(sequence, sound);
 
+    const tokenId = token?.id ?? 'token';
+    const tokenRotation = adapter.getTokenRotation(token);
+
     if (glow) {
         sequence.effect()
-            .name(`${id} - ${token.id}`)
+            .name(`${id} - ${tokenId}`)
             .copySprite(token)
-            .spriteRotation(-token.document.rotation)
+            .spriteRotation(-tokenRotation)
             .attachTo(token, { bindAlpha: false, bindVisibility: false })
             .belowTokens()
             .scaleToObject(1, { considerTokenScale: true })
@@ -160,7 +163,7 @@ function createEffect(token, config = {}) {
             .persist();
 
         sequence.effect()
-            .name(`${id} - ${token.id}`)
+            .name(`${id} - ${tokenId}`)
             .file(closest(`eskie.texture_mask.glitter.01.${color}.particles_only`))
             .attachTo(token, { bindAlpha: false, bindVisibility: false })
             .mask()
@@ -191,7 +194,8 @@ async function playEffect(token, config = {}) {
 async function stop(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
-    if (token) Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}`, object: token });
+    const tokenId = token?.id ?? 'token';
+    if (token) Sequencer.EffectManager.endEffects({ name: `${id} - ${tokenId}`, object: token });
 }
 
 async function clean(config = {}) {

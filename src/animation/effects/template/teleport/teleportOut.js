@@ -12,10 +12,16 @@ const DEFAULT_CONFIG = {
     }
 };
 
-function create(token, targets, config = {}) {
+function create(token, targets = [], config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
-    const maxDistance = Math.max(...targets.map(target => 3 * Math.max(Math.abs(target.x - token.x), Math.abs(target.y - token.y)) / canvas.dimensions.size + 1));
+    const gridSize = adapter.getSceneDimensions(canvas?.scene).size;
+    const tokenCenter = adapter.getCenter(token);
+    const tokenX = token?.x ?? (tokenCenter.x - gridSize / 2);
+    const tokenY = token?.y ?? (tokenCenter.y - gridSize / 2);
+    const maxDistance = targets.length > 0 
+        ? Math.max(...targets.map(target => 3 * Math.max(Math.abs((target?.x ?? 0) - tokenX), Math.abs((target?.y ?? 0) - tokenY)) / gridSize + 1))
+        : 1;
 
     let sequence = new Sequence();
     applySound(sequence, mConfig.sound.teleportOut);
@@ -69,13 +75,18 @@ function create(token, targets, config = {}) {
     return sequence;
 }
 
-async function play(token, targets, config = {}) {
+async function play(token, targets = [], config = {}) {
     const sequence = create(token, targets, config);
     if (sequence) { return sequence.play(); }
+}
+
+function stop(token, { id = DEFAULT_CONFIG.id } = {}) {
+    // Instantaneous effect
 }
 
 export const teleportOut = {
     create,
     play,
+    stop,
     default_config: DEFAULT_CONFIG,
 };

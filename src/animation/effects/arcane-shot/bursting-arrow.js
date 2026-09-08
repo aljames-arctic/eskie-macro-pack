@@ -3,8 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { adapter } from '../../../adapters/index.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { adapter, autorec } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -22,7 +21,7 @@ async function create(token, target, config = {}) {
     const sequence = new Sequence();
     applySound(sequence, sound);
 
-    const targetWidth = target.document?.width ?? target.width ?? 1;
+    const targetWidth = adapter.getTokenDimensions(target).widthUnits;
 
     sequence
         .effect()

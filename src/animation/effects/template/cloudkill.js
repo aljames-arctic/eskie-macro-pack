@@ -33,19 +33,17 @@ async function create(token, config = {}) {
     const sequence = new Sequence();
     applySound(sequence, sound);
     const bgSrc = adapter.getSceneBackground(canvas?.scene);
-    const sceneDimensions = canvas?.dimensions ?? { width: 4000, height: 4000 };
-    const gridSize = canvas?.grid?.size ?? 100;
-    const sceneWidth = canvas?.scene?.width ?? 4000;
-    const sceneHeight = canvas?.scene?.height ?? 4000;
-    const tokenName = token?.name ?? 'Token';
+    const sceneDimensions = adapter.getSceneDimensions(canvas?.scene);
+    const sceneCenter = adapter.getSceneCenter(canvas?.scene);
+    const tokenName = token.name;
 
     if (tintMap && bgSrc) {
         sequence
             .effect()
                 .name(`Casting ${tokenName}`)
                 .file(bgSrc)
-                .atLocation({ x: sceneDimensions.width / 2, y: sceneDimensions.height / 2 })
-                .size({ width: sceneWidth / gridSize, height: sceneHeight / gridSize }, { gridUnits: true })
+                .atLocation(sceneCenter)
+                .size({ width: sceneDimensions.width / sceneDimensions.size, height: sceneDimensions.height / sceneDimensions.size }, { gridUnits: true })
                 .persist()
                 .fadeIn(1000, { ease: 'easeOutCubic' })
                 .fadeOut(3000)
@@ -112,9 +110,10 @@ async function play(token, config = {}) {
 }
 
 function stop(token) {
-    const tokenName = token?.name ?? 'Token';
-    Sequencer.EffectManager.endEffects({ name: `Cloudkill ${tokenName}` });
-    Sequencer.EffectManager.endEffects({ name: `Casting ${tokenName}` });
+    if (token) {
+        Sequencer.EffectManager.endEffects({ name: `Cloudkill ${token.name}` });
+        Sequencer.EffectManager.endEffects({ name: `Casting ${token.name}` });
+    }
 }
 
 export const cloudkill = {

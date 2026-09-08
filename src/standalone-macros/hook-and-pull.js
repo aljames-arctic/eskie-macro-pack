@@ -106,12 +106,12 @@ const latchAsset = config.latch ?? "eskie.objects.meat_hook.ranged.01.physical.l
 const location = getBestAdjacentLocation(token, target);
 
 // Determine travel distance in grid units
-const targetCenterX = target.center?.x ?? target.x;
-const targetCenterY = target.center?.y ?? target.y;
-const gridSize = canvas.grid.size ?? 100;
+const targetCenterX = target.center.x;
+const targetCenterY = target.center.y;
+const gridSize = canvas.grid.size;
 const offsetX = (location.x - targetCenterX) / gridSize;
 const offsetY = (location.y - targetCenterY) / gridSize;
-const targetRotation = target.document.rotation ?? 0;
+const targetRotation = target.document.rotation;
 
 const sequence = new Sequence();
 

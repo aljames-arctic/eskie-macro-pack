@@ -63,7 +63,7 @@ function _dissolve({ id, target, offset, steps, shape }) {
 
         seq = seq.effect()
             .name(id)
-            .atLocation({ x: target.center.x, y: target.center.y })
+            .atLocation(adapter.getCenter(target))
             .copySprite(target)
             .spriteRotation(-target.document.rotation)
             .scaleToObject(1, { considerTokenScale: true })
@@ -88,7 +88,7 @@ function _reform({ id, target, allSteps, shape }) {
 
         formingSequence.effect()
             .name(id)
-            .atLocation({ x: target.center.x, y: target.center.y })
+            .atLocation(adapter.getCenter(target))
             .copySprite(target)
             .spriteRotation(-target.document.rotation)
             .scaleToObject(1, { considerTokenScale: true })
@@ -112,9 +112,10 @@ function getDissolveShape() {
 }
 
 function getDissolveConfig() {
+    const gridSize = adapter.getGridSize();
     return [
         {
-            offset: { x: canvas.grid.size * 0.1, y: -canvas.grid.size * 0.4 },
+            offset: { x: gridSize * 0.1, y: -gridSize * 0.4 },
             steps: [
                 { radius: 0.15, duration: 1500, fill: true }, { radius: 0.2, duration: 1800 },
                 { radius: 0.25, duration: 2000 }, { radius: 0.3, duration: 2200 },
@@ -123,7 +124,7 @@ function getDissolveConfig() {
             ]
         },
         {
-            offset: { x: -canvas.grid.size * 0.4, y: canvas.grid.size * 0.3 },
+            offset: { x: -gridSize * 0.4, y: gridSize * 0.3 },
             steps: [
                 { radius: 0.15, duration: 500, fill: true }, { radius: 0.2, duration: 700 },
                 { radius: 0.25, duration: 900 }, { radius: 0.3, duration: 1100 },
@@ -133,7 +134,7 @@ function getDissolveConfig() {
             ]
         },
         {
-            offset: { x: canvas.grid.size * 0.5, y: canvas.grid.size * 0.4 },
+            offset: { x: gridSize * 0.5, y: gridSize * 0.4 },
             steps: [
                 { radius: 0.15, duration: 1500, fill: true }, { radius: 0.25, duration: 1900 },
                 { radius: 0.3, duration: 2100 }, { radius: 0.35, duration: 2300 },

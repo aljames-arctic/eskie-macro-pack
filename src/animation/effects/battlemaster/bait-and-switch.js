@@ -3,8 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { adapter } from '../../../adapters/index.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { adapter, autorec } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -19,8 +18,8 @@ async function create(token, target, config = {}) {
 
     if (!token || !target) return;
 
-    const tokenCenter = token.center ?? { x: token.x ?? 0, y: token.y ?? 0 };
-    const targetCenter = target.center ?? { x: target.x ?? 0, y: target.y ?? 0 };
+    const tokenCenter = adapter.getCenter(token);
+    const targetCenter = adapter.getCenter(target);
 
     let blurDirectionX = 0;
     let blurDirectionY = 0;

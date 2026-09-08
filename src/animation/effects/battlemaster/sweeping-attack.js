@@ -3,8 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { adapter } from '../../../adapters/index.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { adapter, autorec } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -41,13 +40,13 @@ async function create(token, targetOrTargets, config = {}) {
     const effectSize = 2 + (0.25 * 2);
     const effectOffset = -0.75 - (0.25 * 2);
 
-    const p1 = adapter.getNearestSquareCenter(token, target1) ?? target1.center ?? { x: target1.x ?? 0, y: target1.y ?? 0 };
-    const p2 = adapter.getNearestSquareCenter(token, target2) ?? target2.center ?? { x: target2.x ?? 0, y: target2.y ?? 0 };
+    const p1 = adapter.getNearestSquareCenter(token, target1) ?? adapter.getCenter(target1);
+    const p2 = adapter.getNearestSquareCenter(token, target2) ?? adapter.getCenter(target2);
     const targetSquare = (p1 && p2)
         ? { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 }
-        : (p1 ?? token.center ?? { x: token.x ?? 0, y: token.y ?? 0 });
+        : (p1 ?? adapter.getCenter(token));
 
-    const tokenWidth = token.document?.width ?? token.width ?? 1;
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
     const sequence = new Sequence();
     applySound(sequence, sound);

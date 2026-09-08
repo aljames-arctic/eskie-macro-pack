@@ -1,7 +1,6 @@
 // Original Author: .eskie
 // Modular Conversion: bakanabaka
 
-import { utils } from '../../utils/index.js';
 import { closest } from '../../../lib/filemanager.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
@@ -30,11 +29,13 @@ async function create(token, target, config = {}) {
     const isHit = mConfig.isHit ?? hitTargets?.includes(target.document.id);
 
     // Determine pull location (best adjacent square to the token along the line to the target)
-    const location = utils.grid.getBestAdjacentLocation(token, target);
+    const location = adapter.getBestAdjacentLocation(token, target);
 
     // Determine travel distance
-    const offsetX = (location.x - target.center.x) / canvas.grid.size;
-    const offsetY = (location.y - target.center.y) / canvas.grid.size;
+    const targetCenter = adapter.getCenter(target);
+    const gridSize = adapter.getGridSize();
+    const offsetX = (location.x - targetCenter.x) / gridSize;
+    const offsetY = (location.y - targetCenter.y) / gridSize;
     const grappleEffect = isHit ? effect.hit : effect.miss;
 
     const sequence = new Sequence();

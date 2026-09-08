@@ -24,7 +24,8 @@ const DEFAULT_CONFIG_CAST = {
     }
 };
 
-async function createCast(source, config = {}) {
+async function createCast(source, config = {}, options = {}) {
+    if (options?.type == "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_CAST, config);
     const { id, size, icon, label, tag, drawIcon, drawOutline, interval, rememberControlled, sound } = mConfig;
 
@@ -39,18 +40,11 @@ async function createCast(source, config = {}) {
         rememberControlled: rememberControlled,
     };
 
-    let position;
-    if (mConfig.template) {
-        const [primary, secondary] = await templatelib.getPosition(mConfig.template);
-        position = secondary || primary;
-        if (!position) {
-            position = await Sequencer.Crosshair.show(crosshairConfig);
-            if (position.cancelled) return;
-        }
-    } else {
-        position = await Sequencer.Crosshair.show(crosshairConfig);
-        if (position.cancelled) return;
-    }
+    const [primary, secondary] = await templatelib.getPosition(mConfig.template, crosshairConfig);
+    const position = secondary ?? primary;
+    if (!position || position.cancelled) return;
+
+    const sourceWidth = adapter.getTokenDimensions(source).widthUnits;
     let sequence = new Sequence();
     applySound(sequence, sound.cast);
     sequence = sequence
@@ -63,7 +57,7 @@ async function createCast(source, config = {}) {
         .playbackRate(1)
         .duration(5100)
         .fadeOut(1000)
-        .spriteOffset({ x: -0.2, y: 0.1 + (source.document.width - 1) / 2 }, { gridUnits: true })
+        .spriteOffset({ x: -0.2, y: 0.1 + (sourceWidth - 1) / 2 }, { gridUnits: true })
         .filter('ColorMatrix', { saturate: 1, hue: 0 })
         .zIndex(3)
 
@@ -75,7 +69,7 @@ async function createCast(source, config = {}) {
         .playbackRate(1.5)
         .duration(5100)
         .scaleOut(0, 2000, { ease: 'easeOutCubic' })
-        .spriteOffset({ x: -0.1 + (source.document.width - 1) / 2 }, { gridUnits: true })
+        .spriteOffset({ x: -0.1 + (sourceWidth - 1) / 2 }, { gridUnits: true })
         .filter('ColorMatrix', { saturate: 0.5, hue: -30 })
         .zIndex(2)
 
@@ -86,7 +80,7 @@ async function createCast(source, config = {}) {
         .scale(0.1)
         .rotateTowards(position)
         .playbackRate(0.25)
-        .spriteOffset({ x: -0.4, y: 0 + (source.document.width - 1) / 2 }, { gridUnits: true })
+        .spriteOffset({ x: -0.4, y: (sourceWidth - 1) / 2 }, { gridUnits: true })
         .opacity(0.75)
         .tint('#BEE43E')
         .zIndex(2)
@@ -97,25 +91,31 @@ async function createCast(source, config = {}) {
         .scale(0.5)
         .rotateTowards(position)
         .playbackRate(1.5)
-        .spriteOffset({ x: 0.35 + (source.document.width - 1) / 2 }, { gridUnits: true })
+        .spriteOffset({ x: 0.35 + (sourceWidth - 1) / 2 }, { gridUnits: true })
         .zIndex(1);
 
     return sequence;
 }
 
-async function playCast(source, config = {}) {
-    const sequence = await createCast(source, config);
+async function playCast(source, config = {}, options = {}) {
+    if (options?.type == "aefx") return;
+    const sequence = await createCast(source, config, options);
     if (sequence) return sequence.play();
 }
 
-async function createTarget(source, config = {}) {
+async function createTarget(source, config = {}, options = {}) {
+    if (options?.type == "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_CAST, config);
     let sequence = new Sequence();
     applySound(sequence, mConfig.sound.burn);
 
-    let targets = mConfig.targets?.length ? mConfig.targets : Array.from(game.user.targets);
+    let targets = mConfig.targets?.length ? mConfig.targets : Array.from(game.user?.targets ?? []);
 
     for (let target of targets) {
+        const targetWidth = adapter.getTokenDimensions(target).widthUnits;
+        const targetName = target.name;
+        const targetScaleX = target?.document?.texture?.scaleX ?? 1;
+
         let targetSeq = new Sequence()
             .wait(2200)
 
@@ -126,7 +126,7 @@ async function createTarget(source, config = {}) {
             .fadeIn(200)
             .fadeOut(500)
             .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
-            .scaleToObject(target.document.texture.scaleX)
+            .scaleToObject(targetScaleX)
             .duration(1800)
             .opacity(0.25)
             .tint('#BEE43E')
@@ -134,7 +134,7 @@ async function createTarget(source, config = {}) {
 
             .effect()
             .file(closest('jb2a.grease.dark_grey.loop'))
-            .attachTo(target, { offset: { x: 0.25 * target.document.width, y: 0.3 * target.document.width }, gridUnits: true, bindRotation: false })
+            .attachTo(target, { offset: { x: 0.25 * targetWidth, y: 0.3 * targetWidth }, gridUnits: true, bindRotation: false })
             .randomRotation()
             .scaleToObject(0.4)
             .opacity(0.8)
@@ -146,14 +146,14 @@ async function createTarget(source, config = {}) {
             .scaleOut(0, 1500, { ease: 'easeOutCubic' })
             .mask(target)
             .zIndex(0.1)
-            .name(`${target.document.name}CausticBrew`)
+            .name(`${targetName}CausticBrew`)
             .persist()
             .private()
 
             .effect()
             .delay(100, 1000)
             .file(closest('eskie.smoke.05.purple'))
-            .attachTo(target, { offset: { x: 0.25 * target.document.width, y: 0.1 * target.document.width }, gridUnits: true, bindRotation: false })
+            .attachTo(target, { offset: { x: 0.25 * targetWidth, y: 0.1 * targetWidth }, gridUnits: true, bindRotation: false })
             .scaleToObject(0.4)
             .opacity(0.4)
             .tint('#BEE43E')
@@ -161,13 +161,13 @@ async function createTarget(source, config = {}) {
             .fadeIn(500)
             .fadeOut(500)
             .zIndex(0.2)
-            .name(`${target.document.name}CausticBrew`)
+            .name(`${targetName}CausticBrew`)
             .persist()
             .private()
 
             .effect()
             .file(closest('jb2a.grease.dark_grey.loop'))
-            .attachTo(target, { offset: { x: -0.4 * target.document.width, y: 0 * target.document.width }, gridUnits: true, bindRotation: false })
+            .attachTo(target, { offset: { x: -0.4 * targetWidth, y: 0 }, gridUnits: true, bindRotation: false })
             .randomRotation()
             .scaleToObject(0.4)
             .opacity(0.8)
@@ -179,14 +179,14 @@ async function createTarget(source, config = {}) {
             .scaleOut(0, 1500, { ease: 'easeOutCubic' })
             .mask(target)
             .zIndex(0.1)
-            .name(`${target.document.name}CausticBrew`)
+            .name(`${targetName}CausticBrew`)
             .persist()
             .private()
 
             .effect()
             .delay(100, 1000)
             .file(closest('eskie.smoke.05.purple'))
-            .attachTo(target, { offset: { x: -0.4 * target.document.width, y: -0.2 * target.document.width }, gridUnits: true, bindRotation: false })
+            .attachTo(target, { offset: { x: -0.4 * targetWidth, y: -0.2 * targetWidth }, gridUnits: true, bindRotation: false })
             .scaleToObject(0.4)
             .opacity(0.4)
             .tint('#BEE43E')
@@ -194,13 +194,13 @@ async function createTarget(source, config = {}) {
             .fadeIn(500)
             .fadeOut(500)
             .zIndex(0.2)
-            .name(`${target.document.name}CausticBrew`)
+            .name(`${targetName}CausticBrew`)
             .persist()
             .private()
 
             .effect()
             .file(closest('jb2a.grease.dark_grey.loop'))
-            .attachTo(target, { offset: { x: 0.15 * target.document.width, y: -0.5 * target.document.width }, gridUnits: true, bindRotation: false })
+            .attachTo(target, { offset: { x: 0.15 * targetWidth, y: -0.5 * targetWidth }, gridUnits: true, bindRotation: false })
             .randomRotation()
             .scaleToObject(0.4)
             .opacity(0.8)
@@ -212,14 +212,14 @@ async function createTarget(source, config = {}) {
             .scaleOut(0, 1500, { ease: 'easeOutCubic' })
             .mask(target)
             .zIndex(0.1)
-            .name(`${target.document.name}CausticBrew`)
+            .name(`${targetName}CausticBrew`)
             .persist()
             .private()
 
             .effect()
             .delay(100, 1000)
             .file(closest('eskie.smoke.05.purple'))
-            .attachTo(target, { offset: { x: 0.15 * target.document.width, y: -0.55 * target.document.width }, gridUnits: true, bindRotation: false })
+            .attachTo(target, { offset: { x: 0.15 * targetWidth, y: -0.55 * targetWidth }, gridUnits: true, bindRotation: false })
             .scaleToObject(0.3)
             .opacity(0.4)
             .tint('#BEE43E')
@@ -227,7 +227,7 @@ async function createTarget(source, config = {}) {
             .fadeIn(500)
             .fadeOut(500)
             .zIndex(0.2)
-            .name(`${target.document.name}CausticBrew`)
+            .name(`${targetName}CausticBrew`)
             .persist();
 
         sequence.addSequence(targetSeq);
@@ -236,16 +236,19 @@ async function createTarget(source, config = {}) {
     return sequence;
 }
 
-async function playTarget(source, config = {}) {
-    const sequence = await createTarget(source, config);
+async function playTarget(source, config = {}, options = {}) {
+    if (options?.type == "aefx") return;
+    const sequence = await createTarget(source, config, options);
     if (sequence) return sequence.play();
 }
 
 async function stopTarget(source, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_CAST, config);
-    let targets = mConfig.targets?.length ? mConfig.targets : Array.from(game.user.targets);
+    let targets = mConfig.targets?.length ? mConfig.targets : Array.from(game.user?.targets ?? []);
     for (let target of targets) {
-        Sequencer.EffectManager.endEffects({ name: `${target.document.name}CausticBrew`, object: target });
+        if (target) {
+            Sequencer.EffectManager.endEffects({ name: `${target.name}CausticBrew`, object: target });
+        }
     }
 }
 
@@ -261,20 +264,22 @@ export const tashasCausticBrew = {
         stop: stopTarget,
         default_config: DEFAULT_CONFIG_CAST,
     },
-    create: async function (source, config = {}) {
+    create: async function (source, config = {}, options = {}) {
+        if (options?.type == "aefx") return;
         const sequence = new Sequence();
-        const castSeq = await createCast(source, config);
+        const castSeq = await createCast(source, config, options);
         if (!castSeq) return;
         sequence.addSequence(castSeq);
 
-        const targetSeq = await createTarget(source, config);
+        const targetSeq = await createTarget(source, config, options);
         if (targetSeq) {
             sequence.addSequence(targetSeq);
         }
         return sequence;
     },
-    play: async function (source, config = {}) {
-        const sequence = await this.create(source, config);
+    play: async function (source, config = {}, options = {}) {
+        if (options?.type == "aefx") return;
+        const sequence = await this.create(source, config, options);
         if (sequence) return sequence.play();
     },
     stop: stopTarget,

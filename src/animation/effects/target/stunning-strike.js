@@ -27,10 +27,13 @@ async function createStunningStrike(token, target, config = {}) {
     const sequence = new Sequence();
     applySound(sequence, sound);
 
+    const tokenCenter = adapter.getCenter(token);
+    const targetCenter = adapter.getCenter(target);
     const middle = {
-        x: (target.center.x - token.center.x) * 0.25,
-        y: (target.center.y - token.center.y) * 0.25,
+        x: (targetCenter.x - tokenCenter.x) * 0.25,
+        y: (targetCenter.y - tokenCenter.y) * 0.25,
     };
+    const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);
 
     sequence
         .effect()
@@ -150,7 +153,7 @@ async function createStunningStrike(token, target, config = {}) {
         .scaleIn(0, 100, { ease: "easeOutCubic" })
         .scaleToObject(1)
         .opacity(1)
-        .attachTo(target, { offset: { y: -0.5 * target.document.width }, gridUnits: true })
+        .attachTo(target, { offset: { y: -0.5 * targetWidth }, gridUnits: true })
         .persist()
         ;
 
@@ -178,7 +181,7 @@ async function playStunningStrike(token, target, config = {}) {
  */
 function stopStunningStrike(target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, sound } = mConfig;
+    const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `StunningStrike - DizzyStars - ${id} - ${target.uuid}` });
 }
 

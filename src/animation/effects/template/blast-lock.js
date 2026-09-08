@@ -6,13 +6,12 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
+import { adapter } from '../../../adapters/index.js';
 import { socket } from '../../../adapters/modules/socketlib/socketlib-module-adapter.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
-
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'blastLock',
     radius: 3, // in grid units
@@ -32,20 +31,23 @@ const DEFAULT_CONFIG = {
 /**
  * Finds the first locked door within a given radius of a position.
  * @param {object} position - The position to search from, with x and y coordinates.
- * @param {number} aoeDistance - The search radius in grid units.
+ * @param {number} radius - The search radius in grid units.
  * @returns {Wall} The found Wall object, or undefined.
  */
 function findLockedDoor(position, radius) {
-    const radiusPx = (radius / canvas.scene.grid.distance) * canvas.grid.size;
+    const { size: gridSize, distance: gridDist } = adapter.getSceneDimensions(canvas?.scene);
+    const radiusPx = (radius / gridDist) * gridSize;
 
     // Look for the first locked door within radius
-    const lockedDoor = canvas.walls.placeables.find(wall => {
-        const isDoor = wall.document.door > 0;
-        const isLocked = wall.document.ds > 0;
+    const walls = canvas?.walls?.placeables ?? [];
+    const lockedDoor = walls.find(wall => {
+        const isDoor = (wall?.document?.door ?? 0) > 0;
+        const isLocked = (wall?.document?.ds ?? 0) > 0;
 
         if (!isDoor || !isLocked) return false;
 
-        const dist = Math.hypot(wall.center.x - position.x, wall.center.y - position.y);
+        const wallCenter = adapter.getCenter(wall);
+        const dist = Math.hypot(wallCenter.x - position.x, wallCenter.y - position.y);
         return dist <= radiusPx;
     });
 
@@ -59,25 +61,27 @@ function findLockedDoor(position, radius) {
  * @param {object} [config={}] Configuration for the effect.
  * @returns {Promise<Sequence|null>} A promise that resolves with the Sequence object, or null if the creation fails.
  */
-async function create(token, config = {}) {
+async function create(token, config = {}, options = {}) {
+    if (options?.type == "aefx") return null;
     config = settingsOverride(config);
     const { id, template, crosshair, radius, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Define Safe Elevation (Token height + 10)
-    const safeElevation = (token.document.elevation || 0) + 10;
+    const safeElevation = (token?.document?.elevation ?? 0) + 10;
 
     // 1. Select location with Crosshair
     let [position, _] = await templatelib.getPosition(template, crosshair);
-    if (!position || position.cancelled ) { return null; }
+    if (!position || position.cancelled) { return null; }
 
     // 2. Door Detection Logic
     const lockedDoor = findLockedDoor(position, radius);
-    eskie.lockedDoor = lockedDoor;
-    if (lockedDoor) { position = { x: lockedDoor.center.x, y: lockedDoor.center.y }; }
+    if (lockedDoor) {
+        position = adapter.getCenter(lockedDoor);
+    }
 
-    let effectSize = 0.25;
-    const width = lockedDoor?.hitArea ? lockedDoor?.hitArea.width : canvas.grid.size;
-    effectSize = width / canvas.grid.size;
+    const gridSize = adapter.getGridSize();
+    const width = lockedDoor?.hitArea ? lockedDoor.hitArea.width : gridSize;
+    const effectSize = width / gridSize;
 
     // 4. Animation Sequence (Only runs after damage confirmation)
     const seq = new Sequence()
@@ -116,7 +120,7 @@ async function create(token, config = {}) {
         .file(closest("jb2a.muzzle_flash.single.01.yellow"))
         .atLocation(token)
         .rotateTowards(position)
-        .scaleToObject(2.25 * token.document.width)
+        .scaleToObject(2.25 * adapter.getTokenDimensions(token).widthUnits)
         .elevation(safeElevation)
         .zIndex(12)
 
@@ -163,17 +167,22 @@ async function create(token, config = {}) {
  * @param {object} [config={}] Configuration for the effect.
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
-async function play(token, config = {}) {
-    const sequence = await create(token, config);
+async function play(token, config = {}, options = {}) {
+    if (options?.type == "aefx") return;
+    const sequence = await create(token, config, options);
     if (sequence) {
         await sequence.play();
     }
 }
 
+function stop(token, { id = DEFAULT_CONFIG.id } = {}) {
+    // Instantaneous effect
+}
 
 export const blastLock = {
     create,
     play,
+    stop,
     default_config: DEFAULT_CONFIG,
 };
 

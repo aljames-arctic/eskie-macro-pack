@@ -29,11 +29,11 @@ const DEFAULT_CONFIG = {
 
 /* Works for tokens and tiles */
 async function createMaskTiles(object, config = {}) {
-    const widthAdjustment = adapter.isDocumentOfType(object, 'Token') ? canvas.grid.size : 1;
+    const { widthPx, heightPx } = adapter.getTokenDimensions(object);
 
     const { revealOverlay, rotation } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const revealOverlayPath = absolutePath(revealOverlay);
-    const scaleXY = object.document.texture.scaleX;
+    const scaleXY = object.document.texture.scaleX ?? 1;
     
     const revealOffset = adapter.getTileOffset(object, 'reveal');
     const revealMaskUpdatesBase = {
@@ -47,8 +47,8 @@ async function createMaskTiles(object, config = {}) {
             loop: false,
             volume: 0
         },
-        "width": (widthAdjustment * object.document.width) * scaleXY,
-        "height": (widthAdjustment * object.document.height) * scaleXY,
+        "width": widthPx * scaleXY,
+        "height": heightPx * scaleXY,
         "rotation": rotation,
     };
 
@@ -60,8 +60,8 @@ async function createMaskTiles(object, config = {}) {
         "x": shapeOffset.x,
         "y": shapeOffset.y,
         "rotation": object.document.rotation,
-        "width": widthAdjustment * object.document.width,
-        "height": widthAdjustment * object.document.height,
+        "width": widthPx,
+        "height": heightPx,
     };
 
     const revealMaskUpdates = adapter.deepClone(revealMaskUpdatesBase);
@@ -89,7 +89,7 @@ async function createMaskTiles(object, config = {}) {
  */
 async function createLocal(object, tileIds, animationId, config = {}) {
     if (!object) {
-        ui.notifications?.warn("Eskie Macros | No token or tile provided or selected.");
+        ui.notifications.warn("Eskie Macros | No token or tile provided or selected.");
         return log.warn("tokenMaskEffect.createLocal: No object provided. Effect aborted.");
     }
     if (!tileIds || tileIds.length === 0) {
@@ -102,7 +102,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
     const isToken = adapter.isDocumentOfType(object, 'Token');
     const isTile = adapter.isDocumentOfType(object, 'Tile');
     if (!isToken && !isTile) {
-        ui.notifications?.warn("Eskie Macros | Provided object is not a Token or a Tile.");
+        ui.notifications.warn("Eskie Macros | Provided object is not a Token or a Tile.");
         return log.warn("tokenMaskEffect.createLocal: Invalid object type. Effect aborted.");
     }
 
@@ -159,13 +159,15 @@ async function createLocal(object, tileIds, animationId, config = {}) {
     let seq = new Sequence();
 
     // Background mask
-    const sceneBackground = adapter.getSceneBackground(canvas.scene);
+    const sceneBackground = adapter.getSceneBackground(canvas?.scene);
     if (sceneBackground.src) {
+        const sceneCenter = adapter.getSceneCenter(canvas?.scene);
+        const sceneDims = adapter.getSceneDimensions(canvas?.scene);
         seq = seq.effect()
             .name(label)
             .file(sceneBackground.src)
-            .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
-            .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
+            .atLocation(sceneCenter)
+            .size({ width: sceneDims.sceneRect.width / sceneDims.size, height: sceneDims.sceneRect.height / sceneDims.size }, { gridUnits: true })
             .persist()
             .belowTokens()
             .mask(sceneRevealMask)
@@ -256,14 +258,14 @@ async function createLocal(object, tileIds, animationId, config = {}) {
  */
 async function create(object, config = {}) {
     if (!object) {
-        ui.notifications?.warn("Eskie Macros | No token or tile provided or selected.");
+        ui.notifications.warn("Eskie Macros | No token or tile provided or selected.");
         return log.warn("tokenMaskEffect: No object provided. Effect aborted.");
     }
 
     const isToken = adapter.isDocumentOfType(object, 'Token');
     const isTile = adapter.isDocumentOfType(object, 'Tile');
     if (!isToken && !isTile) {
-        ui.notifications?.warn("Eskie Macros | Provided object is not a Token or a Tile.");
+        ui.notifications.warn("Eskie Macros | Provided object is not a Token or a Tile.");
         return log.warn("tokenMaskEffect: Invalid object type. Effect aborted.");
     }
 

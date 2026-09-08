@@ -17,29 +17,6 @@ const DEFAULT_CONFIG = {
     }
 };
 
-function getNearestSquareCenter(token, target) {
-    const gs = canvas.grid.size;
-    const srcCenter = token.center;
-    const w = target.document.width;
-    const h = target.document.height;
-    let bestPoint = null;
-    let bestDist2 = Infinity;
-    for (let gx = 0; gx < w; gx++) {
-        for (let gy = 0; gy < h; gy++) {
-            const cx = target.document.x + (gx + 0.5) * gs;
-            const cy = target.document.y + (gy + 0.5) * gs;
-            const dx = cx - srcCenter.x;
-            const dy = cy - srcCenter.y;
-            const d2 = dx * dx + dy * dy;
-            if (d2 < bestDist2) {
-                bestDist2 = d2;
-                bestPoint = { x: cx, y: cy };
-            }
-        }
-    }
-    return bestPoint ?? target.center;
-}
-
 async function createMelee(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { darkMap, sound } = mConfig;
@@ -81,11 +58,12 @@ async function createMelee(token, target, config = {}) {
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
+        const dims = adapter.getSceneDimensions(canvas?.scene);
         sequence.effect()
             .file(closest(bg.src))
             .filter('ColorMatrix', { brightness: 0.5 })
-            .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
-            .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
+            .atLocation(adapter.getSceneCenter(canvas?.scene))
+            .size({ width: dims.width / dims.size, height: dims.height / dims.size }, { gridUnits: true })
             .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY })
             .duration(2500)
             .fadeIn(250)
@@ -155,14 +133,16 @@ async function createRanged(token, target, config = {}) {
 
     const sequence = new Sequence();
     applySound(sequence, sound.attack);
+    const tokenCenter = adapter.getCenter(token);
+    const targetCenter = adapter.getCenter(target);
     const distance = {
-        x: (token.center.x - target.center.x),
-        y: (token.center.y - target.center.y)
+        x: (tokenCenter.x - targetCenter.x),
+        y: (tokenCenter.y - targetCenter.y)
     };
 
     const midpoint = {
-        x: (token.center.x + target.center.x) / 2,
-        y: (token.center.y + target.center.y) / 2
+        x: (tokenCenter.x + targetCenter.x) / 2,
+        y: (tokenCenter.y + targetCenter.y) / 2
     };
 
     const randomOffset = Math.abs(distance.x) > Math.abs(distance.y)
@@ -202,11 +182,12 @@ async function createRanged(token, target, config = {}) {
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
+        const dims = adapter.getSceneDimensions(canvas?.scene);
         sequence.effect()
             .file(closest(bg.src))
             .filter('ColorMatrix', { brightness: 0.5 })
-            .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
-            .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
+            .atLocation(adapter.getSceneCenter(canvas?.scene))
+            .size({ width: dims.width / dims.size, height: dims.height / dims.size }, { gridUnits: true })
             .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY })
             .duration(2000)
             .fadeIn(250)
@@ -256,18 +237,19 @@ async function createTwilightMelee(token, target, config = {}) {
     const effectSize = 2 + (0.25 * weightIndex);
     const effectOffset = -0.75 - (0.25 * weightIndex);
 
-    const targetSquare = getNearestSquareCenter(token, target);
+    const targetSquare = adapter.getNearestSquareCenter(token, target) ?? adapter.getCenter(target);
 
     const sequence = new Sequence();
     applySound(sequence, sound.attack);
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
+        const dims = adapter.getSceneDimensions(canvas?.scene);
         sequence.effect()
             .name(`Casting ${target.document.name}`)
             .file(closest(bg.src))
-            .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
-            .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
+            .atLocation(adapter.getSceneCenter(canvas?.scene))
+            .size({ width: dims.width / dims.size, height: dims.height / dims.size }, { gridUnits: true })
             .fadeIn(750)
             .fadeOut(750)
             .duration(3000)
@@ -362,11 +344,12 @@ async function createTwilightRanged(token, target, config = {}) {
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
+        const dims = adapter.getSceneDimensions(canvas?.scene);
         sequence.effect()
             .name(`Casting ${target.document.name}`)
             .file(closest(bg.src))
-            .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
-            .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
+            .atLocation(adapter.getSceneCenter(canvas?.scene))
+            .size({ width: dims.width / dims.size, height: dims.height / dims.size }, { gridUnits: true })
             .fadeIn(750)
             .fadeOut(750)
             .duration(3000)

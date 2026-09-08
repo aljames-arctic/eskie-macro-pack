@@ -55,13 +55,15 @@ async function create(source, target, config = {}) {
 
     const sequence = new Sequence();
 
-    // Vector calculations for knockback
-    const dx = target.center.x - source.center.x;
-    const dy = target.center.y - source.center.y;
+    const sourceCenter = adapter.getCenter(source);
+    const targetCenter = adapter.getCenter(target);
+    const dx = targetCenter.x - sourceCenter.x;
+    const dy = targetCenter.y - sourceCenter.y;
     const dist = Math.hypot(dx, dy);
 
     if (dist === 0) return sequence;
 
+    const gridSize = adapter.getGridSize();
     const nx = dx / dist;
     const ny = dy / dist;
     const nxt = -nx;
@@ -160,16 +162,16 @@ async function create(source, target, config = {}) {
     sequence.effect()
         .delay(100)
         .copySprite(source)
-        .spriteRotation(-source.document.rotation)
+        .spriteRotation(-adapter.getTokenRotation(source))
         .animateProperty('spriteContainer', 'position.x', {
             from: 0,
-            to: nxt * canvas.grid.size * 0.2,
+            to: nxt * gridSize * 0.2,
             duration: knockbackDuration,
             ease: 'easeOutExpo'
         })
         .animateProperty('spriteContainer', 'position.y', {
             from: 0,
-            to: nyt * canvas.grid.size * 0.2,
+            to: nyt * gridSize * 0.2,
             duration: knockbackDuration,
             ease: 'easeOutExpo'
         });
@@ -177,15 +179,15 @@ async function create(source, target, config = {}) {
     sequence.effect()
         .delay(100)
         .copySprite(source)
-        .spriteRotation(-source.document.rotation)
+        .spriteRotation(-adapter.getTokenRotation(source))
         .animateProperty('spriteContainer', 'position.x', {
-            from: nxt * canvas.grid.size * 0.2,
+            from: nxt * gridSize * 0.2,
             to: 0,
             duration: returnDuration,
             ease: 'easeInQuart'
         })
         .animateProperty('spriteContainer', 'position.y', {
-            from: nyt * canvas.grid.size * 0.2,
+            from: nyt * gridSize * 0.2,
             to: 0,
             duration: returnDuration,
             ease: 'easeInQuart'

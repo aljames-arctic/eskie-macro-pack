@@ -45,7 +45,7 @@ async function create(token, config = {}) {
     // TODO(bakanabaka): Utilizes old [] -> {}
     let { id, duration, effect, facing , sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    const tokenWidth = token.document.width;
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
     const mirrorFace = facing === 'right';
     const facingFactor = mirrorFace ? -1 : 1;
 
@@ -72,14 +72,14 @@ async function create(token, config = {}) {
         .effect()
         .name(id)
         .copySprite(token)
-        .spriteRotation(-token.document.rotation)
+        .spriteRotation(-adapter.getTokenRotation(token))
         .scaleToObject(1, { considerTokenScale: true })
         .atLocation(token)
         .attachTo(token, { bindAlpha: false })
         .loopProperty('spriteContainer', 'position.y', { from: 0, to: -0.01, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
         .loopProperty('sprite', "width", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
         .loopProperty('sprite', "height", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
-        .mirrorY(token.document.mirrorX)
+        .mirrorY(token.document.mirrorX ?? false)
         .waitUntilFinished(-200)
     laughEffect = (duration > 0) ? laughEffect.duration(duration) : laughEffect.persist();
 

@@ -42,7 +42,7 @@ export const rageTotem = {
 
 function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, color, spirit, effect } = mConfig;
+    const { id, color, spirit, effect, sound } = mConfig;
     const label = `${id} - ${token.id}`;
 
     let seq = new Sequence();

@@ -31,16 +31,16 @@ async function create(object, config = {}) {
     let sequence = new Sequence();
     applySound(sequence, sound);
 
-    const widthAdjustment = adapter.isDocumentOfType(object, 'Token') ? canvas.grid.size : 1;
+    const { widthPx, heightPx, widthUnits, heightUnits } = adapter.getTokenDimensions(object);
     const [visibleTile] = await socket.tile.create({
         "texture.src": null,
-        "alpha": 1,                // Alphe must be 1 or else the animation will not render
+        "alpha": 1,                // Alpha must be 1 or else the animation will not render
         "hidden": false,
         "x": object.x,
         "y": object.y,
-        "width": object.document.width * widthAdjustment,
-        "height": object.document.height * widthAdjustment,
-        "rotation": object.document.rotation,
+        "width": widthPx,
+        "height": heightPx,
+        "rotation": adapter.getTokenRotation(object),
         "overhead": true,
     });
 
@@ -81,8 +81,8 @@ async function create(object, config = {}) {
                 .delay(950)
                 .atLocation(visibleTile)        // 🔥 important
                 .size({
-                    width: object.document.width * 2.5,
-                    height: object.document.height * 2.5
+                    width: widthUnits * 2.5,
+                    height: heightUnits * 2.5
                 }, { gridUnits: true })
                 .playbackRate(0.5)
                 .filter("Glow", {
@@ -98,8 +98,8 @@ async function create(object, config = {}) {
                 .effect()
                 .file(closest("jb2a.markers.circle_of_stars.blue"))
                 .size({
-                    width: object.document.width * 1.8,
-                    height: object.document.height * 1.8
+                    width: widthUnits * 1.8,
+                    height: heightUnits * 1.8
                 }, { gridUnits: true })
                 .delay(1050)
                 .fadeIn(600)

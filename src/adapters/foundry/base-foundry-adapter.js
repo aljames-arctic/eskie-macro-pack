@@ -468,10 +468,7 @@ export class BaseFoundryAdapter {
     isUserInCharge(token, user = game.user) {
         if (!token || !user) return false;
 
-        const tokenDoc = token.document ?? token;
-        const actor = token.actor ?? tokenDoc?.actor ?? null;
-
-        const isOwner = (u) => this.isUserDocumentOwner(u, actor) || this.isUserDocumentOwner(u, tokenDoc);
+        const isOwner = (u) => this.isUserDocumentOwner(u, token.actor) || this.isUserDocumentOwner(u, token.document);
 
         if (!isOwner(user)) {
             return false;
@@ -579,12 +576,11 @@ export class BaseFoundryAdapter {
 
         let primary = { x: position.x ?? 0, y: position.y ?? 0 };
         const token = config.token ?? config.sourceToken;
-        const tokenCenter = token?.center ?? (token?.x !== undefined ? { x: token.x, y: token.y } : null);
+        const tokenCenter = token ? this.getCenter(token) : null;
 
-        const gridSize = canvas?.grid?.size ?? canvas?.dimensions?.size ?? 100;
-        const gridDistance = canvas?.grid?.distance ?? canvas?.scene?.grid?.distance ?? canvas?.dimensions?.distance ?? 5;
+        const { size: gridSize, distance: gridDistance } = this.getSceneDimensions();
 
-        const dir = position.direction ?? config.direction ?? token?.document?.rotation ?? 0;
+        const dir = position.direction ?? config.direction ?? (token ? this.getTokenRotation(token) : 0);
         const isRayOrCone = position.t === 'ray' || position.t === 'cone' || position.type === 'ray' || position.type === 'cone' || config.type === 'ray' || config.type === 'cone';
         const isAttached = Boolean(position.sticky || config.sticky || config.stickToToken || isRayOrCone);
 
@@ -645,6 +641,58 @@ export class BaseFoundryAdapter {
      */
     getSceneBackground(scene = canvas?.scene, level = null) {
         throw new Error('BaseFoundryAdapter.getSceneBackground must be implemented by version subclass');
+    }
+
+    /**
+     * Retrieves normalized scene dimension metrics with safe canvas and document fallbacks.
+     * @param {Scene|null} [scene=canvas?.scene] Target scene
+     * @returns {{ width: number, height: number, size: number, distance: number, maxRayDistance: number, sceneRect: { x: number, y: number, width: number, height: number } }}
+     */
+    getSceneDimensions(scene = canvas?.scene) {
+        const isCurrentScene = !scene || scene === canvas?.scene;
+        const dims = isCurrentScene ? canvas?.dimensions : null;
+        const sceneDoc = scene?.document ?? scene;
+        const width = dims?.width ?? sceneDoc?.width ?? 4000;
+        const height = dims?.height ?? sceneDoc?.height ?? 4000;
+        const size = sceneDoc?.grid?.size ?? sceneDoc?.gridSize ?? dims?.size ?? canvas?.grid?.size ?? 100;
+        const distance = sceneDoc?.grid?.distance ?? sceneDoc?.gridDistance ?? dims?.distance ?? canvas?.grid?.distance ?? 5;
+        const maxRayDistance = dims?.maxRayDistance ?? Math.hypot(width, height);
+        const sceneRect = dims?.sceneRect ?? {
+            x: dims?.sceneX ?? 0,
+            y: dims?.sceneY ?? 0,
+            width: dims?.sceneWidth ?? width,
+            height: dims?.sceneHeight ?? height
+        };
+        return {
+            width,
+            height,
+            size,
+            distance,
+            maxRayDistance,
+            sceneRect
+        };
+    }
+
+    /**
+     * Retrieves the grid pixel size of the scene.
+     * @param {Scene|null} [scene=canvas?.scene] Target scene
+     * @returns {number} Grid size in pixels
+     */
+    getGridSize(scene = canvas?.scene) {
+        return this.getSceneDimensions(scene).size;
+    }
+
+    /**
+     * Computes the center coordinates of the scene with safe canvas and document fallbacks.
+     * @param {Scene|null} [scene=canvas?.scene] Target scene
+     * @returns {{ x: number, y: number }} Center coordinates
+     */
+    getSceneCenter(scene = canvas?.scene) {
+        const dims = this.getSceneDimensions(scene);
+        return {
+            x: dims.width / 2,
+            y: dims.height / 2
+        };
     }
 
     /* -------------------------------------------- */
@@ -733,23 +781,80 @@ export class BaseFoundryAdapter {
     /* -------------------------------------------- */
 
     /**
+     * Resolves the { x, y } center coordinates of a placeable, document, or coordinate object.
+     * @param {PlaceableObject|Document|{x: number, y: number}|null} target Target placeable, document, or coordinate point
+     * @returns {{ x: number, y: number }} Center coordinates
+     */
+    getCenter(target) {
+        if (!target) return null;
+        if (target.center && typeof target.center.x === 'number' && typeof target.center.y === 'number') {
+            return { x: target.center.x, y: target.center.y };
+        }
+        if (target.object?.center && typeof target.object.center.x === 'number' && typeof target.object.center.y === 'number') {
+            return { x: target.object.center.x, y: target.object.center.y };
+        }
+        if (typeof target.x === 'number' && typeof target.y === 'number' && !target.document && !target.object && target.width === undefined && target.height === undefined) {
+            return { x: target.x, y: target.y };
+        }
+        const doc = target.document ? target.document : target;
+        const gridSize = this.getGridSize();
+        const width = (doc.width ?? 1) * gridSize;
+        const height = (doc.height ?? 1) * gridSize;
+        return {
+            x: doc.x + width / 2,
+            y: doc.y + height / 2
+        };
+    }
+
+    /**
+     * Extracts normalized pixel dimensions, grid unit spans, and pixel radius for a token placeable.
+     * @param {Token} token Target token placeable
+     * @returns {{ widthPx: number, heightPx: number, widthUnits: number, heightUnits: number, radiusPx: number }}
+     */
+    getTokenDimensions(token) {
+        if (!token) return { widthPx: 0, heightPx: 0, widthUnits: 1, heightUnits: 1, radiusPx: 0 };
+        const gridSize = this.getGridSize();
+        const widthUnits = token.document.width ?? 1;
+        const heightUnits = token.document.height ?? 1;
+        const widthPx = token.w ?? (widthUnits * gridSize);
+        const heightPx = token.h ?? (heightUnits * gridSize);
+        const radiusPx = Math.max(widthPx, heightPx) / 2;
+        return {
+            widthPx,
+            heightPx,
+            widthUnits,
+            heightUnits,
+            radiusPx
+        };
+    }
+
+    /**
+     * Extracts the authoritative rotation in degrees for a token placeable.
+     * @param {Token} token Target token placeable
+     * @returns {number} Rotation angle in degrees (0 to 360)
+     */
+    getTokenRotation(token) {
+        if (!token) return 0;
+        return token.document.rotation ?? 0;
+    }
+
+    /**
      * Calculates the 3D distance between two tokens in scene units (e.g. feet/meters), rounded up.
-     * @param {Token} t1 The source token
-     * @param {Token} t2 The target token
+     * @param {Token} t1 The source token placeable
+     * @param {Token} t2 The target token placeable
      * @returns {number} Distance in scene units, rounded up
      */
     getDistance(t1, t2) {
         if (!t1 || !t2) return 0;
-        const p1 = t1.center ?? { x: t1.x ?? 0, y: t1.y ?? 0 };
-        const p2 = t2.center ?? { x: t2.x ?? 0, y: t2.y ?? 0 };
+        const p1 = this.getCenter(t1);
+        const p2 = this.getCenter(t2);
         const dist2DPx = Math.hypot(p1.x - p2.x, p1.y - p2.y);
 
-        const gridSize = canvas?.grid?.size ?? 100;
-        const gridDistance = canvas?.scene?.grid?.distance ?? canvas?.grid?.distance ?? 5;
+        const { size: gridSize, distance: gridDistance } = this.getSceneDimensions();
         const dist2DUnits = (dist2DPx / gridSize) * gridDistance;
 
-        const el1 = t1.document?.elevation ?? 0;
-        const el2 = t2.document?.elevation ?? 0;
+        const el1 = t1.document.elevation ?? 0;
+        const el2 = t2.document.elevation ?? 0;
         const elDiff = el1 - el2;
 
         const dist3DUnits = Math.hypot(dist2DUnits, elDiff);
@@ -757,26 +862,53 @@ export class BaseFoundryAdapter {
     }
 
     /**
+     * Calculates an array of linearly interpolated { x, y } coordinates between two points.
+     * @param {{ x: number, y: number }} point1 Starting point
+     * @param {{ x: number, y: number }} point2 Ending point
+     * @param {number} [stepDistancePx=100] Distance in pixels between each interpolated point
+     * @returns {Array<{ x: number, y: number }>} Array of interpolated points including start and end
+     */
+    getInterpolatedPoints(point1, point2, stepDistancePx = 100) {
+        const p1 = this.getCenter(point1);
+        const p2 = this.getCenter(point2);
+        if (!p1 || !p2) return p1 ? [p1] : (p2 ? [p2] : []);
+        const totalDistance = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+        if (totalDistance === 0 || stepDistancePx <= 0) return [p1];
+
+        const steps = Math.max(1, Math.round(totalDistance / stepDistancePx));
+        const points = [];
+        for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            points.push({
+                x: p1.x + (p2.x - p1.x) * t,
+                y: p1.y + (p2.y - p1.y) * t
+            });
+        }
+        return points;
+    }
+
+    /**
      * Finds the center coordinate of the grid square on a target token nearest to a source token.
-     * @param {Token} token The source token
-     * @param {Token} target The target token
+     * @param {Token} token The source token placeable
+     * @param {Token} target The target token placeable
      * @returns {{x: number, y: number}|null} Coordinate of nearest square center
      */
     getNearestSquareCenter(token, target) {
         if (!token || !target) return null;
-        const gs = canvas?.grid?.size ?? 100;
-        const srcCenter = token.center ?? { x: token.x ?? 0, y: token.y ?? 0 };
+        const gs = this.getGridSize();
+        const srcCenter = this.getCenter(token);
+        if (!srcCenter) return null;
 
-        const w = target.document?.width ?? target.width ?? 1;
-        const h = target.document?.height ?? target.height ?? 1;
+        const w = target.document.width ?? 1;
+        const h = target.document.height ?? 1;
 
         let bestPoint = null;
         let bestDist2 = Infinity;
 
         for (let gx = 0; gx < w; gx++) {
             for (let gy = 0; gy < h; gy++) {
-                const cx = (target.x ?? 0) + (gx + 0.5) * gs;
-                const cy = (target.y ?? 0) + (gy + 0.5) * gs;
+                const cx = target.x + (gx + 0.5) * gs;
+                const cy = target.y + (gy + 0.5) * gs;
 
                 const dx = cx - srcCenter.x;
                 const dy = cy - srcCenter.y;
@@ -793,6 +925,77 @@ export class BaseFoundryAdapter {
     }
 
     /**
+     * Finds the center point of the adjacent grid cell with the minimal perpendicular distance
+     * to the line between two tokens.
+     * @param {Token} token The reference token placeable
+     * @param {Token} target The target token placeable
+     * @returns {{ x: number, y: number }} The center point { x, y } of the best adjacent grid cell
+     */
+    getBestAdjacentLocation(token, target) {
+        const p1 = this.getCenter(token);
+        const p2 = this.getCenter(target);
+        if (!p1 || !p2) return null;
+
+        // Line: ax + by + c = 0 where (x1, y1) is p1 and (x2, y2) is p2
+        const a = p1.y - p2.y;
+        const b = p2.x - p1.x;
+        const c = p1.x * p2.y - p2.x * p1.y;
+        const denominator = Math.hypot(a, b);
+
+        const getDistance = (p) => {
+            if (denominator === 0) return 0;
+            return Math.abs(a * p.x + b * p.y + c) / denominator;
+        };
+
+        const gridSize = this.getGridSize();
+        const tDoc = token.document;
+        const tWidth = tDoc.width ?? 1;
+        const tHeight = tDoc.height ?? 1;
+        const tX = tDoc.x;
+        const tY = tDoc.y;
+
+        const getCenterPoint = (pt) => {
+            if (canvas?.grid?.getCenterPoint) return canvas.grid.getCenterPoint(pt);
+            return { x: pt.x + gridSize / 2, y: pt.y + gridSize / 2 };
+        };
+
+        const candidates = [];
+        // Iterate around the token's footprint to find all adjacent grid centers
+        for (let i = -1; i <= tWidth; i++) {
+            for (let j = -1; j <= tHeight; j++) {
+                // Skip the cells actually occupied by the token
+                if (i >= 0 && i < tWidth && j >= 0 && j < tHeight) continue;
+
+                const cellX = tX + (i * gridSize);
+                const cellY = tY + (j * gridSize);
+                candidates.push(getCenterPoint({ x: cellX, y: cellY }));
+            }
+        }
+
+        if (candidates.length === 0) return p1;
+
+        let location = candidates[0];
+        let minDistance = Infinity;
+
+        for (const cand of candidates) {
+            const d = getDistance(cand);
+            if (d < minDistance) {
+                minDistance = d;
+                location = cand;
+            } else if (Math.abs(d - minDistance) < 0.1) {
+                // Tie-breaker: choose the one closer to the target's current position
+                const distToTargetCurr = Math.hypot(cand.x - p2.x, cand.y - p2.y);
+                const distToTargetBest = Math.hypot(location.x - p2.x, location.y - p2.y);
+                if (distToTargetCurr < distToTargetBest) {
+                    location = cand;
+                }
+            }
+        }
+
+        return location;
+    }
+
+    /**
      * Returns an array of users who are owners of a given token.
      * Evaluates document ownership permissions via user permission tiers and ownership levels.
      * @param {Token} token Target token placeable
@@ -805,10 +1008,8 @@ export class BaseFoundryAdapter {
         if (!token) return [];
         const applyPC = config.applyPC !== false;
         const applyGM = config.applyGM !== false;
-        const doc = token.document ?? token;
-        const actor = token.actor ?? doc?.actor ?? null;
 
-        const isOwner = (u) => this.isUserDocumentOwner(u, actor) || this.isUserDocumentOwner(u, doc);
+        const isOwner = (u) => this.isUserDocumentOwner(u, token.actor) || this.isUserDocumentOwner(u, token.document);
 
         const usersCollection = game?.users;
         const allUsers = usersCollection?.contents
@@ -828,17 +1029,17 @@ export class BaseFoundryAdapter {
     /**
      * Calculate bounding box and center for a Tile.
      * In V12/V13 baseline, tile origin (x, y) is top-left (0, 0).
-     * @param {Tile|TileDocument} tile Target tile placeable or document
-     * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number }}
+     * @param {Tile} tile Target tile placeable
+     * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number, anchor: {x: number, y: number} }}
      */
     getTileBounds(tile) {
         if (!tile) return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0, y: 0 } };
-        const doc = tile.document ?? tile;
-        const x = doc.x ?? tile.x ?? 0;
-        const y = doc.y ?? tile.y ?? 0;
-        const width = doc.width ?? tile.width ?? 0;
-        const height = doc.height ?? tile.height ?? 0;
-        const center = tile.center ?? doc.center ?? { x: x + width / 2, y: y + height / 2 };
+        const doc = tile.document;
+        const x = doc.x;
+        const y = doc.y;
+        const width = doc.width;
+        const height = doc.height;
+        const center = tile.center ?? { x: x + width / 2, y: y + height / 2 };
         return {
             minX: x,
             maxX: x + width,
@@ -853,25 +1054,25 @@ export class BaseFoundryAdapter {
 
     /**
      * Retrieve all tokens overlapping or contained within a tile.
-     * @param {Tile|TileDocument} tile Target Tile placeable or Tile document
+     * @param {Tile} tile Target Tile placeable
      * @returns {Token[]} Array of matching Token placeables
      */
     getTokensInTile(tile) {
         if (!tile) return [];
         const { minX: tileMinX, maxX: tileMaxX, minY: tileMinY, maxY: tileMaxY } = this.getTileBounds(tile);
 
-        const gridSize = canvas?.grid?.size ?? canvas?.dimensions?.size ?? 100;
+        const gridSize = this.getGridSize();
         const tokens = canvas?.tokens?.placeables ?? [];
 
         return tokens.filter(token => {
-            const tDoc = token.document ?? token;
+            const tDoc = token.document;
             const tWidth = (tDoc.width ?? 1) * gridSize;
             const tHeight = (tDoc.height ?? 1) * gridSize;
 
             // Check authoritative document bounds (where the token is logically placed in the database)
-            const docMinX = tDoc.x ?? token.x ?? 0;
+            const docMinX = tDoc.x;
             const docMaxX = docMinX + tWidth;
-            const docMinY = tDoc.y ?? token.y ?? 0;
+            const docMinY = tDoc.y;
             const docMaxY = docMinY + tHeight;
             const docOverlaps = !(docMaxX <= tileMinX || docMinX >= tileMaxX || docMaxY <= tileMinY || docMinY >= tileMaxY);
 

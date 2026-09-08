@@ -29,14 +29,14 @@ if (activeEffects.length > 0) {
 const target = game.user.targets.first();
 if (!target) return ui.notifications.warn("Please target an enemy to tiger pounce!");
 
-const tokenWidth = token.document?.width ?? 1;
+const tokenWidth = token.document.width;
 const dx = target.center.x - token.center.x;
 const dy = target.center.y - token.center.y;
 const dist = Math.hypot(dx, dy) || 1;
 
 const sizeAdjust = (tokenWidth - 1) / 2;
 const totalSquares = 1 + sizeAdjust;
-const totalPixels = totalSquares * (canvas.grid.size ?? 100);
+const totalPixels = totalSquares * canvas.grid.size;
 
 const ux = dx / dist;
 const uy = dy / dist;
@@ -46,11 +46,11 @@ const rawCenter = {
     y: target.center.y - uy * totalPixels
 };
 
-const tokenSpan = (tokenWidth * (canvas.grid.size ?? 100)) / 2;
+const tokenSpan = (tokenWidth * canvas.grid.size) / 2;
 const rawPosition = { x: rawCenter.x - tokenSpan, y: rawCenter.y - tokenSpan };
 const gridSnap = canvas.grid.getSnappedPosition ? canvas.grid.getSnappedPosition(rawPosition.x, rawPosition.y, 1) : rawPosition;
 const location = { x: gridSnap.x + tokenSpan, y: gridSnap.y + tokenSpan };
-const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
+const tokenRotation = token.document.rotation;
 
 let seq = new Sequence();
 

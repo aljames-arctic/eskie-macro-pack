@@ -54,8 +54,9 @@ async function create(token, text, config = {}) {
     duration = Math.max(duration, delay * text.length);
 
     // Start of text offset (bottom left corner)
+    const { widthUnits } = adapter.getTokenDimensions(token);
     const x = -((text.length - 1) * kerning) / 2;
-    const y = -(token.document.width + verticalOffset);
+    const y = -(widthUnits + verticalOffset);
 
     let sequence = new Sequence();
     for (let i = 0; i < text.length; i++) {
@@ -167,7 +168,7 @@ function createTyping(sequence, text, config = {}) {
                 .duration(duration - (charGlobalIndex * letterDelay));
 
             if (!screenSpace) {
-                effect.atLocation(mConfig.atLocation || canvas.stage);
+                effect.atLocation(mConfig.atLocation ?? canvas.stage);
             }
 
             charGlobalIndex++;

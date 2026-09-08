@@ -26,7 +26,7 @@ const crosshairConfig = {
 const targetCoord = await Sequencer.Crosshair.show(crosshairConfig);
 if (!targetCoord || targetCoord.cancelled) return;
 
-const gridSize = canvas.grid.size ?? 100;
+const gridSize = canvas.grid.size;
 const pos1 = { x: token.x, y: token.y };
 const pos2 = { x: targetCoord.x - gridSize / 2, y: targetCoord.y - gridSize / 2 };
 const mirrorY = pos1.x > pos2.x;
@@ -117,11 +117,11 @@ seq.effect()
     .zIndex(1);
 
 function createDeathEffect(targetToken, delay = 2250) {
-    const gs = canvas.grid.size ?? 100;
+    const gs = canvas.grid.size;
     const cx = targetToken.center.x;
     const cy = targetToken.center.y;
-    const tRot = targetToken.document?.rotation ?? targetToken.rotation ?? 0;
-    const tName = targetToken.document?.name ?? targetToken.name ?? "Target";
+    const tRot = targetToken.document.rotation;
+    const tName = targetToken.name;
 
     const dSeq = new Sequence();
 

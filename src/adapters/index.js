@@ -227,6 +227,38 @@ export class Adapter {
         return this.foundry.getSceneBackground(scene, level);
     }
 
+    getSceneDimensions(scene = canvas?.scene) {
+        return this.foundry.getSceneDimensions(scene);
+    }
+
+    getGridSize(scene = canvas?.scene) {
+        return this.foundry.getGridSize(scene);
+    }
+
+    getSceneCenter(scene = canvas?.scene) {
+        return this.foundry.getSceneCenter(scene);
+    }
+
+    getCenter(target) {
+        return this.foundry.getCenter(target);
+    }
+
+    getTokenDimensions(token) {
+        return this.foundry.getTokenDimensions(token);
+    }
+
+    getTokenRotation(token) {
+        return this.foundry.getTokenRotation(token);
+    }
+
+    getInterpolatedPoints(point1, point2, stepDistancePx = 100) {
+        return this.foundry.getInterpolatedPoints(point1, point2, stepDistancePx);
+    }
+
+    getBestAdjacentLocation(token, target) {
+        return this.foundry.getBestAdjacentLocation(token, target);
+    }
+
     buttonDialog(buttonData, options = {}) {
         return this.foundry.buttonDialog(buttonData, options);
     }

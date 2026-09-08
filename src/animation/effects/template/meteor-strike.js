@@ -7,10 +7,10 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
+import { adapter } from '../../../adapters/index.js';
 import { positions as posUtil } from '../../utils/positions.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     showMarkers: true,
     hideFromPlayers: true,

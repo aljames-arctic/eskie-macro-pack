@@ -159,7 +159,7 @@ function create(token, targetTokens, config = {}) {
                 // Shaking copy sprite representing electrocution
                 bigSeq.effect()
                     .copySprite(childToken)
-                    .spriteRotation(-(childToken.document?.rotation ?? childToken.rotation ?? 0))
+                    .spriteRotation(-adapter.getTokenRotation(childToken))
                     .attachTo(childToken)
                     .scaleToObject(1, { considerTokenScale: true })
                     .fadeIn(250)

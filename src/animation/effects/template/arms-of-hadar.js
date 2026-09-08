@@ -5,10 +5,10 @@
 ** */
 
 import { closest } from "../../../lib/filemanager.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { adapter } from "../../../adapters/index.js";
+import { autorec } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'armsOfHadar',
     excludeSelf: true,
@@ -135,8 +135,13 @@ async function create(token, config = {}) {
 
         .thenDo(function () {
             targets.forEach(target => {
-                let newX = target.center.x - (canvas.grid.size / 2.5 * Math.sign(token.center.x - target.center.x));
-                let newY = target.center.y - (canvas.grid.size / 2.5 * Math.sign(token.center.y - target.center.y));
+                const gridSize = adapter.getGridSize();
+                const tokenPos = adapter.getCenter(token);
+                const targetPos = adapter.getCenter(target);
+                const newX = targetPos.x - (gridSize / 2.5 * Math.sign(tokenPos.x - targetPos.x));
+                const newY = targetPos.y - (gridSize / 2.5 * Math.sign(tokenPos.y - targetPos.y));
+                const targetRotation = adapter.getTokenRotation(target);
+                const targetWidth = adapter.getTokenDimensions(target).widthUnits;
 
                 new Sequence()
                     .thenDo(function () {
@@ -145,9 +150,9 @@ async function create(token, config = {}) {
 
                     .effect()
                     .copySprite(target)
-                    .spriteRotation(-target.document.rotation)
+                    .spriteRotation(-targetRotation)
                     .atLocation(target)
-                    .scaleToObject(target.document.width, { considerTokenScale: true })
+                    .scaleToObject(targetWidth, { considerTokenScale: true })
                     .moveTowards({ x: newX, y: newY }, { rotate: false, ease: "easeOutBack" })
                     .duration(750)
                     .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 175, pingPong: true, gridUnits: true })
@@ -156,16 +161,16 @@ async function create(token, config = {}) {
 
                     .effect()
                     .copySprite(target)
-                    .spriteRotation(-target.document.rotation)
+                    .spriteRotation(-targetRotation)
                     .atLocation(target)
-                    .scaleToObject(target.document.width, { considerTokenScale: true })
+                    .scaleToObject(targetWidth, { considerTokenScale: true })
                     .moveTowards({ x: newX, y: newY }, { rotate: false, ease: "easeOutBack" })
                     .duration(750)
                     .waitUntilFinished(-50)
 
                     .effect()
                     .copySprite(target)
-                    .spriteRotation(-target.document.rotation)
+                    .spriteRotation(-targetRotation)
                     .atLocation({ x: newX, y: newY })
                     .scaleToObject(1, { considerTokenScale: true })
                     .moveTowards(target, { rotate: false, ease: "easeOutBack" })

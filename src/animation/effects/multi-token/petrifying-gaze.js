@@ -54,7 +54,7 @@ async function create(token, targetTokens, config = {}) {
 
         .effect()
         .copySprite(token)
-        .spriteRotation(-token.document.rotation)
+        .spriteRotation(-adapter.getTokenRotation(token))
         .atLocation(token)
         .scaleToObject(1, { considerTokenScale: true })
         .filter("Blur", { blurX: 5, blurY: 20 })
@@ -112,7 +112,7 @@ async function create(token, targetTokens, config = {}) {
 
             .effect()
             .copySprite(target)
-            .spriteRotation(-target.document.rotation)
+            .spriteRotation(-adapter.getTokenRotation(target))
             .atLocation(target)
             .scaleToObject(1, { considerTokenScale: true })
             .filter("Blur", { blurX: 5, blurY: 20 })

@@ -17,12 +17,13 @@ const DEFAULT_CONFIG = {
     overlay: {
         applyPC: true,
         applyGM: false,
-    }
-}
+    },
+    sound: { ...DEFAULT_SOUND_CONFIG },
+};
 
 async function create(token, config = {}) {
-    const { id, duration } = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const tokenWidth = token.document.width;
+    const { id, duration, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
     const label = `${id} - ${token.id}`;
 
     let drunkEffect = new Sequence();
@@ -124,7 +125,6 @@ export const drunk = {
     play,
     stop,
     default_config: DEFAULT_CONFIG,
-    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-autorec.register("drunk", "effect", "eskie.effect.emote.drunk", DEFAULT_CONFIG, "0.0.1", "Drunk");
+autorec.register("drunk", "effect", "eskie.effect.emote.drunk", DEFAULT_CONFIG, "0.0.2", "Drunk");

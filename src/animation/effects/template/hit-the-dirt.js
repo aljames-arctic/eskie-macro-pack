@@ -1,9 +1,9 @@
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
+import { adapter } from '../../../adapters/index.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
-import { adapter } from "../../../adapters/index.js";
 //Last Updated: 4/30/2024
 //Author: EskieMoh#2969
 
@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(token, config, options) {
+async function create(token, config = {}, options = {}) {
     if (options?.type == 'aefx') return;
     const { id, template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -23,7 +23,9 @@ async function create(token, config, options) {
         label: 'Hit The Dirt!'
     };
     let [position, _] = await templatelib.getPosition(template, cfg);
-    if (!position) { return; }
+    if (!position || position.cancelled) { return; }
+
+    const tokenRotation = adapter.getTokenRotation(token);
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -44,7 +46,7 @@ async function create(token, config, options) {
 
         .effect()
         .copySprite(token)
-        .spriteRotation(-token.document.rotation)
+        .spriteRotation(-tokenRotation)
         .atLocation(token)
         .scaleToObject(0.85, { considerTokenScale: true })
         .moveTowards(position, { delay: 100, rotate: false, ease: "easeOutQuint" })
@@ -68,7 +70,7 @@ async function create(token, config, options) {
         // Animate the token jumping
         .effect()
         .copySprite(token)
-        .spriteRotation(-token.document.rotation)
+        .spriteRotation(-tokenRotation)
         .atLocation(token)
         .scaleToObject(1, { considerTokenScale: true })
         .moveTowards(position, { delay: 100, rotate: false, ease: "easeOutQuint" })    // Horizontal Movement
@@ -82,7 +84,7 @@ async function create(token, config, options) {
         .animation()
         .on(token)
         .teleportTo(position, { relativeToCenter: true })
-        .rotate(token.document.rotation + 90)
+        .rotate(tokenRotation + 90)
         .opacity(1);
     return seq;
 }
@@ -93,10 +95,11 @@ async function play(token, config = {}) {
 }
 
 function destroy(token, config = {}) {
+    const tokenRotation = adapter.getTokenRotation(token);
     let seq = new Sequence()
         .animation()
         .on(token)
-        .rotate(token.document.rotation - 90);
+        .rotate(tokenRotation - 90);
     return seq;
 }
 

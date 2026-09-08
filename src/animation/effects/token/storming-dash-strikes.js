@@ -233,7 +233,7 @@ async function play(source, config = {}) {
     let positions = mConfig.positions;
     if (!positions || !positions.length) {
         positions = [];
-        const maxStrikes = mConfig.maxStrikes || 12;
+        const maxStrikes = mConfig.maxStrikes ?? 12;
         for (let i = 0; i < maxStrikes; i++) {
             const pos = await Sequencer.Crosshair.show(
                 {

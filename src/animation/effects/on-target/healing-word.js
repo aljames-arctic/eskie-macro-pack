@@ -4,10 +4,9 @@
  */
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { adapter, autorec } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'healing-word',
     color: 'green',
@@ -33,7 +32,7 @@ async function create(token, targets, config = {}) {
     const targetList = [targets].flat().filter(Boolean);
 
     const colorVal = getColor(color);
-    const hue = colorVal.hue;
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
     const seq = new Sequence();
     applySound(seq, sound);
@@ -41,51 +40,52 @@ async function create(token, targets, config = {}) {
     const style = {
         "fill": "#ffffff",
         "fontFamily": "Helvetica",
-        "fontSize": 24 * token.document.width,
+        "fontSize": 24 * tokenWidth,
         "strokeThickness": 0,
         fontWeight: "bold",
     };
 
     for (const target of targetList) {
+        const targetWidth = adapter.getTokenDimensions(target).widthUnits;
         const target_seq = new Sequence()
             .effect()
-            .atLocation(target, { offset: { x: 0, y: -0.55 * target.document.width }, gridUnits: true })
+            .atLocation(target, { offset: { x: 0, y: -0.55 * targetWidth }, gridUnits: true })
             .file(closest(`eskie.pulse.energy.02.fast.${color}`))
             .fadeOut(250)
             .zIndex(1)
-            .scale(0.25 * target.document.width)
+            .scale(0.25 * targetWidth)
             .scaleIn(0, 500, { ease: "easeOutBack" })
             .zIndex(0)
 
             .effect()
-            .atLocation(target, { offset: { x: 0, y: -0.55 * target.document.width }, gridUnits: true })
+            .atLocation(target, { offset: { x: 0, y: -0.55 * targetWidth }, gridUnits: true })
             .file(closest("jb2a.particles.outward.orange.02.04"))
             .fadeOut(250)
             .zIndex(1)
-            .scale(0.25 * target.document.width)
+            .scale(0.25 * targetWidth)
             .duration(600)
             .scaleIn(0, 500, { ease: "easeOutBack" })
             .zIndex(0)
 
             .effect()
-            .atLocation(target, { offset: { x: 0, y: -0.6 * target.document.width }, gridUnits: true })
+            .atLocation(target, { offset: { x: 0, y: -0.6 * targetWidth }, gridUnits: true })
             .file(closest("jb2a.particles.outward.orange.02.03"))
             .fadeOut(250)
             .zIndex(1)
-            .scale(0.25 * target.document.width)
+            .scale(0.25 * targetWidth)
             .scaleIn(0, 500, { ease: "easeOutBack" })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: 0.6 * target.document.width, duration: 1000, gridUnits: true, delay: 500 })
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: 0.6 * targetWidth, duration: 1000, gridUnits: true, delay: 500 })
             .animateProperty('spriteContainer', "scale.x", { from: 0, to: 0.15, duration: 1000, delay: 500 })
             .animateProperty('spriteContainer', "scale.y", { from: 0, to: 0.15, duration: 1000, delay: 500 })
             .zIndex(1.1)
 
             .effect()
-            .atLocation(target, { offset: { x: 0, y: -0.6 * target.document.width }, gridUnits: true })
+            .atLocation(target, { offset: { x: 0, y: -0.6 * targetWidth }, gridUnits: true })
             .text(word, style)
             .duration(2000)
             .fadeOut(1000)
             .zIndex(1)
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: 0.6 * target.document.width, duration: 2000, gridUnits: true })
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: 0.6 * targetWidth, duration: 2000, gridUnits: true })
             .rotateIn(-10, 1000, { ease: "easeOutElastic" })
             .scaleIn(0, 500, { ease: "easeOutElastic" })
             .filter("Glow", { color: colorVal.hex })
@@ -95,7 +95,7 @@ async function create(token, targets, config = {}) {
     }
 
     seq.effect()
-        .atLocation(token, { offset: { x: 0, y: -0.6 * token.document.width }, gridUnits: true })
+        .atLocation(token, { offset: { x: 0, y: -0.6 * tokenWidth }, gridUnits: true })
         .text(word, style)
         .duration(2000)
         .fadeOut(250)
@@ -107,7 +107,7 @@ async function create(token, targets, config = {}) {
         .scaleIn(0, 500, { ease: "easeOutBack" })
         .waitUntilFinished(-750);
 
-    for (let target of targets) {
+    for (let target of targetList) {
         const target_seq = new Sequence()
             .effect()
             .atLocation(target)
@@ -118,7 +118,7 @@ async function create(token, targets, config = {}) {
 
             .effect()
             .copySprite(target)
-            .spriteRotation(-target.document.rotation)
+            .spriteRotation(-adapter.getTokenRotation(target))
             .opacity(0.5)
             .attachTo(target)
             .scaleToObject(1, { considerTokenScale: true })

@@ -2,8 +2,7 @@
 //Modular Conversion: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
-import { adapter } from "../../../adapters/index.js";
+import { adapter, autorec, CONCENTRATING } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
@@ -30,7 +29,7 @@ async function create(token, target, config = {}) {
     const orbitDirection = 1;
 
     // Dynamic orbit mapping (1 → 9)
-    const clamped = Math.clamp(mCount, 1, 9);
+    const clamped = Math.min(Math.max(mCount, 1), 9);
     const t = (clamped - 1) / 8;
 
     const orbitStartAngle = 0 + (-90 - 0) * t;   // 0 → -90

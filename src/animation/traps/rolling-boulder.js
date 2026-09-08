@@ -21,24 +21,22 @@ async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { boulderSpeed, boulderSize, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    const tileDoc = tile.document ?? tile;
+    const tileDoc = tile.document;
 
     // Retrieve end tile from flags
-    const targetTileIds = tileDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
-    const endTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
+    const targetTileIds = tileDoc.getFlag(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
+    const endTile = adapter.getPlaceable(targetTileIds[0]);
 
     if (!endTile) {
         log.warn(`Rolling Boulder Trap: Tile "${tileDoc.id}" has no configured end tile.`);
-        ui.notifications?.warn?.(game.i18n.format('EMP.traps.rollingBoulder.noEndTile', { id: tileDoc.id }) ?? 'Rolling Boulder Trap: No end tile found.');
+        ui.notifications.warn(game.i18n.format('EMP.traps.rollingBoulder.noEndTile', { id: tileDoc.id }));
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;
     }
 
-    const tileBounds = adapter.getTileBounds(tile);
-    const endTileBounds = adapter.getTileBounds(endTile);
-    const startLoc = tileBounds.center;
-    const endLoc = endTileBounds.center;
+    const startLoc = adapter.getCenter(tile);
+    const endLoc = adapter.getCenter(endTile);
 
     let seq = new Sequence();
     applySound(seq, sound);

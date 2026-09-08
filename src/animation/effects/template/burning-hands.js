@@ -31,12 +31,13 @@ async function create(token, config = {}) {
     if (!primary && !center) return null;
     const targetPos = center ?? primary;
 
-    const tokenWidth = token?.document?.width ?? token?.width ?? 1;
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
     const tokenOffset = (tokenWidth - 1) / 2;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
-    const label = `${token?.name ?? 'Token'} Burning Hands`;
+    const tokenName = token.name;
+    const label = `${tokenName} Burning Hands`;
 
     sequence
         .effect()

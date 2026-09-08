@@ -94,13 +94,13 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      */
     getRevealOffset(object, scale = 1) {
         if (!object) return { x: 0, y: 0 };
-        const doc = object.document ?? object;
-        const isToken = (doc.documentName === 'Token' || object.documentName === 'Token');
-        const widthAdjustment = isToken ? (canvas?.grid?.size ?? 100) : 1;
+        const doc = object.document;
+        const isToken = this.isDocumentOfType(object, 'Token');
+        const widthAdjustment = isToken ? this.getGridSize() : 1;
         const scaleXY = doc.texture?.scaleX ?? 1;
         const totalScale = scaleXY * scale;
-        const objX = object.x ?? doc.x ?? 0;
-        const objY = object.y ?? doc.y ?? 0;
+        const objX = object.x;
+        const objY = object.y;
         const docWidth = doc.width ?? 1;
         const docHeight = doc.height ?? 1;
 
@@ -118,10 +118,9 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      */
     getShapeOffset(object) {
         if (!object) return { x: 0, y: 0 };
-        const doc = object.document ?? object;
         return {
-            x: object.x ?? doc.x ?? 0,
-            y: object.y ?? doc.y ?? 0
+            x: object.x,
+            y: object.y
         };
     }
 
@@ -152,8 +151,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
             ? doc.distance
             : ((placeable?.distance !== undefined && placeable.distance > 0) ? placeable.distance : (config.distance ?? 0));
         const direction = doc.direction ?? placeable?.direction ?? config.direction ?? 0;
-        const gridSize = canvas?.grid?.size ?? canvas?.dimensions?.size ?? 100;
-        const gridDistance = canvas?.grid?.distance ?? canvas?.scene?.grid?.distance ?? canvas?.dimensions?.distance ?? 5;
+        const { size: gridSize, distance: gridDistance } = this.getSceneDimensions(canvas?.scene);
         const distancePx = (distance / gridDistance) * gridSize;
         const rad = (direction * Math.PI) / 180;
 

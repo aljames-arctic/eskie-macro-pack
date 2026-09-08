@@ -88,6 +88,8 @@ async function movement(token, tile, config = {}) {
         const { rotation, travelTime, label } = config;
         const particleRepeats = travelTime / 250;
         
+        const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
+
         //Play MATT Sequence
         const SequenceMATT = new Sequence()
         .effect()
@@ -114,7 +116,7 @@ async function movement(token, tile, config = {}) {
             .attachTo(token)
             .rotateTowards(tile, {attachTo: false})
             .scaleToObject(1.5, {considerTokenScale: true})
-            .spriteOffset({x: -(1.5 * token.document.width)}, {gridUnits:true})
+            .spriteOffset({x: -(1.5 * tokenWidth)}, {gridUnits:true})
             .opacity(1)
             .persist()
             .timeRange(250, 750)
@@ -147,4 +149,4 @@ export const stepOfTheWindMove = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("stepOfTheWind", "effect", "eskie.effect.stepOfTheWind.move", DEFAULT_CONFIG, "0.0.1", "Step of the Wind");
+autorec.register("stepOfTheWind", "effect", "eskie.effect.stepOfTheWind.move", DEFAULT_CONFIG, "0.0.2", "Step of the Wind");

@@ -1,9 +1,9 @@
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
+import { adapter } from '../../../adapters/index.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'Psychic Teleportation',
     sound: { ...DEFAULT_SOUND_CONFIG }
@@ -22,7 +22,9 @@ async function create(token, config = {}) {
         label: id
     };
     let [position, _] = await templatelib.getPosition(template, cfg);
-    if (!position) { return; }
+    if (!position || position.cancelled) { return; }
+
+    const tokenRotation = adapter.getTokenRotation(token);
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -75,13 +77,13 @@ async function create(token, config = {}) {
 
         .effect()
             .copySprite(token)
-            .spriteRotation(-token.document.rotation)
+            .spriteRotation(-tokenRotation)
             .atLocation(token)
             .scaleToObject(1, { considerTokenScale: true })
-            .filter("ColorMatrix", {saturate: -1, brightness:10})
+            .filter("ColorMatrix", { saturate: -1, brightness: 10 })
             .filter("Blur", { blurX: 5, blurY: 10 })
             .duration(500)
-            .scaleOut(0, 500, {ease: "easeOutCubic"})
+            .scaleOut(0, 500, { ease: "easeOutCubic" })
             .fadeOut(500)
 
         .animation()
@@ -93,7 +95,7 @@ async function create(token, config = {}) {
         .wait(1000)
 
         .thenDo(function(){
-                Sequencer.EffectManager.endEffects({name: id})  
+                Sequencer.EffectManager.endEffects({ name: id })  
             })
 
         .effect()
@@ -105,7 +107,7 @@ async function create(token, config = {}) {
 
         .effect()
             .file(closest("jb2a.particles.outward.blue.01.03"))
-            .filter("ColorMatrix", {saturate: 1, brightness:5})
+            .filter("ColorMatrix", { saturate: 1, brightness: 5 })
             .filter("Glow", { color: 0x2EB8C1, distance: 3, innerStrength: 2 })
             .atLocation(token)
             .scaleToObject(2)
@@ -124,19 +126,19 @@ async function create(token, config = {}) {
             .file(closest("jb2a.particles.outward.blue.01.03"))
             .atLocation(token)
             .scaleToObject(1.25)
-            .filter("ColorMatrix", {saturate: -1, brightness:10})
+            .filter("ColorMatrix", { saturate: -1, brightness: 10 })
             .opacity(0.25)
             .fadeOut(500)
 
         .effect()
             .copySprite(token)
-            .spriteRotation(-token.document.rotation)
+            .spriteRotation(-tokenRotation)
             .atLocation(token)
             .scaleToObject(1, { considerTokenScale: true })
-            .filter("ColorMatrix", {saturate: -1, brightness:10})
+            .filter("ColorMatrix", { saturate: -1, brightness: 10 })
             .filter("Blur", { blurX: 5, blurY: 10 })
             .duration(500)
-            .scaleIn(0, 500, {ease: "easeOutCubic"})
+            .scaleIn(0, 500, { ease: "easeOutCubic" })
             .fadeOut(500)
 
         .waitUntilFinished(-400)

@@ -19,11 +19,12 @@ const DEFAULT_CONFIG = {
         { id: 'blurred-vision', opacity: 1, blur: 3, sway: 1, durationX: 6500, durationY: 11000 },
         { id: 'blurred-vision', opacity: 0.57, blur: 3, sway: -0.9, durationX: 16500, durationY: 7000 },
         { id: 'blurred-vision', opacity: 0.47, blur: 3, sway: 1.1, durationX: 13000, durationY: 10500 },
-    ]
-}
+    ],
+    sound: { ...DEFAULT_SOUND_CONFIG },
+};
 
 function create(token, config = {}) {
-    const { overlay, configs } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { overlay, configs, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const seq = new Sequence();
     applySound(seq, sound);
     const owners = adapter.getTokenOwners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
@@ -56,7 +57,6 @@ export const blurredVision = {
     play,
     stop,
     default_config: DEFAULT_CONFIG,
-    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-autorec.register("blurredVision", "effect", "eskie.effect.blurredVision", DEFAULT_CONFIG, "0.0.1", "Blurred Vision");
+autorec.register("blurredVision", "effect", "eskie.effect.blurredVision", DEFAULT_CONFIG, "0.0.2", "Blurred Vision");

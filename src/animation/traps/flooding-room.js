@@ -19,11 +19,11 @@ async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { fadeTime, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    const tileDoc = tile.document ?? tile;
+    const tileDoc = tile.document;
 
     // Retrieve water spray origin tiles from flags
-    const originIds = tileDoc.getFlag?.(MODULE_ID, 'trap.floodingRoomSplashOrigins') ?? [];
-    let splashOrigins = originIds.map(id => canvas.tiles.get(id)).filter(Boolean);
+    const originIds = tileDoc.getFlag(MODULE_ID, 'trap.floodingRoomSplashOrigins') ?? [];
+    let splashOrigins = originIds.map(id => adapter.getPlaceable(id)).filter(Boolean);
     
     if (splashOrigins.length === 0 && game.modules.get('tagger')?.active) {
         const taggedOrigins = await Tagger.getByTag('Flooding Room Trap Origin');
@@ -37,15 +37,13 @@ async function create(tile, targets, config = {}) {
         .shake({ duration: 500, strength: 2, rotation: false })
         .wait(500);
 
-    const tileBounds = adapter.getTileBounds(tile);
-    const tileCenter = tileBounds.center;
+    const tileCenter = adapter.getCenter(tile);
 
     // Spawn persistent water splashes at each origin tile pointing towards the water tile
     if (splashOrigins.length > 0) {
         splashOrigins.forEach(origin => {
-            const originDoc = origin.document ?? origin;
             const originBounds = adapter.getTileBounds(origin);
-            const originCenter = originBounds.center;
+            const originCenter = adapter.getCenter(origin);
 
             seq = seq
                 .effect()
@@ -55,7 +53,7 @@ async function create(tile, targets, config = {}) {
                 .rotateTowards(tileCenter)
                 .size({ width: 2 * originBounds.width, height: 2 * originBounds.height })
                 .fadeIn(1000, { ease: 'easeOutCubic' })
-                .elevation(originDoc.elevation)
+                .elevation(origin.document.elevation ?? 0)
                 .persist()
                 .belowTokens();
         });

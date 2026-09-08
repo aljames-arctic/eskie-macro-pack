@@ -19,10 +19,10 @@ async function create(token, target, config = {}) {
 
     if (!token || !target) return;
 
-    const targetSquare = adapter.getNearestSquareCenter(token, target) ?? target.center ?? { x: target.x ?? 0, y: target.y ?? 0 };
-    const targetCenter = target.center ?? { x: target.x ?? 0, y: target.y ?? 0 };
+    const targetSquare = adapter.getNearestSquareCenter(token, target) ?? adapter.getCenter(target);
+    const targetCenter = adapter.getCenter(target);
     const targetOffset = { x: targetSquare.x - targetCenter.x, y: targetSquare.y - targetCenter.y };
-    const targetWidth = target.document?.width ?? target.width ?? 1;
+    const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);
 
     const sequence = new Sequence();
     applySound(sequence, sound);

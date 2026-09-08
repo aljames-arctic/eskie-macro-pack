@@ -10,65 +10,39 @@ import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
     id: 'wallOfFire',
+    distance: 60,
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token, config = {}) {
+async function create(token, config = {}, options = {}) {
+    if (options?.type == "aefx") return;
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { sound, template } = mConfig;
+    const { sound, template, distance: configDistance } = mConfig;
 
-    let position1 = null;
-    let position2 = null;
+    const tokenImg = token?.document?.texture?.src ?? 'icons/svg/fire.svg';
+    const cfg = {
+        type: 'ray',
+        distance: configDistance ?? 60,
+        icon: tokenImg,
+        label: 'Wall of Fire',
+    };
 
-    if (template) {
-        const [primary, secondary, center] = await templatelib.getPosition(template);
-        position1 = primary ?? center;
-        position2 = secondary ?? (position1 ? { x: position1.x + 600, y: position1.y } : null);
-    }
+    const [primary, secondary, center] = await templatelib.getPosition(template, cfg);
+    if (!primary && !center) return null;
 
-    const tokenName = token?.name ?? 'Token';
+    const position1 = primary ?? center;
+    const position2 = secondary ?? (position1 ? { x: position1.x + (configDistance ?? 60) * 10, y: position1.y } : null);
+    if (!position1 || !position2) return null;
 
-    if (!position1 || !position2) {
-        const tokenImg = token?.document?.texture?.src ?? '';
-        position1 = await Sequencer.Crosshair.show({
-            type: 'circle',
-            distance: 2.5,
-            icon: tokenImg,
-            label: 'Wall of Fire (Start)',
-        });
-        if (!position1 || position1.cancelled) return null;
-
-        position2 = await Sequencer.Crosshair.show({
-            type: 'circle',
-            distance: 2.5,
-            icon: tokenImg,
-            label: 'Wall of Fire (End)',
-        });
-        if (!position2 || position2.cancelled) return null;
-    }
-
-    const dx = position2.x - position1.x;
-    const dy = position2.y - position1.y;
-    const gridSize = canvas?.grid?.size ?? 100;
+    const tokenName = token.name;
+    const gridSize = adapter.getGridSize();
     const stepSize = gridSize / 2;
-    const distance = Math.hypot(dx, dy);
+    const effectPoints = adapter.getInterpolatedPoints(position1, position2, stepSize);
     const midpoint = {
         x: (position1.x + position2.x) / 2,
         y: (position1.y + position2.y) / 2,
     };
-
-    const steps = Math.max(Math.floor(distance / stepSize), 1);
-    const stepX = dx / steps;
-    const stepY = dy / steps;
-
-    const effectPoints = [];
-    for (let i = 0; i <= steps; i++) {
-        effectPoints.push({
-            x: position1.x + stepX * i,
-            y: position1.y + stepY * i,
-        });
-    }
 
     let castingFlip;
     if (Math.abs(position1.x - position2.x) > Math.abs(position1.y - position2.y)) {
@@ -77,7 +51,7 @@ async function create(token, config = {}) {
         castingFlip = position1.y > position2.y;
     }
 
-    const tokenCenter = token?.center ?? { x: token?.x ?? 0, y: token?.y ?? 0 };
+    const tokenCenter = adapter.getCenter(token);
     if (midpoint.x < tokenCenter.x || midpoint.y < tokenCenter.y) {
         castingFlip = !castingFlip;
     }
@@ -177,15 +151,19 @@ async function create(token, config = {}) {
     return sequence;
 }
 
-async function play(token, config = {}) {
-    const sequence = await create(token, config);
+async function play(token, config = {}, options = {}) {
+    if (options?.type == "aefx") return;
+    const sequence = await create(token, config, options);
     if (sequence) return sequence.play();
 }
 
-function stop(token) {
-    const tokenName = token?.name ?? 'Token';
-    Sequencer.EffectManager.endEffects({ name: `${tokenName} Wall of Fire` });
-    Sequencer.EffectManager.endEffects({ name: `${tokenName} Wall Fire Crosshair` });
+function stop(token, { id = DEFAULT_CONFIG.id } = {}) {
+    if (token) {
+        const tokenName = token.name;
+        Sequencer.EffectManager.endEffects({ name: `${tokenName} Wall of Fire` });
+        Sequencer.EffectManager.endEffects({ name: `${tokenName} Wall of Fire ${id}` });
+        Sequencer.EffectManager.endEffects({ name: `${tokenName} Wall Fire Crosshair` });
+    }
 }
 
 export const wallOfFire = {
@@ -195,4 +173,4 @@ export const wallOfFire = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register('wallOfFire', 'template', 'eskie.effect.wallOfFire', DEFAULT_CONFIG, '0.0.1', 'Wall of Fire');
+autorec.register('wallOfFire', 'template', 'eskie.effect.wallOfFire', DEFAULT_CONFIG, '0.0.2', 'Wall of Fire');

@@ -68,6 +68,7 @@ async function stop(token, config = {}) {
 async function movement(token, tile, config = {}) {
     function travelSequence(config = {}) {
         const { rotation, travelTime, label } = config;
+        const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
         
         const SequenceMATT = new Sequence()
         .effect()
@@ -94,7 +95,7 @@ async function movement(token, tile, config = {}) {
             .attachTo(token)
             .rotateTowards(tile, {attachTo: false})
             .scaleToObject(1.5, {considerTokenScale: true})
-            .spriteOffset({x: -(1.5 * token.document.width)}, {gridUnits:true})
+            .spriteOffset({x: -(1.5 * tokenWidth)}, {gridUnits:true})
             .opacity(1)
             .persist()
             .timeRange(250, 750)

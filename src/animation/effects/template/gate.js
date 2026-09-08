@@ -7,10 +7,10 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
+import { adapter } from '../../../adapters/index.js';
 import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: `gate`,
     destination: "Menu Prompt",
@@ -50,7 +50,7 @@ async function _getDestination(destinations) {
             </select>
         </div>`;
 
-    const dialogCls = foundry.applications?.api?.DialogV2;
+    const dialogCls = adapter.foundry.DialogV2 ?? foundry.applications?.api?.DialogV2;
     if (dialogCls?.prompt) {
         return dialogCls.prompt({
             window: { title: 'Select a Destination' },
@@ -118,7 +118,8 @@ function _getPlaneConfig(destination) {
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    mConfig.id = `${token.id} - ${mConfig.id}`;
+    const tokenId = token.id;
+    mConfig.id = `${tokenId} - ${mConfig.id}`;
     const { id, destination, destinationList, template, sound } = mConfig;
 
     const cfg = { 
@@ -142,8 +143,10 @@ async function create(token, config = {}) {
         return;
     }
 
-    const diameter = (template?.distance) ? (template.distance / canvas.grid.distance) : 20;
-    const portalSize = diameter / canvas.grid.distance;
+    const sceneDims = adapter.getSceneDimensions(canvas?.scene);
+    const gridDist = sceneDims.distance;
+    const diameter = (template?.distance) ? (template.distance / gridDist) : 20;
+    const portalSize = diameter / gridDist;
     const [width, height] = [portalSize, portalSize];
 
     const { portalColor, circleColor, castColor, planeImage, pulseColor, saturation, hue, weather, filter } = planeConfig;
@@ -243,13 +246,10 @@ async function play(token, config = {}, options = {}) {
 }
 
 async function stop(token, config = {}) {
+    if (!token) return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    mConfig.id = `${token.id} - ${mConfig.id}`;
-    const { id } = mConfig;
+    const id = `${token.id} - ${mConfig.id}`;
     Sequencer.EffectManager.endEffects({ name: id });
-    // This stops scene-wide filters, might need a more robust way to handle this
-    // For now, assuming we want to clear all filters.
-    // canvas.scene.update({ "filters": {} }); 
 }
 
 export const gate = {

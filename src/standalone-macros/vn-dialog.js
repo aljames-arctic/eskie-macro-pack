@@ -23,7 +23,7 @@ const speakerText = await Dialog.prompt({
 }) ?? "Hold it right there! You cannot pass!";
 
 const duration = 7000;
-const portrait = token.document?.texture?.src ?? token.actor?.img ?? "icons/svg/mystery-man.svg";
+const portrait = token.document.texture.src ?? token.actor?.img ?? "icons/svg/mystery-man.svg";
 const emote = "eskie.emote.angry.02";
 
 const actorAnchor = { x: 0.15, y: 0.75 };
@@ -33,7 +33,7 @@ const textAnchor = { x: 0.5, y: 0.82 };
 const style = {
     fill: "white",
     fontFamily: "Arial Black, Impact, sans-serif",
-    fontSize: (canvas.grid.size ?? 100) * 0.7,
+    fontSize: canvas.grid.size * 0.7,
     stroke: "#000000",
     strokeThickness: 8,
 };

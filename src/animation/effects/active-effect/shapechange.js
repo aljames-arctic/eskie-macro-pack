@@ -50,6 +50,9 @@ async function createShapechange(token, config = {}) {
     if (choice === false) return null;
 
     const targetForm = choice === 'hybrid' ? hybridForm : wolfForm;
+    const tokenDim = adapter.getTokenDimensions(token);
+    const tokenWidth = tokenDim.widthUnits;
+    const scaleX = token.document?.texture?.scaleX ?? 1;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
@@ -66,11 +69,12 @@ async function createShapechange(token, config = {}) {
         .scaleToObject(1.5, { considerTokenScale: true })
         .randomRotation()
         .filter('ColorMatrix', { saturate: -0, brightness: 0 })
-        .animateProperty('sprite', 'width', { from: 0, to: 0.25 * token.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeOutCubic', delay: 2600 })
-        .animateProperty('sprite', 'height', { from: 0, to: 0.25 * token.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeOutCubic', delay: 2600 })
+        .animateProperty('sprite', 'width', { from: 0, to: 0.25 * scaleX, duration: 500, gridUnits: true, ease: 'easeOutCubic', delay: 2600 })
+        .animateProperty('sprite', 'height', { from: 0, to: 0.25 * scaleX, duration: 500, gridUnits: true, ease: 'easeOutCubic', delay: 2600 })
         .belowTokens()
 
-        // Swirling dark vortex ring.
+    // Swirling dark vortex ring.
+    sequence
         .effect()
         .delay(400)
         .file(closest('jb2a.template_circle.vortex.loop.dark_black'))
@@ -84,7 +88,8 @@ async function createShapechange(token, config = {}) {
         .filter('ColorMatrix', { saturate: -0, brightness: 0 })
         .belowTokens()
 
-        // Ghost of the current token image — stretches and squashes as it warps.
+    // Ghost of the current token image — stretches and squashes as it warps.
+    sequence
         .effect()
         .copySprite(token)
         .spriteRotation(-token.document.rotation)
@@ -92,26 +97,28 @@ async function createShapechange(token, config = {}) {
         .fadeIn(500)
         .fadeOut(500)
         .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('sprite', 'width', { from: (token.document.width * 1.1) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
-        .animateProperty('sprite', 'height', { from: (token.document.width) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
+        .animateProperty('sprite', 'width', { from: (tokenWidth * 1.1) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
+        .animateProperty('sprite', 'height', { from: (tokenWidth) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
         .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
         .opacity(0.65)
         .repeats(3, 800, 800)
 
-        // First ghost of the target form — very faint, brightened.
+    // First ghost of the target form — very faint, brightened.
+    sequence
         .effect()
         .file(closest(targetForm))
         .attachTo(token)
         .fadeIn(500)
         .fadeOut(500)
         .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('sprite', 'width', { from: (token.document.width * 1.1) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
-        .animateProperty('sprite', 'height', { from: (token.document.width) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
+        .animateProperty('sprite', 'width', { from: (tokenWidth * 1.1) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
+        .animateProperty('sprite', 'height', { from: (tokenWidth) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
         .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
         .opacity(0.25)
         .filter('ColorMatrix', { brightness: 0.75 })
 
-        // Second ghost — slightly more opaque.
+    // Second ghost — slightly more opaque.
+    sequence
         .effect()
         .file(closest(targetForm))
         .delay(800)
@@ -119,13 +126,14 @@ async function createShapechange(token, config = {}) {
         .fadeIn(500)
         .fadeOut(500)
         .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('sprite', 'width', { from: (token.document.width * 1.1) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
-        .animateProperty('sprite', 'height', { from: (token.document.width) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
+        .animateProperty('sprite', 'width', { from: (tokenWidth * 1.1) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
+        .animateProperty('sprite', 'height', { from: (tokenWidth) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
         .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
         .opacity(0.5)
         .filter('ColorMatrix', { brightness: 0.5 })
 
-        // Third ghost — nearly solid.
+    // Third ghost — nearly solid.
+    sequence
         .effect()
         .file(closest(targetForm))
         .delay(1600)
@@ -133,8 +141,8 @@ async function createShapechange(token, config = {}) {
         .fadeIn(500)
         .fadeOut(500)
         .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('sprite', 'width', { from: (token.document.width * 1.1) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
-        .animateProperty('sprite', 'height', { from: (token.document.width) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
+        .animateProperty('sprite', 'width', { from: (tokenWidth * 1.1) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
+        .animateProperty('sprite', 'height', { from: (tokenWidth) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
         .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
         .opacity(0.75)
         .filter('ColorMatrix', { brightness: 0.25 })
@@ -149,7 +157,8 @@ async function createShapechange(token, config = {}) {
         .fadeOut(500)
         .zIndex(1)
 
-        // Final blurred ghost of the target form before the swap.
+    // Final blurred ghost of the target form before the swap.
+    sequence
         .effect()
         .file(closest(targetForm))
         .delay(2400)
@@ -158,13 +167,14 @@ async function createShapechange(token, config = {}) {
         .fadeIn(500)
         .fadeOut(500)
         .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('sprite', 'width', { from: (token.document.width * 1.1) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
-        .animateProperty('sprite', 'height', { from: (token.document.width) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
+        .animateProperty('sprite', 'width', { from: (tokenWidth * 1.1) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
+        .animateProperty('sprite', 'height', { from: (tokenWidth) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
         .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
         .opacity(0.75)
         .filter('ColorMatrix', { brightness: 0.2 })
 
-        // Copy of the current token sprite — blurred and darkened during the climax.
+    // Copy of the current token sprite — blurred and darkened during the climax.
+    sequence
         .effect()
         .copySprite(token)
         .spriteRotation(-token.document.rotation)
@@ -174,8 +184,8 @@ async function createShapechange(token, config = {}) {
         .fadeIn(750)
         .fadeOut(500)
         .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('sprite', 'width', { from: (token.document.width * 1.1) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
-        .animateProperty('sprite', 'height', { from: (token.document.width) * token.document.texture.scaleX, to: (token.document.width * 1.25) * token.document.texture.scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
+        .animateProperty('sprite', 'width', { from: (tokenWidth * 1.1) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 500, gridUnits: true, ease: 'easeInOutBack' })
+        .animateProperty('sprite', 'height', { from: (tokenWidth) * scaleX, to: (tokenWidth * 1.25) * scaleX, duration: 750, gridUnits: true, ease: 'easeOutBack' })
         .loopProperty('spriteContainer', 'position.x', { from: -0.005, to: 0.005, duration: 100, pingPong: true, gridUnits: true })
         .opacity(1)
         .filter('ColorMatrix', { brightness: 0 })

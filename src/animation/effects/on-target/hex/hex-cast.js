@@ -4,10 +4,8 @@
  */
 
 import { closest } from '../../../../lib/filemanager.js';
-import { autorec } from '../../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { adapter, autorec } from '../../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../../utils/sound.js';
-
-import { adapter } from "../../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'hex',
     duration: 10000,

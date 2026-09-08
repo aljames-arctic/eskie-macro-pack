@@ -2,10 +2,9 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { adapter, autorec, CONCENTRATING } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'stunningFist',
     sound: { ...DEFAULT_SOUND_CONFIG }
@@ -15,10 +14,17 @@ async function create(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
+    const srcCenter = adapter.getCenter(token);
+    const tgtCenter = adapter.getCenter(target);
     const middleposition = {
-        x: (target.center.x - token.center.x)* 0.25,
-        y: (target.center.y - token.center.y)* 0.25,
+        x: (tgtCenter.x - srcCenter.x) * 0.25,
+        y: (tgtCenter.y - srcCenter.y) * 0.25,
     };
+
+    const tokenScaleX = token.document.texture.scaleX ?? 1;
+    const tokenScaleY = token.document.texture.scaleY ?? 1;
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
+    const targetWidth = adapter.getTokenDimensions(target).widthUnits;
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -37,13 +43,13 @@ async function create(token, target, config = {}) {
         .copySprite(target)
         .attachTo(target, {bindAlpha: false})
         .scaleToObject(1, { considerTokenScale: true })
-        .spriteRotation(-target.document.rotation)
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: token.document.texture.scaleX*middleposition.x+0.5, duration: 100, ease:"easeOutExpo", delay: 1350})
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: token.document.texture.scaleY*middleposition.y+0.5, duration: 100, ease:"easeOutExpo", delay: 1350})
+        .spriteRotation(-adapter.getTokenRotation(target))
+        .animateProperty('spriteContainer', 'position.x', { from: 0, to: tokenScaleX * middleposition.x + 0.5, duration: 100, ease:"easeOutExpo", delay: 1350})
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: tokenScaleY * middleposition.y + 0.5, duration: 100, ease:"easeOutExpo", delay: 1350})
         .animateProperty('sprite', 'rotation', { from: 0, to: 45, duration: 150, ease:"easeOutCubic", delay: 1300})
         .animateProperty('sprite', 'rotation', { from: 0, to: -45, duration: 350, ease:"easeOutBack", delay: 1450})
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: -token.document.texture.scaleX*middleposition.x-0.5, duration: 250, ease:"easeInOutQuad", delay: 1450})
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -token.document.texture.scaleY*middleposition.y-0.5, duration: 250, ease:"easeInOutQuad", delay: 1450})
+        .animateProperty('spriteContainer', 'position.x', { from: 0, to: -tokenScaleX * middleposition.x - 0.5, duration: 250, ease:"easeInOutQuad", delay: 1450})
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -tokenScaleY * middleposition.y - 0.5, duration: 250, ease:"easeInOutQuad", delay: 1450})
         .fadeIn(200, {delay:1250})
         .fadeOut(500)
         .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true})
@@ -54,24 +60,24 @@ async function create(token, target, config = {}) {
         .copySprite(target)
         .attachTo(target, {bindAlpha: false})
         .scaleToObject(1, { considerTokenScale: true })
-        .spriteRotation(-target.document.rotation)
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: token.document.texture.scaleX*middleposition.x+0.5, duration: 100, ease:"easeOutExpo", delay: 1350})
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: token.document.texture.scaleY*middleposition.y+0.5, duration: 100, ease:"easeOutExpo", delay: 1350})
+        .spriteRotation(-adapter.getTokenRotation(target))
+        .animateProperty('spriteContainer', 'position.x', { from: 0, to: tokenScaleX * middleposition.x + 0.5, duration: 100, ease:"easeOutExpo", delay: 1350})
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: tokenScaleY * middleposition.y + 0.5, duration: 100, ease:"easeOutExpo", delay: 1350})
         .animateProperty('sprite', 'rotation', { from: 0, to: 45, duration: 150, ease:"easeOutCubic", delay: 1300})
         .animateProperty('sprite', 'rotation', { from: 0, to: -45, duration: 350, ease:"easeOutBack", delay: 1450})
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: -token.document.texture.scaleX*middleposition.x-0.5, duration: 250, ease:"easeInOutQuad", delay: 1450})
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -token.document.texture.scaleY*middleposition.y-0.5, duration: 250, ease:"easeInOutQuad", delay: 1450})
+        .animateProperty('spriteContainer', 'position.x', { from: 0, to: -tokenScaleX * middleposition.x - 0.5, duration: 250, ease:"easeInOutQuad", delay: 1450})
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -tokenScaleY * middleposition.y - 0.5, duration: 250, ease:"easeInOutQuad", delay: 1450})
         .duration(2000)  
 
     .effect()
         .copySprite(token)
         .attachTo(token, {bindAlpha: false})
         .scaleToObject(1, { considerTokenScale: true })
-        .spriteRotation(-token.document.rotation)
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: token.document.texture.scaleX*middleposition.x, duration: 100, ease:"easeOutExpo", delay: 1250})
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: token.document.texture.scaleY*middleposition.y, duration: 100, ease:"easeOutExpo", delay: 1250})
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: -token.document.texture.scaleX*middleposition.x, duration: 350, ease:"easeInOutQuad", delay: 1350})
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -token.document.texture.scaleY*middleposition.y, duration: 350, ease:"easeInOutQuad", delay: 1350})
+        .spriteRotation(-adapter.getTokenRotation(token))
+        .animateProperty('spriteContainer', 'position.x', { from: 0, to: tokenScaleX * middleposition.x, duration: 100, ease:"easeOutExpo", delay: 1250})
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: tokenScaleY * middleposition.y, duration: 100, ease:"easeOutExpo", delay: 1250})
+        .animateProperty('spriteContainer', 'position.x', { from: 0, to: -tokenScaleX * middleposition.x, duration: 350, ease:"easeInOutQuad", delay: 1350})
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -tokenScaleY * middleposition.y, duration: 350, ease:"easeInOutQuad", delay: 1350})
         .duration(2000)
 
     .effect()
@@ -93,7 +99,7 @@ async function create(token, target, config = {}) {
     .effect()
         .file(closest("jb2a.particles.inward.blue.01.01"))
         .attachTo(token)
-.opacity(0.35)
+        .opacity(0.35)
         .scaleToObject(1.5)
         .filter("ColorMatrix", {saturate: 1})
         .fadeIn(500)
@@ -139,7 +145,7 @@ async function create(token, target, config = {}) {
         .atLocation(token, {offset:{x:-0.75 , y:-0.2}, gridUnits:true, local:true})
         .rotateTowards(target,{randomOffset:0.15})
         .scaleToObject(3)
-        .spriteOffset({x:-0.3-(token.document.width-1) , y:-0.2*token.document.width}, {gridUnits:true})
+        .spriteOffset({x:-0.3-(tokenWidth-1) , y:-0.2*tokenWidth}, {gridUnits:true})
         .zIndex(2)
 
     .effect()
@@ -186,7 +192,7 @@ async function create(token, target, config = {}) {
         .scaleIn(0, 100, {ease: "easeOutCubic"}) 
         .scaleToObject(1)
         .opacity(1)
-        .attachTo(target, {offset:{y:-0.5*target.document.width}, gridUnits:true});
+        .attachTo(target, {offset:{y:-0.5*targetWidth}, gridUnits:true});
     
     return seq;
 }

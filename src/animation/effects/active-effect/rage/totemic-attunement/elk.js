@@ -9,6 +9,7 @@ import { applySound, DEFAULT_SOUND_CONFIG } from "../../../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'Elk Totemic Attunement',
     color: 'red',
+    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function pronePlay(token, target, config = {}) {
@@ -18,10 +19,12 @@ async function pronePlay(token, target, config = {}) {
 
 function proneCreate(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, color } = mConfig;
+    const { id, color, sound } = mConfig;
     const label = `${id} - ${token.id}`;
 
-    const seq = new Sequence()
+    const seq = new Sequence();
+    applySound(seq, sound);
+    seq
         .animation()
             .delay(100)
             .on(target)
@@ -72,16 +75,17 @@ function proneCreate(token, target, config = {}) {
             .delay(300)
             .on(target)
             .opacity(1)
-            .rotate(target.document.rotation+90)
+            .rotate(target.document.rotation+90);
     return seq;
 }
 
 function chargeCreate(token, config = {}) {
-    const { id, color } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id, color, sound } = mConfig;
     const label = matt.getLabel(id, token);
 
     const sequenceOn = new Sequence();
-    applySound(sequenceOn, mConfig.sound);
+    applySound(sequenceOn, sound);
     sequenceOn
       .effect()
         .file(closest("eskie.smoke.03.tan"))
@@ -189,5 +193,6 @@ export const elkAttunement = {
         macro: {
             movement: chargeMovement,
         },
-    }
+    },
+    default_config: DEFAULT_CONFIG,
 };

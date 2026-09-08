@@ -102,6 +102,7 @@ async function play(token, position, config = {}) {
 }
 
 async function stop(token, config = {}) {
+    const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     Sequencer.EffectManager.endEffects({ name: id, object: token });
     Sequencer.EffectManager.endEffects({ name: `${id}-con`, object: token }); // Stop the persistent condition effect
 }

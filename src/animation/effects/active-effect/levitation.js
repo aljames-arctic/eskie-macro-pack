@@ -15,8 +15,10 @@ const DEFAULT_CONFIG = {
 
 function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, tint } = mConfig;
+    const { id, tint, sound } = mConfig;
     const label = `${id} - ${token.id}`;
+    const gridSize = adapter.getSceneDimensions().size;
+    const floatOffset = gridSize / 9;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
@@ -63,8 +65,8 @@ function create(token, config = {}) {
         .fadeOut(500)
         .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.6, duration: 2000, gridUnits: true, ease: "easeOutCubic" })
         .loopProperty('sprite', "rotation", {from: -10, to: 10, duration: 1100, pingPong: true, ease: "easeInOutSine" })
-        .loopProperty('spriteContainer', 'position.x', {from: -canvas.grid.size/9, to: canvas.grid.size/9, duration: 2000, pingPong: true, ease: "easeInOutSine" })
-        .loopProperty('spriteContainer', 'position.y', {from: -canvas.grid.size/9, to: canvas.grid.size/9, duration: 3000, pingPong: true, ease: "easeInOutSine" })
+        .loopProperty('spriteContainer', 'position.x', {from: -floatOffset, to: floatOffset, duration: 2000, pingPong: true, ease: "easeInOutSine" })
+        .loopProperty('spriteContainer', 'position.y', {from: -floatOffset, to: floatOffset, duration: 3000, pingPong: true, ease: "easeInOutSine" })
         .zIndex(2)
         .persist()
 
@@ -79,8 +81,8 @@ function create(token, config = {}) {
         .belowTokens()
         .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.6, duration: 2000, gridUnits: true, ease: "easeOutCubic" })
         .loopProperty('sprite', "rotation", {from: -10, to: 10, duration: 1100, pingPong: true, ease: "easeInOutSine" })
-        .loopProperty('spriteContainer', 'position.x', {from: -canvas.grid.size/9, to: canvas.grid.size/9, duration: 2000, pingPong: true, ease: "easeInOutSine" })
-        .loopProperty('spriteContainer', 'position.y', {from: -canvas.grid.size/9, to: canvas.grid.size/9, duration: 3000, pingPong: true, ease: "easeInOutSine" })
+        .loopProperty('spriteContainer', 'position.x', {from: -floatOffset, to: floatOffset, duration: 2000, pingPong: true, ease: "easeInOutSine" })
+        .loopProperty('spriteContainer', 'position.y', {from: -floatOffset, to: floatOffset, duration: 3000, pingPong: true, ease: "easeInOutSine" })
         .zIndex(1)
         .persist();
     

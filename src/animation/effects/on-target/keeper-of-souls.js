@@ -2,10 +2,9 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { adapter, autorec } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'keeperOfSouls',
     color: 'teal',
@@ -63,7 +62,7 @@ async function create(target, ally, config = {}) {
 
     seq.effect()
         .copySprite(target)
-        .spriteRotation(-target.document.rotation)
+        .spriteRotation(-adapter.getTokenRotation(target))
         .attachTo(target, { offset: { y: 0 }, gridUnits: true, bindRotation: false })
         .mask(target)
         .opacity(0.25)

@@ -726,3 +726,121 @@ test('getCombatantsByToken and getCombatantByToken across FoundryV12Adapter (sin
     assert.deepEqual(v14.getCombatantsByToken(modernCombat, mockToken), [mockCombatant1, mockCombatant2]);
     assert.equal(v14.getCombatantByToken(modernCombat, mockToken), mockCombatant1);
 });
+
+test('getSceneDimensions and getSceneCenter calculate safe scene metrics and center coordinates', () => {
+    const v12 = new FoundryV12Adapter();
+
+    // With canvas dimensions populated
+    globalThis.canvas = {
+        dimensions: {
+            width: 4000,
+            height: 3000,
+            size: 100,
+            distance: 5,
+            maxRayDistance: 5000,
+            sceneRect: { x: 0, y: 0, width: 4000, height: 3000 }
+        }
+    };
+
+    const dims = v12.getSceneDimensions();
+    assert.equal(dims.width, 4000);
+    assert.equal(dims.height, 3000);
+    assert.equal(dims.size, 100);
+    assert.equal(dims.distance, 5);
+
+    const center = v12.getSceneCenter();
+    assert.deepEqual(center, { x: 2000, y: 1500 });
+
+    // Fallbacks without canvas.dimensions
+    globalThis.canvas = {};
+    const mockScene = {
+        document: {
+            width: 2000,
+            height: 1000,
+            grid: { size: 50, distance: 10 }
+        }
+    };
+    const fallbackDims = v12.getSceneDimensions(mockScene);
+    assert.equal(fallbackDims.width, 2000);
+    assert.equal(fallbackDims.height, 1000);
+    assert.equal(fallbackDims.size, 50);
+    assert.equal(fallbackDims.distance, 10);
+    assert.deepEqual(v12.getSceneCenter(mockScene), { x: 1000, y: 500 });
+});
+
+test('getCenter, getTokenDimensions, and getInterpolatedPoints calculate geometry properties correctly', () => {
+    const v12 = new FoundryV12Adapter();
+    globalThis.canvas = { grid: { size: 100 } };
+
+    // getCenter with various placeables / documents
+    assert.equal(v12.getCenter(null), null);
+    assert.deepEqual(v12.getCenter({ center: { x: 150, y: 250 } }), { x: 150, y: 250 });
+    assert.deepEqual(v12.getCenter({ object: { center: { x: 300, y: 400 } } }), { x: 300, y: 400 });
+    assert.deepEqual(v12.getCenter({ x: 100, y: 200, width: 2, height: 2 }), { x: 200, y: 300 });
+
+    // getTokenDimensions
+    const mockToken = {
+        document: { width: 2, height: 3 },
+        w: 200,
+        h: 300
+    };
+    const tokDims = v12.getTokenDimensions(mockToken);
+    assert.equal(tokDims.widthPx, 200);
+    assert.equal(tokDims.heightPx, 300);
+    assert.equal(tokDims.widthUnits, 2);
+    assert.equal(tokDims.heightUnits, 3);
+    assert.equal(tokDims.radiusPx, 150);
+
+    // getTokenRotation
+    assert.equal(v12.getTokenRotation(null), 0);
+    assert.equal(v12.getTokenRotation(mockToken), 0);
+    assert.equal(v12.getTokenRotation({ document: { rotation: 180 } }), 180);
+    assert.equal(v12.getTokenRotation({ document: { rotation: 90 } }), 90);
+
+    // getInterpolatedPoints
+    const p1 = { x: 0, y: 0 };
+    const p2 = { x: 300, y: 400 }; // dist = 500
+    const points = v12.getInterpolatedPoints(p1, p2, 100);
+    assert.equal(points.length, 6);
+    assert.deepEqual(points[0], { x: 0, y: 0 });
+    assert.deepEqual(points[5], { x: 300, y: 400 });
+});
+
+test('getBestAdjacentLocation calculates nearest adjacent cell to line between two tokens', () => {
+    const v12 = new FoundryV12Adapter();
+    globalThis.canvas = {
+        grid: {
+            size: 100,
+            getCenterPoint: ({ x, y }) => ({ x: x + 50, y: y + 50 })
+        }
+    };
+
+    const caster = {
+        document: { x: 100, y: 100, width: 1, height: 1 },
+        center: { x: 150, y: 150 }
+    };
+    const target = {
+        document: { x: 400, y: 100, width: 1, height: 1 },
+        center: { x: 450, y: 150 }
+    };
+
+    const bestLoc = v12.getBestAdjacentLocation(caster, target);
+    assert.ok(bestLoc);
+    assert.equal(bestLoc.y, 150);
+    // Closest cell on line towards target
+    assert.equal(bestLoc.x, 250);
+});
+
+test('getGridSize delegates to getSceneDimensions and returns grid size in pixels', () => {
+    const v12 = new FoundryV12Adapter();
+    globalThis.canvas = {
+        grid: { size: 100 },
+        scene: { grid: { size: 100 } }
+    };
+    assert.equal(v12.getGridSize(), 100);
+    assert.equal(adapter.getGridSize(), 100);
+
+    const customScene = { grid: { size: 150 }, width: 3000, height: 3000 };
+    assert.equal(v12.getGridSize(customScene), 150);
+    assert.equal(adapter.getGridSize(customScene), 150);
+});

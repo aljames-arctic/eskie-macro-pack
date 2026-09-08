@@ -21,17 +21,16 @@ async function create(tile, targets, config = {}) {
     const { size, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInTile(tile);
 
-    const tileDoc = tile.document ?? tile;
+    const tileDoc = tile.document;
     const tileBounds = adapter.getTileBounds(tile);
     const tileCenter = tileBounds.center;
 
-    const targetTileIds = tileDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
-    const targetTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
-    const targetTileBounds = targetTile ? adapter.getTileBounds(targetTile) : null;
-    const targetLoc = targetTileBounds?.center ?? (targetList.length ? (targetList[0].center ?? targetList[0].object?.center) : null);
+    const targetTileIds = tileDoc.getFlag(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
+    const targetTile = adapter.getPlaceable(targetTileIds[0]);
+    const targetLoc = adapter.getCenter(targetTile);
 
     if (!targetLoc) {
-        log.warn(`Fire Trap: Tile "${tileDoc.id}" has no configured target tile or targeted tokens.`);
+        log.warn(`Fire Trap: Tile "${tileDoc.id}" has no configured target tile.`);
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;
@@ -51,14 +50,11 @@ async function create(tile, targets, config = {}) {
 
     if (targetList.length > 0) {
         targetList.forEach(target => {
-            const targetDoc = target.document ?? target;
-            const targetRotation = targetDoc.rotation;
-
             seq = seq
                 // Burning token shake effect
                 .effect()
                 .copySprite(target)
-                .spriteRotation(-targetRotation)
+                .spriteRotation(-adapter.getTokenRotation(target))
                 .delay(2000)
                 .attachTo(target)
                 .scaleToObject(1, { considerTokenScale: true })

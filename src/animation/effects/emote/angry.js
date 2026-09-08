@@ -1,7 +1,5 @@
 import { closest } from "../../../lib/filemanager.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
-
-import { adapter } from "../../../adapters/index.js";
+import { adapter, autorec, CONCENTRATING } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 /* **
    Originally Published: 4/14/2023
@@ -19,8 +17,9 @@ const DEFAULT_CONFIG = {
 
 async function create(token, config = {}) {
     const { id, duration, scale, file , sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const tokenHeight = token.document.height;
-    const tokenWidth = token.document.width;
+    const dims = adapter.getTokenDimensions(token);
+    const tokenHeight = dims.heightUnits;
+    const tokenWidth = dims.widthUnits;
 
     let angryEffect = new Sequence();
     applySound(angryEffect, sound);

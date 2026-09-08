@@ -3,8 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { adapter } from '../../../adapters/index.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { adapter, autorec } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -26,13 +25,13 @@ async function create(token, target, config = {}) {
     if (!token) return;
     const tgt = target ?? token;
 
-    const src = token.center ?? { x: token.x ?? 0, y: token.y ?? 0 };
-    const tgtCenter = tgt.center ?? { x: tgt.x ?? 0, y: tgt.y ?? 0 };
+    const src = adapter.getCenter(token);
+    const tgtCenter = adapter.getCenter(tgt);
 
     const baseRad = Math.atan2(tgtCenter.y - src.y, tgtCenter.x - src.x);
     const baseDeg = deg(baseRad);
 
-    const tokenWidth = token.document?.width ?? token.width ?? 1;
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
     const sequence = new Sequence();
     applySound(sequence, sound);

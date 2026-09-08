@@ -4,10 +4,10 @@
 
 import { closest, absolutePath } from "../../../lib/filemanager.js";
 import { template as templatelib } from "../../../lib/templates.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { adapter } from "../../../adapters/index.js";
+import { autorec } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: "grease",
     sound: {
@@ -20,7 +20,8 @@ async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { template, sound } = mConfig;
 
-    const radius = 5 / canvas.grid.distance;
+    const gridDist = adapter.getSceneDimensions(canvas?.scene).distance;
+    const radius = 5 / gridDist;
     const cfg = { 
         radius: 1,
         max: 500,
@@ -31,13 +32,13 @@ async function create(token, config = {}) {
     if (!primary && !center) { return; }
 
     const position = center ?? (secondary ? { x: (secondary.x + primary.x) / 2, y: (secondary.y + primary.y) / 2 } : primary);
-    
+    const tokenName = token.name;
 
     const seq = new Sequence();
     applySound(seq, sound.cast);
 
     seq.effect()
-        .name(`Casting ${token.document.name}`)
+        .name(`Casting ${tokenName}`)
         .attachTo(token)
         .file(closest(`jb2a.magic_signs.circle.02.conjuration.loop.yellow`))
         .scaleToObject(1.25)
@@ -72,23 +73,23 @@ async function create(token, config = {}) {
         .fadeOut(1000)
         .duration(1000)
         .size(1.75, {gridUnits: true})
-        .animateProperty('spriteContainer', 'position.y', {  from:0 , to: -0.5, gridUnits:true, duration: 1000})
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.5, gridUnits: true, duration: 1000 })
         .zIndex(1);
     
     seq.thenDo(function(){
-        Sequencer.EffectManager.endEffects({ name: `Casting ${token.document.name}`, object: token });
+        Sequencer.EffectManager.endEffects({ name: `Casting ${tokenName}`, object: token });
     });
 
     seq.effect()
         .atLocation(position)
         .file(closest(`jb2a.magic_signs.circle.02.conjuration.complete.dark_yellow`))
-        .size(radius * 2, {gridUnits: true})
+        .size(radius * 2, { gridUnits: true })
         .fadeIn(600)
         .fadeOut(1000)
         .duration(7200)
         .opacity(1)
-        .rotateIn(180, 600, {ease: "easeOutCubic"})
-        .scaleIn(0, 600, {ease: "easeOutCubic"})
+        .rotateIn(180, 600, { ease: "easeOutCubic" })
+        .scaleIn(0, 600, { ease: "easeOutCubic" })
         .belowTokens();
 
     seq.wait(1000);
@@ -97,13 +98,13 @@ async function create(token, config = {}) {
     seq.effect()
         .file(closest("jb2a.water_splash.circle.01.black"))
         .atLocation(position)
-        .scaleIn(0, 1500, {ease: "easeOutCubic"})
-        .scaleOut(0, 1500, {ease: "linear"})
+        .scaleIn(0, 1500, { ease: "easeOutCubic" })
+        .scaleOut(0, 1500, { ease: "linear" })
         .fadeIn(500)
         .fadeOut(1000)
         .belowTokens()
         .zIndex(2)
-        .size(radius * 1.5, {gridUnits: true});
+        .size(radius * 1.5, { gridUnits: true });
 
     seq.effect()
         .delay(100)
@@ -113,10 +114,10 @@ async function create(token, config = {}) {
         .fadeIn(5000)
         .zIndex(1)
         .randomRotation()
-        .scaleOut(0, 1500, {ease: "linear"})
+        .scaleOut(0, 1500, { ease: "linear" })
         .fadeOut(1000)
-        .scaleIn(0, 5000, {ease: "easeOutCubic"})
-        .size(radius * 2.2, {gridUnits: true})
+        .scaleIn(0, 5000, { ease: "easeOutCubic" })
+        .size(radius * 2.2, { gridUnits: true })
         .persist() 
         .name('Grease');
 
@@ -128,9 +129,17 @@ async function play(token, config = {}, options = {}) {
     if (seq) { return seq.play(); }
 }
 
+function stop(token) {
+    if (token) {
+        Sequencer.EffectManager.endEffects({ name: `Casting ${token.name}`, object: token });
+    }
+    Sequencer.EffectManager.endEffects({ name: 'Grease' });
+}
+
 export const grease = {
     create,
     play,
+    stop,
     default_config: DEFAULT_CONFIG,
 };
 

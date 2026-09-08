@@ -17,7 +17,7 @@ const DEFAULT_CONFIG = {
 function create(targets, config = {}) {
     const targetList = [targets].flat().filter(Boolean);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    mConfig.destinationPoints = targetList.map(t => ({ x: t.x, y: t.y }));
+    mConfig.destinationPoints = targetList.map(t => adapter.getCenter(t));
     const { sendToCenter, destinationPoints, sound } = mConfig;
 
     if (targetList.length !== destinationPoints.length)
@@ -54,7 +54,7 @@ function create(targets, config = {}) {
 async function play(targets, config = {}) {
     const targetList = [targets].flat().filter(Boolean);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    mConfig.destinationPoints = targetList.map(t => ({ x: t.x, y: t.y }));
+    mConfig.destinationPoints = targetList.map(t => adapter.getCenter(t));
     const { repeat, delay, sendToCenter, destinationPoints } = mConfig;
 
     for (let i = 0; i <= repeat; i++) {

@@ -18,20 +18,26 @@ async function play(token, target, config = {}) {
 
 function create(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, color } = mConfig;
+    const { id, color, sound } = mConfig;
     const label = `${id} - ${token.id}`;
 
+    const tokenCenter = adapter.getCenter(token);
+    const targetCenter = adapter.getCenter(target);
+    const tokenDim = adapter.getTokenDimensions(token);
+
     const mid = {
-        x: (target.center.x - token.center.x)* 0.25,
-        y: (target.center.y - token.center.y)* 0.25,
+        x: (targetCenter.x - tokenCenter.x) * 0.25,
+        y: (targetCenter.y - tokenCenter.y) * 0.25,
     };
 
     const back = {
-        x: (target.center.x - token.center.x)* -0.25,
-        y: (target.center.y - token.center.y)* -0.25,
+        x: (targetCenter.x - tokenCenter.x) * -0.25,
+        y: (targetCenter.y - tokenCenter.y) * -0.25,
     };
 
-    const seq = new Sequence()
+    const seq = new Sequence();
+    applySound(seq, sound);
+    seq
         .animation()
             .delay(100)
             .on(token)
@@ -62,7 +68,7 @@ function create(token, target, config = {}) {
             .delay(200)
             .file(closest(`jb2a.impact.008.${color}`))
             .atLocation(target,{offset:{x:-mid.x,y:-mid.y}})
-            .size(token.document.width+1, {gridUnits:true})
+            .size(tokenDim.widthUnits + 1, {gridUnits:true})
             .zIndex(1)
 
         .effect()
@@ -125,7 +131,7 @@ function create(token, target, config = {}) {
         .effect()
             .file(closest(`eskie.sound.roar.01`))
             .atLocation(target,{offset:{x:-mid.x,y:-mid.y}})
-            .size(token.document.width+5,{gridUnits:true})
+            .size(tokenDim.widthUnits + 5,{gridUnits:true})
 
         .animation()
             .delay(100)
@@ -185,4 +191,5 @@ function create(token, target, config = {}) {
 export const wolfAttunement = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };

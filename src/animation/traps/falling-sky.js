@@ -28,13 +28,13 @@ async function create(tile, targets, config = {}) {
     // 1. Look for tokens on target tiles
     // 2. Look for tokens on the trap tile itself
     // 3. Fallback to targets passed
-    const tileDoc = tile.document ?? tile;
-    const targetTileIds = tileDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
+    const tileDoc = tile.document;
+    const targetTileIds = tileDoc.getFlag(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
     let finalTargets = [];
 
     if (targetTileIds.length > 0) {
         targetTileIds.forEach(id => {
-            const targetTile = canvas.tiles.get(id);
+            const targetTile = adapter.getPlaceable(id);
             if (targetTile) {
                 finalTargets.push(...adapter.getTokensInTile(targetTile));
             }
@@ -61,10 +61,8 @@ async function create(tile, targets, config = {}) {
     if (finalTargets.length > 0) {
         const targetSeqs = [];
         finalTargets.forEach(target => {
-            const targetDoc = target.document ?? target;
-            const targetWidth = targetDoc.width;
-            const targetHeight = targetDoc.height;
-            const targetRotation = targetDoc.rotation;
+            const { widthUnits: targetWidth, widthPx, heightPx } = adapter.getTokenDimensions(target);
+            const targetRotation = adapter.getTokenRotation(target);
             const staggerDelay = Math.random() * (randomDelay);
 
             const targetSeq = new Sequence()
@@ -115,7 +113,7 @@ async function create(tile, targets, config = {}) {
                 .effect()
                 .file(closest('jb2a.smoke.puff.ring.01.white'))
                 .atLocation(target)
-                .size({ width: targetWidth * smokeSize * canvas.grid.size, height: targetHeight * smokeSize * canvas.grid.size })
+                .size({ width: widthPx * smokeSize, height: heightPx * smokeSize })
                 .opacity(0.8)
                 .belowTokens()
 
@@ -123,14 +121,14 @@ async function create(tile, targets, config = {}) {
                 .effect()
                 .file(closest(`jb2a.impact.ground_crack.${color}.02`))
                 .atLocation(target)
-                .size({ width: targetWidth * 2 * canvas.grid.size, height: targetHeight * 2 * canvas.grid.size })
+                .size({ width: widthPx * 2, height: heightPx * 2 })
                 .belowTokens()
 
                 // Ground crack still frame
                 .effect()
                 .file(closest('jb2a.impact.ground_crack.still_frame.02'))
                 .atLocation(target)
-                .size({ width: targetWidth * 2 * canvas.grid.size, height: targetHeight * 2 * canvas.grid.size })
+                .size({ width: widthPx * 2, height: heightPx * 2 })
                 .belowTokens()
                 .fadeOut(1000)
                 .duration(5000)

@@ -3,8 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { adapter } from '../../../adapters/index.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { adapter, autorec } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -34,8 +33,8 @@ async function create(token, targets, config = {}) {
     if (targetList.length === 0) return;
 
     const midpoint = {
-        x: targetList.reduce((sum, t) => sum + (t.center?.x ?? t.x ?? 0), 0) / targetList.length,
-        y: targetList.reduce((sum, t) => sum + (t.center?.y ?? t.y ?? 0), 0) / targetList.length,
+        x: targetList.reduce((sum, t) => sum + adapter.getCenter(t).x, 0) / targetList.length,
+        y: targetList.reduce((sum, t) => sum + adapter.getCenter(t).y, 0) / targetList.length,
     };
 
     const sequence = new Sequence();

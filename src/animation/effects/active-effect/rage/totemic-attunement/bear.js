@@ -9,7 +9,8 @@ import { applySound, DEFAULT_SOUND_CONFIG } from "../../../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: 'Bear Totemic Attunement',
     color: 'red',
-}
+    sound: { ...DEFAULT_SOUND_CONFIG },
+};
 
 async function play(token, targets, config = {}) {
     const seq = await create(token, targets, config);
@@ -17,9 +18,9 @@ async function play(token, targets, config = {}) {
 }
 
 function targetSequence(target, config = {}) {
-    const { color } = config;
+    const { color, sound } = config;
     let seq = new Sequence();
-    applySound(seq, mConfig.sound);
+    applySound(seq, sound);
     seq = seq.effect()
         .copySprite(target)
         .attachTo(target)
@@ -55,11 +56,11 @@ function targetSequence(target, config = {}) {
 
 function create(token, targets, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
     const label = `${id} - ${token.id}`;
 
     let seq = new Sequence();
-    applySound(seq, mConfig.sound);
+    applySound(seq, sound);
 
     seq = seq.effect()
         .name(label)
@@ -71,7 +72,8 @@ function create(token, targets, config = {}) {
         .repeats(8, 250,250)
         .zIndex(1);
 
-    for (const target of targets) seq.addSequence(targetSequence(target, config));
+    const targetList = (Array.isArray(targets) ? targets : [targets]).filter(Boolean);
+    for (const target of targetList) seq.addSequence(targetSequence(target, mConfig));
 
     return seq;
 }
@@ -79,5 +81,5 @@ function create(token, targets, config = {}) {
 export const bearAttunement = {
     create,
     play,
-    sound: { ...DEFAULT_SOUND_CONFIG },
+    default_config: DEFAULT_CONFIG,
 };

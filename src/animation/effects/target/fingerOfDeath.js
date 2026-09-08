@@ -37,14 +37,15 @@ async function create(token, target, config = {}) {
         .filter("ColorMatrix", { saturate: 0, brightness: 0 })
         .zIndex(1);
 
-    const sceneBackground = adapter.getSceneBackground(canvas.scene);
-    if (darkMap && sceneBackground.src) {
+    const sceneBackground = adapter.getSceneBackground(canvas?.scene);
+    if (darkMap && sceneBackground?.src) {
+        const dims = adapter.getSceneDimensions(canvas?.scene);
         sequence.effect()
-            .file(sceneBackground.src)
+            .file(closest(sceneBackground.src))
             .filter("ColorMatrix", { brightness: 0.3 })
-            .atLocation({ x: (canvas.dimensions.width) / 2, y: (canvas.dimensions.height) / 2 })
-            .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
-            .spriteOffset({ x: -0.5 }, { gridUnits: true })
+            .atLocation(adapter.getSceneCenter(canvas?.scene))
+            .size({ width: dims.width / dims.size, height: dims.height / dims.size }, { gridUnits: true })
+            .spriteOffset({ x: -sceneBackground.offsetX, y: -sceneBackground.offsetY })
             .duration(6000)
             .fadeIn(500)
             .fadeOut(500)

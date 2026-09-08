@@ -2,8 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
-import { adapter } from '../../../adapters/index.js';
+import { adapter, autorec, CONCENTRATING } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -25,11 +24,13 @@ async function create(token, config = {}) {
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
+        const sceneDims = adapter.getSceneDimensions(canvas?.scene);
+        const gridSize = adapter.getGridSize(canvas?.scene);
         seq.effect()
             .name(label)
             .file(closest(bg.src))
-            .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
-            .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
+            .atLocation(adapter.getSceneCenter(canvas?.scene))
+            .size({ width: sceneDims.width / gridSize, height: sceneDims.height / gridSize }, { gridUnits: true })
             .fadeIn(750)
             .fadeOut(750)
             .duration(4000)

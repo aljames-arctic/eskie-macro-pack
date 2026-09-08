@@ -276,4 +276,158 @@ test('no animation effect module or standalone macro uses globalThis', () => {
     }
 });
 
+test('all active-effect modules export standard interfaces and sound configurations', async () => {
+    const { banishment } = await import('../../src/animation/effects/active-effect/banishment.js');
+    const { bless } = await import('../../src/animation/effects/active-effect/bless.js');
+    const { blurredVision } = await import('../../src/animation/effects/active-effect/blurred-vision.js');
+    const { charmed } = await import('../../src/animation/effects/active-effect/charmed.js');
+    const { dash } = await import('../../src/animation/effects/active-effect/dash.js');
+    const { drunk } = await import('../../src/animation/effects/active-effect/drunk.js');
+    const { enlargeReduce } = await import('../../src/animation/effects/active-effect/enlarge-reduce.js');
+    const { entangled } = await import('../../src/animation/effects/active-effect/entangled.js');
+    const { fightingSpirit } = await import('../../src/animation/effects/active-effect/fighting-spirit.js');
+    const { fireShield } = await import('../../src/animation/effects/active-effect/fire-shield.js');
+    const { hide } = await import('../../src/animation/effects/active-effect/hide.js');
+    const { levitation } = await import('../../src/animation/effects/active-effect/levitation.js');
+    const { mirrorImage } = await import('../../src/animation/effects/active-effect/mirror-image.js');
+    const { petrified } = await import('../../src/animation/effects/active-effect/petrified.js');
+    const { rage } = await import('../../src/animation/effects/active-effect/rage/index.js');
+    const { totemicAttunement } = await import('../../src/animation/effects/active-effect/rage/totemic-attunement/index.js');
+    const { sandevistan } = await import('../../src/animation/effects/active-effect/sandevistan.js');
+    const { shapechange } = await import('../../src/animation/effects/active-effect/shapechange.js');
+    const { speakWithDead } = await import('../../src/animation/effects/active-effect/speakWithDead.js');
+    const { stepOfTheWindMove } = await import('../../src/animation/effects/active-effect/step-of-the-wind.js');
+    const { strengthBeforeDeath } = await import('../../src/animation/effects/active-effect/strength-before-death.js');
+
+    // Banishment
+    assert.ok(banishment.banish, 'banishment.banish must exist');
+    assert.equal(typeof banishment.banish.create, 'function');
+    assert.equal(typeof banishment.banish.play, 'function');
+    assert.equal(typeof banishment.banish.stop, 'function');
+    assert.ok(banishment.default_config.sound, 'banishment sound must exist');
+
+    // Bless
+    assert.ok(bless.cast, 'bless.cast must exist');
+    assert.ok(bless.effect, 'bless.effect must exist');
+    assert.equal(typeof bless.create, 'function');
+    assert.equal(typeof bless.play, 'function');
+    assert.ok(bless.default_config.sound.cast, 'bless cast sound must exist');
+    assert.ok(bless.default_config.sound.target, 'bless target sound must exist');
+
+    // Blurred Vision
+    assert.equal(typeof blurredVision.create, 'function');
+    assert.equal(typeof blurredVision.play, 'function');
+    assert.equal(typeof blurredVision.stop, 'function');
+    assert.ok(blurredVision.default_config.sound, 'blurredVision DEFAULT_CONFIG must have sound');
+
+    // Charmed
+    assert.equal(typeof charmed.create, 'function');
+    assert.equal(typeof charmed.play, 'function');
+    assert.equal(typeof charmed.stop, 'function');
+    assert.ok(charmed.default_config.sound, 'charmed DEFAULT_CONFIG must have sound');
+
+    // Dash
+    assert.equal(typeof dash.create, 'function');
+    assert.equal(typeof dash.play, 'function');
+    assert.equal(typeof dash.stop, 'function');
+    assert.ok(dash.default_config.sound, 'dash DEFAULT_CONFIG must have sound');
+
+    // Drunk
+    assert.equal(typeof drunk.create, 'function');
+    assert.equal(typeof drunk.play, 'function');
+    assert.equal(typeof drunk.stop, 'function');
+    assert.ok(drunk.default_config.sound, 'drunk DEFAULT_CONFIG must have sound');
+
+    // Enlarge Reduce
+    assert.ok(enlargeReduce.enlarge, 'enlargeReduce.enlarge must exist');
+    assert.ok(enlargeReduce.reduce, 'enlargeReduce.reduce must exist');
+    assert.ok(enlargeReduce.default_config.sound.enlarge, 'enlargeReduce enlarge sound must exist');
+    assert.ok(enlargeReduce.default_config.sound.reduce, 'enlargeReduce reduce sound must exist');
+
+    // Entangled
+    assert.equal(typeof entangled.create, 'function');
+    assert.equal(typeof entangled.play, 'function');
+    assert.equal(typeof entangled.stop, 'function');
+    assert.ok(entangled.default_config.sound, 'entangled DEFAULT_CONFIG must have sound');
+
+    // Fighting Spirit
+    assert.equal(typeof fightingSpirit.create, 'function');
+    assert.equal(typeof fightingSpirit.play, 'function');
+    assert.equal(typeof fightingSpirit.stop, 'function');
+    assert.ok(fightingSpirit.default_config.sound, 'fightingSpirit DEFAULT_CONFIG must have sound');
+
+    // Fire Shield
+    assert.equal(typeof fireShield.create, 'function');
+    assert.equal(typeof fireShield.play, 'function');
+    assert.equal(typeof fireShield.stop, 'function');
+    assert.ok(fireShield.default_config.sound, 'fireShield DEFAULT_CONFIG must have sound');
+
+    // Hide
+    assert.equal(typeof hide.create, 'function');
+    assert.equal(typeof hide.play, 'function');
+    assert.equal(typeof hide.stop, 'function');
+    assert.ok(hide.default_config.sound, 'hide DEFAULT_CONFIG must have sound');
+
+    // Levitation
+    assert.equal(typeof levitation.create, 'function');
+    assert.equal(typeof levitation.play, 'function');
+    assert.equal(typeof levitation.stop, 'function');
+    assert.ok(levitation.default_config.sound, 'levitation DEFAULT_CONFIG must have sound');
+
+    // Mirror Image
+    assert.ok(mirrorImage.v1, 'mirrorImage.v1 must exist');
+    assert.ok(mirrorImage.v2, 'mirrorImage.v2 must exist');
+    assert.ok(mirrorImage.default_config.config_v1.sound, 'mirrorImage v1 sound must exist');
+    assert.ok(mirrorImage.default_config.config_v2.sound, 'mirrorImage v2 sound must exist');
+
+    // Petrified
+    assert.equal(typeof petrified.create, 'function');
+    assert.equal(typeof petrified.play, 'function');
+    assert.equal(typeof petrified.stop, 'function');
+    assert.ok(petrified.default_config.sound, 'petrified DEFAULT_CONFIG must have sound');
+
+    // Rage & Totemic Attunement
+    assert.ok(rage.v1 && rage.v2 && rage.v3 && rage.v4 && rage.v5, 'rage versions 1-5 must exist');
+    assert.ok(totemicAttunement.bear, 'totemicAttunement.bear must exist');
+    assert.ok(totemicAttunement.eagle, 'totemicAttunement.eagle must exist');
+    assert.ok(totemicAttunement.elk, 'totemicAttunement.elk must exist');
+    assert.ok(totemicAttunement.tiger, 'totemicAttunement.tiger must exist');
+    assert.ok(totemicAttunement.wolf, 'totemicAttunement.wolf must exist');
+    assert.ok(totemicAttunement.bear.default_config.sound, 'bear sound must exist');
+    assert.ok(totemicAttunement.eagle.default_config.sound, 'eagle sound must exist');
+    assert.ok(totemicAttunement.elk.default_config.sound, 'elk sound must exist');
+    assert.ok(totemicAttunement.tiger.default_config.sound, 'tiger sound must exist');
+    assert.ok(totemicAttunement.wolf.default_config.sound, 'wolf sound must exist');
+
+    // Sandevistan
+    assert.equal(typeof sandevistan.create, 'function');
+    assert.equal(typeof sandevistan.play, 'function');
+    assert.equal(typeof sandevistan.stop, 'function');
+    assert.ok(sandevistan.default_config.sound, 'sandevistan DEFAULT_CONFIG must have sound');
+
+    // Shapechange
+    assert.ok(shapechange.shapechange, 'shapechange.shapechange must exist');
+    assert.ok(shapechange.revert, 'shapechange.revert must exist');
+    assert.ok(shapechange.default_config.sound, 'shapechange DEFAULT_CONFIG must have sound');
+
+    // Speak with Dead
+    assert.equal(typeof speakWithDead.create, 'function');
+    assert.equal(typeof speakWithDead.play, 'function');
+    assert.equal(typeof speakWithDead.stop, 'function');
+    assert.ok(speakWithDead.default_config.sound, 'speakWithDead DEFAULT_CONFIG must have sound');
+
+    // Step of the Wind
+    assert.equal(typeof stepOfTheWindMove.create, 'function');
+    assert.equal(typeof stepOfTheWindMove.play, 'function');
+    assert.equal(typeof stepOfTheWindMove.stop, 'function');
+    assert.ok(stepOfTheWindMove.default_config.sound, 'stepOfTheWindMove DEFAULT_CONFIG must have sound');
+
+    // Strength Before Death
+    assert.equal(typeof strengthBeforeDeath.create, 'function');
+    assert.equal(typeof strengthBeforeDeath.play, 'function');
+    assert.equal(typeof strengthBeforeDeath.stop, 'function');
+    assert.ok(strengthBeforeDeath.default_config.sound, 'strengthBeforeDeath DEFAULT_CONFIG must have sound');
+});
+
+
 

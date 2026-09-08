@@ -9,9 +9,8 @@ function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { delay } = mConfig;
 
-    const gs = canvas.grid.size;
-    const cx = token.center.x;
-    const cy = token.center.y;
+    const { size: gs } = adapter.getSceneDimensions();
+    const { x: cx, y: cy } = adapter.getCenter(token);
 
     const seq = new Sequence()
         .effect()

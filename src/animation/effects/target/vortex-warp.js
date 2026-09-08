@@ -77,14 +77,15 @@ async function create(target, config = {}) {
 async function play(target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { position } = mConfig;
+    const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);
     const crosshairConfig = {
-        size: target.w / canvas.grid.size,
+        size: targetWidth,
         icon: 'icons/magic/air/wind-vortex-swirl-blue.webp',
         label: 'Vortex Warp',
         tag: 'Vortex Warp',
         drawIcon: true,
         drawOutline: true,
-        interval: target.document.width % 2 === 0 ? 1 : -1,
+        interval: targetWidth % 2 === 0 ? 1 : -1,
     };
 
     if (!position) {

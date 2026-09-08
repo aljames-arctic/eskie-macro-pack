@@ -11,16 +11,14 @@ const EFFECT_NAME = 'Fly';
 export const DEFAULT_CONFIG = {
     id: 'AerodyneVehicle',
     sound: { ...DEFAULT_SOUND_CONFIG },
-    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
-    const tokenRotation = token.document.rotation || 0;
-    const w = token.w;
-    const h = token.h;
+    const tokenRotation = adapter.getTokenRotation(token);
+    const { widthPx: w, heightPx: h } = adapter.getTokenDimensions(token);
 
     const seq = new Sequence();
     applySound(seq, sound);
@@ -41,7 +39,7 @@ async function create(token, config = {}) {
 
         .effect()
         .copySprite(token)
-        .spriteRotation(-token.document.rotation)
+        .spriteRotation(-tokenRotation)
         .name(EFFECT_NAME)
         .atLocation(token, { offset: { x: 0, y: -0.2 }, gridUnits: true })
         .size({ width: w, height: h })
@@ -56,7 +54,7 @@ async function create(token, config = {}) {
 
         .effect()
         .copySprite(token)
-        .spriteRotation(-token.document.rotation)
+        .spriteRotation(-tokenRotation)
         .name(EFFECT_NAME)
         .atLocation(token)
         .size({ width: w, height: h })

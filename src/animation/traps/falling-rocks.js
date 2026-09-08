@@ -24,7 +24,7 @@ async function create(tile, targets, config = {}) {
 
     const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
 
-    const tileDoc = tile.document ?? tile;
+    const tileDoc = tile.document;
     const tileBounds = adapter.getTileBounds(tile);
     const tileCenter = tileBounds.center;
     const tileWidth = tileBounds.width;
@@ -91,15 +91,12 @@ async function create(tile, targets, config = {}) {
         .shake({ duration: 500, strength: 2, rotation: false });
 
     if (finalTargets.length > 0) {
-        const currentPinnedIds = tileDoc.getFlag?.(MODULE_ID, `${label} - pinned`) ?? [];
+        const currentPinnedIds = tileDoc.getFlag(MODULE_ID, `${label} - pinned`) ?? [];
         const finalTargetIds = finalTargets.map(token => token.id);
-        await tileDoc.setFlag?.(MODULE_ID, `${label} - pinned`, [...currentPinnedIds, ...finalTargetIds]);
+        await tileDoc.setFlag(MODULE_ID, `${label} - pinned`, [...currentPinnedIds, ...finalTargetIds]);
         
         finalTargets.forEach(target => {
-            const targetDoc = target.document ?? target;
-            const targetName = targetDoc.name;
-            const targetRotation = targetDoc.rotation;
-            const buryEffectName = `${label}-${targetName}-${target.id}`;
+            const buryEffectName = `${label}-${target.name}-${target.id}`;
 
             seq = seq
                 // Persistent copy sprite under rocks
@@ -107,7 +104,7 @@ async function create(tile, targets, config = {}) {
                 .name(buryEffectName)
                 .copySprite(target)
                 .attachTo(target, { bindAlpha: false })
-                .spriteRotation(-targetRotation)
+                .spriteRotation(-adapter.getTokenRotation(target))
                 .scaleToObject(1, { considerTokenScale: true })
                 .fadeOut(750, { ease: 'easeOutCubic' })
                 .persist()
@@ -130,10 +127,10 @@ async function play(tile, targets, config = {}) {
 
 async function stop(tile, config = {}) {
     const { label } = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const tileDoc = tile.document ?? tile;
+    const tileDoc = tile.document;
     
     // 1. Retrieve the pinned IDs from the tile's flags (fallback to an empty array if none)
-    const pinnedIds = tileDoc.getFlag?.(MODULE_ID, `${label} - pinned`) ?? [];
+    const pinnedIds = tileDoc.getFlag(MODULE_ID, `${label} - pinned`) ?? [];
 
     // 2. Clear rock rubble effect on the tile
     await Sequencer.EffectManager.endEffects({ name: `${label}-${tile.id}` });
@@ -141,8 +138,8 @@ async function stop(tile, config = {}) {
     if (pinnedIds.length > 0) {
         // 3. Convert IDs to actual canvas token objects, filtering out any that no longer exist
         const tokensToClean = pinnedIds
-            .map(tokenId => canvas.tokens.get(tokenId))
-            .filter(token => token !== undefined);
+            .map(tokenId => adapter.getPlaceable(tokenId))
+            .filter(Boolean);
 
         // 4. Trigger the unbury sequence for all tokens simultaneously and wait for them to finish
         const cleanPromises = tokensToClean.map(token => cleanToken(token, config));

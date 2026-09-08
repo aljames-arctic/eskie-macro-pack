@@ -30,7 +30,7 @@ async function create(token, target, config = {}) {
     const sequence = new Sequence();
     applySound(sequence, sound);
 
-    const tokenWidth = token.document?.width ?? token.width ?? 1;
+    const tokenWidth = token.document.width ?? 1;
 
     sequence
         .effect()
@@ -89,7 +89,7 @@ async function create(token, target, config = {}) {
 
         .effect()
             .copySprite(target)
-            .spriteRotation(-target.document.rotation)
+            .spriteRotation(-adapter.getTokenRotation(target))
             .attachTo(target)
             .scaleToObject(1, { considerTokenScale: true })
             .fadeIn(250)

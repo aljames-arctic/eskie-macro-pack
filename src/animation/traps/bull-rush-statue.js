@@ -23,19 +23,18 @@ async function create(tile, targets, config = {}) {
     const targetList = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
     const target = targetList.length ? targetList[0] : null;
 
-    const tileDoc = tile.document ?? tile;
+    const tileDoc = tile.document;
     const tileBounds = adapter.getTileBounds(tile);
     const tileCenter = tileBounds.center;
     const tileWidth = tileBounds.width;
     const tileHeight = tileBounds.height;
 
-    const targetTileIds = tileDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
-    const targetTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
-    const targetTileBounds = targetTile ? adapter.getTileBounds(targetTile) : null;
-    const targetLoc = targetTileBounds?.center ?? (target ? (target.center ?? target.object?.center) : null);
+    const targetTileIds = tileDoc.getFlag(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
+    const targetTile = adapter.getPlaceable(targetTileIds[0]);
+    const targetLoc = adapter.getCenter(targetTile);
 
     if (!targetLoc) {
-        log.warn(`Bull Rush Statue Trap: Tile "${tileDoc.id}" has no configured target tile or targeted tokens.`);
+        log.warn(`Bull Rush Statue Trap: Tile "${tileDoc.id}" has no configured target tile.`);
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;
@@ -49,31 +48,32 @@ async function create(tile, targets, config = {}) {
     applySound(seq, sound);
 
     const startCenter = tileCenter;
-        const distance = {
-            x: targetLoc.x - startCenter.x,
-            y: targetLoc.y - startCenter.y
-        };
+    const distance = {
+        x: targetLoc.x - startCenter.x,
+        y: targetLoc.y - startCenter.y
+    };
 
-        const getDirection = (value) => {
-            if (value > 0) return 1;
-            if (value < 0) return -1;
-            return 0;
-        };
+    const getDirection = (value) => {
+        if (value > 0) return 1;
+        if (value < 0) return -1;
+        return 0;
+    };
 
-        const direction = {
-            x: getDirection(distance.x),
-            y: getDirection(distance.y)
-        };
+    const direction = {
+        x: getDirection(distance.x),
+        y: getDirection(distance.y)
+    };
 
-        const destination = {
-            x: targetLoc.x + (canvas.grid.size * pushDistance) * direction.x,
-            y: targetLoc.y + (canvas.grid.size * pushDistance) * direction.y
-        };
+    const gridSize = adapter.getGridSize();
+    const destination = {
+        x: targetLoc.x + (gridSize * pushDistance) * direction.x,
+        y: targetLoc.y + (gridSize * pushDistance) * direction.y
+    };
 
-        const slideDistance = {
-            x: distance.x - (canvas.grid.size * 0.5) * direction.x,
-            y: distance.y - (canvas.grid.size * 0.5) * direction.y
-        };
+    const slideDistance = {
+        x: distance.x - (gridSize * 0.5) * direction.x,
+        y: distance.y - (gridSize * 0.5) * direction.y
+    };
 
         seq = seq
             .wait(500)
@@ -82,7 +82,7 @@ async function create(tile, targets, config = {}) {
             .file(textureSrc)
             .atLocation(tileCenter)
             .size({ width: tileWidth * scaleX, height: tileHeight * scaleY })
-            .spriteRotation(-(tileDoc.rotation ?? 0))
+            .spriteRotation(-adapter.getTokenRotation(tile))
             .animateProperty('spriteContainer', 'position.x', { from: 0, to: slideDistance.x, duration: 500, ease: 'easeOutQuint', delay: 200 })
             .animateProperty('spriteContainer', 'position.y', { from: 0, to: slideDistance.y, duration: 500, ease: 'easeOutQuint', delay: 200 })
             .animateProperty('spriteContainer', 'position.x', { from: 0, to: -slideDistance.x, duration: 3000, ease: 'easeInOutQuad', delay: 700 })

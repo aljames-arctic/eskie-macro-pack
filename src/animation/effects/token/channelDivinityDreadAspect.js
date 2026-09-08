@@ -41,11 +41,12 @@ async function create(token, targets, config = {}) {
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
+        const dims = adapter.getSceneDimensions(canvas?.scene);
         sequence.effect()
             .file(closest(bg.src))
             .filter("ColorMatrix", { brightness: 0.3 })
-            .atLocation({ x: (canvas.dimensions.width) / 2, y: (canvas.dimensions.height) / 2 })
-            .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
+            .atLocation(adapter.getSceneCenter(canvas?.scene))
+            .size({ width: dims.width / dims.size, height: dims.height / dims.size }, { gridUnits: true })
             .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY })
             .duration(3000)
             .fadeIn(500)
@@ -53,10 +54,12 @@ async function create(token, targets, config = {}) {
             .belowTokens();
     }
 
+    const { widthUnits: tokenWidth } = adapter.getTokenDimensions(token);
+
     sequence.effect()
         .file(closest(`jb2a.particles.outward.red.01.03`))
         .attachTo(token, { offset: { y: 0.1 }, gridUnits: true, bindRotation: false })
-        .size(0.5 * token.document.width, { gridUnits: true })
+        .size(0.5 * tokenWidth, { gridUnits: true })
         .duration(1000)
         .fadeOut(800)
         .scaleIn(0, 1000, { ease: "easeOutCubic" })

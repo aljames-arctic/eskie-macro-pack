@@ -15,7 +15,7 @@ const DEFAULT_CONFIG = {
 
 function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
     const label = `${id}-${token.id}`;
 
     let seq = new Sequence();

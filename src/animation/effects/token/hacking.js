@@ -13,7 +13,6 @@ const UI_IMAGES = ['D2ROdgN', 'IMr77nW', 'LRr5crs'];
 export const DEFAULT_CONFIG = {
     id: 'Hacking',
     sound: { ...DEFAULT_SOUND_CONFIG },
-    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 function _randomUiImage() {

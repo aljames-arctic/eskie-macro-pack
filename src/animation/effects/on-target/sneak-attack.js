@@ -1,6 +1,5 @@
-import { adapter } from '../../../adapters/index.js';
+import { adapter, autorec } from '../../../adapters/index.js';
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG_MELEE = {
@@ -23,13 +22,14 @@ async function createMelee(token, target, config = {}) {
     const { id, color, type, weight, sound } = mConfig;
 
     //Determine Attack Size
-    const weightIndex = { light: 0, medium: 1, heavy: 2 }[weight];
+    const weightIndex = { light: 0, medium: 1, heavy: 2 }[weight] ?? 1;
 
-    let effectSize = 2 + (0.25 * weightIndex);
-    let effectOffset = -0.75 - (0.25 * weightIndex);
+    const effectSize = 2 + (0.25 * weightIndex);
+    const effectOffset = -0.75 - (0.25 * weightIndex);
 
     //Determine nearest targetSquare
-    let targetSquare = adapter.getNearestSquareCenter(token, target);
+    const targetSquare = adapter.getNearestSquareCenter(token, target) ?? adapter.getCenter(target);
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
     let seq = new Sequence();
     applySound(seq, sound.attack);
@@ -41,14 +41,14 @@ async function createMelee(token, target, config = {}) {
         .atLocation(token)
         .rotateTowards(targetSquare)
         .scaleToObject(effectSize)
-        .spriteOffset({ x: effectOffset * token.document.width }, { gridUnits: true })
+        .spriteOffset({ x: effectOffset * tokenWidth }, { gridUnits: true })
         .randomizeMirrorY()
         .zIndex(1)
 
         .effect()
         .delay(150)
         .file(closest(`jb2a.impact.008.${color.impact}`))
-        .size(1.25 * token.document.width, { gridUnits: true })
+        .size(1.25 * tokenWidth, { gridUnits: true })
         .atLocation(targetSquare)
         .randomRotation()
         .playbackRate(0.9)
@@ -58,23 +58,23 @@ async function createMelee(token, target, config = {}) {
         .delay(150)
         .file(closest(`jb2a.liquid.splash_side.${color.damage}`))
         .atLocation(targetSquare)
-        .size(1.5 * token.document.width, { gridUnits: true })
+        .size(1.5 * tokenWidth, { gridUnits: true })
         .rotateTowards(token)
-        .spriteOffset({ x: -1.15 * token.document.width }, { gridUnits: true })
+        .spriteOffset({ x: -1.15 * tokenWidth }, { gridUnits: true })
         .spriteRotation(180)
         .zIndex(0)
 
         .effect()
         .delay(150)
         .copySprite(target)
-        .spriteRotation(-target.document.rotation)
+        .spriteRotation(-adapter.getTokenRotation(target))
         .attachTo(target)
         .scaleToObject(1, { considerTokenScale: true })
         .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
         .opacity(0.25)
         .duration(1000)
         .fadeOut(750)
-        .tint("#FF0000")
+        .tint("#FF0000");
 
     return seq;
 }
@@ -87,7 +87,7 @@ async function playMelee(token, target, config = {}) {
 const melee = {
     create: createMelee,
     play: playMelee,
-}
+};
 
 const DEFAULT_CONFIG_RANGED = {
     id: "sneakAttackRanged",
@@ -105,6 +105,7 @@ const DEFAULT_CONFIG_RANGED = {
 function createRanged(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_RANGED, config);
     const { id, color, sound } = mConfig;
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
     let seq = new Sequence();
     applySound(seq, sound.attack);
@@ -114,13 +115,13 @@ function createRanged(token, target, config = {}) {
         .file(closest(`eskie.slice.01_ranged.black.${color.attack}`))
         .atLocation(token)
         .stretchTo(target)
-        .spriteOffset({ x: token.document.width / 2 }, { gridUnits: true })
+        .spriteOffset({ x: tokenWidth / 2 }, { gridUnits: true })
         .zIndex(1)
 
         .effect()
         .delay(150)
         .file(closest(`jb2a.impact.008.${color.impact}`))
-        .size(1.25 * token.document.width, { gridUnits: true })
+        .size(1.25 * tokenWidth, { gridUnits: true })
         .atLocation(target)
         .randomRotation()
         .playbackRate(0.9)
@@ -130,16 +131,16 @@ function createRanged(token, target, config = {}) {
         .delay(150)
         .file(closest(`jb2a.liquid.splash_side.${color.damage}`))
         .atLocation(target)
-        .size(1.5 * token.document.width, { gridUnits: true })
+        .size(1.5 * tokenWidth, { gridUnits: true })
         .rotateTowards(token)
-        .spriteOffset({ x: -1.15 * token.document.width }, { gridUnits: true })
+        .spriteOffset({ x: -1.15 * tokenWidth }, { gridUnits: true })
         .spriteRotation(180)
         .zIndex(0)
 
         .effect()
         .delay(150)
         .copySprite(target)
-        .spriteRotation(-target.document.rotation)
+        .spriteRotation(-adapter.getTokenRotation(target))
         .attachTo(target)
         .scaleToObject(1, { considerTokenScale: true })
         .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
@@ -158,7 +159,7 @@ async function playRanged(token, target, config = {}) {
 const ranged = {
     create: createRanged,
     play: playRanged,
-}
+};
 
 const DEFAULT_CONFIG = {
     melee: DEFAULT_CONFIG_MELEE,

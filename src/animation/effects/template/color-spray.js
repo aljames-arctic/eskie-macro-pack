@@ -4,17 +4,17 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { template as templatelib } from "../../../lib/templates.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { adapter } from "../../../adapters/index.js";
+import { autorec } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'colorSpray',
     wave_count: 4,
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(token, config) {
+async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { wave_count, template, sound } = mConfig;
 
@@ -34,21 +34,23 @@ async function create(token, config) {
     const seq = new Sequence();
     applySound(seq, sound);
     
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
+
     //Cast Effect
     seq.effect()
         .file(closest("eskie.star.02.white"))
         .atLocation(position)
-        .size(token.document.width, {gridUnits:true})
+        .size(tokenWidth, { gridUnits: true })
         .zIndex(3);
 
     seq.effect()
         .file(closest("jb2a.sacred_flame.target.white"))
         .atLocation(position)
-        .size(token.document.width*0.65, {gridUnits:true})
+        .size(tokenWidth * 0.65, { gridUnits: true })
         .zIndex(2)
-        .scaleIn(0, 500, {ease: "easeOutCubic"})
-        .filter("ColorMatrix", { hue: 150, brightness:1.1 })
-        .scaleOut(0, 500, {ease: "easeOutCubic"})
+        .scaleIn(0, 500, { ease: "easeOutCubic" })
+        .filter("ColorMatrix", { hue: 150, brightness: 1.1 })
+        .scaleOut(0, 500, { ease: "easeOutCubic" })
         .endTime(2500);
 
     //Color Spray Effect
@@ -64,11 +66,11 @@ async function create(token, config) {
             .file(closest("eskie.pulse.energy.03.fast.white"))
             .atLocation(position)
             .rotateTowards(secondary)
-            .spriteOffset({x:-token.document.width*1.1},{gridUnits:true})
-            .size(token.document.width*2, {gridUnits:true})
+            .spriteOffset({ x: -tokenWidth * 1.1 }, { gridUnits: true })
+            .size(tokenWidth * 2, { gridUnits: true })
             .tint(tintColor1)
             .zIndex(2)
-            .filter("ColorMatrix", { brightness:2 });
+            .filter("ColorMatrix", { brightness: 2 });
 
         wave.effect()
             .file(closest("jb2a.energy_strands.range.standard.grey"))
@@ -120,7 +122,7 @@ async function create(token, config) {
     return seq;
 }
 
-async function play(token, config) {
+async function play(token, config = {}) {
     const seq = await create(token, config);
     if (seq) { return seq.play(); }
 }

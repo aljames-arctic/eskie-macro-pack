@@ -44,7 +44,7 @@ async function create(token, config = {}) {
     // TODO(bakanabaka): Utilizes old mergeObject
     let { id, duration, effect, facing , sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    const tokenWidth = token.document.width;
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
     const mirrorFace = facing === 'right';
     const facingFactor = mirrorFace ? -1 : 1;
 

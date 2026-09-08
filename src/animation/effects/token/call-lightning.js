@@ -55,7 +55,7 @@ async function create(position, config = {}) {
 async function play(token, position, config = {}) {
     if (!position) {
         const crosshairConfig = {
-            size: token.document.width / canvas.grid.size,
+            size: token.document.width,
             icon: 'icons/magic/air/wind-stream-blue-gray.webp',
             label: 'Dash',
             tag: 'dashing',

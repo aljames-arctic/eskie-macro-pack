@@ -38,7 +38,6 @@ const UNICODE_CHARS = [
 export const DEFAULT_CONFIG = {
     id: 'Call',
     sound: { ...DEFAULT_SOUND_CONFIG },
-    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, config = {}) {

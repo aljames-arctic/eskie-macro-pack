@@ -3,8 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { adapter } from '../../../adapters/index.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { adapter, autorec } from '../../../adapters/index.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
@@ -25,7 +24,7 @@ async function create(token, targetOrConfig, config = {}) {
         const [primary, secondary, center] = await templatelib.getPosition(template);
         position = center ?? primary;
     } else if (target?.center || (target?.x !== undefined && target?.y !== undefined)) {
-        position = target.center ?? target;
+        position = adapter.getCenter(target);
     } else {
         const crosshairConfig = {
             type: 'ray',
@@ -42,7 +41,7 @@ async function create(token, targetOrConfig, config = {}) {
     const sequence = new Sequence();
     applySound(sequence, sound);
 
-    const tokenWidth = token?.document?.width ?? token?.width ?? 1;
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
     sequence
         .effect()

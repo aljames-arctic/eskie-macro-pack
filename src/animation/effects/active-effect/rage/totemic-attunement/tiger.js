@@ -19,34 +19,18 @@ async function play(token, target, config = {}) {
     if (seq) { await seq.play(); }
 }
 
-function create(token, target, config = {}) {
+async function create(token, target, config = {}) {
+    if (!token || !target) return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, color, attack } = mConfig;
-    const { count } = attack;
+    const { id, color, attack, sound } = mConfig;
+    const count = attack?.count ?? 2;
     const label = `${id} - ${token.id}`;
 
-    const dx = target.center.x -  token.center.x;
-    const dy = target.center.y -  token.center.y;
-    const dist = Math.hypot(dx, dy);
-
-    const sizeAdjust = (token.document.width - 1) / 2; 
-    const totalSquares = 1 + sizeAdjust;
-    const totalPixels  = totalSquares * canvas.grid.size;
-
-    const ux = dx / dist;
-    const uy = dy / dist;
-
-    const rawCenter = {
-        x: target.center.x - ux * totalPixels,
-        y: target.center.y - uy * totalPixels
-    };
-
-    const tokenSpan = (token.document.width * canvas.grid.size) / 2; 
-    const rawPosition = { x: rawCenter.x - tokenSpan, y: rawCenter.y - tokenSpan};
-    const gridSnap = canvas.grid.getSnappedPosition(rawPosition.x, rawPosition.y, 1);
-    const location = { x: gridSnap.x + tokenSpan, y: gridSnap.y + tokenSpan};
+    const location = adapter.getNearestSquareCenter(token, target) ?? adapter.getCenter(target);
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
     let seq = new Sequence();
+    applySound(seq, sound);
 
     seq = seq.animation()
         .delay(100)
@@ -78,7 +62,7 @@ function create(token, target, config = {}) {
         .rotateTowards(target)
         .scaleToObject(4)
         .spriteScale({x:1.25,y:1},{gridUnits:true})
-        .spriteOffset({x:-3*token.document.width},{gridUnits:true})
+        .spriteOffset({x:-3*tokenWidth},{gridUnits:true})
         .duration(900)
         .tint("#ff0000")
         .moveTowards(location, {relativeToCenter: true, ease:"easeOutQuint",rotate:false, snapToGrid:true})
@@ -90,7 +74,7 @@ function create(token, target, config = {}) {
         .rotateTowards(target)
         .scaleToObject(4)
         .opacity(0.5)
-        .spriteOffset({x:-2*token.document.width},{gridUnits:true})
+        .spriteOffset({x:-2*tokenWidth},{gridUnits:true})
         .zIndex(3)
 
     .canvasPan()
@@ -108,11 +92,11 @@ function create(token, target, config = {}) {
         .atLocation(location)
         .rotateTowards(target)
         .filter("ColorMatrix", {saturate:0.5})
-        .spriteOffset({x:-0.9, y:-0*token.document.width},{gridUnits:true})
+        .spriteOffset({x:-0.9, y:0},{gridUnits:true})
         .rotate(-60)
         .zIndex(1)
         .rotateIn(-270, 400, {ease: "easeOutCubic"}) 
-        .size(2+token.document.width,{gridUnits:true})
+        .size(2+tokenWidth,{gridUnits:true})
         .playIf(count >= 1)
 
     .effect()
@@ -121,11 +105,11 @@ function create(token, target, config = {}) {
         .atLocation(location)
         .rotateTowards(target)
         .filter("ColorMatrix", {saturate:0.5})
-        .spriteOffset({x:-0.9, y:-0*token.document.width},{gridUnits:true})
+        .spriteOffset({x:-0.9, y:0},{gridUnits:true})
         .rotate(60)
         .zIndex(1)
         .rotateIn(270, 400, {ease: "easeOutCubic"}) 
-        .size(2+token.document.width,{gridUnits:true})
+        .size(2+tokenWidth,{gridUnits:true})
         .mirrorY()
         .playIf(count >= 2)
     
@@ -141,4 +125,5 @@ function create(token, target, config = {}) {
 export const tigerAttunement = {
     create,
     play,
+    default_config: DEFAULT_CONFIG,
 };

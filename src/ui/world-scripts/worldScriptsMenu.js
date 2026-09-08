@@ -95,7 +95,7 @@ export class WorldScriptsApp extends adapter.foundry.HandlebarsApplicationMixin(
         updateWorldScripts();
 
         // 3. Show a friendly notification
-        ui.notifications?.info(game.i18n?.localize?.("EMP.worldScripts.savedNotify") ?? "World Scripts Saved");
+        ui.notifications.info(game.i18n?.localize?.("EMP.worldScripts.savedNotify") ?? "World Scripts Saved");
     }
 }
 

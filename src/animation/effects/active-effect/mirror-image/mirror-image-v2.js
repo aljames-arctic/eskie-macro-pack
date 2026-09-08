@@ -31,7 +31,7 @@ async function create(token, config = {}) {
     const sequence = new Sequence();
     applySound(sequence, sound);
 
-    const tokenName = token.name ?? token.document?.name ?? 'Token';
+    const tokenName = token.name;
 
     sequence
         .animation()
@@ -181,7 +181,7 @@ async function create(token, config = {}) {
  */
 async function play(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const tokenName = token.name ?? token.document?.name ?? 'Token';
+    const tokenName = token.name;
     const label = `${tokenName} Mirror Image`;
     const activeEffect = Sequencer.EffectManager.getEffects({ name: `${label} *` }).length > 0;
 
@@ -202,7 +202,7 @@ async function play(token, config = {}) {
  */
 async function stop(token, config = {}) {
     if (!token) return;
-    const tokenName = token.name ?? token.document?.name ?? 'Token';
+    const tokenName = token.name;
     Sequencer.EffectManager.endEffects({ name: `${tokenName} Mirror Image *` });
     Sequencer.EffectManager.endEffects({ name: `${tokenName} Mirror Image *`, object: token });
 

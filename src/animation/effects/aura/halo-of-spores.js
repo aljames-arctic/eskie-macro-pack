@@ -2,10 +2,8 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { adapter, autorec, CONCENTRATING } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
-
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'HaloOfSpores',
     opacity: 0.45,
@@ -22,13 +20,15 @@ function createAura(token, config = {}, options = {}) {
     const sequence = new Sequence();
     applySound(sequence, sound.aura);
 
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
+
     sequence
         .effect()
         .name(label)
         .file(closest("jb2a.spirit_guardians.green.particles"))
         .attachTo(token)
         .filter("ColorMatrix", { hue: 60 })
-        .size(3.5 + token.document.width, { gridUnits: true })
+        .size(3.5 + tokenWidth, { gridUnits: true })
         .belowTokens()
         .scaleIn(0, 500, { ease: "easeOutCubic" })
         .opacity(opacity)
@@ -40,7 +40,7 @@ function createAura(token, config = {}, options = {}) {
         .name(label)
         .file(closest("jb2a.sleep.cloud.01.green"))
         .attachTo(token)
-        .size(5.5 + token.document.width, { gridUnits: true })
+        .size(5.5 + tokenWidth, { gridUnits: true })
         .belowTokens()
         .scaleIn(0, 500, { ease: "easeOutCubic" })
         .filter("ColorMatrix", { hue: 60 })
@@ -101,7 +101,7 @@ function createDamageEffect(token, target, config = {}) {
 
         .effect()
         .copySprite(target)
-        .spriteRotation(-target.document.rotation)
+        .spriteRotation(-adapter.getTokenRotation(target))
         .attachTo(target)
         .scaleToObject(1, { considerTokenScale: true })
         .fadeIn(200)

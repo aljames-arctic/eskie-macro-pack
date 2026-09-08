@@ -18,16 +18,14 @@ async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, radius, path, sound } = mConfig;
 
-    const grid = canvas.scene.grid.distance ?? 5;
-    const radiusGU = radius / grid;
+    const grid = adapter.getSceneDimensions(canvas?.scene).distance;
 
     const collectedTargets = canvas.tokens.placeables.filter(t => {
         if (!t?.actor) return false;
         if (t.id === token.id) return false;
 
-        const distPx = Math.hypot(t.center.x - token.center.x, t.center.y - token.center.y);
-        const distGU = distPx / canvas.grid.size;
-        return distGU <= radiusGU;
+        const dist = adapter.getDistance(token, t);
+        return dist <= radius;
     });
 
     const seq = new Sequence();
@@ -56,8 +54,8 @@ async function create(token, config = {}) {
         const value = path ? adapter.getProperty(target, path) : adapter.getCreatureType(target?.actor);
         const isUndead = String(value ?? '').toLowerCase().includes('undead');
 
-        const distance = Math.hypot(target.x - token.x, target.y - token.y);
-        const gridDistance = distance / canvas.grid.size;
+        const distance = adapter.getDistance(token, target);
+        const gridDistance = distance / grid;
         const delayMs = gridDistance * 125;
 
         const targetSeq = new Sequence()

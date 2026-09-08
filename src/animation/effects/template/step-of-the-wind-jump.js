@@ -3,22 +3,26 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { template as templatelib } from '../../../lib/templates.js';
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
+import { autorec } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
-
 import { adapter } from "../../../adapters/index.js";
+
 const DEFAULT_CONFIG = {
     id: 'step-of-the-wind-jump',
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(token, config = {}) {
+async function create(token, config = {}, options = {}) {
+    if (options?.type == "aefx") return;
     let { id, template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const tokenName = token.name;
+    const tokenCenter = adapter.getCenter(token);
+    const tokenRotation = adapter.getTokenRotation(token);
 
     //Determine Jump Timings
     let jumpTime = 750;
-    let upTime = jumpTime*0.5;
-    let downTime = jumpTime*0.4;
+    let upTime = jumpTime * 0.5;
+    let downTime = jumpTime * 0.4;
 
     const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
     const portalPath = portalEntry?.file ?? portalEntry?.files?.[0] ?? portalEntry;
@@ -29,11 +33,11 @@ async function create(token, config = {}) {
         label: 'Step of the Wind'
     };
     let [position, _] = await templatelib.getPosition(template, cfg);
-    if (!position || position.cancelled ) { return; }
+    if (!position || position.cancelled) { return; }
 
     // Determine Trail Direction
-    let dx = position.x - token.center.x;
-    let dy = position.y - token.center.y;
+    let dx = position.x - tokenCenter.x;
+    let dy = position.y - tokenCenter.y;
 
     let trailOffset  = { x: -0.75, y: 0 };
     let trailRotFrom = -45;
@@ -80,7 +84,7 @@ async function create(token, config = {}) {
             .scaleToObject(1.75)
             .belowTokens()
             .randomRotation()
-            .scaleIn(0, 300, {ease: "easeOutExpo"})
+            .scaleIn(0, 300, { ease: "easeOutExpo" })
             .opacity(0.85)
             .zIndex(1)
 
@@ -89,17 +93,17 @@ async function create(token, config = {}) {
             .atLocation(token)
             .scaleToObject(1.5)
             .playbackRate(2)
-            .scaleIn(0, 1000, {ease: "easeOutCubic"})
+            .scaleIn(0, 1000, { ease: "easeOutCubic" })
             .duration(2500)
             .fadeIn(250)
             .fadeOut(1000)
             .spriteRotation(45)
             .zIndex(6)
-            .animateProperty('sprite', 'height', {from:1, to: 1.5,  duration: 1000, gridUnits: true, ease:"easeOutCubic"})
+            .animateProperty('sprite', 'height', { from: 1, to: 1.5, duration: 1000, gridUnits: true, ease: "easeOutCubic" })
 
         .effect()
             .copySprite(token)
-            .spriteRotation(-token.document.rotation)
+            .spriteRotation(-tokenRotation)
             .atLocation(token)   
             .scaleToObject(0.9, { considerTokenScale: true })
             .opacity(0.5)
@@ -107,47 +111,47 @@ async function create(token, config = {}) {
             .anchor({ x: 0.5, y: 0.5 })
             .filter("ColorMatrix", { brightness: -1 })
             .filter("Blur", { blurX: 5, blurY: 10 })
-            .animateProperty('sprite', 'width', {from: 0, to: -0.15,  duration: upTime, gridUnits: true,delay: 200})
-            .animateProperty('sprite', 'width', {from: 0, to: 0.15,  duration: downTime, gridUnits: true, delay: upTime+200})
-            .animateProperty('sprite', 'height', {from: 0, to: -0.15,  duration: upTime, gridUnits: true,delay: 200})
-            .animateProperty('sprite', 'height', {from: 0, to: 0.15,  duration: downTime, gridUnits: true, delay: upTime+200})
-            .moveTowards(position, {ease:"linear", rotate:false,delay: 200})
-            .duration(jumpTime+200)
+            .animateProperty('sprite', 'width', { from: 0, to: -0.15, duration: upTime, gridUnits: true, delay: 200 })
+            .animateProperty('sprite', 'width', { from: 0, to: 0.15, duration: downTime, gridUnits: true, delay: upTime + 200 })
+            .animateProperty('sprite', 'height', { from: 0, to: -0.15, duration: upTime, gridUnits: true, delay: 200 })
+            .animateProperty('sprite', 'height', { from: 0, to: 0.15, duration: downTime, gridUnits: true, delay: upTime + 200 })
+            .moveTowards(position, { ease: "linear", rotate: false, delay: 200 })
+            .duration(jumpTime + 200)
             .zIndex(2)
 
         .effect()
-            .name(`${token.document.name} Step of the Wind (Jump)`)
+            .name(`${tokenName} Step of the Wind (Jump)`)
             .copySprite(token)
-            .spriteRotation(-token.document.rotation)
+            .spriteRotation(-tokenRotation)
             .atLocation(token)
             .scaleToObject(1, { considerTokenScale: true })
             .opacity(1)
-            .animateProperty('spriteContainer', 'position.y', {from: 0, to: -1.5,  duration: upTime, gridUnits: true, ease: "easeOutCubic",delay: 200})
-            .animateProperty('spriteContainer', 'position.y', {from: 0, to: 1.5,  duration: downTime, gridUnits: true, fromEnd: false, ease: "easeInSine", delay: upTime+200})
-            .moveTowards(position, {ease:"linear", rotate:false,delay: 200})
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -1.5, duration: upTime, gridUnits: true, ease: "easeOutCubic", delay: 200 })
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: 1.5, duration: downTime, gridUnits: true, fromEnd: false, ease: "easeInSine", delay: upTime + 200 })
+            .moveTowards(position, { ease: "linear", rotate: false, delay: 200 })
             .persist()
             .extraEndDuration(800)
-            .duration(jumpTime+200)
-            .animateProperty('sprite', 'rotation', { from: 0, to: 360, duration: upTime+downTime,ease:"easeInSine", delay:200})
+            .duration(jumpTime + 200)
+            .animateProperty('sprite', 'rotation', { from: 0, to: 360, duration: upTime + downTime, ease: "easeInSine", delay: 200 })
             .zIndex(5)
 
         .effect()
-            .name(`${token.document.name} Step of the Wind (Jump)`)
+            .name(`${tokenName} Step of the Wind (Jump)`)
             .file(closest("eskie.trail.token.generic.01.white"))
-            .scaleToObject(1.5, {considerTokenScale: true})
+            .scaleToObject(1.5, { considerTokenScale: true })
             .atLocation(token)   
             .opacity(1)
-            .animateProperty('spriteContainer', 'position.y', {from: 0, to: -1.5,  duration: upTime, gridUnits: true, ease: "easeOutCubic",delay: 200})
-            .animateProperty('spriteContainer', 'position.y', {from: 0, to: 1.5,  duration: downTime, gridUnits: true, fromEnd: false, ease: "easeInSine", delay: upTime+200})
-            .moveTowards(position, {ease:"linear", rotate:false,delay: 200})
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -1.5, duration: upTime, gridUnits: true, ease: "easeOutCubic", delay: 200 })
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: 1.5, duration: downTime, gridUnits: true, fromEnd: false, ease: "easeInSine", delay: upTime + 200 })
+            .moveTowards(position, { ease: "linear", rotate: false, delay: 200 })
             .persist()
-            .fadeIn(250, {delay:200})
-            .fadeOut(50, {ease:"easeOutQuint"})
-            .duration(jumpTime+200)
-            .animateProperty('sprite', 'rotation', { from: trailRotFrom, to: trailRotTo, duration: upTime+downTime,ease:"easeInSine", delay:200})
+            .fadeIn(250, { delay: 200 })
+            .fadeOut(50, { ease: "easeOutQuint" })
+            .duration(jumpTime + 200)
+            .animateProperty('sprite', 'rotation', { from: trailRotFrom, to: trailRotTo, duration: upTime + downTime, ease: "easeInSine", delay: 200 })
             .mirrorX(mirrorTrail)
-            .spriteOffset(trailOffset,{gridUnits:true})
-            .filter("ColorMatrix", { saturate:3})
+            .spriteOffset(trailOffset, { gridUnits: true })
+            .filter("ColorMatrix", { saturate: 3 })
             .zIndex(5)
 
         .wait(jumpTime)
@@ -159,7 +163,7 @@ async function create(token, config = {}) {
             .waitUntilFinished()
 
         .thenDo(function(){
-            Sequencer.EffectManager.endEffects({ name: `${token.document.name} Step of the Wind (Jump)`})
+            Sequencer.EffectManager.endEffects({ name: `${tokenName} Step of the Wind (Jump)` });
         })
 
         .animation()
@@ -174,7 +178,7 @@ async function create(token, config = {}) {
             .scaleToObject(1.75)
             .belowTokens()
             .randomRotation()
-            .scaleIn(0, 300, {ease: "easeOutExpo"})
+            .scaleIn(0, 300, { ease: "easeOutExpo" })
             .opacity(0.85)
 
         .effect()
@@ -182,27 +186,35 @@ async function create(token, config = {}) {
             .atLocation(token)
             .scaleToObject(1.5)
             .playbackRate(2)
-            .scaleIn(0, 1000, {ease: "easeOutCubic"})
+            .scaleIn(0, 1000, { ease: "easeOutCubic" })
             .duration(2500)
             .fadeIn(250)
             .fadeOut(1000)
             .spriteRotation(45)
             .zIndex(6)
-            .animateProperty('sprite', 'height', {from:1, to: 1.5,  duration: 1000, gridUnits: true, ease:"easeOutCubic"});
+            .animateProperty('sprite', 'height', { from: 1, to: 1.5, duration: 1000, gridUnits: true, ease: "easeOutCubic" });
         
     return seq;
 }
 
-async function play(token, config = {}) {
+async function play(token, config = {}, options = {}) {
+    if (options?.type == "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const sequence = await create(token, mConfig);
+    const sequence = await create(token, mConfig, options);
     if (sequence) { return sequence.play(); }
 }
 
+function stop(token, { id = DEFAULT_CONFIG.id } = {}) {
+    if (token) {
+        Sequencer.EffectManager.endEffects({ name: `${token.name} Step of the Wind (Jump)` });
+        Sequencer.EffectManager.endEffects({ name: `${token.name} Step of the Wind (Jump) ${id}` });
+    }
+}
 
 export const stepOfTheWindJump = {
     create,
     play,
+    stop,
     default_config: DEFAULT_CONFIG,
 };
 

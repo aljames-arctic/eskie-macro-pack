@@ -24,21 +24,20 @@ async function create(tile, targets, config = {}) {
     const { sound, repeats, repeatDelay, splashScale } = mConfig;
     const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInTile(tile);
 
-    const tileDoc = tile.document ?? tile;
+    const tileDoc = tile.document;
     const tileBounds = adapter.getTileBounds(tile);
     const tileCenter = tileBounds.center;
 
     // Retrieve projectile type from flags, defaulting to arrow
-    const projectileType = tileDoc.getFlag?.(MODULE_ID, 'trap.projectileType') ?? mConfig.projectileType ?? 'arrow';
+    const projectileType = tileDoc.getFlag(MODULE_ID, 'trap.projectileType') ?? mConfig.projectileType ?? 'arrow';
 
     // Retrieve target/landing tile from flags
-    const targetTileIds = tileDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
-    const targetTile = targetTileIds.length ? canvas.tiles.get(targetTileIds[0]) : null;
-    const targetTileBounds = targetTile ? adapter.getTileBounds(targetTile) : null;
-    const targetLoc = targetTileBounds?.center ?? (targetList.length ? (targetList[0].center ?? targetList[0].object?.center) : null);
+    const targetTileIds = tileDoc.getFlag(MODULE_ID, 'trap.trapTargetTileIds') ?? [];
+    const targetTile = adapter.getPlaceable(targetTileIds[0]);
+    const targetLoc = adapter.getCenter(targetTile);
 
     if (!targetLoc) {
-        log.warn(`Projectile Trap: Tile "${tileDoc.id}" has no configured target tile or targeted tokens.`);
+        log.warn(`Projectile Trap: Tile "${tileDoc.id}" has no configured target tile.`);
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;
@@ -80,10 +79,10 @@ async function create(tile, targets, config = {}) {
 
     if (targetList.length > 0) {
         targetList.forEach(target => {
-            const targetDoc = target.document ?? target;
+            const targetDoc = target.document;
             const targetWidth = targetDoc.width;
             const targetScaleX = targetDoc.texture.scaleX;
-            const targetRotation = targetDoc.rotation;
+            const targetRotation = adapter.getTokenRotation(target);
 
             if (projectileType === 'javelin') {
                 seq = seq
@@ -195,7 +194,7 @@ async function setup(config = {}) {
         ...config
     };
 
-    const playPath = config.playPath || 'eskie.traps.projectile';
+    const playPath = config.playPath ?? 'eskie.traps.projectile';
     return matt.trap.setup(playPath, setupConfig);
 }
 

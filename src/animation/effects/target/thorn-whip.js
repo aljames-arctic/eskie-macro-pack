@@ -20,24 +20,28 @@ async function create(token, target, config = {}) {
 
     if (!token || !target) return;
 
-    const dx = token.center.x - target.center.x;
-    const dy = token.center.y - target.center.y;
+    const tokenCenter = adapter.getCenter(token);
+    const targetCenter = adapter.getCenter(target);
+    const dx = tokenCenter.x - targetCenter.x;
+    const dy = tokenCenter.y - targetCenter.y;
     const distance = Math.hypot(dx, dy);
 
-    const pullDistance = canvas.grid.size * 2; // 10ft
-    const adjacentDistance = canvas.grid.size; // 5ft
+    const gridSize = adapter.getGridSize();
+    const pullDistance = gridSize * 2; // 10ft
+    const adjacentDistance = gridSize; // 5ft
     const maxAllowedPull = Math.max(0, distance - adjacentDistance);
     const moveDistance = Math.min(pullDistance, maxAllowedPull);
 
     const rawLocation = {
-        x: target.center.x + (distance > 0 ? (dx / distance) * moveDistance : 0),
-        y: target.center.y + (distance > 0 ? (dy / distance) * moveDistance : 0)
+        x: targetCenter.x + (distance > 0 ? (dx / distance) * moveDistance : 0),
+        y: targetCenter.y + (distance > 0 ? (dy / distance) * moveDistance : 0)
     };
 
     const location = canvas.grid.getCenterPoint ? canvas.grid.getCenterPoint(rawLocation) : rawLocation;
-    const offsetX = (location.x - target.center.x) / canvas.grid.size;
-    const offsetY = (location.y - target.center.y) / canvas.grid.size;
-    const canPull = pull && (target.document.width <= 2);
+    const offsetX = (location.x - targetCenter.x) / gridSize;
+    const offsetY = (location.y - targetCenter.y) / gridSize;
+    const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);
+    const canPull = pull && (targetWidth <= 2);
 
     const seq = new Sequence();
     applySound(seq, sound);

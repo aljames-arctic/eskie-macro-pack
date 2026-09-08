@@ -25,11 +25,11 @@ let position = await Sequencer.Crosshair.show(crosshairConfig);
 if (!position || position.cancelled) return;
 
 const radius = 3;
-const radiusPx = (radius / (canvas.scene?.grid?.distance ?? 5)) * (canvas.grid.size ?? 100);
+const radiusPx = (radius / (canvas.scene.grid.distance ?? 5)) * canvas.grid.size;
 
 const lockedDoor = canvas.walls.placeables.find((wall) => {
-    const isDoor = (wall.document?.door ?? 0) > 0;
-    const isLocked = (wall.document?.ds ?? 0) > 0;
+    const isDoor = (wall.document.door ?? 0) > 0;
+    const isLocked = (wall.document.ds ?? 0) > 0;
     if (!isDoor || !isLocked) return false;
     const dist = Math.hypot(wall.center.x - position.x, wall.center.y - position.y);
     return dist <= radiusPx;
@@ -39,10 +39,10 @@ if (lockedDoor) {
     position = { x: lockedDoor.center.x, y: lockedDoor.center.y };
 }
 
-const safeElevation = (token.document?.elevation ?? 0) + 10;
-const width = lockedDoor?.hitArea ? lockedDoor.hitArea.width : (canvas.grid.size ?? 100);
-const effectSize = width / (canvas.grid.size ?? 100);
-const tokenWidth = token.document?.width ?? 1;
+const safeElevation = token.document.elevation + 10;
+const width = lockedDoor?.hitArea ? lockedDoor.hitArea.width : canvas.grid.size;
+const effectSize = width / canvas.grid.size;
+const tokenWidth = token.document.width;
 
 const seq = new Sequence();
 

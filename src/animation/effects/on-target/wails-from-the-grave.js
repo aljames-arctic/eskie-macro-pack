@@ -3,10 +3,9 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { adapter, autorec } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'wailsFromTheGrave',
     type: 'slashing', // 'slashing', 'piercing', 'bludgeoning'
@@ -14,34 +13,10 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-function getNearestSquareCenter(token, target1) {
-    const gs = canvas.grid.size;
-    const srcCenter = token.center;
-    const w = target1.document.width;
-    const h = target1.document.height;
-
-    let bestPoint = null;
-    let bestDist2 = Infinity;
-
-    for (let gx = 0; gx < w; gx++) {
-        for (let gy = 0; gy < h; gy++) {
-            const cx = target1.document.x + (gx + 0.5) * gs;
-            const cy = target1.document.y + (gy + 0.5) * gs;
-            const dx = cx - srcCenter.x;
-            const dy = cy - srcCenter.y;
-            const d2 = dx * dx + dy * dy;
-            if (d2 < bestDist2) {
-                bestDist2 = d2;
-                bestPoint = { x: cx, y: cy };
-            }
-        }
-    }
-    return bestPoint ?? target1.center;
-}
-
 function generateOffsets(target, count = 3) {
     const randomOffset = [];
-    const minDistance = 0.1 * target.document.width;
+    const targetWidth = adapter.getTokenDimensions(target).widthUnits;
+    const minDistance = 0.1 * targetWidth;
     for (let i = 0; i < count; i++) {
         let valid = false;
         let offset;
@@ -49,8 +24,8 @@ function generateOffsets(target, count = 3) {
         while (!valid && attempts < 20) {
             attempts++;
             offset = {
-                x: (Math.random() * 0.5 - 0.25) * target.document.width,
-                y: (Math.random() * 0.5 - 0.25) * target.document.width
+                x: (Math.random() * 0.5 - 0.25) * targetWidth,
+                y: (Math.random() * 0.5 - 0.25) * targetWidth
             };
             valid = randomOffset.every(existing => {
                 const dx = offset.x - existing.x;
@@ -70,6 +45,7 @@ async function createDamageOnly(target, config = {}) {
 
     if (!target) return;
 
+    const targetRotation = adapter.getTokenRotation(target);
     const randomOffset = generateOffsets(target, 3);
     const seq = new Sequence();
 
@@ -98,7 +74,7 @@ async function createDamageOnly(target, config = {}) {
     seq.effect()
         .delay(150)
         .copySprite(target)
-        .spriteRotation(-target.document.rotation)
+        .spriteRotation(-targetRotation)
         .attachTo(target)
         .scaleToObject(1, { considerTokenScale: true })
         .loopProperty('sprite', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
@@ -124,13 +100,18 @@ async function createAttack(token, target1, target2, config = {}) {
 
     if (!token || !target1) return;
 
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
+    const tokenCenter = adapter.getCenter(token);
+    const target1Rotation = adapter.getTokenRotation(target1);
+    const target2Rotation = adapter.getTokenRotation(target2);
+
     const weightIndex = { light: 0, medium: 1, heavy: 2 }[weight] ?? 1;
     const effectSize = 2 + (0.25 * weightIndex);
     const effectOffset = -0.75 - (0.25 * weightIndex);
 
-    const targetSquare = getNearestSquareCenter(token, target1);
-    const dx = targetSquare.x - token.center.x;
-    const dy = targetSquare.y - token.center.y;
+    const targetSquare = adapter.getNearestSquareCenter(token, target1) ?? adapter.getCenter(target1);
+    const dx = targetSquare.x - tokenCenter.x;
+    const dy = targetSquare.y - tokenCenter.y;
     const sx = Math.sign(dx);
     const sy = Math.sign(dy);
     const targetOffset = { x: sx * 0.5, y: sy * 0.5 };
@@ -146,7 +127,7 @@ async function createAttack(token, target1, target2, config = {}) {
         .atLocation(token)
         .rotateTowards(targetSquare)
         .scaleToObject(effectSize, { considerTokenScale: true })
-        .spriteOffset({ x: effectOffset * token.document.width }, { gridUnits: true })
+        .spriteOffset({ x: effectOffset * tokenWidth }, { gridUnits: true })
         .randomizeMirrorY()
         .zIndex(1)
         .filter('ColorMatrix', { hue: -130 });
@@ -154,7 +135,7 @@ async function createAttack(token, target1, target2, config = {}) {
     seq.effect()
         .delay(150)
         .file(closest(`eskie.damage.${type}.01.yellow`))
-        .size(1.25 * token.document.width, { gridUnits: true })
+        .size(1.25 * tokenWidth, { gridUnits: true })
         .atLocation(targetSquare)
         .randomRotation()
         .playbackRate(0.9)
@@ -165,9 +146,9 @@ async function createAttack(token, target1, target2, config = {}) {
         .delay(150)
         .file(closest('jb2a.smoke.puff.side.dark_black.4'))
         .atLocation(targetSquare)
-        .size(1.5 * token.document.width, { gridUnits: true })
+        .size(1.5 * tokenWidth, { gridUnits: true })
         .rotateTowards(token)
-        .spriteOffset({ x: -1.15 * token.document.width }, { gridUnits: true })
+        .spriteOffset({ x: -1.15 * tokenWidth }, { gridUnits: true })
         .spriteRotation(180)
         .fadeOut(1500)
         .zIndex(0);
@@ -175,7 +156,7 @@ async function createAttack(token, target1, target2, config = {}) {
     seq.effect()
         .delay(150)
         .copySprite(target1)
-        .spriteRotation(-target1.document.rotation)
+        .spriteRotation(-target1Rotation)
         .attachTo(target1)
         .scaleToObject(1, { considerTokenScale: true })
         .loopProperty('sprite', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
@@ -236,7 +217,7 @@ async function createAttack(token, target1, target2, config = {}) {
         damageSeq.effect()
             .delay(150)
             .copySprite(target2)
-            .spriteRotation(-target2.document.rotation)
+            .spriteRotation(-target2Rotation)
             .attachTo(target2)
             .scaleToObject(1, { considerTokenScale: true })
             .loopProperty('sprite', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
@@ -281,4 +262,5 @@ export const wailsFromTheGrave = {
 
 autorec.register('wailsFromTheGrave', 'melee-target', 'eskie.effect.wailsFromTheGrave.attack', DEFAULT_CONFIG, '0.0.2', 'Wails from the Grave');
 autorec.register('wailsFromTheGraveDamage', 'ranged-target', 'eskie.effect.wailsFromTheGrave.damage', DEFAULT_CONFIG, '0.0.2', 'Wails from the Grave (Damage)');
+
 

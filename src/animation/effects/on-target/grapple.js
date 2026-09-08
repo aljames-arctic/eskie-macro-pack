@@ -56,8 +56,9 @@ async function stop(token, target, config = {}) {
 }
 
 async function movement(token, targetuuid, tile, config = {}) {
-    const targetDoc = await fromUuid(targetuuid);
-    const target = targetDoc.object;
+    const targetDoc = await adapter.fromUuid(targetuuid);
+    const target = targetDoc?.object;
+    if (!target) return;
     function travelSequence(config = {}) {
         const {rotation, travelTime, label, delta: {x: dx, y: dy}} = config;
         const repetitions = Math.floor(travelTime / 100);

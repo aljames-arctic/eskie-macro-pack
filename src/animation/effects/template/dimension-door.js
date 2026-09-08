@@ -3,10 +3,10 @@
 
 import { closest, absolutePath } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
+import { adapter } from '../../../adapters/index.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'DimensionDoor',
     sound: {
@@ -25,7 +25,9 @@ async function create(token, config = {}) {
         label: 'Dimension Door'
     };
     let [position, _] = await templatelib.getPosition(template, cfg);
-    if (!position) { return; }
+    if (!position || position.cancelled) { return; }
+
+    const { widthUnits: tokenWidth, heightUnits: tokenHeight } = adapter.getTokenDimensions(token);
 
     let sequence = new Sequence();
     applySound(sequence, sound.teleportOut);
@@ -49,8 +51,8 @@ async function create(token, config = {}) {
             .atLocation(token)
             .rotateTowards(position)
             .belowTokens()
-            .scaleOut(0, 400, {ease: "easeOutQuint"})
-            .scale({ x:token.document.width / 2, y: token.document.height / 2 })
+            .scaleOut(0, 400, { ease: "easeOutQuint" })
+            .scale({ x: tokenWidth / 2, y: tokenHeight / 2 })
             .rotate(-90)
             .anchor({ x: 0.5, y: 0.8 })
             .duration(3000)
@@ -63,8 +65,8 @@ async function create(token, config = {}) {
             .rotateTowards(token)
             .rotate(90)
             .duration(3000)
-            .scaleOut(0, 400, {ease: "easeOutQuint"})
-            .scale({ x:token.document.width / 2, y: token.document.height / 2 })
+            .scaleOut(0, 400, { ease: "easeOutQuint" })
+            .scale({ x: tokenWidth / 2, y: tokenHeight / 2 })
             .anchor({ x: 0.5, y: 0.2 })
             .mirrorY()
             .belowTokens()

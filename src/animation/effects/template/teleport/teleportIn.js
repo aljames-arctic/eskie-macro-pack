@@ -12,11 +12,18 @@ const DEFAULT_CONFIG = {
     }
 };
 
-function create(token, targets, config = {}) {
+function create(token, targets = [], config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, position } = mConfig;
-    const maxDistance = Math.max(...targets.map(target => 3 * Math.max(Math.abs(target.x - token.x), Math.abs(target.y - token.y)) / canvas.dimensions.size + 1));
-    const {x, y} = token.center;
+    if (!position) return;
+    const gridSize = adapter.getSceneDimensions(canvas?.scene).size;
+    const tokenCenter = adapter.getCenter(token);
+    const tokenX = token?.x ?? (tokenCenter.x - gridSize / 2);
+    const tokenY = token?.y ?? (tokenCenter.y - gridSize / 2);
+    const maxDistance = targets.length > 0 
+        ? Math.max(...targets.map(target => 3 * Math.max(Math.abs((target?.x ?? 0) - tokenX), Math.abs((target?.y ?? 0) - tokenY)) / gridSize + 1))
+        : 1;
+    const tokenRotation = adapter.getTokenRotation(token);
 
     let sequence = new Sequence();
     applySound(sequence, mConfig.sound.teleportIn);
@@ -26,8 +33,9 @@ function create(token, targets, config = {}) {
         .snapToGrid()
         .offset({ x: -1, y: -1 });
     targets.forEach(target => {
-        let targetX = position.x + (target.center.x - x);
-        let targetY = position.y + (target.center.y - y);
+        const targetCenter = adapter.getCenter(target);
+        let targetX = position.x + (targetCenter.x - tokenCenter.x);
+        let targetY = position.y + (targetCenter.y - tokenCenter.y);
         sequence = sequence.animation()
             .on(target)
             .teleportTo({ x: targetX, y: targetY })
@@ -55,7 +63,7 @@ function create(token, targets, config = {}) {
 
     sequence = sequence.effect()
         .copySprite(token)
-        .spriteRotation(-token.document.rotation)
+        .spriteRotation(-tokenRotation)
         .atLocation(token)
         .scaleToObject(1.1, { considerTokenScale: true })
         .filter("ColorMatrix", { saturate: -1, brightness: 10 })
@@ -66,7 +74,7 @@ function create(token, targets, config = {}) {
     targets.forEach(target => {
         sequence = sequence.effect()
             .copySprite(target)
-            .spriteRotation(-target.document.rotation)
+            .spriteRotation(-adapter.getTokenRotation(target))
             .atLocation(target)
             .scaleToObject(1.1, { considerTokenScale: true })
             .filter("ColorMatrix", { saturate: -1, brightness: 10 })
@@ -91,13 +99,18 @@ function create(token, targets, config = {}) {
     return sequence;
 }
 
-async function play(token, targets, config = {}) {
+async function play(token, targets = [], config = {}) {
     const sequence = create(token, targets, config);
     if (sequence) { return sequence.play(); }
+}
+
+function stop(token, { id = DEFAULT_CONFIG.id } = {}) {
+    // Instantaneous effect
 }
 
 export const teleportIn = {
     create,
     play,
+    stop,
     default_config: DEFAULT_CONFIG,
 };

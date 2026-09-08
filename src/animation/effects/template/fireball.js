@@ -52,16 +52,14 @@ async function create(token, config = {}) {
     if (!primary && !center) return null;
     const targetPos = center ?? primary;
 
-    const tokenWidth = token?.document?.width ?? token?.width ?? 1;
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
     const tokenOffset = (tokenWidth - 1) / 2;
 
     const sequence = new Sequence();
     const bgSrc = adapter.getSceneBackground(canvas?.scene);
-    const sceneDimensions = canvas?.dimensions ?? { width: 4000, height: 4000 };
-    const gridSize = canvas?.grid?.size ?? 100;
-    const sceneWidth = canvas?.scene?.width ?? 4000;
-    const sceneHeight = canvas?.scene?.height ?? 4000;
-    const tokenName = token?.name ?? 'Token';
+    const sceneDimensions = adapter.getSceneDimensions(canvas?.scene);
+    const sceneCenter = adapter.getSceneCenter(canvas?.scene);
+    const tokenName = token.name;
 
     if (tintMap && bgSrc) {
         sequence
@@ -69,8 +67,8 @@ async function create(token, config = {}) {
                 .name(`Casting ${tokenName}`)
                 .file(bgSrc)
                 .filter('ColorMatrix', { saturate: 1, brightness: 0.6 })
-                .atLocation({ x: sceneDimensions.width / 2, y: sceneDimensions.height / 2 })
-                .size({ width: sceneWidth / gridSize, height: sceneHeight / gridSize }, { gridUnits: true })
+                .atLocation(sceneCenter)
+                .size({ width: sceneDimensions.width / sceneDimensions.size, height: sceneDimensions.height / sceneDimensions.size }, { gridUnits: true })
                 .persist()
                 .fadeIn(2000)
                 .fadeOut(3000)
@@ -220,8 +218,9 @@ async function play(token, config = {}) {
 }
 
 function stop(token) {
-    const tokenName = token?.name ?? 'Token';
-    Sequencer.EffectManager.endEffects({ name: `Casting ${tokenName}` });
+    if (token) {
+        Sequencer.EffectManager.endEffects({ name: `Casting ${token.name}` });
+    }
 }
 
 export const fireball = {

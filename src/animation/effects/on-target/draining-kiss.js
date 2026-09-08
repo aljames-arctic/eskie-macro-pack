@@ -4,10 +4,9 @@
  */
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { adapter, autorec } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'draining-kiss',
     duration: 10000,
@@ -17,6 +16,14 @@ const DEFAULT_CONFIG = {
 function create(token, target, config = {}) {
     const { id, duration, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id} - ${target.id}`;
+
+    const gridSize = adapter.getGridSize();
+    const tokenCenter = adapter.getCenter(token);
+    const targetCenter = adapter.getCenter(target);
+    const tokenX = tokenCenter.x;
+    const tokenY = tokenCenter.y;
+    const targetX = targetCenter.x;
+    const targetY = targetCenter.y;
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -31,8 +38,8 @@ function create(token, target, config = {}) {
             .filter("ColorMatrix", { hue: -30 })
             .scaleIn(0, 200, { ease: "linear" })
             .duration(duration)
-            .animateProperty('spriteContainer', "scale.x", { from: Math.abs((token.x - target.x) / canvas.grid.size), to: 0, duration: 300, ease: "easeInOutBack" })
-            .animateProperty('spriteContainer', "scale.y", { from: Math.abs((token.y - target.y) / canvas.grid.size), to: 0, duration: 300, ease: "easeInOutBack" })
+            .animateProperty('spriteContainer', "scale.x", { from: Math.abs((tokenX - targetX) / gridSize), to: 0, duration: 300, ease: "easeInOutBack" })
+            .animateProperty('spriteContainer', "scale.y", { from: Math.abs((tokenY - targetY) / gridSize), to: 0, duration: 300, ease: "easeInOutBack" })
             .zIndex(3)
 
         .effect()
@@ -69,7 +76,7 @@ function create(token, target, config = {}) {
 
         .effect()
             .copySprite(target)
-            .spriteRotation(-target.document.rotation)
+            .spriteRotation(-adapter.getTokenRotation(target))
             .atLocation(target)
             .scaleToObject(1, { considerTokenScale: true })
             .attachTo(target)
@@ -127,7 +134,7 @@ function create(token, target, config = {}) {
         seq = seq.effect()
             .name(label)
             .copySprite(target)
-            .spriteRotation(-target.document.rotation)
+            .spriteRotation(-adapter.getTokenRotation(target))
             .scaleToObject(1, { considerTokenScale: true })
             .delay(1500)
             .fadeIn(10000)

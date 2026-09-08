@@ -16,18 +16,18 @@ const DEFAULT_CONFIG = {
 function createUserBlur(user, bg, config = {}) {
     const { id, opacity, blur, sway, durationX, durationY } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    const x = (canvas?.scene?.dimensions?.width ?? canvas?.dimensions?.width ?? 0) / 2;
-    const y = (canvas?.scene?.dimensions?.height ?? canvas?.dimensions?.height ?? 0) / 2;
-    const drift = ((canvas?.grid?.size ?? 100) / 8) * sway;
+    const sceneCenter = adapter.getSceneCenter(canvas?.scene);
+    const sceneDims = adapter.getSceneDimensions(canvas?.scene);
+    const drift = (sceneDims.size / 8) * sway;
 
     const seq = new Sequence();
     seq.effect()
         .name(`${id} - ${user.name}`)
         .file(bg.src)
-        .atLocation({ x, y })
+        .atLocation(sceneCenter)
         .size({
-            width: canvas?.scene?.dimensions?.sceneWidth ?? canvas?.dimensions?.sceneWidth ?? canvas?.dimensions?.width ?? 100,
-            height: canvas?.scene?.dimensions?.sceneHeight ?? canvas?.dimensions?.sceneHeight ?? canvas?.dimensions?.height ?? 100
+            width: sceneDims.sceneRect.width,
+            height: sceneDims.sceneRect.height
         })
         .belowTokens()
         .belowTiles()

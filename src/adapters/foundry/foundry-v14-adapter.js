@@ -20,14 +20,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      */
     getRevealOffset(object, _scale = 1) {
         if (!object) return { x: 0, y: 0 };
-        const center = object.center;
-        if (center?.x !== undefined && center?.y !== undefined) {
-            return { x: center.x, y: center.y };
-        }
-        const doc = object.document ?? object;
-        const objX = object.x ?? doc.x ?? 0;
-        const objY = object.y ?? doc.y ?? 0;
-        return { x: objX, y: objY };
+        return object.center ?? { x: object.x, y: object.y };
     }
 
     /**
@@ -38,33 +31,26 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      */
     getShapeOffset(object) {
         if (!object) return { x: 0, y: 0 };
-        const center = object.center;
-        if (center?.x !== undefined && center?.y !== undefined) {
-            return { x: center.x, y: center.y };
-        }
-        const doc = object.document ?? object;
-        const objX = object.x ?? doc.x ?? 0;
-        const objY = object.y ?? doc.y ?? 0;
-        return { x: objX, y: objY };
+        return object.center ?? { x: object.x, y: object.y };
     }
 
     /**
      * Calculate bounding box and center for a Tile on Foundry V14+.
      * Evaluates V14 tile anchor configuration (defaulting to centered (0.5, 0.5)).
      * @override
-     * @param {Tile|TileDocument} tile Target tile placeable or document
+     * @param {Tile} tile Target tile placeable
      * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number, anchor: {x: number, y: number} }}
      */
     getTileBounds(tile) {
         if (!tile) return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
-        const doc = tile.document ?? tile;
-        const x = doc.x ?? tile.x ?? 0;
-        const y = doc.y ?? tile.y ?? 0;
-        const width = doc.width ?? tile.width ?? 0;
-        const height = doc.height ?? tile.height ?? 0;
+        const doc = tile.document;
+        const x = doc.x;
+        const y = doc.y;
+        const width = doc.width;
+        const height = doc.height;
 
-        const anchorX = doc.anchor?.x ?? tile.anchor?.x ?? doc.texture?.anchorX ?? tile.texture?.anchorX ?? doc.anchorX ?? 0.5;
-        const anchorY = doc.anchor?.y ?? tile.anchor?.y ?? doc.texture?.anchorY ?? tile.texture?.anchorY ?? doc.anchorY ?? 0.5;
+        const anchorX = doc.anchor?.x ?? tile.anchor?.x ?? doc.texture?.anchorX ?? 0.5;
+        const anchorY = doc.anchor?.y ?? tile.anchor?.y ?? doc.texture?.anchorY ?? 0.5;
 
         const minX = x - (anchorX * width);
         const maxX = minX + width;
@@ -114,8 +100,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
                 y: shape?.center?.y ?? doc.center?.y ?? template.center?.y ?? primary.y
             };
 
-            const gridSize = canvas?.grid?.size ?? canvas?.dimensions?.size ?? 100;
-            const gridDistance = canvas?.grid?.distance ?? canvas?.scene?.grid?.distance ?? canvas?.dimensions?.distance ?? 5;
+            const { size: gridSize, distance: gridDistance } = this.getSceneDimensions(canvas?.scene);
 
             // Grid distance (feet) converted to canvas pixels when provided
             const gridUnits = config.distance ?? doc.distance ?? shape?.distance;

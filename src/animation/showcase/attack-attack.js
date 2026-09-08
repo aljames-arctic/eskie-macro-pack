@@ -7,27 +7,19 @@ const DEFAULT_CONFIG = {
 }
 
 async function validate(red, blue) {
-    function isToken(obj) {
-        return obj?.document?.documentName == 'Token';
-    }
     async function wait(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    if (!isToken(red) || !isToken(blue) || (red.id === blue.id)) {
-        ui.notification.warn('Must provide two valid tokens to fight each other!');
+    if (!adapter.isDocumentOfType(red, 'Token') || !adapter.isDocumentOfType(blue, 'Token') || (red.id === blue.id)) {
+        ui.notifications.warn('Must provide two valid tokens to fight each other!');
         throw 'Must provide two valid tokens to fight each other!';
     }
     
-    let requireInitialTeleport = false;
-    if (canvas.grid.size) {
-        const xDistanceValid = Math.abs((blue.x - red.x)/canvas.grid.size) == 9;
-        const yDistanceValid = (blue.y - red.y)/canvas.grid.size == 0;
-        requireInitialTeleport = (!xDistanceValid || !yDistanceValid);
-    } else {
-        ui.notification.warn('canvas.grid.size needs to be valid to coordinate');
-        throw 'canvas.grid.size needs to be valid to coordinate';
-    }
+    const gridSize = adapter.getGridSize();
+    const xDistanceValid = Math.abs((blue.x - red.x) / gridSize) === 9;
+    const yDistanceValid = (blue.y - red.y) / gridSize === 0;
+    const requireInitialTeleport = (!xDistanceValid || !yDistanceValid);
 
     if (requireInitialTeleport) {
         const config = {
@@ -35,14 +27,14 @@ async function validate(red, blue) {
             distance: 25,
             borderAlpha: 0,
             fillAlpha: 0.1,
-            icon: { texture: "icons/skills/melee/swords-parry-block-blue.webp", },
+            icon: { texture: "icons/skills/melee/swords-parry-block-blue.webp" },
             snap: {
                 position: CONST.GRID_SNAPPING_MODES.VERTEX | CONST.GRID_SNAPPING_MODES.CENTER,
             }
-        }
-        let centerPoint = await Sequencer.Crosshair.show(config);
-        await teleport.play(red, {x: centerPoint.x + (canvas.grid.size) * 9/2, y: centerPoint.y});
-        await teleport.play(blue, {x: centerPoint.x - (canvas.grid.size) * 9/2, y: centerPoint.y});
+        };
+        const centerPoint = await Sequencer.Crosshair.show(config);
+        await teleport.play(red, { x: centerPoint.x + gridSize * 4.5, y: centerPoint.y });
+        await teleport.play(blue, { x: centerPoint.x - gridSize * 4.5, y: centerPoint.y });
         // then wait 100ms so Foundry updates the token locations
         await wait(100);
     }
@@ -80,10 +72,11 @@ function getPositions(red, blue) {
      *    b1             b3   b2   b4
      ***********************************************************/
     function interpolatePos(r, b, t, count) {
-        const { red, blue } = { red: r.center, blue: b.center };
-        const x = blue.x + (red.x - blue.x) * t/count;
-        const y = blue.y + (red.y - blue.y) * t/count;
-        return {x: x, y: y};
+        const redCenter = adapter.getCenter(r);
+        const blueCenter = adapter.getCenter(b);
+        const x = blueCenter.x + (redCenter.x - blueCenter.x) * t/count;
+        const y = blueCenter.y + (redCenter.y - blueCenter.y) * t/count;
+        return { x, y };
     }
 
     return {
@@ -534,16 +527,18 @@ function movement2create(red, blue, config = {}) {
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (bg?.src) {
+        const sceneCenter = adapter.getSceneCenter(canvas?.scene);
+        const sceneDims = adapter.getSceneDimensions(canvas?.scene);
         seq.effect()
             .file(closest(bg.src))
-            .atLocation({x:(canvas.dimensions.width)/2,y:(canvas.dimensions.height)/2})
-            .size({width:canvas.scene.width/canvas.grid.size+10, height:canvas.scene.height/canvas.grid.size}, {gridUnits: true})
-            .fadeOut(1000, {ease: "easeInQuint"})
+            .atLocation(sceneCenter)
+            .size({ width: (sceneDims.sceneRect.width / sceneDims.size) + 10, height: sceneDims.sceneRect.height / sceneDims.size }, { gridUnits: true })
+            .fadeOut(1000, { ease: "easeInQuint" })
             .belowTiles()
-            .spriteOffset({x:-bg.offsetX,y:-bg.offsetY})
+            .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY })
             .filter("Blur", { blurX: 10, blurY: 5 })
             .opacity(0.75)
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -5, duration: 1000, gridUnits: true, ease: "easeOutQuint"});
+            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -5, duration: 1000, gridUnits: true, ease: "easeOutQuint" });
     }
 
     seq.canvasPan() 

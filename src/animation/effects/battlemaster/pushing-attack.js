@@ -3,8 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { adapter } from '../../../adapters/index.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
+import { adapter, autorec } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -27,10 +26,10 @@ async function create(token, target, config = {}) {
     const effectSize = 2 + (0.25 * weightIndex);
     const effectOffset = -0.75 - (0.25 * weightIndex);
 
-    const targetSquare = adapter.getNearestSquareCenter(token, target) ?? target.center ?? { x: target.x ?? 0, y: target.y ?? 0 };
-    const tokenCenter = token.center ?? { x: token.x ?? 0, y: token.y ?? 0 };
-    const targetCenter = target.center ?? { x: target.x ?? 0, y: target.y ?? 0 };
-    const gridSize = canvas?.grid?.size ?? 100;
+    const targetSquare = adapter.getNearestSquareCenter(token, target);
+    const tokenCenter = adapter.getCenter(token);
+    const targetCenter = adapter.getCenter(target);
+    const gridSize = adapter.getGridSize();
 
     const position = {
         x: targetCenter.x - (gridSize * (pushDistance / 5) * Math.sign(tokenCenter.x - targetCenter.x)),
@@ -60,7 +59,7 @@ async function create(token, target, config = {}) {
         backposition.x = 0;
     }
 
-    const tokenWidth = token.document?.width ?? token.width ?? 1;
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
     const sequence = new Sequence();
     applySound(sequence, sound);

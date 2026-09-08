@@ -44,12 +44,12 @@ async function create(token, target, config = {}) {
 
     sequence.effect()
         .copySprite(target)
-        .spriteRotation(-target.document.rotation)
+        .spriteRotation(-adapter.getTokenRotation(target))
         .attachTo(target)
         .scaleToObject(1, { considerTokenScale: true })
         .fadeOut(300)
         .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 175, pingPong: true, gridUnits: true })
-        .scaleToObject(target.document.texture.scaleX)
+        .scaleToObject(target.document?.texture?.scaleX ?? 1)
         .duration(500)
         .tint("#dcace3")
         .opacity(0.45);

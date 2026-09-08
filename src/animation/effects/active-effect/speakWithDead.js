@@ -91,6 +91,7 @@ function _addMagicCircleEffects(token, id) {
  * @param {string} label - The unique ID for the effect to manage persistence.
  */
 function _addTokenVisualEffects(token, label) {
+    const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
     let sequence = new Sequence();
     sequence
         // Token effect
@@ -98,7 +99,7 @@ function _addTokenVisualEffects(token, label) {
         .name(label)
         .delay(1000)
         .file(closest("eskie.attack.ranged.arrow.01.physical.heavy.purpleblack"))
-        .atLocation(token, { offset: { y: -0.75 * token.document.width }, gridUnits: true })
+        .atLocation(token, { offset: { y: -0.75 * tokenWidth }, gridUnits: true })
         .scaleToObject(2)
         .rotate(-90)
         .filter("ColorMatrix", { hue: -65 })
@@ -177,7 +178,7 @@ function _addTokenVisualEffects(token, label) {
         .name(label)
         .delay(3000)
         .file(closest("jb2a.magic_signs.rune.necromancy.complete.blue"))
-        .attachTo(token, { offset: { y: -0.77 * token.document.width }, gridUnits: true, bindAlpha: false, bindRotation: false })
+        .attachTo(token, { offset: { y: -0.77 * tokenWidth }, gridUnits: true, bindAlpha: false, bindRotation: false })
         .scaleToObject(0.4, { considerTokenScale: true })
         .persist()
         .filter("ColorMatrix", { hue: -65 })
@@ -189,7 +190,7 @@ function _addTokenVisualEffects(token, label) {
         .name(label)
         .delay(3000)
         .file(closest("jb2a.magic_signs.rune.necromancy.complete.blue"))
-        .attachTo(token, { offset: { y: -0.55 * token.document.width }, gridUnits: true, bindAlpha: false, bindRotation: false })
+        .attachTo(token, { offset: { y: -0.55 * tokenWidth }, gridUnits: true, bindAlpha: false, bindRotation: false })
         .scaleToObject(0.4, { considerTokenScale: true })
         .persist()
         .opacity(0.5)

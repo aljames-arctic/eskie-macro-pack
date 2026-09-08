@@ -25,11 +25,12 @@ async function create(token, target, config = {}) {
 
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (darkMap && bg?.src) {
+        const dims = adapter.getSceneDimensions(canvas?.scene);
         seq.effect()
             .name(label)
             .file(closest(bg.src))
-            .atLocation({ x: canvas.dimensions.width / 2, y: canvas.dimensions.height / 2 })
-            .size({ width: canvas.scene.width / canvas.grid.size, height: canvas.scene.height / canvas.grid.size }, { gridUnits: true })
+            .atLocation(adapter.getSceneCenter(canvas?.scene))
+            .size({ width: dims.width / dims.size, height: dims.height / dims.size }, { gridUnits: true })
             .fadeIn(750)
             .fadeOut(750)
             .duration(4000)
@@ -39,9 +40,11 @@ async function create(token, target, config = {}) {
             .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY });
     }
 
+    const { widthUnits: recipientWidth } = adapter.getTokenDimensions(recipient);
+
     seq.effect()
         .file(closest('jb2a.healing_generic.03.burst.bluepurple'))
-        .attachTo(recipient, { offset: { y: -0.5 * recipient.document.width }, gridUnits: true })
+        .attachTo(recipient, { offset: { y: -0.5 * recipientWidth }, gridUnits: true })
         .scaleToObject(1.25, { considerTokenScale: true })
         .fadeIn(500)
         .fadeOut(1000)
@@ -66,7 +69,7 @@ async function create(token, target, config = {}) {
     seq.effect()
         .delay(1000)
         .file(closest('jb2a.twinkling_stars.points08.white'))
-        .attachTo(recipient, { offset: { y: -0.5 * recipient.document.width }, gridUnits: true })
+        .attachTo(recipient, { offset: { y: -0.5 * recipientWidth }, gridUnits: true })
         .scaleToObject(0.65, { considerTokenScale: true })
         .scaleIn(0, 500, { ease: 'easeOutCubic' })
         .duration(3500)

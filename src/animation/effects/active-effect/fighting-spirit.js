@@ -8,11 +8,12 @@ import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
     id: "Fighting Spirit",
-}
+    sound: { ...DEFAULT_SOUND_CONFIG },
+};
 
 function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id } = mConfig;
+    const { id, sound } = mConfig;
     const label = `${id} - ${token.name}`;
 
     const seq = new Sequence();
@@ -115,7 +116,7 @@ async function play(token, config = {}) {
 
 async function stop(token, config = {}) {
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const label = `${id} ${token.name}`;
+    const label = `${id} - ${token.name}`;
     Sequencer.EffectManager.endEffects({ name: label, object: token }); 
 }
 
@@ -124,7 +125,6 @@ export const fightingSpirit = {
     play,
     stop,
     default_config: DEFAULT_CONFIG,
-    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-autorec.register("fightingSpirit", "effect", "eskie.effect.fightingSpirit", DEFAULT_CONFIG, "0.0.1", "Fighting Spirit");
+autorec.register("fightingSpirit", "effect", "eskie.effect.fightingSpirit", DEFAULT_CONFIG, "0.0.2", "Fighting Spirit");

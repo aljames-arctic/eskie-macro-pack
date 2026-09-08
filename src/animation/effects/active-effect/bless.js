@@ -18,6 +18,7 @@ const DEFAULT_CONFIG = {
 function createCaster(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { color, sound } = mConfig;
+    const gridSize = adapter.getSceneDimensions().size;
     let hue = -20;
 
     const sequence = new Sequence();
@@ -68,7 +69,7 @@ function createCaster(token, config = {}) {
             .fadeIn(500)
             .fadeOut(500)
             .shape("circle", {
-                lineSize: canvas.grid.size * 5.2,
+                lineSize: gridSize * 5.2,
                 lineColor: "#FF0000",
                 radius: 8.85,
                 gridUnits: true,
@@ -90,7 +91,7 @@ function createCaster(token, config = {}) {
             .fadeOut(500)
             .delay(1200)
             .shape("circle", {
-                lineSize: canvas.grid.size * 0.24,
+                lineSize: gridSize * 0.24,
                 lineColor: "#FFFFFF",
                 radius: 6.175,
                 gridUnits: true,

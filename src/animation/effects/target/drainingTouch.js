@@ -34,10 +34,13 @@ async function create(token, target, config = {}) {
         hue = -95
     }
 
+    const tokenCenter = adapter.getCenter(token);
+    const targetCenter = adapter.getCenter(target);
     const middleposition = {
-        x: (target.center.x - token.center.x) * 0.25,
-        y: (target.center.y - token.center.y) * 0.25,
+        x: (targetCenter.x - tokenCenter.x) * 0.25,
+        y: (targetCenter.y - tokenCenter.y) * 0.25,
     };
+    const { widthUnits: tokenWidth } = adapter.getTokenDimensions(token);
 
     let sequence = new Sequence();
     applySound(sequence, sound);
@@ -109,7 +112,7 @@ async function create(token, target, config = {}) {
         .rotateTowards(token)
         .spriteOffset({ x: -0.4 }, { gridUnits: true })
         .filter("ColorMatrix", { saturate: 0, brightness: 1.5 })
-        .size(token.document.width * 1.5, { gridUnits: true })
+        .size(tokenWidth * 1.5, { gridUnits: true })
         .tint(tintColor)
         .mask(target)
         .zIndex(1)
@@ -144,7 +147,7 @@ async function create(token, target, config = {}) {
         .spriteOffset({ x: -0.4 }, { gridUnits: true })
         .filter("ColorMatrix", { saturate: 0, brightness: 0 })
         .filter("Glow", { outerStrength: 6, distance: 10, color: 0x000000 })
-        .size(token.document.width * 1.5, { gridUnits: true })
+        .size(tokenWidth * 1.5, { gridUnits: true })
         .fadeIn(2000)
         .fadeOut(1000)
         .duration(5000)

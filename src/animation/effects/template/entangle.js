@@ -3,11 +3,11 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
+import { adapter } from '../../../adapters/index.js';
 import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 import { entangled } from '../active-effect/entangled.js';
 
-import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
     id: 'entangle',
     color: 'green',
@@ -32,12 +32,13 @@ async function create(token, config = {}) {
     if (!center && !primary) return;
     const targetPos = center ?? primary;
 
+    const tokenId = token?.id ?? 'token';
     const seq = new Sequence();
     applySound(seq, sound);
 
     // Casting on token
     seq.effect()
-        .name(`${id} - ${token.id}`)
+        .name(`${id} - ${tokenId}`)
         .file(closest(`eskie.casting.nature.01.side.loop.${color}`))
         .attachTo(token)
         .rotateTowards(targetPos)
@@ -48,7 +49,7 @@ async function create(token, config = {}) {
 
     // Center casting ring
     seq.effect()
-        .name(`${id} - ${token.id}`)
+        .name(`${id} - ${tokenId}`)
         .file(closest(`eskie.casting.nature.01.center.loop.${color}`))
         .atLocation(targetPos)
         .size(1, { gridUnits: true })
@@ -60,7 +61,7 @@ async function create(token, config = {}) {
     // Persistent area vines
     seq.effect()
         .delay(500)
-        .name(`${id} - ${token.id}`)
+        .name(`${id} - ${tokenId}`)
         .file(closest('eskie.nature.vine.normal.circle.01.physical.green.radius_20ft'))
         .atLocation(targetPos)
         .scaleToObject(1.15)
@@ -71,7 +72,7 @@ async function create(token, config = {}) {
 
     // Conjuration complete magic sign
     seq.effect()
-        .name(`${id} - ${token.id}`)
+        .name(`${id} - ${tokenId}`)
         .atLocation(targetPos)
         .file(closest('jb2a.magic_signs.circle.02.conjuration.complete.dark_green'))
         .size(3.5, { gridUnits: true })
@@ -85,7 +86,7 @@ async function create(token, config = {}) {
 
     // Persistent faded ground rune
     seq.effect()
-        .name(`${id} - ${token.id}`)
+        .name(`${id} - ${tokenId}`)
         .atLocation(targetPos)
         .file(closest('jb2a.magic_signs.circle.02.conjuration.complete.dark_green'))
         .size(3.5, { gridUnits: true })
@@ -108,7 +109,8 @@ async function play(token, config = {}) {
 async function stop(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
-    Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}` });
+    const tokenId = token?.id ?? 'token';
+    Sequencer.EffectManager.endEffects({ name: `${id} - ${tokenId}` });
 }
 
 export const entangle = {

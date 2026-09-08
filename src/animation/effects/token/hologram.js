@@ -12,14 +12,13 @@ export const DEFAULT_CONFIG = {
     id: 'Hologram',
     tint: '#cd2997',
     sound: { ...DEFAULT_SOUND_CONFIG },
-    sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(token, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { tint, sound } = mConfig;
 
-    const tokenRotation = token.document.rotation || 0;
+    const tokenRotation = adapter.getTokenRotation(token);
 
     const seq = new Sequence();
     applySound(seq, sound);
@@ -27,7 +26,7 @@ async function create(token, config = {}) {
         .effect()
         .name(EFFECT_NAME)
         .copySprite(token)
-        .spriteRotation(-token.document.rotation)
+        .spriteRotation(-tokenRotation)
         .atLocation(token)
         .attachTo(token, { bindRotation: false, bindVisibility: false })
         .opacity(0.5)

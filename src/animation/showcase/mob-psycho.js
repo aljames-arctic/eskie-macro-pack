@@ -61,7 +61,7 @@ function getColorGradient(startColor, endColor, step, totalSteps) {
     return newHex;
 }
 
-async function play(startNumber, endNumber, config = {}){
+async function play(startNumber, endNumber, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { baseDuration, finalDuration } = mConfig;
 
@@ -72,7 +72,7 @@ async function play(startNumber, endNumber, config = {}){
         const style = {
             fill: getColor(n),
             fontFamily: "Impact, Charcoal, sans-serif",
-            fontSize: canvas.grid.size*2,
+            fontSize: adapter.getSceneDimensions().size * 2,
         };
 
         const t = i / totalSteps;
@@ -83,36 +83,36 @@ async function play(startNumber, endNumber, config = {}){
             .effect()
                 .file("icons/svg/d6-grey.svg")
                 .screenSpace()
-                .screenSpaceScale({fitX:true, fitY:true, x:2,y:2})
-                .duration(duration+baseDuration)
-                .filter("ColorMatrix", { brightness:0 })
+                .screenSpaceScale({ fitX: true, fitY: true, x: 2, y: 2 })
+                .duration(duration + baseDuration)
+                .filter("ColorMatrix", { brightness: 0 })
                 .playIf(t !== 1)
                 
             .effect()
                 .text(`${n}`, style)
                 .screenSpace()
-                .screenSpaceScale({x:2,y:2})
+                .screenSpaceScale({ x: 2, y: 2 })
                 .duration(duration)
                 .zIndex(1)
                 .playIf(t !== 1)
-                .waitUntilFinished(-baseDuration/2)
+                .waitUntilFinished(-baseDuration / 2)
             
             //FINAL NUMBER EFFECT (Just longer duration)
             .effect()
                 .file("icons/svg/d6-grey.svg")
                 .screenSpace()
-                .screenSpaceScale({fitX:true, fitY:true, x:2,y:2})
-                .duration(finalDuration*4)
-                .filter("ColorMatrix", { brightness:0 })
-                .playIf(t == 1)
+                .screenSpaceScale({ fitX: true, fitY: true, x: 2, y: 2 })
+                .duration(finalDuration * 4)
+                .filter("ColorMatrix", { brightness: 0 })
+                .playIf(t === 1)
             
             .effect()
                 .text(`${n}`, style)
                 .screenSpace()
-                .screenSpaceScale({x:2,y:2})
-                .duration(finalDuration*4)
+                .screenSpaceScale({ x: 2, y: 2 })
+                .duration(finalDuration * 4)
                 .zIndex(1)
-                .playIf(t == 1)
+                .playIf(t === 1)
                 .waitUntilFinished(-baseDuration)
                 
             .play();
@@ -121,4 +121,4 @@ async function play(startNumber, endNumber, config = {}){
 
 export const mobPsycho = {
     play,
-}
+};

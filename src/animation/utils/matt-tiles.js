@@ -197,8 +197,9 @@ async function setup(animation, config = {}) {
     }
 
     const trapActionCode = `
-// Resolve the TileDocument safely from PlaceableObject or Document
+// Resolve the TileDocument and concrete Tile placeable from MATT execution scope
 const tileDoc = tile.document ?? tile;
+const tilePlaceable = tile.object ?? canvas.tiles?.get?.(tileDoc.id) ?? tile;
 
 // Get the specific Eskie Trap Animation Function if this tile is a trap tile
 const animation = tileDoc.getFlag('${MODULE_ID}', 'trap.animation');
@@ -207,21 +208,21 @@ if (animation) {
     try {
         const trap = adapter.getProperty(globalThis, animation);
         // Collect all tokens contained within / overlapping this trap tile via adapter
-        let targets = adapter.getTokensInTile(tile);
+        let targets = adapter.getTokensInTile(tilePlaceable);
 
         // If this trap tile is also the trigger tile, ensure the activating token that stepped on it is included
         const isTriggerTile = Boolean(tileDoc.getFlag('${MODULE_ID}', 'trap.isTriggerTile'));
         if (isTriggerTile && token) {
-            const activatingTarget = token.object ?? token;
+            const activatingTarget = token.object ?? canvas.tokens?.get?.(token.id) ?? token;
             if (!targets.some(t => t.id === token.id)) {
                 targets.push(activatingTarget);
             }
         } else if (targets.length === 0 && token) {
-            targets = [token.object ?? token];
+            targets = [token.object ?? canvas.tokens?.get?.(token.id) ?? token];
         }
 
         // Play the trap animation with the contained tokens as targets
-        await trap.play(tile.object ?? tile, targets);
+        await trap.play(tilePlaceable, targets);
     } catch (err) {
         console.error('Eskie Macro Pack | Failed to play trap animation "' + animation + '" on tile "' + tileDoc.id + '":', err);
         throw err;
@@ -231,7 +232,7 @@ if (animation) {
 // Manually activate any other linked trap tiles
 const originIds = (tileDoc.getFlag('${MODULE_ID}', 'trap.originIds') ?? []).filter(id => id !== tileDoc.id);
 for (const id of originIds) {
-    const originTile = canvas.tiles.get(id);
+    const originTile = canvas.tiles?.get?.(id);
     if (!originTile) continue;
     await originTile.document.trigger({ token });
 }

@@ -43,11 +43,11 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      */
     getTileBounds(tile) {
         if (!tile) return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
-        const doc = tile.document ?? tile;
-        const x = doc.x ?? tile.x ?? 0;
-        const y = doc.y ?? tile.y ?? 0;
-        const width = doc.width ?? tile.width ?? 0;
-        const height = doc.height ?? tile.height ?? 0;
+        const doc = tile.document;
+        const x = doc.x;
+        const y = doc.y;
+        const width = doc.width;
+        const height = doc.height;
 
         const anchorX = doc.anchor?.x ?? tile.anchor?.x ?? doc.texture?.anchorX ?? 0.5;
         const anchorY = doc.anchor?.y ?? tile.anchor?.y ?? doc.texture?.anchorY ?? 0.5;
@@ -56,7 +56,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
         const maxX = minX + width;
         const minY = y - (anchorY * height);
         const maxY = minY + height;
-        const center = tile.center ?? doc.center ?? { x: minX + width / 2, y: minY + height / 2 };
+        const center = { x: minX + width / 2, y: minY + height / 2 };
 
         return {
             minX,

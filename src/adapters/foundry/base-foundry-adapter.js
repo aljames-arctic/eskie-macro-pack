@@ -468,7 +468,7 @@ export class BaseFoundryAdapter {
     isUserInCharge(token, user = game.user) {
         if (!token || !user) return false;
 
-        const isOwner = (u) => this.isUserDocumentOwner(u, token.actor ?? token.document?.actor) || this.isUserDocumentOwner(u, token.document ?? token);
+        const isOwner = (u) => this.isUserDocumentOwner(u, token.actor) || this.isUserDocumentOwner(u, token.document);
 
         if (!isOwner(user)) {
             return false;
@@ -813,10 +813,9 @@ export class BaseFoundryAdapter {
      */
     getTokenDimensions(token) {
         if (!token) return { widthPx: 0, heightPx: 0, widthUnits: 1, heightUnits: 1, radiusPx: 0 };
-        const doc = token.document ?? token;
         const gridSize = this.getGridSize();
-        const widthUnits = doc.width ?? 1;
-        const heightUnits = doc.height ?? 1;
+        const widthUnits = token.document.width ?? 1;
+        const heightUnits = token.document.height ?? 1;
         const widthPx = token.w ?? (widthUnits * gridSize);
         const heightPx = token.h ?? (heightUnits * gridSize);
         const radiusPx = Math.max(widthPx, heightPx) / 2;
@@ -836,8 +835,7 @@ export class BaseFoundryAdapter {
      */
     getTokenRotation(token) {
         if (!token) return 0;
-        const doc = token.document ?? token;
-        return doc.rotation ?? token.rotation ?? 0;
+        return token.document.rotation ?? 0;
     }
 
     /**
@@ -855,10 +853,8 @@ export class BaseFoundryAdapter {
         const { size: gridSize, distance: gridDistance } = this.getSceneDimensions();
         const dist2DUnits = (dist2DPx / gridSize) * gridDistance;
 
-        const doc1 = t1.document ?? t1;
-        const doc2 = t2.document ?? t2;
-        const el1 = doc1.elevation ?? 0;
-        const el2 = doc2.elevation ?? 0;
+        const el1 = t1.document.elevation ?? 0;
+        const el2 = t2.document.elevation ?? 0;
         const elDiff = el1 - el2;
 
         const dist3DUnits = Math.hypot(dist2DUnits, elDiff);
@@ -903,19 +899,16 @@ export class BaseFoundryAdapter {
         const srcCenter = this.getCenter(token);
         if (!srcCenter) return null;
 
-        const doc = target.document ?? target;
-        const w = doc.width ?? 1;
-        const h = doc.height ?? 1;
-        const targetX = target.x ?? doc.x ?? 0;
-        const targetY = target.y ?? doc.y ?? 0;
+        const w = target.document.width ?? 1;
+        const h = target.document.height ?? 1;
 
         let bestPoint = null;
         let bestDist2 = Infinity;
 
         for (let gx = 0; gx < w; gx++) {
             for (let gy = 0; gy < h; gy++) {
-                const cx = targetX + (gx + 0.5) * gs;
-                const cy = targetY + (gy + 0.5) * gs;
+                const cx = target.x + (gx + 0.5) * gs;
+                const cy = target.y + (gy + 0.5) * gs;
 
                 const dx = cx - srcCenter.x;
                 const dy = cy - srcCenter.y;
@@ -955,11 +948,11 @@ export class BaseFoundryAdapter {
         };
 
         const gridSize = this.getGridSize();
-        const tDoc = token.document ?? token;
+        const tDoc = token.document;
         const tWidth = tDoc.width ?? 1;
         const tHeight = tDoc.height ?? 1;
-        const tX = tDoc.x ?? token.x ?? 0;
-        const tY = tDoc.y ?? token.y ?? 0;
+        const tX = tDoc.x;
+        const tY = tDoc.y;
 
         const getCenterPoint = (pt) => {
             if (canvas?.grid?.getCenterPoint) return canvas.grid.getCenterPoint(pt);
@@ -1016,7 +1009,7 @@ export class BaseFoundryAdapter {
         const applyPC = config.applyPC !== false;
         const applyGM = config.applyGM !== false;
 
-        const isOwner = (u) => this.isUserDocumentOwner(u, token.actor ?? token.document?.actor) || this.isUserDocumentOwner(u, token.document ?? token);
+        const isOwner = (u) => this.isUserDocumentOwner(u, token.actor) || this.isUserDocumentOwner(u, token.document);
 
         const usersCollection = game?.users;
         const allUsers = usersCollection?.contents
@@ -1036,17 +1029,17 @@ export class BaseFoundryAdapter {
     /**
      * Calculate bounding box and center for a Tile.
      * In V12/V13 baseline, tile origin (x, y) is top-left (0, 0).
-     * @param {Tile|TileDocument} tile Target tile placeable or document
+     * @param {Tile} tile Target tile placeable
      * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number, anchor: {x: number, y: number} }}
      */
     getTileBounds(tile) {
         if (!tile) return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0, y: 0 } };
-        const doc = tile.document ?? tile;
-        const x = doc.x ?? tile.x ?? 0;
-        const y = doc.y ?? tile.y ?? 0;
-        const width = doc.width ?? tile.width ?? 0;
-        const height = doc.height ?? tile.height ?? 0;
-        const center = tile.center ?? doc.center ?? { x: x + width / 2, y: y + height / 2 };
+        const doc = tile.document;
+        const x = doc.x;
+        const y = doc.y;
+        const width = doc.width;
+        const height = doc.height;
+        const center = tile.center ?? { x: x + width / 2, y: y + height / 2 };
         return {
             minX: x,
             maxX: x + width,
@@ -1061,7 +1054,7 @@ export class BaseFoundryAdapter {
 
     /**
      * Retrieve all tokens overlapping or contained within a tile.
-     * @param {Tile|TileDocument} tile Target Tile placeable or document
+     * @param {Tile} tile Target Tile placeable
      * @returns {Token[]} Array of matching Token placeables
      */
     getTokensInTile(tile) {
@@ -1072,14 +1065,14 @@ export class BaseFoundryAdapter {
         const tokens = canvas?.tokens?.placeables ?? [];
 
         return tokens.filter(token => {
-            const tDoc = token.document ?? token;
+            const tDoc = token.document;
             const tWidth = (tDoc.width ?? 1) * gridSize;
             const tHeight = (tDoc.height ?? 1) * gridSize;
 
             // Check authoritative document bounds (where the token is logically placed in the database)
-            const docMinX = tDoc.x ?? token.x ?? 0;
+            const docMinX = tDoc.x;
             const docMaxX = docMinX + tWidth;
-            const docMinY = tDoc.y ?? token.y ?? 0;
+            const docMinY = tDoc.y;
             const docMaxY = docMinY + tHeight;
             const docOverlaps = !(docMaxX <= tileMinX || docMinX >= tileMaxX || docMaxY <= tileMinY || docMinY >= tileMaxY);
 

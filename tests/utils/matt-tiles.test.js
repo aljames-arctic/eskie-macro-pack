@@ -99,7 +99,7 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
     // Verify the code string resolves adapter via module API
     assert.ok(trapAction.data.code.includes(`const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter;`), 'Generated code should resolve adapter from module API');
     assert.ok(trapAction.data.code.includes('const trap = adapter.getProperty(globalThis, animation);'), 'Generated code should invoke getProperty on resolved adapter');
-    assert.ok(trapAction.data.code.includes('let targets = adapter.getTokensInTile(tile);'), 'Generated code should delegate token containment lookup directly to adapter.getTokensInTile');
+    assert.ok(trapAction.data.code.includes('let targets = adapter.getTokensInTile(tilePlaceable);'), 'Generated code should delegate token containment lookup directly to adapter.getTokensInTile');
 
     // Test executing trap action code
     let playCalled = false;
@@ -121,11 +121,12 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
     const tokenInside = { id: 'tok-inside', document: { id: 'tok-inside', x: 120, y: 120, width: 1, height: 1 }, x: 120, y: 120, w: 100, h: 100 };
     const tokenOutside = { id: 'tok-outside', document: { id: 'tok-outside', x: 300, y: 300, width: 1, height: 1 }, x: 300, y: 300, w: 100, h: 100 };
     globalThis.canvas.tokens = {
-        placeables: [tokenInside, tokenOutside]
+        placeables: [tokenInside, tokenOutside],
+        get: (id) => (id === 'tok-inside' ? tokenInside : (id === 'tok-activating' ? { id: 'tok-activating', document: { id: 'tok-activating' } } : null))
     };
     globalThis.canvas.grid = { size: 100 };
 
-    const mockTrapTile = {
+    const mockTrapTilePlaceable = {
         id: 'tile-trap-1',
         document: {
             id: 'tile-trap-1',
@@ -144,8 +145,18 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
         height: 100
     };
 
+    // In MATT runtime, "tile" in action scope is a TileDocument, and canvas.tiles.get(id) returns the placeable
+    const mockTrapTileDoc = {
+        id: 'tile-trap-1',
+        object: mockTrapTilePlaceable,
+        getFlag: (mod, key) => (mod === MODULE_ID && key === 'trap.animation' ? 'eskie.traps.spike' : null)
+    };
+    globalThis.canvas.tiles = {
+        get: (id) => (id === 'tile-trap-1' ? mockTrapTilePlaceable : null)
+    };
+
     const trapExecFn = new Function('token', 'tile', 'canvas', `return (async () => { ${trapAction.data.code} })();`);
-    await trapExecFn(mockActivatingToken, mockTrapTile, globalThis.canvas);
+    await trapExecFn(mockActivatingToken, mockTrapTileDoc, globalThis.canvas);
 
     assert.equal(playCalled, true, 'Trap play should be invoked successfully');
     assert.equal(playTargets.length, 1, 'Only tokens contained within the trap tile should be targeted');
@@ -211,7 +222,8 @@ test('matt.trap.setup correctly handles when the trigger tile is the trap tile (
     // Place tokens on canvas: tokenInside is on tile
     const tokenInside = { id: 'tok-on-tile', document: { id: 'tok-on-tile', x: 220, y: 220, width: 1, height: 1 }, x: 220, y: 220, w: 100, h: 100 };
     globalThis.canvas.tokens = {
-        placeables: [tokenInside]
+        placeables: [tokenInside],
+        get: (id) => (id === 'tok-on-tile' ? tokenInside : null)
     };
     globalThis.canvas.grid = { size: 100 };
 
@@ -246,7 +258,10 @@ test('matt.trap.setup correctly handles when the trigger tile is the trap tile (
     // Test fallback when no tokens on canvas overlap (e.g. pre-update movement entry)
     playCalled = false;
     playTargets = [];
-    globalThis.canvas.tokens = { placeables: [] };
+    globalThis.canvas.tokens = {
+        placeables: [],
+        get: (id) => (id === 'tok-on-tile' ? mockToken : null)
+    };
     await execFn(mockToken, mockTile, globalThis.canvas);
     assert.equal(playCalled, true, 'Trap play should still execute with fallback activating token');
     assert.equal(playTargets.length, 1);
@@ -275,14 +290,4 @@ test('adapter.getTokensInTile returns only overlapping tokens', () => {
     const contained = adapter.getTokensInTile(tile);
     assert.deepEqual(contained.map(t => t.id), ['t1', 't2']);
     assert.deepEqual(adapter.getTokensInTile(null), []);
-
-    // Direct TileDocument (MATT script scope where tile is already a TileDocument without .document)
-    const tileDocument = { id: 'td-1', x: 100, y: 100, width: 200, height: 200 };
-    const containedFromDoc = adapter.getTokensInTile(tileDocument);
-    assert.deepEqual(containedFromDoc.map(t => t.id), ['t1', 't2']);
-    const bounds = adapter.foundry.getTileBounds(tileDocument);
-    assert.equal(bounds.minX, 100);
-    assert.equal(bounds.maxX, 300);
-    assert.equal(bounds.center.x, 200);
-    assert.equal(bounds.center.y, 200);
 });

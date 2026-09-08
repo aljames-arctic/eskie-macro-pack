@@ -31,9 +31,8 @@ async function create(tile, targets, config = {}) {
     // 3. Fallback to targets passed
     let finalTargets = [];
 
-    const targetTileObj = (targetTile?.document || targetTile?.center) ? targetTile : adapter.getPlaceable(targetTile);
-    if (targetTileObj) {
-        finalTargets.push(...adapter.getTokensInTile(targetTileObj));
+    if (targetTile) {
+        finalTargets.push(...adapter.getTokensInTile(targetTile));
     }
 
     if (finalTargets.length === 0) {

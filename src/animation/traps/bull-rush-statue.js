@@ -30,8 +30,7 @@ async function create(tile, targets, config = {}) {
     const tileWidth = tileBounds.width;
     const tileHeight = tileBounds.height;
 
-    const targetTileObj = (targetTile?.document || targetTile?.center) ? targetTile : adapter.getPlaceable(targetTile);
-    const targetLoc = adapter.getCenter(targetTileObj);
+    const targetLoc = adapter.getCenter(targetTile);
 
     if (!targetLoc) {
         log.warn(`Bull Rush Statue Trap: Tile "${tile.id}" has no configured target tile.`);

@@ -22,8 +22,7 @@ async function create(tile, targets, config = {}) {
     const { targetTile, size, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInTile(tile);
 
-    const targetTileObj = (targetTile?.document || targetTile?.center) ? targetTile : adapter.getPlaceable(targetTile);
-    const targetLoc = adapter.getCenter(targetTileObj);
+    const targetLoc = adapter.getCenter(targetTile);
 
     if (!targetLoc) {
         log.warn(`Fire Trap: Tile "${tile.id}" has no configured target tile.`);

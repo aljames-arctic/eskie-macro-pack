@@ -26,10 +26,7 @@ async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { targetTile, boulder, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    // Retrieve destination tile from config
-    const endTile = (targetTile?.document || targetTile?.center) ? targetTile : adapter.getPlaceable(targetTile);
-
-    if (!endTile) {
+    if (!targetTile) {
         log.warn(`Rolling Boulder Trap: Tile "${tile.id}" has no configured end tile.`);
         ui.notifications.warn(game.i18n.format('EMP.traps.rollingBoulder.noEndTile', { id: tile.id }));
         let seq = new Sequence();
@@ -38,7 +35,7 @@ async function create(tile, targets, config = {}) {
     }
 
     const startLoc = adapter.getCenter(tile);
-    const endLoc = adapter.getCenter(endTile);
+    const endLoc = adapter.getCenter(targetTile);
 
     if (!startLoc || !endLoc) {
         log.warn(`Rolling Boulder Trap: Could not resolve coordinates for start or end tile.`);

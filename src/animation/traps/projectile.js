@@ -29,8 +29,7 @@ async function create(tile, targets, config = {}) {
     const tileCenter = tileBounds.center;
 
     // Retrieve target/landing tile from config
-    const targetTileObj = (targetTile?.document || targetTile?.center) ? targetTile : adapter.getPlaceable(targetTile);
-    const targetLoc = adapter.getCenter(targetTileObj);
+    const targetLoc = adapter.getCenter(targetTile);
 
     if (!targetLoc) {
         log.warn(`Projectile Trap: Tile "${tile.id}" has no configured target tile.`);

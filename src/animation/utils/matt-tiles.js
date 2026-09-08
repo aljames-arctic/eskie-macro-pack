@@ -246,14 +246,13 @@ async function setup(animation, config = {}) {
                 : 'manual';
 
             const { tileCount: _tc, extraFlags: _ef, extraTiles: _et, trigger: _tr, controlled: _co, playPath: _pp, ...trapOptions } = config;
-            const trapConfig = {
-                ...trapOptions,
-                ...(tileCount === 3 ? { targetTile: targetTiles[0]?.id ?? trapOptions.targetTile ?? null } : {}),
-            };
+            const targetTileId = tileCount === 3 ? (targetTiles[0]?.id ?? null) : null;
+            const trapConfig = { ...trapOptions };
 
             const trapActionCode = `
-// Resolve the concrete Tile placeable from MATT execution scope
+// Resolve the concrete Tile placeables from MATT execution scope
 const tilePlaceable = tile.object ?? canvas.tiles.get(tile.id);
+${targetTileId ? `const targetTile = canvas.tiles.get('${targetTileId}');` : ''}
 
 // Get the specific Eskie Trap Animation Function if this tile is a trap tile
 const animation = tile.getFlag('${MODULE_ID}', 'trap.animation');
@@ -276,7 +275,7 @@ if (animation) {
         }
 
         // Play the trap animation with the contained tokens as targets
-        await trap.play(tilePlaceable, targets, ${JSON.stringify(trapConfig)});
+        await trap.play(tilePlaceable, targets, { ...${JSON.stringify(trapConfig)}${targetTileId ? ', targetTile' : ''} });
     } catch (err) {
         console.error('Eskie Macro Pack | Failed to play trap animation "' + animation + '" on tile "' + tile.id + '":', err);
         throw err;

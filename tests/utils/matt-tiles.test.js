@@ -333,7 +333,7 @@ test('matt.trap.setup configures targetTile in trap config for 3-tile setups', a
     const trapUpdate = updatedTiles.get('tile-trap-3');
     assert.ok(trapUpdate, 'Trap tile should be updated');
     const trapAction = trapUpdate['flags.monks-active-tiles.actions'][0];
-    assert.ok(trapAction.data.code.includes('"targetTile":"tile-target-3"'), 'Generated action code must contain targetTile: "tile-target-3"');
+    assert.ok(trapAction.data.code.includes("const targetTile = canvas.tiles.get('tile-target-3');"), 'Generated action code must resolve targetTile placeable');
     assert.ok(!trapAction.data.code.includes('"triggerId"'), 'Generated action code must not contain triggerId');
     assert.ok(!trapAction.data.code.includes('"sourceId"'), 'Generated action code must not contain sourceId');
 
@@ -356,12 +356,12 @@ test('matt.trap.setup configures targetTile in trap config for 3-tile setups', a
         getFlag: (mod, key) => (mod === MODULE_ID && key === 'trap.animation' ? 'eskie.traps.rollingBoulder' : null)
     };
     trapTilePlaceable.document = mockTrapDoc;
-    globalThis.canvas.tiles.get = (id) => (id === 'tile-trap-3' ? trapTilePlaceable : null);
+    globalThis.canvas.tiles.get = (id) => (id === 'tile-trap-3' ? trapTilePlaceable : (id === 'tile-target-3' ? targetTile : null));
 
     const execFn = new Function('token', 'tile', 'canvas', `return (async () => { ${trapAction.data.code} })();`);
     await execFn(null, mockTrapDoc, globalThis.canvas);
 
     assert.ok(playConfigReceived, 'Play function should be called');
-    assert.equal(playConfigReceived.targetTile, 'tile-target-3', 'Play config must receive targetTile');
+    assert.equal(playConfigReceived.targetTile, targetTile, 'Play config must receive targetTile placeable');
     assert.equal(playConfigReceived.tile, undefined, 'Play config must not contain nested tile object');
 });

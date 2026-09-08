@@ -93,7 +93,7 @@ async function create(tile, targets, config = {}) {
         .playbackRate(playbackRate)
         .spriteRotation(-90)
         .zIndex(3)
-        .waitUntilFinished()
+        .waitUntilFinished(-250)
 
         // Impact flash at target/crash point
         .effect()

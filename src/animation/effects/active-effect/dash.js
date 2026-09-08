@@ -1,4 +1,3 @@
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 import { closest } from '../../../lib/filemanager.js';
 import { matt } from '../../utils/matt-tiles.js';
@@ -128,4 +127,4 @@ export const dash = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("dash", "effect", "eskie.effect.dash", DEFAULT_CONFIG, "0.0.1", "Dash");
+adapter.autorec.register("dash", "effect", "eskie.effect.dash", DEFAULT_CONFIG, "0.0.1", "Dash");

@@ -1,7 +1,6 @@
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { adapter } from '../../../adapters/index.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 //Last Updated: 4/30/2024
@@ -116,5 +115,5 @@ export const hitTheDirt = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("hitTheDirt", 'template', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, "0.0.1", "Hit the Dirt");
-autorec.register("hitTheDirt", 'effect', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, "0.0.1", "Hit the Dirt");
+adapter.autorec.register("hitTheDirt", 'template', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, "0.0.1", "Hit the Dirt");
+adapter.autorec.register("hitTheDirt", 'effect', 'eskie.effect.hitTheDirt', DEFAULT_CONFIG, "0.0.1", "Hit the Dirt");

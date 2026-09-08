@@ -6,7 +6,6 @@
 import { closest } from "../../../lib/filemanager.js";
 import { template as templatelib } from '../../../lib/templates.js';
 import { adapter } from "../../../adapters/index.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
@@ -157,5 +156,5 @@ export const silence = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("silence", "template", "eskie.effect.silence", DEFAULT_CONFIG, "0.0.1", "Silence");
-autorec.register(CONCENTRATING("silence", "Silence"), "effect", "eskie.effect.silence", DEFAULT_CONFIG, "0.0.1");
+adapter.autorec.register("silence", "template", "eskie.effect.silence", DEFAULT_CONFIG, "0.0.1", "Silence");
+adapter.autorec.register(adapter.autorec.CONCENTRATING("silence", "Silence"), "effect", "eskie.effect.silence", DEFAULT_CONFIG, "0.0.1");

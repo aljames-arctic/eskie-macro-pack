@@ -1,7 +1,6 @@
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 import { blur } from "../../scene-overlays/status-blur.js";
-import { autorec } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { log } from '../../../lib/logger.js';
 
 /* **
@@ -59,4 +58,4 @@ export const blurredVision = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("blurredVision", "effect", "eskie.effect.blurredVision", DEFAULT_CONFIG, "0.0.2", "Blurred Vision");
+adapter.autorec.register("blurredVision", "effect", "eskie.effect.blurredVision", DEFAULT_CONFIG, "0.0.2", "Blurred Vision");

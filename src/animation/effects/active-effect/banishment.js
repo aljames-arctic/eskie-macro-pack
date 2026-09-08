@@ -5,7 +5,6 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
@@ -412,4 +411,4 @@ export const banishment = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("banishment", "effect", "eskie.effect.banishment", DEFAULT_CONFIG, '2.0.2', "Banishment");
+adapter.autorec.register("banishment", "effect", "eskie.effect.banishment", DEFAULT_CONFIG, '2.0.2', "Banishment");

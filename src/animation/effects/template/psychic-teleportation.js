@@ -1,7 +1,6 @@
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { adapter } from '../../../adapters/index.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -170,4 +169,4 @@ export const psychicTeleportation = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("psychicTeleportation", "template", "eskie.effect.psychicTeleportation", DEFAULT_CONFIG, "0.0.1", "Psychic Teleportation");
+adapter.autorec.register("psychicTeleportation", "template", "eskie.effect.psychicTeleportation", DEFAULT_CONFIG, "0.0.1", "Psychic Teleportation");

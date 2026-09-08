@@ -8,7 +8,6 @@
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { adapter } from '../../../adapters/index.js';
-import { autorec, CONCENTRATING } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -259,5 +258,5 @@ export const gate = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("gate", "template", "eskie.effect.gate", DEFAULT_CONFIG, "0.0.1", "Gate");
-autorec.register(CONCENTRATING("gate", "Gate"), "effect", "eskie.effect.gate", DEFAULT_CONFIG, "0.0.1");
+adapter.autorec.register("gate", "template", "eskie.effect.gate", DEFAULT_CONFIG, "0.0.1", "Gate");
+adapter.autorec.register(adapter.autorec.CONCENTRATING("gate", "Gate"), "effect", "eskie.effect.gate", DEFAULT_CONFIG, "0.0.1");

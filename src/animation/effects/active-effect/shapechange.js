@@ -5,7 +5,6 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { adapter } from '../../../adapters/index.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -334,4 +333,4 @@ export const shapechange = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("shapechange", 'effect', 'eskie.effect.shapechange', DEFAULT_CONFIG, '0.1.1', "Shapechange");
+adapter.autorec.register("shapechange", 'effect', 'eskie.effect.shapechange', DEFAULT_CONFIG, '0.1.1', "Shapechange");

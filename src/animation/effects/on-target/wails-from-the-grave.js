@@ -1,9 +1,7 @@
 // Original Author: .eskie
 // Modular Conversion: bakanabaka
 
-import { closest } from '../../../lib/filemanager.js';
-import { settingsOverride } from '../../../lib/settings.js';
-import { adapter, autorec } from '../../../adapters/index.js';
+import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -260,7 +258,7 @@ export const wailsFromTheGrave = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('wailsFromTheGrave', 'melee-target', 'eskie.effect.wailsFromTheGrave.attack', DEFAULT_CONFIG, '0.0.2', 'Wails from the Grave');
-autorec.register('wailsFromTheGraveDamage', 'ranged-target', 'eskie.effect.wailsFromTheGrave.damage', DEFAULT_CONFIG, '0.0.2', 'Wails from the Grave (Damage)');
+adapter.autorec.register('wailsFromTheGrave', 'melee-target', 'eskie.effect.wailsFromTheGrave.attack', DEFAULT_CONFIG, '0.0.2', 'Wails from the Grave');
+adapter.autorec.register('wailsFromTheGraveDamage', 'ranged-target', 'eskie.effect.wailsFromTheGrave.damage', DEFAULT_CONFIG, '0.0.2', 'Wails from the Grave (Damage)');
 
 

@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
-import { adapter, autorec, CONCENTRATING } from "../../../adapters/index.js";
+import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
@@ -115,4 +115,4 @@ export const chromaticOrb = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("chromaticOrb", "ranged-target", "eskie.effect.chromaticOrb", DEFAULT_CONFIG, "0.0.1", "Chromatic Orb");
+adapter.autorec.register("chromaticOrb", "ranged-target", "eskie.effect.chromaticOrb", DEFAULT_CONFIG, "0.0.1", "Chromatic Orb");

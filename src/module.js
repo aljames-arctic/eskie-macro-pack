@@ -1,13 +1,7 @@
 import { animation } from './animation/index.js';
-import { autorec } from './adapters/modules/autorec/autorec-module-adapter.js';
-import { autoanimations } from './adapters/modules/autoanimations/autoanimations-module-adapter.js';
-import { blfx } from './adapters/modules/blfx/blfx-module-adapter.js';
-import { socketlibapi, socket } from './adapters/modules/socketlib/socketlib-module-adapter.js';
 import { loadWorldScripts } from './world-scripts/loader.js';
 import { MODULE_ID } from './lib/constants.js';
-import { crosshair } from './lib/crosshairs.js';
 import { standaloneMacros } from './lib/standalone-macros.js';
-import { template } from './lib/templates.js';
 import { adapter, Adapter } from './adapters/index.js';
 
 // Import module settings to also run its initialization code
@@ -45,18 +39,7 @@ export function setupModule() {
             Adapter,
             adapter,
             animation,
-            effect,
-            traps,
-            mask,
-            overlay,
-            showcase,
-            autorec,
-            autoanimations,
-            blfx,
-            crosshair,
-            socket,
-            standaloneMacros,
-            template
+            standaloneMacros
         };
     }
 }
@@ -84,7 +67,7 @@ Hooks.once('ready', async () => {
     status.ready = true;
     const isAaActive = Boolean(game.modules?.get('autoanimations')?.active);
     if (!isAaActive || status.aaReady) {
-        await autorec.submit();
+        await adapter.autorec.submit();
     }
 
     // Load enabled world scripts for the player
@@ -94,8 +77,8 @@ Hooks.once('ready', async () => {
 Hooks.once('aa.ready', async () => {
     status.aaReady = true;
     if (status.ready) {
-        await autorec.submit();
+        await adapter.autorec.submit();
     }
 });
 
-Hooks.once('socketlib.ready', async () => { await socketlibapi.register(); });
+Hooks.once('socketlib.ready', async () => { await adapter.socketlib.register(); });

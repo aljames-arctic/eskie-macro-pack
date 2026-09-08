@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { adapter, autorec, CONCENTRATING } from '../../../adapters/index.js';
+import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -128,6 +128,6 @@ export const twilightSanctuary = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('twilightSanctuary', 'aura', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG, '0.0.1', 'Twilight Sanctuary');
-autorec.register('channelDivinityTwilightSanctuary', 'aura', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG, '0.0.1', 'Channel Divinity: Twilight Sanctuary');
-autorec.register(CONCENTRATING('twilightSanctuary', 'Twilight Sanctuary'), 'effect', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG, "0.0.1");
+adapter.autorec.register('twilightSanctuary', 'aura', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG, '0.0.1', 'Twilight Sanctuary');
+adapter.autorec.register('channelDivinityTwilightSanctuary', 'aura', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG, '0.0.1', 'Channel Divinity: Twilight Sanctuary');
+adapter.autorec.register(adapter.autorec.CONCENTRATING('twilightSanctuary', 'Twilight Sanctuary'), 'effect', 'eskie.effect.twilightSanctuary', DEFAULT_CONFIG, "0.0.1");

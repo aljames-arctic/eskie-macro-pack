@@ -2,7 +2,6 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../../lib/filemanager.js';
-import { autorec } from '../../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { adapter } from '../../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../../utils/sound.js';
 
@@ -121,5 +120,5 @@ export const eyesOfTheGrave = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('eyesOfTheGrave', 'token', 'eskie.effect.detect.eyesOfTheGrave', DEFAULT_CONFIG, '0.0.1', 'Eyes of the Grave');
+adapter.autorec.register('eyesOfTheGrave', 'token', 'eskie.effect.detect.eyesOfTheGrave', DEFAULT_CONFIG, '0.0.1', 'Eyes of the Grave');
 

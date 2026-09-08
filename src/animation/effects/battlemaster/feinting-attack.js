@@ -3,7 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { adapter, autorec } from '../../../adapters/index.js';
+import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -119,4 +119,4 @@ export const feintingAttack = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register('feintingAttack', 'melee-target', 'eskie.effect.battlemaster.feintingAttack', DEFAULT_CONFIG, '0.0.1', 'Feinting Attack');
+adapter.autorec.register('feintingAttack', 'melee-target', 'eskie.effect.battlemaster.feintingAttack', DEFAULT_CONFIG, '0.0.1', 'Feinting Attack');

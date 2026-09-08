@@ -1,6 +1,5 @@
 import { closest } from "../../../lib/filemanager.js";
 import { template as templatelib } from '../../../lib/templates.js';
-import { autorec } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
@@ -578,4 +577,4 @@ export const starwardSword = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("starwardSword", "template", "eskie.effect.starwardSword", DEFAULT_CONFIG, "0.0.2", "Starward Sword");
+adapter.autorec.register("starwardSword", "template", "eskie.effect.starwardSword", DEFAULT_CONFIG, "0.0.2", "Starward Sword");

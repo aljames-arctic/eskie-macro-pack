@@ -6,7 +6,6 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { adapter } from "../../../adapters/index.js";
-import { autorec } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
@@ -222,4 +221,4 @@ export const armsOfHadar = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("armsOfHadar", "template", "eskie.effect.armsOfHadar", DEFAULT_CONFIG, "0.0.1", "Arms of Hadar");
+adapter.autorec.register("armsOfHadar", "template", "eskie.effect.armsOfHadar", DEFAULT_CONFIG, "0.0.1", "Arms of Hadar");

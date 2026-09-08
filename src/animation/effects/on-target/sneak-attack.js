@@ -1,4 +1,4 @@
-import { adapter, autorec } from '../../../adapters/index.js';
+import { adapter } from '../../../adapters/index.js';
 import { closest } from '../../../lib/filemanager.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
@@ -172,5 +172,5 @@ export const sneakAttack = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register(autorec.MELEE("sneakAttack", "Sneak Attack"), "melee-target", "eskie.effect.sneakAttack.melee", DEFAULT_CONFIG_MELEE, "1.0.1", "(Melee) Sneak Attack");
-autorec.register(autorec.RANGED("sneakAttack", "Sneak Attack"), "ranged-target", "eskie.effect.sneakAttack.ranged", DEFAULT_CONFIG_RANGED, "1.0.1", "(Ranged) Sneak Attack");
+adapter.autorec.register(adapter.autorec.MELEE("sneakAttack", "Sneak Attack"), "melee-target", "eskie.effect.sneakAttack.melee", DEFAULT_CONFIG_MELEE, "1.0.1", "(Melee) Sneak Attack");
+adapter.autorec.register(adapter.autorec.RANGED("sneakAttack", "Sneak Attack"), "ranged-target", "eskie.effect.sneakAttack.ranged", DEFAULT_CONFIG_RANGED, "1.0.1", "(Ranged) Sneak Attack");

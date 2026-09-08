@@ -2,7 +2,6 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
@@ -102,4 +101,4 @@ export const fireShield = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("fireShield", "effect", "eskie.effect.fireShield", DEFAULT_CONFIG, "0.0.2", "Fire Shield");
+adapter.autorec.register("fireShield", "effect", "eskie.effect.fireShield", DEFAULT_CONFIG, "0.0.2", "Fire Shield");

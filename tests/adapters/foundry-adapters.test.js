@@ -1,7 +1,11 @@
 import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { initializeFoundryAdapter, BaseFoundryAdapter, FoundryV12Adapter, FoundryV13Adapter, FoundryV14Adapter, USER_PERMISSION_TIERS } from '../../src/adapters/foundry/index.js';
+import { initializeFoundryAdapter, BaseFoundryAdapter } from '../../src/adapters/foundry/index.js';
+import { BaseFoundryAdapter as BaseAdapterClass, USER_PERMISSION_TIERS } from '../../src/adapters/foundry/base-foundry-adapter.js';
+import { FoundryV12Adapter } from '../../src/adapters/foundry/foundry-v12-adapter.js';
+import { FoundryV13Adapter } from '../../src/adapters/foundry/foundry-v13-adapter.js';
+import { FoundryV14Adapter } from '../../src/adapters/foundry/foundry-v14-adapter.js';
 import { adapter } from '../../src/adapters/index.js';
 
 test('BaseFoundryAdapter enforces abstract contracts for version-specific properties and methods', async () => {

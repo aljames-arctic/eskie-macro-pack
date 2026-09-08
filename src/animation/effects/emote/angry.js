@@ -1,5 +1,5 @@
 import { closest } from "../../../lib/filemanager.js";
-import { adapter, autorec, CONCENTRATING } from "../../../adapters/index.js";
+import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 /* **
    Originally Published: 4/14/2023
@@ -71,4 +71,4 @@ export const angry = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("angry", "effect", "eskie.effect.emote.angry", DEFAULT_CONFIG, "0.0.1", "Angry");
+adapter.autorec.register("angry", "effect", "eskie.effect.emote.angry", DEFAULT_CONFIG, "0.0.1", "Angry");

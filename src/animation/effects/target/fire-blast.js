@@ -7,7 +7,6 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 import { adapter } from "../../../adapters/index.js";
@@ -281,4 +280,4 @@ export const fireBlast = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("fireBlast", 'ranged-target', 'eskie.effect.fireBlast', DEFAULT_CONFIG, '0.1.1', "Fire Blast");
+adapter.autorec.register("fireBlast", 'ranged-target', 'eskie.effect.fireBlast', DEFAULT_CONFIG, '0.1.1', "Fire Blast");

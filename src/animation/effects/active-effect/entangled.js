@@ -2,7 +2,6 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
@@ -54,4 +53,4 @@ export const entangled = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('entangled', 'effect', 'eskie.effect.entangled', DEFAULT_CONFIG, '0.0.2', 'Entangled');
+adapter.autorec.register('entangled', 'effect', 'eskie.effect.entangled', DEFAULT_CONFIG, '0.0.2', 'Entangled');

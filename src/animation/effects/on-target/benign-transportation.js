@@ -6,7 +6,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
-import { adapter, autorec, CONCENTRATING } from "../../../adapters/index.js";
+import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 import { log } from "../../../lib/logger.js";
 
@@ -102,4 +102,4 @@ export const benignTransportation = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("benignTransportation", "ranged-target", "eskie.effect.benignTransportation", DEFAULT_CONFIG, "0.0.1", "Benign Transportation");
+adapter.autorec.register("benignTransportation", "ranged-target", "eskie.effect.benignTransportation", DEFAULT_CONFIG, "0.0.1", "Benign Transportation");

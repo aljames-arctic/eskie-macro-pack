@@ -31,7 +31,7 @@ import { chromaticOrb } from './on-target/chromatic-orb.js';
 import { cloudOfSand } from './multi-token/cloudOfSand.js';
 import { colorSpray } from './template/color-spray.js';
 import { dash } from './active-effect/dash.js';
-import { detect, eyesOfTheGrave } from './token/detect/index.js';
+import { detect } from './token/detect/index.js';
 import { dimensionDoor } from './template/dimension-door.js';
 import { disintegrate } from './target/disintegrate.js';
 import { divineSmite } from './on-target/divine-smite.js';
@@ -172,7 +172,7 @@ export const effect = {
     entangle,
     entangled,
     eyesOfNight,
-    eyesOfTheGrave,
+    eyesOfTheGrave: detect.eyesOfTheGrave,
     faerieFire,
     farStep,
     fightingSpirit,

@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
-import { adapter, autorec, CONCENTRATING } from "../../../adapters/index.js";
+import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
@@ -84,4 +84,4 @@ export const divineSmite = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("divineSmite", "melee-target", "eskie.effect.divineSmite", DEFAULT_CONFIG, "0.0.1", "Divine Smite");
+adapter.autorec.register("divineSmite", "melee-target", "eskie.effect.divineSmite", DEFAULT_CONFIG, "0.0.1", "Divine Smite");

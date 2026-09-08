@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { adapter, autorec } from '../../../adapters/index.js';
+import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -177,5 +177,5 @@ export const keeperOfSouls = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('keeperOfSouls', 'ranged-target', 'eskie.effect.keeperOfSouls', DEFAULT_CONFIG, '0.0.1', 'Keeper of Souls');
+adapter.autorec.register('keeperOfSouls', 'ranged-target', 'eskie.effect.keeperOfSouls', DEFAULT_CONFIG, '0.0.1', 'Keeper of Souls');
 

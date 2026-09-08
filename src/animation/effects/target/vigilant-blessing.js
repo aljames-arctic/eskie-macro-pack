@@ -2,7 +2,6 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
@@ -155,5 +154,5 @@ export const vigilantBlessing = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('vigilantBlessing', 'ranged-target', 'eskie.effect.vigilantBlessing.target', DEFAULT_CONFIG, '0.0.1', 'Vigilant Blessing');
-autorec.register('vigilantBlessing', 'effect', 'eskie.effect.vigilantBlessing.effect', DEFAULT_CONFIG, '0.0.1', 'Vigilant Blessing');
+adapter.autorec.register('vigilantBlessing', 'ranged-target', 'eskie.effect.vigilantBlessing.target', DEFAULT_CONFIG, '0.0.1', 'Vigilant Blessing');
+adapter.autorec.register('vigilantBlessing', 'effect', 'eskie.effect.vigilantBlessing.effect', DEFAULT_CONFIG, '0.0.1', 'Vigilant Blessing');

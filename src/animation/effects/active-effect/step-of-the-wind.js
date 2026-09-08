@@ -3,7 +3,6 @@
 
 import { closest } from '../../../lib/filemanager.js';
 
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { matt } from '../../utils/matt-tiles.js';
 
 import { adapter } from "../../../adapters/index.js";
@@ -149,4 +148,4 @@ export const stepOfTheWindMove = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("stepOfTheWind", "effect", "eskie.effect.stepOfTheWind.move", DEFAULT_CONFIG, "0.0.2", "Step of the Wind");
+adapter.autorec.register("stepOfTheWind", "effect", "eskie.effect.stepOfTheWind.move", DEFAULT_CONFIG, "0.0.2", "Step of the Wind");

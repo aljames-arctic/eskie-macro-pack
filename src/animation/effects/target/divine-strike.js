@@ -2,7 +2,6 @@
 // Modularized: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
@@ -458,9 +457,9 @@ export const divineStrike = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register(autorec.MELEE('divineStrike', 'Divine Strike'), 'melee-target', 'eskie.effect.divineStrike.melee', DEFAULT_CONFIG, '0.0.3', '(Melee) Divine Strike');
-autorec.register(autorec.RANGED('divineStrike', 'Divine Strike'), 'ranged-target', 'eskie.effect.divineStrike.ranged', DEFAULT_CONFIG, '0.0.3', '(Ranged) Divine Strike');
-autorec.register(autorec.MELEE('divineStrikeTwilight', 'Divine Strike (Twilight)'), 'melee-target', 'eskie.effect.divineStrike.twilight.melee', DEFAULT_CONFIG, '0.0.3', '(Melee) Divine Strike (Twilight)');
-autorec.register(autorec.RANGED('divineStrikeTwilight', 'Divine Strike (Twilight)'), 'ranged-target', 'eskie.effect.divineStrike.twilight.ranged', DEFAULT_CONFIG, '0.0.3', '(Ranged) Divine Strike (Twilight)');
+adapter.autorec.register(adapter.autorec.MELEE('divineStrike', 'Divine Strike'), 'melee-target', 'eskie.effect.divineStrike.melee', DEFAULT_CONFIG, '0.0.3', '(Melee) Divine Strike');
+adapter.autorec.register(adapter.autorec.RANGED('divineStrike', 'Divine Strike'), 'ranged-target', 'eskie.effect.divineStrike.ranged', DEFAULT_CONFIG, '0.0.3', '(Ranged) Divine Strike');
+adapter.autorec.register(adapter.autorec.MELEE('divineStrikeTwilight', 'Divine Strike (Twilight)'), 'melee-target', 'eskie.effect.divineStrike.twilight.melee', DEFAULT_CONFIG, '0.0.3', '(Melee) Divine Strike (Twilight)');
+adapter.autorec.register(adapter.autorec.RANGED('divineStrikeTwilight', 'Divine Strike (Twilight)'), 'ranged-target', 'eskie.effect.divineStrike.twilight.ranged', DEFAULT_CONFIG, '0.0.3', '(Ranged) Divine Strike (Twilight)');
 
 

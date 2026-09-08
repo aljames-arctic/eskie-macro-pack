@@ -4,7 +4,6 @@
 ** */
 
 import { closest } from "../../../lib/filemanager.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
@@ -291,5 +290,5 @@ export const enlargeReduce = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("enlarged", "effect", "eskie.effect.enlargeReduce.enlarge", DEFAULT_CONFIG, "0.0.1", "Enlarged");
-autorec.register("reduced", "effect", "eskie.effect.enlargeReduce.reduce", DEFAULT_CONFIG, "0.0.1", "Reduced");
+adapter.autorec.register("enlarged", "effect", "eskie.effect.enlargeReduce.enlarge", DEFAULT_CONFIG, "0.0.1", "Enlarged");
+adapter.autorec.register("reduced", "effect", "eskie.effect.enlargeReduce.reduce", DEFAULT_CONFIG, "0.0.1", "Reduced");

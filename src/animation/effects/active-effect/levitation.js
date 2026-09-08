@@ -3,7 +3,6 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
@@ -118,4 +117,4 @@ export const levitation = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("levitating", "effect", "eskie.effect.levitation", DEFAULT_CONFIG, "0.0.1", "Levitating");
+adapter.autorec.register("levitating", "effect", "eskie.effect.levitation", DEFAULT_CONFIG, "0.0.1", "Levitating");

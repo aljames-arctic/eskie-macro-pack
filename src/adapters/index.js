@@ -1,13 +1,24 @@
-import { initializeFoundryAdapter, BaseFoundryAdapter, FoundryV12Adapter, FoundryV13Adapter, FoundryV14Adapter, USER_PERMISSION_TIERS } from './foundry/index.js';
-import { initializeSystemAdapter, BaseSystemAdapter, Dnd5eSystemAdapter, Pf2eSystemAdapter, GenericSystemAdapter, parseAndNormalizeAbility, BASE_ABILITY_MAP } from './system/index.js';
-import { initializeModuleAdapters, hasActiveModuleAdapters, MODULE_ADAPTERS, BaseModuleAdapter, MidiQolModuleAdapter, midiQolAdapter, AutoanimationsModuleAdapter, autoanimationsAdapter, autoanimations, EMP_AA_Menu, BlfxModuleAdapter, blfxAdapter, blfx, EMP_BLFX_Registry, buildBlfxPayload, mergeBlfxCustomAutoRec, SocketlibModuleAdapter, socketlibAdapter, socketlibapi, socket, socketlib, AutorecManager, autorecManager, autorec, promptDestinationDialog, CONCENTRATING, MassEditModuleAdapter, massEditAdapter, massEdit, TokenAttacherModuleAdapter, tokenAttacherAdapter, tokenAttacher } from './modules/index.js';
+import { initializeFoundryAdapter, BaseFoundryAdapter } from './foundry/index.js';
+import { initializeSystemAdapter, BaseSystemAdapter } from './system/index.js';
+import { GenericSystemAdapter } from './system/generic-system-adapter.js';
+import { initializeModuleAdapters, BaseModuleAdapter } from './modules/index.js';
+import { autoanimationsAdapter } from './modules/autoanimations/autoanimations-module-adapter.js';
+import { blfxAdapter } from './modules/blfx/blfx-module-adapter.js';
+import { socketlibAdapter } from './modules/socketlib/socketlib-module-adapter.js';
+import { midiQolAdapter } from './modules/midi-qol/midi-qol-module-adapter.js';
+import { autorecManager } from './modules/autorec/autorec-module-adapter.js';
+import { massEditAdapter } from './modules/mass-edit/mass-edit-module-adapter.js';
+import { tokenAttacherAdapter } from './modules/token-attacher/token-attacher-module-adapter.js';
+import { crosshair } from '../lib/crosshairs.js';
+import { template } from '../lib/templates.js';
+import { file } from '../lib/filemanager.js';
 import { log } from '../lib/logger.js';
 
 /**
  * Unified Adapter Singleton for Eskie Macro Pack.
  * Centralizes and abstracts Foundry platform generations (V12, V13, V14+), Game Systems, and Third-Party Modules.
  */
-export class Adapter {
+class Adapter {
     constructor() {
         this.foundry = new BaseFoundryAdapter(this);
         this.system = new GenericSystemAdapter(this.foundry);
@@ -62,6 +73,25 @@ export class Adapter {
         return this.modules.has(moduleId);
     }
 
+    /**
+     * Property-based accessor for instantiated module adapters.
+     * Supports bracket and dot notation: e.g. adapter.module['midi-qol'] or adapter.module.autoanimations.
+     * @type {Record<string, BaseModuleAdapter>}
+     */
+    get module() {
+        return new Proxy(this.modules, {
+            get: (target, prop) => {
+                if (typeof prop === 'string') {
+                    if (prop in target && typeof target[prop] === 'function') {
+                        return target[prop].bind(target);
+                    }
+                    return target.get(prop) ?? this[prop];
+                }
+                return Reflect.get(target, prop);
+            }
+        });
+    }
+
     get autoanimations() {
         return this.modules.get('autoanimations') ?? autoanimationsAdapter;
     }
@@ -93,6 +123,18 @@ export class Adapter {
 
     get tokenAttacher() {
         return this.modules.get('token-attacher') ?? tokenAttacherAdapter;
+    }
+
+    get crosshair() {
+        return crosshair;
+    }
+
+    get template() {
+        return template;
+    }
+
+    get file() {
+        return file;
     }
 
     /* -------------------------------------------- */
@@ -347,47 +389,8 @@ export class Adapter {
 export const adapter = new Adapter();
 
 export {
+    Adapter,
     BaseFoundryAdapter,
-    FoundryV12Adapter,
-    FoundryV13Adapter,
-    FoundryV14Adapter,
-    USER_PERMISSION_TIERS,
     BaseSystemAdapter,
-    Dnd5eSystemAdapter,
-    Pf2eSystemAdapter,
-    GenericSystemAdapter,
-    parseAndNormalizeAbility,
-    BASE_ABILITY_MAP,
-    MODULE_ADAPTERS,
-    initializeModuleAdapters,
-    hasActiveModuleAdapters,
-    BaseModuleAdapter,
-    MidiQolModuleAdapter,
-    midiQolAdapter,
-    AutoanimationsModuleAdapter,
-    autoanimationsAdapter,
-    autoanimations,
-    EMP_AA_Menu,
-    CONCENTRATING,
-    AutorecManager,
-    autorecManager,
-    autorec,
-    promptDestinationDialog,
-    BlfxModuleAdapter,
-    blfxAdapter,
-    blfx,
-    EMP_BLFX_Registry,
-    buildBlfxPayload,
-    mergeBlfxCustomAutoRec,
-    SocketlibModuleAdapter,
-    socketlibAdapter,
-    socketlibapi,
-    socket,
-    socketlib,
-    MassEditModuleAdapter,
-    massEditAdapter,
-    massEdit,
-    TokenAttacherModuleAdapter,
-    tokenAttacherAdapter,
-    tokenAttacher
+    BaseModuleAdapter
 };

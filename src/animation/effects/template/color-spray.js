@@ -5,7 +5,6 @@
 import { closest } from "../../../lib/filemanager.js";
 import { template as templatelib } from "../../../lib/templates.js";
 import { adapter } from "../../../adapters/index.js";
-import { autorec } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
@@ -133,4 +132,4 @@ export const colorSpray = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("colorSpray", 'template', 'eskie.effect.colorSpray', DEFAULT_CONFIG, '1.0.1', "Color Spray");
+adapter.autorec.register("colorSpray", 'template', 'eskie.effect.colorSpray', DEFAULT_CONFIG, '1.0.1', "Color Spray");

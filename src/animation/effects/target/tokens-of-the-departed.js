@@ -2,7 +2,6 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
@@ -258,6 +257,6 @@ export const tokensOfTheDeparted = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('tokensOfTheDeparted', 'ranged-target', 'eskie.effect.tokensOfTheDeparted.harvest', DEFAULT_CONFIG, '0.0.1', 'Tokens of the Departed');
-autorec.register('tokensOfTheDepartedUse', 'ranged-target', 'eskie.effect.tokensOfTheDeparted.use', DEFAULT_CONFIG, '0.0.1', 'Tokens of the Departed (Use)');
+adapter.autorec.register('tokensOfTheDeparted', 'ranged-target', 'eskie.effect.tokensOfTheDeparted.harvest', DEFAULT_CONFIG, '0.0.1', 'Tokens of the Departed');
+adapter.autorec.register('tokensOfTheDepartedUse', 'ranged-target', 'eskie.effect.tokensOfTheDeparted.use', DEFAULT_CONFIG, '0.0.1', 'Tokens of the Departed (Use)');
 

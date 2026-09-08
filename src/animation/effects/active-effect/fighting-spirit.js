@@ -2,7 +2,6 @@
 //Author: .eskie
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
@@ -127,4 +126,4 @@ export const fightingSpirit = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("fightingSpirit", "effect", "eskie.effect.fightingSpirit", DEFAULT_CONFIG, "0.0.2", "Fighting Spirit");
+adapter.autorec.register("fightingSpirit", "effect", "eskie.effect.fightingSpirit", DEFAULT_CONFIG, "0.0.2", "Fighting Spirit");

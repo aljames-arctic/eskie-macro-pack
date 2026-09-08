@@ -6,7 +6,6 @@
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 import { log } from '../../../lib/logger.js';
@@ -162,4 +161,4 @@ export const lightningBolt = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("lightningBolt", "template", "eskie.effect.lightningBolt", DEFAULT_CONFIG, "0.0.3", "Lightning Bolt");
+adapter.autorec.register("lightningBolt", "template", "eskie.effect.lightningBolt", DEFAULT_CONFIG, "0.0.3", "Lightning Bolt");

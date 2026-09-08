@@ -4,7 +4,6 @@
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { adapter } from '../../../adapters/index.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -140,4 +139,4 @@ export const rayOfSickness = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register('rayOfSickness', 'ranged-target', 'eskie.effect.rayOfSickness', DEFAULT_CONFIG, '0.0.1', 'Ray of Sickness');
+adapter.autorec.register('rayOfSickness', 'ranged-target', 'eskie.effect.rayOfSickness', DEFAULT_CONFIG, '0.0.1', 'Ray of Sickness');

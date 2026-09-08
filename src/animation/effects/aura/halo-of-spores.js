@@ -2,7 +2,7 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { adapter, autorec, CONCENTRATING } from '../../../adapters/index.js';
+import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 const DEFAULT_CONFIG = {
     id: 'HaloOfSpores',
@@ -168,5 +168,5 @@ export const haloOfSpores = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("haloOfSpores", "aura", "eskie.effect.haloOfSpores.aura", DEFAULT_CONFIG, "0.0.1", "Halo of Spores");
-autorec.register(CONCENTRATING("haloOfSpores", "Halo of Spores"), "effect", "eskie.effect.haloOfSpores.aura", DEFAULT_CONFIG, "0.0.1");
+adapter.autorec.register("haloOfSpores", "aura", "eskie.effect.haloOfSpores.aura", DEFAULT_CONFIG, "0.0.1", "Halo of Spores");
+adapter.autorec.register(adapter.autorec.CONCENTRATING("haloOfSpores", "Halo of Spores"), "effect", "eskie.effect.haloOfSpores.aura", DEFAULT_CONFIG, "0.0.1");

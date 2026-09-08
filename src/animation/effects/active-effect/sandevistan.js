@@ -5,7 +5,6 @@ import { time } from "../../../lib/time.js";
 import { matt } from '../../utils/matt-tiles.js';
 import { closest } from '../../../lib/filemanager.js';
 
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { MODULE_ID } from "../../../lib/constants.js";
 
 import { adapter } from "../../../adapters/index.js";
@@ -168,4 +167,4 @@ export const sandevistan = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("sandevistan", "effect", "eskie.effect.sandevistan", DEFAULT_CONFIG, "0.0.1", "Sandevistan");
+adapter.autorec.register("sandevistan", "effect", "eskie.effect.sandevistan", DEFAULT_CONFIG, "0.0.1", "Sandevistan");

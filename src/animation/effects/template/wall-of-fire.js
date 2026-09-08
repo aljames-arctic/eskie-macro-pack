@@ -4,7 +4,6 @@
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { adapter } from '../../../adapters/index.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
@@ -173,4 +172,4 @@ export const wallOfFire = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register('wallOfFire', 'template', 'eskie.effect.wallOfFire', DEFAULT_CONFIG, '0.0.2', 'Wall of Fire');
+adapter.autorec.register('wallOfFire', 'template', 'eskie.effect.wallOfFire', DEFAULT_CONFIG, '0.0.2', 'Wall of Fire');

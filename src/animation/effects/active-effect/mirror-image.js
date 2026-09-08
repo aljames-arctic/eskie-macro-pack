@@ -1,4 +1,3 @@
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { adapter } from '../../../adapters/index.js';
 
 import { mirrorImageV1 as v1, DEFAULT_CONFIG as config_v1 } from './mirror-image/mirror-image-v1.js';
@@ -55,4 +54,4 @@ export const mirrorImage = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register('mirrorImage', 'effect', 'eskie.effect.mirrorImage', DEFAULT_CONFIG, '1.0.1', 'Mirror Image');
+adapter.autorec.register('mirrorImage', 'effect', 'eskie.effect.mirrorImage', DEFAULT_CONFIG, '1.0.1', 'Mirror Image');

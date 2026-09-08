@@ -2,7 +2,6 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 import { adapter } from "../../../adapters/index.js";
@@ -127,5 +126,5 @@ export const thornWhip = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('thornWhip', 'ranged-target', 'eskie.effect.thornWhip', DEFAULT_CONFIG, '0.0.1', 'Thorn Whip');
+adapter.autorec.register('thornWhip', 'ranged-target', 'eskie.effect.thornWhip', DEFAULT_CONFIG, '0.0.1', 'Thorn Whip');
 

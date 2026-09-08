@@ -3,7 +3,7 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
-import { adapter, autorec, CONCENTRATING } from "../../../adapters/index.js";
+import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
@@ -94,5 +94,5 @@ export const flurryOfBlows = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("flurryOfBlows", "melee-target", "eskie.effect.flurryOfBlows", DEFAULT_CONFIG, "0.0.1", "Flurry Of Blows");
+adapter.autorec.register("flurryOfBlows", "melee-target", "eskie.effect.flurryOfBlows", DEFAULT_CONFIG, "0.0.1", "Flurry Of Blows");
 

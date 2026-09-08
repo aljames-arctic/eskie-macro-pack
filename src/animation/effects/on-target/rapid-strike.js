@@ -1,4 +1,4 @@
-import { adapter, autorec } from '../../../adapters/index.js';
+import { adapter } from '../../../adapters/index.js';
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from "../../../lib/settings.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
@@ -120,4 +120,4 @@ export const rapidStrike = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("rapidStrike", "melee-target", "eskie.effect.rapidStrike", DEFAULT_CONFIG, "0.0.1", "Rapid Strike");
+adapter.autorec.register("rapidStrike", "melee-target", "eskie.effect.rapidStrike", DEFAULT_CONFIG, "0.0.1", "Rapid Strike");

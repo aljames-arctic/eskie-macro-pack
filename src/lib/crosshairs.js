@@ -12,7 +12,8 @@ const BBC_DEPENDENCY = { id: 'bakana-better-crosshairs', ref: "Bakana's Better C
  */
 function getBbcApi() {
     dependency.required([BBC_DEPENDENCY]);
-    const api = game.modules?.get('bakana-better-crosshairs')?.api;
+    const bbc = game.modules?.get('bakana-better-crosshairs');
+    const api = bbc?.api?.adapter ?? bbc?.api;
     if (!api?.crosshair) {
         const errorMsg = "Bakana's Better Crosshairs (BBC) API is not initialized.";
         log.error(errorMsg);

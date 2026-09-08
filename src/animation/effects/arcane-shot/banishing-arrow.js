@@ -3,7 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { adapter, autorec } from '../../../adapters/index.js';
+import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -128,4 +128,4 @@ export const banishingArrow = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register('banishingArrow', 'ranged-target', 'eskie.effect.arcaneShot.banishingArrow', DEFAULT_CONFIG, '0.0.1', 'Banishing Arrow');
+adapter.autorec.register('banishingArrow', 'ranged-target', 'eskie.effect.arcaneShot.banishingArrow', DEFAULT_CONFIG, '0.0.1', 'Banishing Arrow');

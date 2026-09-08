@@ -4,7 +4,6 @@
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { adapter } from '../../../adapters/index.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -134,4 +133,4 @@ export const contagion = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register('contagion', 'melee-target', 'eskie.effect.contagion', DEFAULT_CONFIG, '0.0.1', 'Contagion');
+adapter.autorec.register('contagion', 'melee-target', 'eskie.effect.contagion', DEFAULT_CONFIG, '0.0.1', 'Contagion');

@@ -2,7 +2,6 @@
 // Updater: @bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
@@ -169,5 +168,5 @@ export const eyesOfNight = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('eyesOfNight', 'ranged-target', 'eskie.effect.eyesOfNight.target', DEFAULT_CONFIG, '0.0.1', 'Eyes of Night');
-autorec.register('eyesOfNight', 'effect', 'eskie.effect.eyesOfNight.effect', DEFAULT_CONFIG, '0.0.1', 'Eyes of Night');
+adapter.autorec.register('eyesOfNight', 'ranged-target', 'eskie.effect.eyesOfNight.target', DEFAULT_CONFIG, '0.0.1', 'Eyes of Night');
+adapter.autorec.register('eyesOfNight', 'effect', 'eskie.effect.eyesOfNight.effect', DEFAULT_CONFIG, '0.0.1', 'Eyes of Night');

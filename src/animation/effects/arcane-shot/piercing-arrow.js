@@ -3,7 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { adapter, autorec } from '../../../adapters/index.js';
+import { adapter } from '../../../adapters/index.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
@@ -124,5 +124,5 @@ export const piercingArrow = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register('piercingArrow', 'template', 'eskie.effect.arcaneShot.piercingArrow', DEFAULT_CONFIG, '0.0.1', 'Piercing Arrow');
-autorec.register('piercingArrow', 'ranged-target', 'eskie.effect.arcaneShot.piercingArrow', DEFAULT_CONFIG, '0.0.1', 'Piercing Arrow');
+adapter.autorec.register('piercingArrow', 'template', 'eskie.effect.arcaneShot.piercingArrow', DEFAULT_CONFIG, '0.0.1', 'Piercing Arrow');
+adapter.autorec.register('piercingArrow', 'ranged-target', 'eskie.effect.arcaneShot.piercingArrow', DEFAULT_CONFIG, '0.0.1', 'Piercing Arrow');

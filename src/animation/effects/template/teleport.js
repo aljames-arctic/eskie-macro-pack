@@ -5,7 +5,6 @@ import { absolutePath } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { teleportIn } from "./teleport/teleportIn.js";
 import { teleportOut } from "./teleport/teleportOut.js";
-import { autorec } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 import { adapter } from "../../../adapters/index.js";
 
@@ -65,4 +64,4 @@ export const teleport = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("teleport", "template", "eskie.effect.teleport", DEFAULT_CONFIG, "0.0.1", "Teleport");
+adapter.autorec.register("teleport", "template", "eskie.effect.teleport", DEFAULT_CONFIG, "0.0.1", "Teleport");

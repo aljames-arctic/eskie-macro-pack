@@ -3,7 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { adapter, autorec } from '../../../adapters/index.js';
+import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -135,4 +135,4 @@ export const shadowArrow = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register('shadowArrow', 'ranged-target', 'eskie.effect.arcaneShot.shadowArrow', DEFAULT_CONFIG, '0.0.1', 'Shadow Arrow');
+adapter.autorec.register('shadowArrow', 'ranged-target', 'eskie.effect.arcaneShot.shadowArrow', DEFAULT_CONFIG, '0.0.1', 'Shadow Arrow');

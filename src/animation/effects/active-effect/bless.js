@@ -2,7 +2,6 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
@@ -182,5 +181,5 @@ export const bless = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("bless", "token", "eskie.effect.bless.cast", DEFAULT_CONFIG, "0.0.1", "Bless");
-autorec.register("bless", "effect", "eskie.effect.bless.effect", DEFAULT_CONFIG, "0.0.1", "Bless");
+adapter.autorec.register("bless", "token", "eskie.effect.bless.cast", DEFAULT_CONFIG, "0.0.1", "Bless");
+adapter.autorec.register("bless", "effect", "eskie.effect.bless.effect", DEFAULT_CONFIG, "0.0.1", "Bless");

@@ -5,7 +5,6 @@
 ** */
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
@@ -84,4 +83,4 @@ export const petrified = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("petrified", "effect", "eskie.effect.petrified", DEFAULT_CONFIG, "0.0.2", "Petrified");
+adapter.autorec.register("petrified", "effect", "eskie.effect.petrified", DEFAULT_CONFIG, "0.0.2", "Petrified");

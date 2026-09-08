@@ -2,7 +2,6 @@ import { closest } from "../../../lib/filemanager.js";
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 import { blur } from "../../scene-overlays/status-blur.js";
-import { autorec } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { log } from '../../../lib/logger.js';
 
 /* **
@@ -127,4 +126,4 @@ export const drunk = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("drunk", "effect", "eskie.effect.emote.drunk", DEFAULT_CONFIG, "0.0.2", "Drunk");
+adapter.autorec.register("drunk", "effect", "eskie.effect.emote.drunk", DEFAULT_CONFIG, "0.0.2", "Drunk");

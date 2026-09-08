@@ -4,7 +4,6 @@
 import { closest, absolutePath } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { adapter } from '../../../adapters/index.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -110,4 +109,4 @@ export const dimensionDoor = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("dimensionDoor", "template", "eskie.effect.dimensionDoor", DEFAULT_CONFIG, "0.0.1", "Dimension Door");
+adapter.autorec.register("dimensionDoor", "template", "eskie.effect.dimensionDoor", DEFAULT_CONFIG, "0.0.1", "Dimension Door");

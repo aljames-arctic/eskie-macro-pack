@@ -3,7 +3,6 @@
 
 import { closest } from "../../../lib/filemanager.js";
 import { template as templatelib } from '../../../lib/templates.js';
-import { autorec } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 import { adapter } from "../../../adapters/index.js";
 
@@ -218,4 +217,4 @@ export const stepOfTheWindJump = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("stepOfTheWindJump", "template", "eskie.effect.stepOfTheWind.jump", DEFAULT_CONFIG, "0.0.1", "Step of the Wind Jump");
+adapter.autorec.register("stepOfTheWindJump", "template", "eskie.effect.stepOfTheWind.jump", DEFAULT_CONFIG, "0.0.1", "Step of the Wind Jump");

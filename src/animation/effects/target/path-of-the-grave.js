@@ -2,7 +2,6 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 import { adapter } from "../../../adapters/index.js";
@@ -161,6 +160,6 @@ export const pathOfTheGrave = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('pathOfTheGrave', 'ranged-target', 'eskie.effect.pathOfTheGrave', DEFAULT_CONFIG, '0.0.1', 'Path of the Grave');
-autorec.register('channelDivinityPathToTheGrave', 'ranged-target', 'eskie.effect.pathOfTheGrave', DEFAULT_CONFIG, '0.0.1', 'Channel Divinity: Path to the Grave');
+adapter.autorec.register('pathOfTheGrave', 'ranged-target', 'eskie.effect.pathOfTheGrave', DEFAULT_CONFIG, '0.0.1', 'Path of the Grave');
+adapter.autorec.register('channelDivinityPathToTheGrave', 'ranged-target', 'eskie.effect.pathOfTheGrave', DEFAULT_CONFIG, '0.0.1', 'Channel Divinity: Path to the Grave');
 

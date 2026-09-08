@@ -2,7 +2,6 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
@@ -286,4 +285,4 @@ export const tashasCausticBrew = {
     default_config: DEFAULT_CONFIG_CAST,
 };
 
-autorec.register("tashasCausticBrew", "template", "eskie.effect.tashasCausticBrew", DEFAULT_CONFIG_CAST, '0.1.1', "Tasha's Caustic Brew");
+adapter.autorec.register("tashasCausticBrew", "template", "eskie.effect.tashasCausticBrew", DEFAULT_CONFIG_CAST, '0.1.1', "Tasha's Caustic Brew");

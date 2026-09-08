@@ -1,11 +1,4 @@
 import { BaseModuleAdapter } from './base-module-adapter.js';
-import { MidiQolModuleAdapter, midiQolAdapter } from './midi-qol/midi-qol-module-adapter.js';
-import { AutoanimationsModuleAdapter, autoanimationsAdapter, autoanimations, EMP_AA_Menu, CONCENTRATING as AA_CONCENTRATING, standardizeTrigger, createAutorecEntry } from './autoanimations/autoanimations-module-adapter.js';
-import { BlfxModuleAdapter, blfxAdapter, blfx, EMP_BLFX_Registry, buildBlfxPayload, mergeBlfxCustomAutoRec, standardizeBlfxTrigger, buildBlfxMacroCommand } from './blfx/blfx-module-adapter.js';
-import { SocketlibModuleAdapter, socketlibAdapter, socketlibapi, socket, socketlib } from './socketlib/socketlib-module-adapter.js';
-import { AutorecManager, autorecManager, autorec, promptDestinationDialog, CONCENTRATING, register as autorecRegister, submit as autorecSubmit } from './autorec/autorec-module-adapter.js';
-import { MassEditModuleAdapter, massEditAdapter, massEdit } from './mass-edit/mass-edit-module-adapter.js';
-import { TokenAttacherModuleAdapter, tokenAttacherAdapter, tokenAttacher } from './token-attacher/token-attacher-module-adapter.js';
 import { MODULE_ADAPTERS } from './module-adapters.js';
 import { log } from '../../lib/logger.js';
 
@@ -38,40 +31,5 @@ export function hasActiveModuleAdapters() {
 
 export {
     BaseModuleAdapter,
-    MODULE_ADAPTERS,
-    MidiQolModuleAdapter,
-    midiQolAdapter,
-    AutoanimationsModuleAdapter,
-    autoanimationsAdapter,
-    autoanimations,
-    EMP_AA_Menu,
-    AA_CONCENTRATING,
-    standardizeTrigger,
-    createAutorecEntry,
-    BlfxModuleAdapter,
-    blfxAdapter,
-    blfx,
-    EMP_BLFX_Registry,
-    buildBlfxPayload,
-    mergeBlfxCustomAutoRec,
-    standardizeBlfxTrigger,
-    buildBlfxMacroCommand,
-    SocketlibModuleAdapter,
-    socketlibAdapter,
-    socketlibapi,
-    socket,
-    socketlib,
-    AutorecManager,
-    autorecManager,
-    autorec,
-    promptDestinationDialog,
-    CONCENTRATING,
-    autorecRegister,
-    autorecSubmit,
-    MassEditModuleAdapter,
-    massEditAdapter,
-    massEdit,
-    TokenAttacherModuleAdapter,
-    tokenAttacherAdapter,
-    tokenAttacher
+    MODULE_ADAPTERS
 };

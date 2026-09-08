@@ -6,7 +6,6 @@
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { adapter } from '../../../adapters/index.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -88,4 +87,4 @@ export const firecracker = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("firecracker", "template", "eskie.effect.firecracker", DEFAULT_CONFIG, "0.0.1", "Firecracker");
+adapter.autorec.register("firecracker", "template", "eskie.effect.firecracker", DEFAULT_CONFIG, "0.0.1", "Firecracker");

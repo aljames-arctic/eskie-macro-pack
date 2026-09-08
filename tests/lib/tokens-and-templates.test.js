@@ -2,7 +2,9 @@ import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { template } from '../../src/lib/templates.js';
-import { adapter, FoundryV14Adapter, FoundryV12Adapter } from '../../src/adapters/index.js';
+import { adapter } from '../../src/adapters/index.js';
+import { FoundryV14Adapter } from '../../src/adapters/foundry/foundry-v14-adapter.js';
+import { FoundryV12Adapter } from '../../src/adapters/foundry/foundry-v12-adapter.js';
 
 test('template.getPosition delegates to adapter.getTemplatePosition', async () => {
     adapter.foundry = new FoundryV14Adapter();

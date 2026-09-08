@@ -2,7 +2,6 @@
 //Author: .eskie
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
@@ -298,4 +297,4 @@ export const strengthBeforeDeath = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("strengthBeforeDeath", "effect", "eskie.effect.strengthBeforeDeath", DEFAULT_CONFIG, "0.0.2", "Strength Before Death");
+adapter.autorec.register("strengthBeforeDeath", "effect", "eskie.effect.strengthBeforeDeath", DEFAULT_CONFIG, "0.0.2", "Strength Before Death");

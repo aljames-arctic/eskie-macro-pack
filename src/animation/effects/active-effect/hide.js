@@ -3,7 +3,6 @@
 //Integration: bakanabaka
 
 import { closest } from "../../../lib/filemanager.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
@@ -89,4 +88,4 @@ export const hide = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("hide", "effect", "eskie.effect.hide", DEFAULT_CONFIG, "0.0.2", "Hide");
+adapter.autorec.register("hide", "effect", "eskie.effect.hide", DEFAULT_CONFIG, "0.0.2", "Hide");

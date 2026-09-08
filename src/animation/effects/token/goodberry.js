@@ -2,7 +2,6 @@
 // Modular Conversion: bakanabaka
 
 import { closest } from '../../../lib/filemanager.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
@@ -138,7 +137,7 @@ export const goodberry = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('goodberry', 'token', 'eskie.effect.goodberry.cast', DEFAULT_CONFIG, '0.0.1', 'Goodberry');
-autorec.register('goodberryUse', 'token', 'eskie.effect.goodberry.use', DEFAULT_CONFIG, '0.0.1', 'Goodberry (Use)');
-autorec.register('goodberry', 'effect', 'eskie.effect.goodberry.use', DEFAULT_CONFIG, '0.0.1', 'Goodberry');
+adapter.autorec.register('goodberry', 'token', 'eskie.effect.goodberry.cast', DEFAULT_CONFIG, '0.0.1', 'Goodberry');
+adapter.autorec.register('goodberryUse', 'token', 'eskie.effect.goodberry.use', DEFAULT_CONFIG, '0.0.1', 'Goodberry (Use)');
+adapter.autorec.register('goodberry', 'effect', 'eskie.effect.goodberry.use', DEFAULT_CONFIG, '0.0.1', 'Goodberry');
 

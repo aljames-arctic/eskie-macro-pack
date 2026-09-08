@@ -4,7 +4,7 @@
  */
 
 import { closest } from '../../../lib/filemanager.js';
-import { adapter, autorec } from '../../../adapters/index.js';
+import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -166,4 +166,4 @@ export const drainingKiss = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("drainingKiss", "melee-target", "eskie.effect.drainingKiss", DEFAULT_CONFIG, "0.0.1", "Draining Kiss");
+adapter.autorec.register("drainingKiss", "melee-target", "eskie.effect.drainingKiss", DEFAULT_CONFIG, "0.0.1", "Draining Kiss");

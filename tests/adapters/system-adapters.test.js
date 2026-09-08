@@ -1,8 +1,14 @@
 import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { initializeSystemAdapter, BaseSystemAdapter, Dnd5eSystemAdapter, Pf2eSystemAdapter, GenericSystemAdapter } from '../../src/adapters/system/index.js';
-import { BaseFoundryAdapter, FoundryV12Adapter, FoundryV13Adapter, FoundryV14Adapter } from '../../src/adapters/foundry/index.js';
+import { initializeSystemAdapter, BaseSystemAdapter } from '../../src/adapters/system/index.js';
+import { Dnd5eSystemAdapter } from '../../src/adapters/system/dnd5e-system-adapter.js';
+import { Pf2eSystemAdapter } from '../../src/adapters/system/pf2e-system-adapter.js';
+import { GenericSystemAdapter } from '../../src/adapters/system/generic-system-adapter.js';
+import { BaseFoundryAdapter } from '../../src/adapters/foundry/index.js';
+import { FoundryV12Adapter } from '../../src/adapters/foundry/foundry-v12-adapter.js';
+import { FoundryV13Adapter } from '../../src/adapters/foundry/foundry-v13-adapter.js';
+import { FoundryV14Adapter } from '../../src/adapters/foundry/foundry-v14-adapter.js';
 
 test('initializeSystemAdapter and BaseSystemAdapter enforce instanceof BaseFoundryAdapter contract across all versions', async () => {
     // Non-BaseFoundryAdapter inputs are rejected

@@ -1,6 +1,5 @@
 // Original Author: EskieMoh#2969
 // Updater: @bakanabaka
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
@@ -322,4 +321,4 @@ export const speakWithDead = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("speakWithDead", "effect", "eskie.effect.speakWithDead", DEFAULT_CONFIG, "0.0.1", "Speak with Dead");
+adapter.autorec.register("speakWithDead", "effect", "eskie.effect.speakWithDead", DEFAULT_CONFIG, "0.0.1", "Speak with Dead");

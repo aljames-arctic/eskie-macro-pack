@@ -1,5 +1,7 @@
 import { MODULE_ID } from "./lib/constants.js";
-import { RecommendedModulesFormApplication, WorldScriptsFormApplication, ConfigureAutorecFormApplication } from "./ui/index.js";
+import { RecommendedModulesFormApplication } from "./ui/recommended-modules/recommendedModulesMenu.js";
+import { WorldScriptsFormApplication } from "./ui/world-scripts/worldScriptsMenu.js";
+import { ConfigureAutorecFormApplication } from "./ui/autorec/manageAutorecMenu.js";
 import { blfx, isBlfxAutorecAvailable } from "./adapters/modules/blfx/blfx-module-adapter.js";
 import { updateMacroCompendiums } from "./lib/standalone-macros.js";
 import { log } from './lib/logger.js';

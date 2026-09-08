@@ -6,7 +6,6 @@
 import { closest } from "../../../lib/filemanager.js";
 import { template as templatelib } from '../../../lib/templates.js';
 import { adapter } from "../../../adapters/index.js";
-import { autorec, CONCENTRATING } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
@@ -190,5 +189,5 @@ export const spikeGrowth = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("spikeGrowth", "template", "eskie.effect.spikeGrowth", DEFAULT_CONFIG, "0.0.1", "Spike Growth");
-autorec.register(CONCENTRATING("spikeGrowth", "Spike Growth"), "effect", "eskie.effect.spikeGrowth", DEFAULT_CONFIG, "0.0.1");
+adapter.autorec.register("spikeGrowth", "template", "eskie.effect.spikeGrowth", DEFAULT_CONFIG, "0.0.1", "Spike Growth");
+adapter.autorec.register(adapter.autorec.CONCENTRATING("spikeGrowth", "Spike Growth"), "effect", "eskie.effect.spikeGrowth", DEFAULT_CONFIG, "0.0.1");

@@ -3,7 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
-import { adapter, autorec } from '../../../adapters/index.js';
+import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 
 const DEFAULT_CONFIG = {
@@ -112,4 +112,4 @@ export const beguilingArrow = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register('beguilingArrow', 'ranged-target', 'eskie.effect.arcaneShot.beguilingArrow', DEFAULT_CONFIG, '0.0.1', 'Beguiling Arrow');
+adapter.autorec.register('beguilingArrow', 'ranged-target', 'eskie.effect.arcaneShot.beguilingArrow', DEFAULT_CONFIG, '0.0.1', 'Beguiling Arrow');

@@ -4,7 +4,6 @@
 import { closest } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { adapter } from '../../../adapters/index.js';
-import { autorec } from '../../../adapters/modules/autorec/autorec-module-adapter.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
 import { entangled } from '../active-effect/entangled.js';
 
@@ -128,5 +127,5 @@ export const entangle = {
     default_config: DEFAULT_CONFIG
 };
 
-autorec.register('entangle', 'template', 'eskie.effect.entangle', DEFAULT_CONFIG, '0.0.4', 'Entangle');
+adapter.autorec.register('entangle', 'template', 'eskie.effect.entangle', DEFAULT_CONFIG, '0.0.4', 'Entangle');
 

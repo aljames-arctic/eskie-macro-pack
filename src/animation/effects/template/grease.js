@@ -5,7 +5,6 @@
 import { closest, absolutePath } from "../../../lib/filemanager.js";
 import { template as templatelib } from "../../../lib/templates.js";
 import { adapter } from "../../../adapters/index.js";
-import { autorec } from "../../../adapters/modules/autorec/autorec-module-adapter.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 
 const DEFAULT_CONFIG = {
@@ -143,4 +142,4 @@ export const grease = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("grease", "template", "eskie.effect.grease", DEFAULT_CONFIG, "0.0.1", "Grease");
+adapter.autorec.register("grease", "template", "eskie.effect.grease", DEFAULT_CONFIG, "0.0.1", "Grease");

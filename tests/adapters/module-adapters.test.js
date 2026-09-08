@@ -1,7 +1,14 @@
 import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { initializeModuleAdapters, hasActiveModuleAdapters, BaseModuleAdapter, MidiQolModuleAdapter, AutoanimationsModuleAdapter, BlfxModuleAdapter, SocketlibModuleAdapter, AutorecManager, MassEditModuleAdapter, TokenAttacherModuleAdapter } from '../../src/adapters/modules/index.js';
+import { initializeModuleAdapters, hasActiveModuleAdapters, BaseModuleAdapter } from '../../src/adapters/modules/index.js';
+import { MidiQolModuleAdapter } from '../../src/adapters/modules/midi-qol/midi-qol-module-adapter.js';
+import { AutoanimationsModuleAdapter } from '../../src/adapters/modules/autoanimations/autoanimations-module-adapter.js';
+import { BlfxModuleAdapter } from '../../src/adapters/modules/blfx/blfx-module-adapter.js';
+import { SocketlibModuleAdapter } from '../../src/adapters/modules/socketlib/socketlib-module-adapter.js';
+import { AutorecManager } from '../../src/adapters/modules/autorec/autorec-module-adapter.js';
+import { MassEditModuleAdapter } from '../../src/adapters/modules/mass-edit/mass-edit-module-adapter.js';
+import { TokenAttacherModuleAdapter } from '../../src/adapters/modules/token-attacher/token-attacher-module-adapter.js';
 import { adapter } from '../../src/adapters/index.js';
 
 test('BaseModuleAdapter provides standard isActive and extractRolls base interface', () => {
@@ -310,18 +317,18 @@ test('setupModule deploys Adapter and adapter exclusively on game.modules.get(MO
     assert.equal(empRecord.api.Adapter, Adapter);
     assert.equal(empRecord.api.adapter, adapter);
     assert.ok(empRecord.api.animation);
-    assert.ok(empRecord.api.effect);
-    assert.ok(empRecord.api.traps);
-    assert.ok(empRecord.api.mask);
-    assert.ok(empRecord.api.overlay);
-    assert.ok(empRecord.api.showcase);
-    assert.ok(empRecord.api.autorec);
-    assert.ok(empRecord.api.autoanimations);
-    assert.ok(empRecord.api.blfx);
-    assert.ok(empRecord.api.crosshair);
-    assert.ok(empRecord.api.socket);
+    assert.ok(empRecord.api.animation.effect);
+    assert.ok(empRecord.api.animation.traps);
+    assert.ok(empRecord.api.animation.mask);
+    assert.ok(empRecord.api.animation.overlay);
+    assert.ok(empRecord.api.animation.showcase);
+    assert.ok(empRecord.api.adapter.autorec);
+    assert.ok(empRecord.api.adapter.autoanimations);
+    assert.ok(empRecord.api.adapter.blfx);
+    assert.ok(empRecord.api.adapter.crosshair);
+    assert.ok(empRecord.api.adapter.socketlib);
     assert.ok(empRecord.api.standaloneMacros);
-    assert.ok(empRecord.api.template);
+    assert.ok(empRecord.api.adapter.template);
 
     // Adapter and adapter must not leak into globalThis.eskie
     assert.equal(globalThis.eskie.Adapter, undefined);

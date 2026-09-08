@@ -4,7 +4,7 @@
  */
 
 import { closest } from '../../../../lib/filemanager.js';
-import { adapter, autorec } from '../../../../adapters/index.js';
+import { adapter } from '../../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../../utils/sound.js';
 const DEFAULT_CONFIG = {
     id: 'hex',
@@ -94,4 +94,4 @@ export const hexCast = {
     default_config: DEFAULT_CONFIG,
 };
 
-autorec.register("hexed", "effect", "eskie.effect.hex.cast", DEFAULT_CONFIG, "0.0.1", "Hexed");
+adapter.autorec.register("hexed", "effect", "eskie.effect.hex.cast", DEFAULT_CONFIG, "0.0.1", "Hexed");

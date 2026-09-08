@@ -6,7 +6,7 @@
 import { MODULE_ID } from '../../lib/constants.js';
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
-import { matt } from '../utils/matt-tiles.js';
+import { setupTrap } from './trap-manager.js';
 
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
@@ -32,11 +32,11 @@ async function create(tile, targets, config = {}) {
     let finalTargets = [];
 
     if (targetTile) {
-        finalTargets.push(...adapter.getTokensInTile(targetTile));
+        finalTargets.push(...adapter.getTokensInPlaceable(targetTile));
     }
 
     if (finalTargets.length === 0) {
-        finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
+        finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
     }
 
     finalTargets = Array.from(new Set(finalTargets));
@@ -44,7 +44,7 @@ async function create(tile, targets, config = {}) {
     let seq = new Sequence();
     applySound(seq, sound);
 
-    if (reveal) {
+    if (reveal && adapter.isDocumentOfType(tile, 'Tile')) {
         seq = seq
             .animation()
             .on(tile)
@@ -150,16 +150,19 @@ async function play(tile, targets, config = {}) {
 }
 
 async function stop(tile, config = {}) {
-    await new Sequence()
-        .animation()
-        .on(tile)
-        .fadeOut(1000)
-        .opacity(0)
-        .play();
+    if (!tile) return;
+    if (adapter.isDocumentOfType(tile, 'Tile')) {
+        await new Sequence()
+            .animation()
+            .on(tile)
+            .fadeOut(1000)
+            .opacity(0)
+            .play();
+    }
 }
 
 async function setup(config = {}) {
-    return matt.trap.setup('eskie.traps.fallingSky', { tileCount: 3, ...config });
+    return setupTrap('eskie.traps.fallingSky', { tileCount: 3, ...config });
 }
 
 export const fallingSky = {

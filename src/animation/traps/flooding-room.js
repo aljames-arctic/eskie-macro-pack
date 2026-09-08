@@ -6,7 +6,7 @@
 import { MODULE_ID } from '../../lib/constants.js';
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
-import { matt } from '../utils/matt-tiles.js';
+import { setupTrap } from './trap-manager.js';
 
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
@@ -19,7 +19,7 @@ async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { fadeTime, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    const tileDoc = tile.document;
+    const tileDoc = tile.document ?? tile;
 
     // Retrieve water spray origin tiles from flags
     const originIds = tileDoc.getFlag(MODULE_ID, 'trap.floodingRoomSplashOrigins') ?? [];
@@ -42,7 +42,7 @@ async function create(tile, targets, config = {}) {
     // Spawn persistent water splashes at each origin tile pointing towards the water tile
     if (splashOrigins.length > 0) {
         splashOrigins.forEach(origin => {
-            const originBounds = adapter.getTileBounds(origin);
+            const originBounds = adapter.getBounds(origin);
             const originCenter = adapter.getCenter(origin);
 
             seq = seq
@@ -92,6 +92,7 @@ async function stop(tile, config = {}) {
 
 async function setup(config = {}) {
     const setupConfig = {
+        requiresTile: true,
         extraTiles: [
             {
                 key: 'floodingRoomSplashOrigins',
@@ -101,7 +102,7 @@ async function setup(config = {}) {
         ],
         ...config
     };
-    return matt.trap.setup('eskie.traps.floodingRoom', setupConfig);
+    return setupTrap('eskie.traps.floodingRoom', setupConfig);
 }
 
 export const floodingRoom = {

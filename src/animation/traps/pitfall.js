@@ -5,7 +5,7 @@
 
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
-import { matt } from '../utils/matt-tiles.js';
+import { setupTrap } from './trap-manager.js';
 
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
@@ -22,12 +22,12 @@ async function create(tile, targets, config = {}) {
 
     if (!tile) return new Sequence();
 
-    const tileBounds = adapter.getTileBounds(tile);
+    const tileBounds = adapter.getBounds(tile);
     const tileCenter = tileBounds.center;
     const tileWidth = tileBounds.width;
     const tileHeight = tileBounds.height;
 
-    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
+    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -40,7 +40,7 @@ async function create(tile, targets, config = {}) {
         .size({ width: tileWidth * smokeSize, height: tileHeight * smokeSize })
         .belowTokens();
 
-    if (reveal) {
+    if (reveal && adapter.isDocumentOfType(tile, 'Tile')) {
         seq = seq
             .animation()
             .on(tile)
@@ -117,16 +117,18 @@ async function stop(tile, config = {}) {
 
     if (!tile) return;
 
-    const finalTargets = adapter.getTokensInTile(tile);
+    const finalTargets = adapter.getTokensInPlaceable(tile);
 
     let seq = new Sequence();
     applySound(seq, sound);
-    seq = seq
-        // Reset/hide the pit tile
-        .animation()
-        .on(tile)
-        .fadeOut(1000)
-        .opacity(0);
+    if (adapter.isDocumentOfType(tile, 'Tile')) {
+        seq = seq
+            // Reset/hide the pit tile
+            .animation()
+            .on(tile)
+            .fadeOut(1000)
+            .opacity(0);
+    }
 
     if (finalTargets.length > 0) {
         finalTargets.forEach(target => {
@@ -147,7 +149,7 @@ async function stop(tile, config = {}) {
 }
 
 async function setup(config = {}) {
-    return matt.trap.setup('eskie.traps.pitfall', config);
+    return setupTrap('eskie.traps.pitfall', config);
 }
 
 export const pitfall = {

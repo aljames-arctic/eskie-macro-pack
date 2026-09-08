@@ -6,7 +6,7 @@
 import { MODULE_ID } from '../../lib/constants.js';
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
-import { matt } from '../utils/matt-tiles.js';
+import { setupTrap } from './trap-manager.js';
 import { log } from '../../lib/logger.js';
 import { adapter } from '../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../utils/sound.js';
@@ -23,9 +23,9 @@ const DEFAULT_CONFIG = {
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { targetTile, projectileType, sound, repeats, repeatDelay, splashScale } = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInTile(tile);
+    const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInPlaceable(tile);
 
-    const tileBounds = adapter.getTileBounds(tile);
+    const tileBounds = adapter.getBounds(tile);
     const tileCenter = tileBounds.center;
 
     // Retrieve target/landing tile from config
@@ -188,7 +188,7 @@ async function setup(config = {}) {
     };
 
     const playPath = config.playPath ?? 'eskie.traps.projectile';
-    return matt.trap.setup(playPath, setupConfig);
+    return setupTrap(playPath, setupConfig);
 }
 
 export const projectile = {

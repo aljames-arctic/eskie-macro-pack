@@ -6,7 +6,7 @@
 import { MODULE_ID } from '../../lib/constants.js';
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
-import { matt } from '../utils/matt-tiles.js';
+import { setupTrap } from './trap-manager.js';
 
 import { log } from '../../lib/logger.js';
 import { adapter } from "../../adapters/index.js";
@@ -20,7 +20,7 @@ const DEFAULT_CONFIG = {
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { targetTile, size, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInTile(tile);
+    const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInPlaceable(tile);
 
     const targetLoc = adapter.getCenter(targetTile);
 
@@ -77,7 +77,7 @@ async function stop(tile, config = {}) {
 }
 
 async function setup(config = {}) {
-    return matt.trap.setup('eskie.traps.fire', { tileCount: 3, ...config });
+    return setupTrap('eskie.traps.fire', { tileCount: 3, ...config });
 }
 
 export const fire = {

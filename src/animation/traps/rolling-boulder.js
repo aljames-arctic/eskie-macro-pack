@@ -6,7 +6,7 @@
 import { MODULE_ID } from '../../lib/constants.js';
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
-import { matt } from '../utils/matt-tiles.js';
+import { setupTrap } from './trap-manager.js';
 
 import { log } from '../../lib/logger.js';
 import { adapter } from "../../adapters/index.js";
@@ -132,7 +132,7 @@ async function stop(tile, config = {}) {
 }
 
 async function setup(config = {}) {
-    return matt.trap.setup('eskie.traps.rollingBoulder', { tileCount: 3, ...config });
+    return setupTrap('eskie.traps.rollingBoulder', { tileCount: 3, ...config });
 }
 
 export const rollingBoulder = {

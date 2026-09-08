@@ -5,7 +5,7 @@
 
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
-import { matt } from '../utils/matt-tiles.js';
+import { setupTrap } from './trap-manager.js';
 import { MODULE_ID } from '../../lib/constants.js';
 
 import { adapter } from "../../adapters/index.js";
@@ -22,10 +22,10 @@ async function create(tile, targets, config = {}) {
 
     if (!tile) return new Sequence();
 
-    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
+    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
 
-    const tileDoc = tile.document;
-    const tileBounds = adapter.getTileBounds(tile);
+    const tileDoc = tile.document ?? tile;
+    const tileBounds = adapter.getBounds(tile);
     const tileCenter = tileBounds.center;
     const tileWidth = tileBounds.width;
     const tileHeight = tileBounds.height;
@@ -162,7 +162,7 @@ async function cleanToken(token, config = {}) {
 }
 
 async function setup(config = {}) {
-    return matt.trap.setup('eskie.traps.fallingRocks', config);
+    return setupTrap('eskie.traps.fallingRocks', config);
 }
 
 export const fallingRocks = {

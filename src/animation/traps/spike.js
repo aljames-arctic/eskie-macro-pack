@@ -5,7 +5,7 @@
 
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
-import { matt } from '../utils/matt-tiles.js';
+import { setupTrap } from './trap-manager.js';
 
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
@@ -24,13 +24,13 @@ async function create(tile, targets, config = {}) {
 
     if (!tile) return new Sequence();
 
-    const tileBounds = adapter.getTileBounds(tile);
+    const tileBounds = adapter.getBounds(tile);
     const tileCenter = tileBounds.center;
     const { xScale, yScale } = spikeConfig;
     const effectWidth = tileBounds.width * xScale;
     const effectHeight = tileBounds.height * yScale;
 
-    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
+    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -93,7 +93,7 @@ async function stop(tile, config = {}) {
 }
 
 async function setup(config = {}) {
-    return matt.trap.setup('eskie.traps.spike', config);
+    return setupTrap('eskie.traps.spike', config);
 }
 
 export const spike = {

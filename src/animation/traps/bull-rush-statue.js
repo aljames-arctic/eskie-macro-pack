@@ -6,7 +6,7 @@
 import { MODULE_ID } from '../../lib/constants.js';
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
-import { matt } from '../utils/matt-tiles.js';
+import { setupTrap } from './trap-manager.js';
 import { log } from '../../lib/logger.js';
 
 import { adapter } from "../../adapters/index.js";
@@ -21,11 +21,11 @@ async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { targetTile, pushDistance, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    const targetList = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
+    const targetList = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
     const target = targetList.length ? targetList[0] : null;
 
-    const tileDoc = tile.document;
-    const tileBounds = adapter.getTileBounds(tile);
+    const tileDoc = tile.document ?? tile;
+    const tileBounds = adapter.getBounds(tile);
     const tileCenter = tileBounds.center;
     const tileWidth = tileBounds.width;
     const tileHeight = tileBounds.height;
@@ -39,9 +39,9 @@ async function create(tile, targets, config = {}) {
         return seq;
     }
 
-    const textureSrc = tileDoc.texture.src;
-    const scaleX = tileDoc.texture.scaleX ?? 1;
-    const scaleY = tileDoc.texture.scaleY ?? 1;
+    const textureSrc = adapter.getPlaceableTexture(tile) ?? config.textureSrc ?? config.src ?? closest('jb2a.boulder.01.brown');
+    const scaleX = tileDoc?.texture?.scaleX ?? 1;
+    const scaleY = tileDoc?.texture?.scaleY ?? 1;
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -144,7 +144,7 @@ async function stop(tile, config = {}) {
 }
 
 async function setup(config = {}) {
-    return matt.trap.setup('eskie.traps.bullRushStatue', { tileCount: 3, ...config });
+    return setupTrap('eskie.traps.bullRushStatue', { tileCount: 3, requiresTile: true, ...config });
 }
 
 export const bullRushStatue = {

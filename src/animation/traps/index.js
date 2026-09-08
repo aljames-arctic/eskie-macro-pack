@@ -1,5 +1,6 @@
 import { adapter } from '../../adapters/index.js';
 import { localize, format } from '../../lib/utils.js';
+import { executeTrapTrigger, setupTrap, setupRegionTrap } from './trap-manager.js';
 
 import { bullRushStatue } from './bull-rush-statue.js';
 import { electricDoor } from './electric-door.js';
@@ -14,7 +15,7 @@ import { spike } from './spike.js';
 
 // High level setup function to select between different traps to configure
 async function setup (config = {}) {
-    const activeTrapKeys = Object.keys(traps).filter(key => key !== 'setup');
+    const activeTrapKeys = Object.keys(traps).filter(key => key !== 'setup' && key !== 'execute' && key !== 'setupTrap' && key !== 'setupRegionTrap');
     const buttons = activeTrapKeys.map(key => {
         const fallback = key
             .replace(/([A-Z])/g, ' $1')
@@ -57,5 +58,8 @@ export const traps = {
     rollingBoulder,
     spike,
 
-    setup
+    setup,
+    setupTrap,
+    setupRegionTrap,
+    execute: executeTrapTrigger,
 };

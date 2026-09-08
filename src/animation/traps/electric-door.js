@@ -6,7 +6,7 @@
 import { MODULE_ID } from '../../lib/constants.js';
 import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
-import { matt } from '../utils/matt-tiles.js';
+import { setupTrap } from './trap-manager.js';
 
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
@@ -22,10 +22,10 @@ async function create(tile, targets, config = {}) {
 
     if (!tile) return new Sequence();
 
-    const tileBounds = adapter.getTileBounds(tile);
+    const tileBounds = adapter.getBounds(tile);
     const tileCenter = tileBounds.center;
 
-    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInTile(tile);
+    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -85,51 +85,52 @@ async function stop(tile, config = {}) {
 
 async function setup(config = {}) {
     const setupConfig = {
+        tileCount: 1,
         trigger: ['door'],
         controlled: 'all',
         ...config
     };
     
-    const result = await matt.trap.setup('eskie.traps.electricDoor', setupConfig);
+    const result = await setupTrap('eskie.traps.electricDoor', setupConfig);
     if (!result) return;
 
-    const { triggerTiles } = result;
+    const hasMatt = Boolean(game.modules?.get('monks-active-tiles')?.active);
+    if (hasMatt) {
+        const triggerTiles = result.triggerTiles ?? [];
 
-    for (const triggerTile of triggerTiles) {
-        const tag = `EMP-electric-door-trigger-${triggerTile.id}`;
-        await Tagger.addTags(triggerTile, tag);
+        for (const triggerTile of triggerTiles) {
+            const tag = `EMP-electric-door-trigger-${triggerTile.id}`;
+            await Tagger.addTags(triggerTile, tag);
 
-        // Find all walls on the scene that are doors and geographically intersect/overlap the trigger tile
-        const doors = canvas.walls.placeables.filter(w => {
-            if (w.document.door === 0) return false; // Not a door
-            
-            const { minX, maxX, minY, maxY } = adapter.getTileBounds(triggerTile);
-            const [x1, y1, x2, y2] = w.document.c;
+            // Find all walls on the scene that are doors and geographically intersect/overlap the trigger tile
+            const doors = canvas.walls.placeables.filter(w => {
+                if (w.document.door === 0) return false; // Not a door
+                
+                const [x1, y1, x2, y2] = w.document.c;
+                const p1Inside = adapter.containsPoint(triggerTile, { x: x1, y: y1 });
+                const p2Inside = adapter.containsPoint(triggerTile, { x: x2, y: y2 });
 
-            // Bounding box intersection check for wall segment endpoints
-            const p1Inside = x1 >= minX && x1 <= maxX && y1 >= minY && y1 <= maxY;
-            const p2Inside = x2 >= minX && x2 <= maxX && y2 >= minY && y2 <= maxY;
-
-            return p1Inside || p2Inside;
-        });
-
-        // Programmatically update each door wall to trigger our tile when opened
-        for (const door of doors) {
-            await door.document.update({
-                "flags.monks-active-tiles": {
-                    checklock: false,
-                    close: false,
-                    entity: {
-                        id: `tagger:${tag}`,
-                        match: "all",
-                        name: `<i class="fas fa-tag fa-sm"></i> ${tag}`,
-                        scene: "_active"
-                    },
-                    lock: false,
-                    open: true,
-                    secret: false
-                }
+                return p1Inside || p2Inside;
             });
+
+            // Programmatically update each door wall to trigger our tile when opened
+            for (const door of doors) {
+                await door.document.update({
+                    "flags.monks-active-tiles": {
+                        checklock: false,
+                        close: false,
+                        entity: {
+                            id: `tagger:${tag}`,
+                            match: "all",
+                            name: `<i class="fas fa-tag fa-sm"></i> ${tag}`,
+                            scene: "_active"
+                        },
+                        lock: false,
+                        open: true,
+                        secret: false
+                    }
+                });
+            }
         }
     }
 

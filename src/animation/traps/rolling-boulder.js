@@ -26,32 +26,14 @@ async function create(tile, targets, config = {}) {
     const tileDoc = tile.document;
 
     // Check for tile-level trap.boulder overrides from MATT flags
-    const tileBoulder = { ...(tileDoc.getFlag(MODULE_ID, 'trap.boulder') ?? {}) };
-    if (tileBoulder.animationSpeed !== undefined && tileBoulder.playbackRate === undefined) {
-        tileBoulder.playbackRate = tileBoulder.animationSpeed;
+    const tileBoulder = tileDoc.getFlag(MODULE_ID, 'trap.boulder');
+    const tileOverrides = tileBoulder ? { boulder: tileBoulder } : {};
+    const overrides = adapter.mergeObject(tileOverrides, config);
+    if (overrides.boulder?.animationSpeed !== undefined && overrides.boulder?.playbackRate === undefined) {
+        overrides.boulder.playbackRate = overrides.boulder.animationSpeed;
     }
 
-    let resolvedConfig = config;
-    if (config.boulder?.animationSpeed !== undefined && config.boulder?.playbackRate === undefined) {
-        resolvedConfig = {
-            ...config,
-            boulder: {
-                ...config.boulder,
-                playbackRate: config.boulder.animationSpeed,
-            },
-        };
-    }
-
-    const baseConfig = adapter.mergeObject(DEFAULT_CONFIG, { boulder: tileBoulder });
-    const mConfig = adapter.mergeObject(baseConfig, resolvedConfig);
-
-    const boulder = {
-        src: mConfig.boulder?.src ?? DEFAULT_CONFIG.boulder.src,
-        speed: mConfig.boulder?.speed ?? DEFAULT_CONFIG.boulder.speed,
-        size: mConfig.boulder?.size ?? DEFAULT_CONFIG.boulder.size,
-        playbackRate: mConfig.boulder?.playbackRate ?? DEFAULT_CONFIG.boulder.playbackRate,
-    };
-    const sound = mConfig.sound;
+    const { boulder, sound } = adapter.mergeObject(DEFAULT_CONFIG, overrides);
 
     // Retrieve end tile from flags
     const targetTileIds = tileDoc.getFlag(MODULE_ID, 'trap.trapTargetTileIds') ?? [];

@@ -365,3 +365,100 @@ test('matt.trap.setup configures targetTile in trap config for 3-tile setups', a
     assert.equal(playConfigReceived.targetTile, targetTile, 'Play config must receive targetTile placeable');
     assert.equal(playConfigReceived.tile, undefined, 'Play config must not contain nested tile object');
 });
+
+test('matt.trap executes multiple trap tiles concurrently via Promise.all', async () => {
+    const updatedTiles = new Map();
+    globalThis.game.user = { isGM: true, id: 'gm-user-1' };
+    globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', active: true });
+
+    let trap1Started = false;
+    let trap1Resolved = false;
+    let trap2Started = false;
+    let trap2Resolved = false;
+
+    let resolveTrap1;
+    const trap1Promise = new Promise(resolve => { resolveTrap1 = resolve; });
+
+    let resolveTrap2;
+    const trap2Promise = new Promise(resolve => { resolveTrap2 = resolve; });
+
+    const createTile = (id, triggerFn) => {
+        const doc = {
+            id,
+            flags: {},
+            trigger: triggerFn,
+            update: async (data) => {
+                updatedTiles.set(id, data);
+                return doc;
+            }
+        };
+        return { id, document: doc };
+    };
+
+    const trapTile1 = createTile('tile-trap-parallel-1', async () => {
+        trap1Started = true;
+        await trap1Promise;
+        trap1Resolved = true;
+    });
+
+    const trapTile2 = createTile('tile-trap-parallel-2', async () => {
+        trap2Started = true;
+        await trap2Promise;
+        trap2Resolved = true;
+    });
+
+    const triggerTile = createTile('tile-trigger-parallel');
+
+    globalThis.canvas.tiles = {
+        controlled: [triggerTile],
+        get: (id) => (id === 'tile-trigger-parallel' ? triggerTile : id === 'tile-trap-parallel-1' ? trapTile1 : id === 'tile-trap-parallel-2' ? trapTile2 : null)
+    };
+
+    let step = 0;
+    adapter.buttonDialog = async () => {
+        step++;
+        if (step === 1) globalThis.canvas.tiles.controlled = [triggerTile];
+        else if (step === 2) globalThis.canvas.tiles.controlled = [trapTile1, trapTile2];
+        return 'continue';
+    };
+
+    await matt.trap.setup('eskie.traps.spike', { tileCount: 2 });
+
+    const triggerUpdate = updatedTiles.get('tile-trigger-parallel');
+    assert.ok(triggerUpdate);
+    const triggerAction = triggerUpdate['flags.monks-active-tiles.actions'][0];
+
+    // Verify generated code contains Promise.all
+    assert.ok(triggerAction.data.code.includes('await Promise.all(promises);'), 'Action code must await Promise.all for concurrent execution');
+
+    // Execute the action code
+    const mockTriggerDoc = {
+        id: 'tile-trigger-parallel',
+        object: triggerTile,
+        getFlag: (mod, key) => {
+            if (mod === MODULE_ID && key === 'trap.originIds') return ['tile-trap-parallel-1', 'tile-trap-parallel-2'];
+            return null;
+        }
+    };
+
+    const execFn = new Function('token', 'tile', 'canvas', `return (async () => { ${triggerAction.data.code} })();`);
+    const runPromise = execFn(null, mockTriggerDoc, globalThis.canvas);
+
+    // Yield to let both triggers start asynchronously
+    await new Promise(r => setTimeout(r, 10));
+
+    // Both trap 1 and trap 2 should have started simultaneously
+    assert.equal(trap1Started, true, 'Trap 1 should have started execution');
+    assert.equal(trap2Started, true, 'Trap 2 should have started execution concurrently with Trap 1');
+    assert.equal(trap1Resolved, false, 'Trap 1 should not have completed yet');
+    assert.equal(trap2Resolved, false, 'Trap 2 should not have completed yet');
+
+    // Resolve them both and verify completion
+    resolveTrap1();
+    resolveTrap2();
+    await runPromise;
+
+    assert.equal(trap1Resolved, true);
+    assert.equal(trap2Resolved, true);
+});
+

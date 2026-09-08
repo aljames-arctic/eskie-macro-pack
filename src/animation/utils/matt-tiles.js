@@ -257,38 +257,44 @@ ${targetTileId ? `const targetTile = canvas.tiles.get('${targetTileId}');` : ''}
 // Get the specific Eskie Trap Animation Function if this tile is a trap tile
 const animation = tile.getFlag('${MODULE_ID}', 'trap.animation');
 const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter;
+const promises = [];
+
 if (animation) {
-    try {
-        const trap = adapter.getProperty(globalThis, animation);
-        // Collect all tokens contained within / overlapping this trap tile via adapter
-        let targets = adapter.getTokensInTile(tilePlaceable);
+    promises.push((async () => {
+        try {
+            const trap = adapter.getProperty(globalThis, animation);
+            // Collect all tokens contained within / overlapping this trap tile via adapter
+            let targets = adapter.getTokensInTile(tilePlaceable);
 
-        // If this trap tile is also the trigger tile, ensure the activating token that stepped on it is included
-        const isTriggerTile = Boolean(tile.getFlag('${MODULE_ID}', 'trap.isTriggerTile'));
-        if (isTriggerTile && token) {
-            const activatingTarget = token.object ?? canvas.tokens?.get?.(token.id) ?? token;
-            if (!targets.some(t => t.id === token.id)) {
-                targets.push(activatingTarget);
+            // If this trap tile is also the trigger tile, ensure the activating token that stepped on it is included
+            const isTriggerTile = Boolean(tile.getFlag('${MODULE_ID}', 'trap.isTriggerTile'));
+            if (isTriggerTile && token) {
+                const activatingTarget = token.object ?? canvas.tokens?.get?.(token.id) ?? token;
+                if (!targets.some(t => t.id === token.id)) {
+                    targets.push(activatingTarget);
+                }
+            } else if (targets.length === 0 && token) {
+                targets = [token.object ?? canvas.tokens?.get?.(token.id) ?? token];
             }
-        } else if (targets.length === 0 && token) {
-            targets = [token.object ?? canvas.tokens?.get?.(token.id) ?? token];
-        }
 
-        // Play the trap animation with the contained tokens as targets
-        await trap.play(tilePlaceable, targets, { ...${JSON.stringify(trapConfig)}${targetTileId ? ', targetTile' : ''} });
-    } catch (err) {
-        console.error('Eskie Macro Pack | Failed to play trap animation "' + animation + '" on tile "' + tile.id + '":', err);
-        throw err;
-    }
+            // Play the trap animation with the contained tokens as targets
+            await trap.play(tilePlaceable, targets, { ...${JSON.stringify(trapConfig)}${targetTileId ? ', targetTile' : ''} });
+        } catch (err) {
+            console.error('Eskie Macro Pack | Failed to play trap animation "' + animation + '" on tile "' + tile.id + '":', err);
+            throw err;
+        }
+    })());
 }
 
-// Manually activate any other linked trap tiles
+// Manually activate any other linked trap tiles concurrently
 const originIds = (tile.getFlag('${MODULE_ID}', 'trap.originIds') ?? []).filter(id => id !== tile.id);
 for (const id of originIds) {
     const originTile = canvas.tiles.get(id);
     if (!originTile) continue;
-    await originTile.document.trigger({ token });
+    promises.push(originTile.document.trigger({ token }));
 }
+
+await Promise.all(promises);
 `;
 
             updateData['flags.monks-active-tiles.active'] = true;

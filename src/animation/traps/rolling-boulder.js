@@ -16,6 +16,7 @@ const DEFAULT_CONFIG = {
         src: 'jb2a.rolling_boulder.loop.01.rock.brown',
         speed: 200,
         size: 4.25,
+        playbackRate: 1.0,
     },
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
@@ -25,14 +26,30 @@ async function create(tile, targets, config = {}) {
     const tileDoc = tile.document;
 
     // Check for tile-level trap.boulder overrides from MATT flags
-    const tileBoulder = tileDoc.getFlag(MODULE_ID, 'trap.boulder') ?? {};
+    const tileBoulder = { ...(tileDoc.getFlag(MODULE_ID, 'trap.boulder') ?? {}) };
+    if (tileBoulder.animationSpeed !== undefined && tileBoulder.playbackRate === undefined) {
+        tileBoulder.playbackRate = tileBoulder.animationSpeed;
+    }
+
+    let resolvedConfig = config;
+    if (config.boulder?.animationSpeed !== undefined && config.boulder?.playbackRate === undefined) {
+        resolvedConfig = {
+            ...config,
+            boulder: {
+                ...config.boulder,
+                playbackRate: config.boulder.animationSpeed,
+            },
+        };
+    }
+
     const baseConfig = adapter.mergeObject(DEFAULT_CONFIG, { boulder: tileBoulder });
-    const mConfig = adapter.mergeObject(baseConfig, config);
+    const mConfig = adapter.mergeObject(baseConfig, resolvedConfig);
 
     const boulder = {
         src: mConfig.boulder?.src ?? DEFAULT_CONFIG.boulder.src,
         speed: mConfig.boulder?.speed ?? DEFAULT_CONFIG.boulder.speed,
         size: mConfig.boulder?.size ?? DEFAULT_CONFIG.boulder.size,
+        playbackRate: mConfig.boulder?.playbackRate ?? DEFAULT_CONFIG.boulder.playbackRate,
     };
     const sound = mConfig.sound;
 
@@ -62,6 +79,7 @@ async function create(tile, targets, config = {}) {
     const distancePx = Math.hypot(endLoc.x - startLoc.x, endLoc.y - startLoc.y);
     const speed = boulder.speed > 0 ? boulder.speed : DEFAULT_CONFIG.boulder.speed;
     const duration = Math.max(100, Math.round((distancePx / speed) * 1000));
+    const playbackRate = boulder.playbackRate > 0 ? boulder.playbackRate : DEFAULT_CONFIG.boulder.playbackRate;
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -78,6 +96,7 @@ async function create(tile, targets, config = {}) {
         .fadeIn(Math.min(500, Math.round(duration / 6)))
         .size(Math.max(0.1, boulder.size - 0.5), { gridUnits: true })
         .duration(500)
+        .playbackRate(playbackRate)
         .filter('ColorMatrix', { brightness: 0 })
         .filter('Blur', { blurX: 5, blurY: 10 })
         .opacity(0.5)
@@ -102,6 +121,7 @@ async function create(tile, targets, config = {}) {
         .size(Math.max(0.1, boulder.size - 0.4), { gridUnits: true })
         .moveTowards(endLoc, { ease: 'easeInSine' })
         .duration(duration)
+        .playbackRate(playbackRate)
         .spriteRotation(-90)
         .zIndex(3)
         .waitUntilFinished(-Math.round(duration / 8))

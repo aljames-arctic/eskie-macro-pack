@@ -80,6 +80,7 @@ test('rollingBoulder.default_config defines boulder attribute with default value
     assert.ok(rollingBoulder.default_config.boulder, 'DEFAULT_CONFIG must define boulder');
     assert.equal(rollingBoulder.default_config.boulder.speed, 200, 'boulder.speed must default to 200');
     assert.equal(rollingBoulder.default_config.boulder.size, 4.25, 'boulder.size must default to 4.25');
+    assert.equal(rollingBoulder.default_config.boulder.playbackRate, 1.0, 'boulder.playbackRate must default to 1.0');
     assert.equal(
         rollingBoulder.default_config.boulder.src,
         'jb2a.rolling_boulder.loop.01.rock.brown',
@@ -145,11 +146,14 @@ test('rollingBoulder.create dynamically calculates duration from tile distance a
     const sizeCall = mainBoulder.calls.find(c => c.method === 'size');
     assert.equal(sizeCall?.size, 4.25 - 0.4, 'Main boulder size should be scaled by default size 4.25');
 
+    const rateCall = mainBoulder.calls.find(c => c.method === 'playbackRate');
+    assert.equal(rateCall?.value, 1.0, 'Main boulder playbackRate should default to 1.0');
+
     const fileCall = mainBoulder.calls.find(c => c.method === 'file');
     assert.equal(fileCall?.value, 'jb2a.rolling_boulder.loop.01.rock.brown');
 });
 
-test('rollingBoulder.create respects custom boulder speed, size, and src config overrides', async () => {
+test('rollingBoulder.create respects custom boulder speed, size, playbackRate, and src config overrides', async () => {
     globalThis.Sequence = MockSequence;
 
     const startTile = {
@@ -194,6 +198,7 @@ test('rollingBoulder.create respects custom boulder speed, size, and src config 
         boulder: {
             speed: 500,
             size: 6.0,
+            playbackRate: 1.5,
             src: 'jb2a.rolling_boulder.loop.01.magma'
         }
     };
@@ -209,6 +214,9 @@ test('rollingBoulder.create respects custom boulder speed, size, and src config 
 
     const sizeCall = mainBoulder.calls.find(c => c.method === 'size');
     assert.equal(sizeCall?.size, 6.0 - 0.4, 'Main boulder size should be scaled by custom size 6.0');
+
+    const rateCall = mainBoulder.calls.find(c => c.method === 'playbackRate');
+    assert.equal(rateCall?.value, 1.5, 'Main boulder playbackRate should be custom 1.5');
 
     const fileCall = mainBoulder.calls.find(c => c.method === 'file');
     assert.equal(fileCall?.value, 'jb2a.rolling_boulder.loop.01.magma');
@@ -231,7 +239,7 @@ test('rollingBoulder.create respects tile MATT flag boulder overrides', async ()
             height: 100,
             getFlag: (mod, key) => {
                 if (mod === MODULE_ID && key === 'trap.trapTargetTileIds') return ['tile-end-3'];
-                if (mod === MODULE_ID && key === 'trap.boulder') return { speed: 400, size: 5.0 };
+                if (mod === MODULE_ID && key === 'trap.boulder') return { speed: 400, size: 5.0, playbackRate: 2.0 };
                 return null;
             }
         }
@@ -266,6 +274,59 @@ test('rollingBoulder.create respects tile MATT flag boulder overrides', async ()
 
     const sizeCall = mainBoulder.calls.find(c => c.method === 'size');
     assert.equal(sizeCall?.size, 5.0 - 0.4, 'Size should be calculated using tile flag size');
+
+    const rateCall = mainBoulder.calls.find(c => c.method === 'playbackRate');
+    assert.equal(rateCall?.value, 2.0, 'Playback rate should be set from tile flag');
+});
+
+test('rollingBoulder.create accepts animationSpeed as an alias for playbackRate', async () => {
+    globalThis.Sequence = MockSequence;
+
+    const startTile = {
+        id: 'tile-start-4',
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        document: {
+            id: 'tile-start-4',
+            x: 0,
+            y: 0,
+            width: 100,
+            height: 100,
+            getFlag: (mod, key) => {
+                if (mod === MODULE_ID && key === 'trap.trapTargetTileIds') return ['tile-end-4'];
+                return null;
+            }
+        }
+    };
+
+    const endTile = {
+        id: 'tile-end-4',
+        x: 300,
+        y: 400,
+        width: 100,
+        height: 100,
+        document: {
+            id: 'tile-end-4',
+            x: 300,
+            y: 400,
+            width: 100,
+            height: 100
+        }
+    };
+
+    globalThis.canvas.tiles.get = (id) => (id === 'tile-end-4' ? endTile : null);
+
+    const seq = await rollingBoulder.create(startTile, [], {
+        boulder: { animationSpeed: 1.75 }
+    });
+    const mainBoulder = seq.effects.find(eff =>
+        eff.calls.some(c => c.method === 'moveTowards')
+    );
+
+    const rateCall = mainBoulder.calls.find(c => c.method === 'playbackRate');
+    assert.equal(rateCall?.value, 1.75, 'animationSpeed should map to playbackRate');
 });
 
 test('rollingBoulder.create warns and returns early when end tile is missing', async () => {

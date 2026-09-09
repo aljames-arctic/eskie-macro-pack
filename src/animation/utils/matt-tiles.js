@@ -215,36 +215,11 @@ async function setup(animation, config = {}) {
         const updateData = {};
 
         if (isTrigger) {
-            const existingOriginIds = tileDoc.getFlag?.(MODULE_ID, 'trap.originIds')
-                ?? tileDoc.flags?.[MODULE_ID]?.trap?.originIds
-                ?? [];
-            const originIdList = originTiles.map(t => t.id);
-            const combinedOriginIds = [...new Set([
-                ...(Array.isArray(existingOriginIds) ? existingOriginIds : []),
-                ...originIdList
-            ])];
             updateData[`flags.${MODULE_ID}.trap.isTriggerTile`] = true;
-            updateData[`flags.${MODULE_ID}.trap.originIds`] = combinedOriginIds;
         }
 
         if (isTrap) {
             updateData[`flags.${MODULE_ID}.trap.isTrapTile`] = true;
-            updateData[`flags.${MODULE_ID}.trap.animation`] = animation;
-            if (tileCount === 3) {
-                updateData[`flags.${MODULE_ID}.trap.trapTargetTileIds`] = targetTiles.map(t => t.id);
-                updateData[`flags.${MODULE_ID}.trap.targetTileIds`] = targetTiles.map(t => t.id);
-                updateData[`flags.${MODULE_ID}.trap.targetTileId`] = targetTiles[0]?.id ?? null;
-            }
-            if (config.extraFlags) {
-                for (const [k, v] of Object.entries(config.extraFlags)) {
-                    updateData[`flags.${MODULE_ID}.trap.${k}`] = v;
-                }
-            }
-            if (config.extraTiles) {
-                for (const extra of config.extraTiles) {
-                    updateData[`flags.${MODULE_ID}.trap.${extra.key}`] = extraTileResults[extra.key];
-                }
-            }
         }
 
         if (isTarget) {
@@ -261,15 +236,31 @@ async function setup(animation, config = {}) {
             const targetTileId = tileCount === 3 ? (targetTiles[0]?.id ?? null) : null;
             const trapConfig = { ...trapOptions };
 
+            const actionId = adapter.randomID();
+            const actionTrapData = {
+                id: actionId,
+                animation,
+                triggerTiles: triggerTiles.map(t => t.id),
+                sourceTiles: originTiles.map(t => t.id),
+                targetTiles: targetTiles.map(t => t.id),
+                extraTiles: extraTileResults,
+                config: trapConfig,
+            };
+
             const trapActionCode = `
+// Action-scoped placeable groups for this run command
+const triggerTileIds = ${JSON.stringify(triggerTiles.map(t => t.id))};
+const sourceTileIds = ${JSON.stringify(originTiles.map(t => t.id))};
+const targetTileIds = ${JSON.stringify(targetTiles.map(t => t.id))};
+
 // Resolve the concrete Tile placeables from MATT execution scope
 const adapter = game.modules.get('${MODULE_ID}').api.adapter;
 const tilePlaceable = tile.object ?? canvas.tiles.get(tile.id);
 ${targetTileId ? `const targetTile = canvas.tiles.get('${targetTileId}');
 const targetLocation = targetTile ? adapter.getTargetLocation(targetTile) : null;` : ''}
 
-// Get the specific Eskie Trap Animation Function if this tile is a trap tile
-const animation = ${isTrap ? `'${animation}'` : `tile.getFlag('${MODULE_ID}', 'trap.animation')`};
+// Get the specific Eskie Trap Animation Function if this tile is a source tile
+const animation = sourceTileIds.includes(tile.id) ? '${animation}' : null;
 const promises = [];
 
 if (animation) {
@@ -279,8 +270,8 @@ if (animation) {
             // Collect all tokens contained within / overlapping this trap tile via adapter
             let targets = adapter.getTokensInTile(tilePlaceable);
 
-            // If this trap tile is also the trigger tile, ensure the activating token that stepped on it is included
-            const isTriggerTile = Boolean(tile.getFlag('${MODULE_ID}', 'trap.isTriggerTile'));
+            // If this trap tile is also a trigger tile for this command, ensure the activating token is included
+            const isTriggerTile = triggerTileIds.includes(tile.id);
             const activatingTarget = token?.object ? token.object : token;
             if (isTriggerTile && token) {
                 if (!targets.some(t => t.id === token.id)) {
@@ -299,12 +290,14 @@ if (animation) {
     })());
 }
 
-// Manually activate any other linked trap tiles concurrently
-const originIds = (${isTrigger ? JSON.stringify(originTiles.map(t => t.id)) : `null`} ?? tile.getFlag('${MODULE_ID}', 'trap.originIds') ?? []).filter(id => id !== tile.id);
-for (const id of originIds) {
-    const originTile = canvas.tiles.get(id);
-    if (!originTile) continue;
-    promises.push(originTile.document.trigger({ token }));
+// If this tile is a trigger tile for this command, manually activate linked source tiles concurrently
+if (triggerTileIds.includes(tile.id)) {
+    const originIds = sourceTileIds.filter(id => id !== tile.id);
+    for (const id of originIds) {
+        const originTile = canvas.tiles.get(id);
+        if (!originTile) continue;
+        promises.push(originTile.document.trigger({ token }));
+    }
 }
 
 await Promise.all(promises);
@@ -320,9 +313,10 @@ await Promise.all(promises);
                 ?? tileDoc.flags?.['monks-active-tiles']?.actions
                 ?? [];
             const newAction = {
-                id: adapter.randomID(),
+                id: actionId,
                 action: 'runcode',
                 data: { code: trapActionCode },
+                trap: actionTrapData,
             };
 
             updateData['flags.monks-active-tiles.active'] = true;
@@ -331,6 +325,7 @@ await Promise.all(promises);
                 ...(Array.isArray(existingActions) ? existingActions : []),
                 newAction
             ];
+            updateData[`flags.${MODULE_ID}.trap.actions.${actionId}`] = actionTrapData;
             updateData['flags.monks-active-tiles.controlled'] = config.controlled ?? 'gm';
         }
 

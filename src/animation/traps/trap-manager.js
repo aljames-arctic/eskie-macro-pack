@@ -242,63 +242,24 @@ for (const id of ${JSON.stringify(tileIds)}) {
 ` : ''}
 await Promise.all(animPromises);`
 
+    const triggerTileIds = triggerRegions.map(r => r.id);
+    const sourceTileIds = originElements.map(e => e.id);
+    const targetTileIds = targetElements.map(e => e.id);
+
     const behaviorName = `${trapKey.charAt(0).toUpperCase() + trapKey.slice(1)} Trap (${MODULE_ID})`;
     const events = config.events ?? ['tokenEnter'];
 
     for (const triggerRegion of triggerRegions) {
-        const existingOriginIds = triggerRegion.getFlag?.(MODULE_ID, 'trap.originIds')
-            ?? triggerRegion.flags?.[MODULE_ID]?.trap?.originIds
-            ?? [];
-        const currentOriginIds = originElements.map(e => e.id);
-        const combinedOriginIds = [...new Set([
-            ...(Array.isArray(existingOriginIds) ? existingOriginIds : []),
-            ...currentOriginIds
-        ])];
-
-        const updateData = {
-            [`flags.${MODULE_ID}.trap.isTriggerRegion`]: true,
-            [`flags.${MODULE_ID}.trap.animation`]: animation,
-            [`flags.${MODULE_ID}.trap.originIds`]: combinedOriginIds,
-            [`flags.${MODULE_ID}.trap.config`]: trapOptions,
+        const actionId = adapter.randomID();
+        const actionData = {
+            id: actionId,
+            animation,
+            triggerTiles: triggerTileIds,
+            sourceTiles: sourceTileIds,
+            targetTiles: targetTileIds,
+            extraTiles: extraResults,
+            config: trapOptions,
         };
-
-        if (tileCount === 3) {
-            updateData[`flags.${MODULE_ID}.trap.trapTargetTileIds`] = targetElements.map(e => e.id);
-            const targetRegionIds = targetElements.filter(e => adapter.isDocumentOfType(e, 'Region')).map(e => e.id);
-            const targetTileIds = targetElements.filter(e => adapter.isDocumentOfType(e, 'Tile')).map(e => e.id);
-            if (targetRegionIds.length > 0) {
-                updateData[`flags.${MODULE_ID}.trap.targetRegionIds`] = targetRegionIds;
-                updateData[`flags.${MODULE_ID}.trap.targetRegionId`] = targetRegionIds[0];
-            }
-            if (targetTileIds.length > 0) {
-                updateData[`flags.${MODULE_ID}.trap.targetTileIds`] = targetTileIds;
-                updateData[`flags.${MODULE_ID}.trap.targetTileId`] = targetTileIds[0];
-            }
-        }
-
-        if (tileIds.length > 0) {
-            const existingTileIds = triggerRegion.getFlag?.(MODULE_ID, 'trap.tileIds')
-                ?? triggerRegion.flags?.[MODULE_ID]?.trap?.tileIds
-                ?? [];
-            updateData[`flags.${MODULE_ID}.trap.tileIds`] = [...new Set([
-                ...(Array.isArray(existingTileIds) ? existingTileIds : []),
-                ...tileIds
-            ])];
-        }
-
-        if (config.extraFlags) {
-            for (const [k, v] of Object.entries(config.extraFlags)) {
-                updateData[`flags.${MODULE_ID}.trap.${k}`] = v;
-            }
-        }
-
-        if (config.extraTiles) {
-            for (const extra of config.extraTiles) {
-                updateData[`flags.${MODULE_ID}.trap.${extra.key}`] = extraResults[extra.key];
-            }
-        }
-
-        await triggerRegion.update(updateData);
 
         const behaviorData = adapter.formatRegionBehaviorData({
             name: behaviorName,
@@ -308,13 +269,19 @@ await Promise.all(animPromises);`
                 [MODULE_ID]: {
                     trap: {
                         isTrapBehavior: true,
-                        animation,
-                        originIds: originElements.map(e => e.id),
+                        ...actionData,
                     }
                 }
             }
         });
-        await adapter.createRegionBehavior(triggerRegion, behaviorData);
+        const createdBehavior = await adapter.createRegionBehavior(triggerRegion, behaviorData);
+        const behaviorId = createdBehavior?.id ?? actionId;
+        actionData.id = behaviorId;
+
+        await triggerRegion.update({
+            [`flags.${MODULE_ID}.trap.isTriggerRegion`]: true,
+            [`flags.${MODULE_ID}.trap.actions.${behaviorId}`]: actionData,
+        });
     }
 
     // Flag any origin placeables that are Tiles
@@ -322,7 +289,6 @@ await Promise.all(animPromises);`
         if (adapter.isDocumentOfType(origin, 'Tile')) {
             await origin.update({
                 [`flags.${MODULE_ID}.trap.isTrapTile`]: true,
-                [`flags.${MODULE_ID}.trap.animation`]: animation,
             });
         }
     }

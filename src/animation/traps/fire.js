@@ -17,24 +17,24 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(tile, targets, config = {}) {
+async function create(trapObject, targets, config = {}) {
     config = settingsOverride(config);
     const { targetLocation, size, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInPlaceable(tile);
+    const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInPlaceable(trapObject);
 
     const targetLoc = targetLocation ? adapter.getTargetLocation(targetLocation) : null;
 
     if (!targetLoc) {
-        log.warn(`Fire Trap: Tile "${tile.id}" has no configured target location.`);
+        log.warn(`Fire Trap: Placeable "${trapObject.id}" has no configured target location.`);
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;
     }
 
-    const tileCenter = adapter.getTargetLocation(tile);
+    const trapCenter = adapter.getTargetLocation(trapObject);
 
-    if (Math.hypot(targetLoc.x - tileCenter.x, targetLoc.y - tileCenter.y) < 1) {
-        const errorMsg = `Fire Trap: Placeable "${tile.id}" target location is identical to origin location.`;
+    if (Math.hypot(targetLoc.x - trapCenter.x, targetLoc.y - trapCenter.y) < 1) {
+        const errorMsg = `Fire Trap: Placeable "${trapObject.id}" target location is identical to origin location.`;
         log.error(errorMsg);
         notify.error(errorMsg);
         throw new Error(errorMsg);
@@ -47,7 +47,7 @@ async function create(tile, targets, config = {}) {
         // Cone fire breath weapon
         .effect()
         .file(closest('jb2a.breath_weapons02.burst.cone.fire.orange.02'))
-        .atLocation(tileCenter)
+        .atLocation(trapCenter)
         .size(size, { gridUnits: true })
         .stretchTo(targetLoc)
         .zIndex(1);
@@ -73,13 +73,13 @@ async function create(tile, targets, config = {}) {
     return seq;
 }
 
-async function play(tile, targets, config = {}) {
+async function play(trapObject, targets, config = {}) {
     config = settingsOverride(config);
-    const seq = await create(tile, targets, config);
+    const seq = await create(trapObject, targets, config);
     return seq.play();
 }
 
-async function stop(tile, config = {}) {
+async function stop(trapObject, config = {}) {
     // No persistent effects to stop
 }
 

@@ -20,23 +20,23 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(tile, targets, config = {}) {
+async function create(trapObject, targets, config = {}) {
     config = settingsOverride(config);
     const { reveal, smokeSize, startScale, fallenScale, randomDelay, color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Target selection:
     // 1. Tokens passed explicitly
     // 2. Tokens on the trap placeable itself
-    let finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
+    let finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(trapObject);
     finalTargets = Array.from(new Set(finalTargets));
 
     let seq = new Sequence();
     applySound(seq, sound);
 
-    if (reveal && adapter.isDocumentOfType(tile, 'Tile')) {
+    if (reveal && adapter.isDocumentOfType(trapObject, 'Tile')) {
         seq = seq
             .animation()
-            .on(tile)
+            .on(trapObject)
             .show()
             .opacity(1);
     }
@@ -132,18 +132,18 @@ async function create(tile, targets, config = {}) {
     return seq;
 }
 
-async function play(tile, targets, config = {}) {
+async function play(trapObject, targets, config = {}) {
     config = settingsOverride(config);
-    const seq = await create(tile, targets, config);
+    const seq = await create(trapObject, targets, config);
     return seq.play();
 }
 
-async function stop(tile, config = {}) {
-    if (!tile) return;
-    if (adapter.isDocumentOfType(tile, 'Tile')) {
+async function stop(trapObject, config = {}) {
+    if (!trapObject) return;
+    if (adapter.isDocumentOfType(trapObject, 'Tile')) {
         await new Sequence()
             .animation()
-            .on(tile)
+            .on(trapObject)
             .fadeOut(1000)
             .opacity(0)
             .play();

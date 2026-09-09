@@ -16,26 +16,26 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(tile, targets, config = {}) {
+async function create(trapObject, targets, config = {}) {
     config = settingsOverride(config);
     const { repeats, repeatDelay, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    if (!tile) return new Sequence();
+    if (!trapObject) return new Sequence();
 
-    const tileBounds = adapter.getBounds(tile);
-    const tileCenter = tileBounds.center;
+    const trapBounds = adapter.getBounds(trapObject);
+    const trapCenter = trapBounds.center;
 
-    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
+    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(trapObject);
 
     let seq = new Sequence();
     applySound(seq, sound);
 
     if (finalTargets.length > 0) {
         seq = seq
-            // Electricity burst at the trap tile
+            // Electricity burst at the trap location
             .effect()
             .file(closest('eskie.lightning.03.blue'))
-            .atLocation(tileCenter)
+            .atLocation(trapCenter)
             .size(1.25, { gridUnits: true })
             .zIndex(1)
 
@@ -73,13 +73,13 @@ async function create(tile, targets, config = {}) {
     return seq;
 }
 
-async function play(tile, targets, config = {}) {
+async function play(trapObject, targets, config = {}) {
     config = settingsOverride(config);
-    const seq = await create(tile, targets, config);
+    const seq = await create(trapObject, targets, config);
     return seq.play();
 }
 
-async function stop(tile, config = {}) {
+async function stop(trapObject, config = {}) {
     // No persistent effects to stop
 }
 

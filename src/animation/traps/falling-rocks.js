@@ -16,19 +16,19 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(tile, targets, config = {}) {
+async function create(trapObject, targets, config = {}) {
     config = settingsOverride(config);
     const { label, dustBrightness, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    if (!tile) return new Sequence();
+    if (!trapObject) return new Sequence();
 
-    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
+    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(trapObject);
 
-    const tileDoc = tile.document;
-    const tileBounds = adapter.getBounds(tile);
-    const tileCenter = tileBounds.center;
-    const tileWidth = tileBounds.width;
-    const tileHeight = tileBounds.height;
+    const trapDoc = trapObject.document;
+    const trapBounds = adapter.getBounds(trapObject);
+    const trapCenter = trapBounds.center;
+    const trapWidth = trapBounds.width;
+    const trapHeight = trapBounds.height;
 
     const num = Math.floor(Math.random() * 2);
     const mirrorX = Math.random() >= 0.5;
@@ -43,20 +43,20 @@ async function create(tile, targets, config = {}) {
         // Falling rocks animation
         .effect()
         .file(closest(`jb2a.falling_rocks.top.1x1.grey.${num}`))
-        .atLocation(tileCenter)
-        .size({ width: tileWidth * 2.5, height: tileHeight * 2.5 })
+        .atLocation(trapCenter)
+        .size({ width: trapWidth * 2.5, height: trapHeight * 2.5 })
         .mirrorX(mirrorX)
         .mirrorY(mirrorY)
         .fadeOut(500)
         .waitUntilFinished(-4000)
 
-        // Persistent rock rubble on the tile
+        // Persistent rock rubble on the trap
         .effect()
-        .name(`${label}-${tile.id}`)
+        .name(`${label}-${trapObject.id}`)
         .delay(3500)
         .file(closest(`jb2a.falling_rocks.endframe.top.1x1.grey.${num}`))
-        .atLocation(tileCenter)
-        .size({ width: tileWidth * 2.5, height: tileHeight * 2.5 })
+        .atLocation(trapCenter)
+        .size({ width: trapWidth * 2.5, height: trapHeight * 2.5 })
         .belowTokens()
         .mirrorX(mirrorX)
         .mirrorY(mirrorY)
@@ -91,9 +91,9 @@ async function create(tile, targets, config = {}) {
         .shake({ duration: 500, strength: 2, rotation: false });
 
     if (finalTargets.length > 0) {
-        const currentPinnedIds = tileDoc.getFlag(MODULE_ID, `${label} - pinned`) ?? [];
+        const currentPinnedIds = trapDoc.getFlag(MODULE_ID, `${label} - pinned`) ?? [];
         const finalTargetIds = finalTargets.map(token => token.id);
-        await tileDoc.setFlag(MODULE_ID, `${label} - pinned`, [...currentPinnedIds, ...finalTargetIds]);
+        await trapDoc.setFlag(MODULE_ID, `${label} - pinned`, [...currentPinnedIds, ...finalTargetIds]);
         
         finalTargets.forEach(target => {
             const buryEffectName = `${label}-${target.name}-${target.id}`;
@@ -119,21 +119,21 @@ async function create(tile, targets, config = {}) {
     return seq;
 }
 
-async function play(tile, targets, config = {}) {
+async function play(trapObject, targets, config = {}) {
     config = settingsOverride(config);
-    const seq = await create(tile, targets, config);
+    const seq = await create(trapObject, targets, config);
     return seq.play();
 }
 
-async function stop(tile, config = {}) {
+async function stop(trapObject, config = {}) {
     const { label } = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const tileDoc = tile.document;
+    const trapDoc = trapObject.document;
     
-    // 1. Retrieve the pinned IDs from the tile's flags (fallback to an empty array if none)
-    const pinnedIds = tileDoc.getFlag(MODULE_ID, `${label} - pinned`) ?? [];
+    // 1. Retrieve the pinned IDs from the trap's flags (fallback to an empty array if none)
+    const pinnedIds = trapDoc.getFlag(MODULE_ID, `${label} - pinned`) ?? [];
 
-    // 2. Clear rock rubble effect on the tile
-    await Sequencer.EffectManager.endEffects({ name: `${label}-${tile.id}` });
+    // 2. Clear rock rubble effect on the trap
+    await Sequencer.EffectManager.endEffects({ name: `${label}-${trapObject.id}` });
 
     if (pinnedIds.length > 0) {
         // 3. Convert IDs to actual canvas token objects, filtering out any that no longer exist
@@ -146,7 +146,7 @@ async function stop(tile, config = {}) {
         await Promise.all(cleanPromises);
 
         // 5. Clean up the flag so these tokens aren't accidentally processed again later
-        await tileDoc.unsetFlag?.(MODULE_ID, `${label} - pinned`);
+        await trapDoc.unsetFlag?.(MODULE_ID, `${label} - pinned`);
     }
 }
 

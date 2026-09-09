@@ -22,21 +22,21 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(tile, targets, config = {}) {
+async function create(trapObject, targets, config = {}) {
     config = settingsOverride(config);
     const { targetLocation, boulder, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const endLoc = targetLocation ? adapter.getTargetLocation(targetLocation) : null;
 
     if (!endLoc) {
-        log.warn(`Rolling Boulder Trap: Placeable "${tile.id}" has no configured destination location.`);
-        ui.notifications.warn(game.i18n.format('EMP.traps.rollingBoulder.noEndTile', { id: tile.id }));
+        log.warn(`Rolling Boulder Trap: Placeable "${trapObject.id}" has no configured destination location.`);
+        ui.notifications.warn(game.i18n.format('EMP.traps.rollingBoulder.noEndTile', { id: trapObject.id }));
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;
     }
 
-    const startLoc = adapter.getTargetLocation(tile);
+    const startLoc = adapter.getTargetLocation(trapObject);
 
     if (!startLoc || !endLoc) {
         log.warn(`Rolling Boulder Trap: Could not resolve coordinates for start or end location.`);
@@ -122,13 +122,13 @@ async function create(tile, targets, config = {}) {
         .zIndex(4);
 }
 
-async function play(tile, targets, config = {}) {
+async function play(trapObject, targets, config = {}) {
     config = settingsOverride(config);
-    const seq = await create(tile, targets, config);
+    const seq = await create(trapObject, targets, config);
     return seq.play();
 }
 
-async function stop(tile, config = {}) {
+async function stop(trapObject, config = {}) {
     // No persistent effects to stop
 }
 

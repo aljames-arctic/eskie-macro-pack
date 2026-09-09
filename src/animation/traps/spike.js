@@ -18,19 +18,19 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(tile, targets, config = {}) {
+async function create(trapObject, targets, config = {}) {
     config = settingsOverride(config);
     const { delay, spike: spikeConfig, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    if (!tile) return new Sequence();
+    if (!trapObject) return new Sequence();
 
-    const tileBounds = adapter.getBounds(tile);
-    const tileCenter = tileBounds.center;
+    const trapBounds = adapter.getBounds(trapObject);
+    const trapCenter = trapBounds.center;
     const { xScale, yScale } = spikeConfig;
-    const effectWidth = tileBounds.width * xScale;
-    const effectHeight = tileBounds.height * yScale;
+    const effectWidth = trapBounds.width * xScale;
+    const effectHeight = trapBounds.height * yScale;
 
-    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
+    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(trapObject);
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -38,7 +38,7 @@ async function create(tile, targets, config = {}) {
         // Hidden/still frame base of the spike trap below tokens
         .effect()
         .file(closest('jb2a.spike_trap.10x10ft.top.base.still_frame.hidden'))
-        .atLocation(tileCenter)
+        .atLocation(trapCenter)
         .fadeIn(250)
         .fadeOut(250)
         .duration(4000)
@@ -48,7 +48,7 @@ async function create(tile, targets, config = {}) {
         // The spike trap snapping/firing above tokens
         .effect()
         .file(closest('jb2a.spike_trap.10x10ft.top.no_base.normal.01.01'))
-        .atLocation(tileCenter)
+        .atLocation(trapCenter)
         .size({ width: effectWidth, height: effectHeight })
         .zIndex(1)
 
@@ -82,13 +82,13 @@ async function create(tile, targets, config = {}) {
     return seq;
 }
 
-async function play(tile, targets, config = {}) {
+async function play(trapObject, targets, config = {}) {
     config = settingsOverride(config);
-    const seq = await create(tile, targets, config);
+    const seq = await create(trapObject, targets, config);
     return seq.play();
 }
 
-async function stop(tile, config = {}) {
+async function stop(trapObject, config = {}) {
     // No persistent effects to stop
 }
 

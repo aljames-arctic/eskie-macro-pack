@@ -16,18 +16,18 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(tile, targets, config = {}) {
+async function create(trapObject, targets, config = {}) {
     config = settingsOverride(config);
     const { reveal, smokeSize, fallenScale, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    if (!tile) return new Sequence();
+    if (!trapObject) return new Sequence();
 
-    const tileBounds = adapter.getBounds(tile);
-    const tileCenter = tileBounds.center;
-    const tileWidth = tileBounds.width;
-    const tileHeight = tileBounds.height;
+    const trapBounds = adapter.getBounds(trapObject);
+    const trapCenter = trapBounds.center;
+    const trapWidth = trapBounds.width;
+    const trapHeight = trapBounds.height;
 
-    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
+    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(trapObject);
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -35,15 +35,15 @@ async function create(tile, targets, config = {}) {
         // Dust puff when trap opens
         .effect()
         .file(closest('jb2a.smoke.puff.ring.01.white.1'))
-        .atLocation(tileCenter)
+        .atLocation(trapCenter)
         .opacity(1)
-        .size({ width: tileWidth * smokeSize, height: tileHeight * smokeSize })
+        .size({ width: trapWidth * smokeSize, height: trapHeight * smokeSize })
         .belowTokens();
 
-    if (reveal && adapter.isDocumentOfType(tile, 'Tile')) {
+    if (reveal && adapter.isDocumentOfType(trapObject, 'Tile')) {
         seq = seq
             .animation()
-            .on(tile)
+            .on(trapObject)
             .show()
             .opacity(1);
     }
@@ -105,27 +105,27 @@ async function create(tile, targets, config = {}) {
     return seq;
 }
 
-async function play(tile, targets, config = {}) {
+async function play(trapObject, targets, config = {}) {
     config = settingsOverride(config);
-    const seq = await create(tile, targets, config);
+    const seq = await create(trapObject, targets, config);
     return seq.play();
 }
 
-async function stop(tile, config = {}) {
+async function stop(trapObject, config = {}) {
     config = settingsOverride(config);
     const { sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    if (!tile) return;
+    if (!trapObject) return;
 
-    const finalTargets = adapter.getTokensInPlaceable(tile);
+    const finalTargets = adapter.getTokensInPlaceable(trapObject);
 
     let seq = new Sequence();
     applySound(seq, sound);
-    if (adapter.isDocumentOfType(tile, 'Tile')) {
+    if (adapter.isDocumentOfType(trapObject, 'Tile')) {
         seq = seq
             // Reset/hide the pit tile
             .animation()
-            .on(tile)
+            .on(trapObject)
             .fadeOut(1000)
             .opacity(0);
     }

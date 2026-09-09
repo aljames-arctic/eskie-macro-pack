@@ -20,26 +20,26 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(tile, targets, config = {}) {
+async function create(trapObject, targets, config = {}) {
     config = settingsOverride(config);
     const { targetLocation, projectileType, sound, repeats, repeatDelay, splashScale } = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInPlaceable(tile);
+    const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInPlaceable(trapObject);
 
-    const tileBounds = adapter.getBounds(tile);
-    const tileCenter = tileBounds.center;
+    const trapBounds = adapter.getBounds(trapObject);
+    const trapCenter = trapBounds.center;
 
     // Retrieve target/landing location from config
     const targetLoc = targetLocation ? adapter.getTargetLocation(targetLocation) : null;
 
     if (!targetLoc) {
-        log.warn(`Projectile Trap: Tile "${tile.id}" has no configured target location.`);
+        log.warn(`Projectile Trap: Placeable "${trapObject.id}" has no configured target location.`);
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;
     }
 
-    if (Math.hypot(targetLoc.x - tileCenter.x, targetLoc.y - tileCenter.y) < 1) {
-        const errorMsg = `Projectile Trap: Placeable "${tile.id}" target location is identical to origin location.`;
+    if (Math.hypot(targetLoc.x - trapCenter.x, targetLoc.y - trapCenter.y) < 1) {
+        const errorMsg = `Projectile Trap: Placeable "${trapObject.id}" target location is identical to origin location.`;
         log.error(errorMsg);
         notify.error(errorMsg);
         throw new Error(errorMsg);
@@ -52,20 +52,20 @@ async function create(tile, targets, config = {}) {
     }
 
     if (projectileType === 'javelin') {
-        const offset = targetLoc.x < tileCenter.x ? -0.15 : 0.15;
+        const offset = targetLoc.x < trapCenter.x ? -0.15 : 0.15;
         seq = seq
             .effect()
             .file(closest('jb2a.javelin.01.throw'))
-            .atLocation(tileCenter, { offset: { y: offset }, gridUnits: true })
+            .atLocation(trapCenter, { offset: { y: offset }, gridUnits: true })
             .stretchTo(targetLoc)
             .startTime(750)
             .waitUntilFinished(-1500);
     } else if (projectileType === 'dart') {
-        const offset = targetLoc.x < tileCenter.x ? -0.15 : 0.15;
+        const offset = targetLoc.x < trapCenter.x ? -0.15 : 0.15;
         seq = seq
             .effect()
             .file(closest('jb2a.dart.01.throw.physical.white'))
-            .atLocation(tileCenter, { offset: { y: offset }, gridUnits: true })
+            .atLocation(trapCenter, { offset: { y: offset }, gridUnits: true })
             .stretchTo(targetLoc, { randomOffset: 0.85, gridUnits: true })
             .startTime(750)
             .repeats(repeats, repeatDelay, repeatDelay);
@@ -73,7 +73,7 @@ async function create(tile, targets, config = {}) {
         seq = seq
             .effect()
             .file(closest('jb2a.arrow.physical.white.01'))
-            .atLocation(tileCenter)
+            .atLocation(trapCenter)
             .stretchTo(targetLoc, { randomOffset: 0.65, gridUnits: true })
             .startTime(350)
             .repeats(repeats, repeatDelay, repeatDelay);
@@ -161,13 +161,13 @@ async function create(tile, targets, config = {}) {
     return seq;
 }
 
-async function play(tile, targets, config = {}) {
+async function play(trapObject, targets, config = {}) {
     config = settingsOverride(config);
-    const seq = await create(tile, targets, config);
+    const seq = await create(trapObject, targets, config);
     return seq.play();
 }
 
-async function stop(tile, config = {}) {
+async function stop(trapObject, config = {}) {
     // No persistent effects to stop
 }
 

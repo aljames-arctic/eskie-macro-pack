@@ -476,8 +476,8 @@ const targetLocation = adapter.getTargetLocation(targetPlaceable);
 const animPlaceables = ${JSON.stringify(originIds)}.map(id => adapter.getPlaceable(id)).filter(Boolean);
 if (animPlaceables.length === 0) return;
 
-// Execute the trap animation for each launcher placeable
-for (const placeable of animPlaceables) {
+// Execute the trap animation for all launcher placeables simultaneously
+const animPromises = animPlaceables.map(placeable => {
     let targets = adapter.getTokensInPlaceable(placeable);
     if (token.id && !targets.some(t => t.id === token.id)) {
         targets.push(token);
@@ -485,18 +485,19 @@ for (const placeable of animPlaceables) {
         targets = [token];
     }
 
-    await ${animation}.play(placeable, targets, ${optionsStr});
-}
+    return ${animation}.play(placeable, targets, ${optionsStr});
+});
 ${tileIds.length > 0 ? `
 // Trigger any linked external MATT tiles concurrently
 for (const id of ${JSON.stringify(tileIds)}) {
     if (id === event.region?.id) continue;
     const tile = canvas.tiles.get(id);
     if (tile?.document?.trigger) {
-        await tile.document.trigger({ token });
+        animPromises.push(tile.document.trigger({ token }));
     }
 }
-` : ''}`.trim();
+` : ''}
+await Promise.all(animPromises);`
 
     const behaviorName = `${trapKey.charAt(0).toUpperCase() + trapKey.slice(1)} Trap (${MODULE_ID})`;
     const events = config.events ?? ['tokenEnter'];

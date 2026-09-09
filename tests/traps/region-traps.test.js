@@ -173,7 +173,8 @@ test('setupRegionTrap: configures RegionDocument flags and creates executeScript
     assert.equal(createdBehaviorData.type, 'executeScript');
     assert.deepEqual(createdBehaviorData.system.events, ['tokenEnter']);
     assert.ok(createdBehaviorData.system.source.includes(`const adapter = game.modules.get('${MODULE_ID}').api.adapter;`));
-    assert.ok(createdBehaviorData.system.source.includes('await eskie.traps.spike.play(placeable, targets,'));
+    assert.ok(createdBehaviorData.system.source.includes('eskie.traps.spike.play(placeable, targets,'));
+    assert.ok(createdBehaviorData.system.source.includes('await Promise.all(animPromises);'));
 
     // Execute the transparent script to verify direct invocation of eskie.traps.spike.play
     let spikePlayed = false;
@@ -408,8 +409,8 @@ test('setupRegionTrap: tileCount === 3 embeds targetLocation in generated script
 
     assert.ok(createdBehaviorData);
     assert.ok(createdBehaviorData.system.source.includes("const targetPlaceable = adapter.getPlaceable('reg-target-fire');"));
-    assert.ok(createdBehaviorData.system.source.includes('targetLocation'));
-    assert.ok(createdBehaviorData.system.source.includes('await eskie.traps.fire.play(placeable, targets,'));
+    assert.ok(createdBehaviorData.system.source.includes('eskie.traps.fire.play(placeable, targets,'));
+    assert.ok(createdBehaviorData.system.source.includes('await Promise.all(animPromises);'));
 
     // Execute generated script to verify targetLocation is passed
     let firePlayed = false;
@@ -443,6 +444,98 @@ test('setupRegionTrap: tileCount === 3 embeds targetLocation in generated script
         data: { token: { id: 'act-tok-fire', object: { id: 'act-tok-fire' } } }
     });
     assert.equal(firePlayed, false, 'Must abort early when targetPlaceable does not exist');
+
+    delete globalThis.eskie;
+    adapter.foundry = new FoundryV12Adapter(adapter);
+    globalThis.game.release = { generation: 12 };
+});
+
+test('setupRegionTrap: multiple trap regions fire simultaneously via Promise.all', async () => {
+    globalThis.game.user = { isGM: true };
+    globalThis.game.release = { generation: 14 };
+    const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
+    const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
+    adapter.foundry = new FoundryV14Adapter(adapter);
+
+    let createdBehaviorData = null;
+    const triggerRegionDoc = {
+        id: 'reg-trig-multi',
+        documentName: 'Region',
+        behaviors: [],
+        update: async () => triggerRegionDoc,
+        createEmbeddedDocuments: async (_type, [data]) => {
+            createdBehaviorData = data;
+            return [{ id: 'beh-multi', ...data }];
+        }
+    };
+
+    const launcher1 = { id: 'reg-launch-1', documentName: 'Region', document: { id: 'reg-launch-1' } };
+    const launcher2 = { id: 'reg-launch-2', documentName: 'Region', document: { id: 'reg-launch-2' } };
+    const launcher3 = { id: 'reg-launch-3', documentName: 'Region', document: { id: 'reg-launch-3' } };
+
+    globalThis.canvas.regions = {
+        controlled: [{ document: triggerRegionDoc, id: 'reg-trig-multi' }],
+        get: (id) => {
+            if (id === 'reg-launch-1') return { document: launcher1, id };
+            if (id === 'reg-launch-2') return { document: launcher2, id };
+            if (id === 'reg-launch-3') return { document: launcher3, id };
+            if (id === 'reg-trig-multi') return { document: triggerRegionDoc, id };
+            return null;
+        }
+    };
+    globalThis.canvas.tiles = { controlled: [], get: () => null };
+
+    let step = 0;
+    adapter.buttonDialog = async () => {
+        step++;
+        if (step === 2) {
+            // Select all 3 launcher regions in step 2
+            globalThis.canvas.regions.controlled = [
+                { document: launcher1, id: 'reg-launch-1' },
+                { document: launcher2, id: 'reg-launch-2' },
+                { document: launcher3, id: 'reg-launch-3' }
+            ];
+        }
+        return 'continue';
+    };
+
+    const result = await setupRegionTrap('eskie.traps.spike', { tileCount: 2 });
+    assert.equal(result.originElements.length, 3);
+
+    assert.ok(createdBehaviorData.system.source.includes('const animPromises = animPlaceables.map('));
+    assert.ok(createdBehaviorData.system.source.includes('await Promise.all(animPromises);'));
+
+    // Verify all 3 animations are triggered concurrently
+    const activeExecutions = [];
+    const executionOrder = [];
+    let maxConcurrent = 0;
+
+    globalThis.eskie = {
+        traps: {
+            spike: {
+                play: async (placeable) => {
+                    activeExecutions.push(placeable.id);
+                    if (activeExecutions.length > maxConcurrent) {
+                        maxConcurrent = activeExecutions.length;
+                    }
+                    // Simulate asynchronous animation sequence runtime
+                    await new Promise(resolve => setTimeout(resolve, 10));
+                    executionOrder.push(placeable.id);
+                    activeExecutions.splice(activeExecutions.indexOf(placeable.id), 1);
+                }
+            }
+        }
+    };
+
+    const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+    const scriptFn = new AsyncFunction('event', createdBehaviorData.system.source);
+    await scriptFn({
+        region: triggerRegionDoc,
+        data: { token: { id: 'act-tok-multi', object: { id: 'act-tok-multi' } } }
+    });
+
+    assert.equal(executionOrder.length, 3, 'All 3 trap regions must execute');
+    assert.equal(maxConcurrent, 3, 'All 3 trap regions must execute simultaneously (maxConcurrent === 3)');
 
     delete globalThis.eskie;
     adapter.foundry = new FoundryV12Adapter(adapter);

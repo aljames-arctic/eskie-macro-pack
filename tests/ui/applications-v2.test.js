@@ -118,6 +118,27 @@ test('RecommendedModulesApp inherits from ApplicationV2 with HandlebarsApplicati
     const context = await app._prepareContext();
     assert.ok(Array.isArray(context.categories));
     assert.ok(context.categories.some(c => c.id === 'assets'));
+
+    // Verify Event Macro Triggering category & subsections
+    const eventCategory = context.categories.find(c => c.id === 'eventTriggering');
+    assert.ok(eventCategory, 'eventTriggering category must exist');
+    assert.ok(eventCategory.subcategories.some(s => s.id === 'regionTriggers'), 'regionTriggers subcategory must exist');
+    assert.ok(eventCategory.subcategories.some(s => s.id === 'tileTriggers'), 'tileTriggers subcategory must exist');
+
+    const regionSub = eventCategory.subcategories.find(s => s.id === 'regionTriggers');
+    assert.ok(regionSub.modules.some(m => m.id === 'foundry-regions'), 'foundry-regions module must exist');
+    assert.ok(regionSub.subStatus, 'regionTriggers must define subStatus');
+
+    const tileSub = eventCategory.subcategories.find(s => s.id === 'tileTriggers');
+    assert.ok(tileSub.modules.some(m => m.id === 'monks-active-tiles'), 'monks-active-tiles must be in tileTriggers');
+
+    // Verify Tagging subcategory under Functionality
+    const funcCategory = context.categories.find(c => c.id === 'functionality');
+    assert.ok(funcCategory, 'functionality category must exist');
+    assert.ok(funcCategory.subcategories.some(s => s.id === 'tagging'), 'tagging subcategory must exist');
+    const taggingSub = funcCategory.subcategories.find(s => s.id === 'tagging');
+    assert.ok(taggingSub.modules.some(m => m.id === 'tagger'), 'tagger must be in tagging subcategory');
+
     const autoCategory = context.categories.find(c => c.id === 'automation');
     assert.ok(autoCategory);
     assert.ok(autoCategory.modules.some(m => m.id === 'boss-loot-assets-premium'));

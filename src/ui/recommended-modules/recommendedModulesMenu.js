@@ -59,10 +59,25 @@ export const RECOMMENDED_CATEGORIES = [
         ]
     },
     {
-        id: "functionality",
-        name: "EMP.recommendedModules.categories.functionality",
-        icon: "fa-solid fa-sliders",
+        id: "eventTriggering",
+        name: "EMP.recommendedModules.categories.eventTriggering",
+        icon: "fa-solid fa-bolt-lightning",
         subcategories: [
+            {
+                id: "regionTriggers",
+                name: "EMP.recommendedModules.subcategories.regionTriggers",
+                icon: "fa-solid fa-draw-polygon",
+                isNative: true,
+                modules: [
+                    {
+                        id: "foundry-regions",
+                        isNative: true,
+                        name: "EMP.recommendedModules.modules.foundryRegions.name",
+                        description: "EMP.recommendedModules.modules.foundryRegions.description",
+                        icon: "fa-solid fa-draw-polygon"
+                    }
+                ]
+            },
             {
                 id: "tileTriggers",
                 name: "EMP.recommendedModules.subcategories.tileTriggers",
@@ -73,7 +88,21 @@ export const RECOMMENDED_CATEGORIES = [
                         name: "EMP.recommendedModules.modules.matt.name",
                         description: "EMP.recommendedModules.modules.matt.description",
                         icon: "fa-solid fa-vector-square"
-                    },
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        id: "functionality",
+        name: "EMP.recommendedModules.categories.functionality",
+        icon: "fa-solid fa-sliders",
+        subcategories: [
+            {
+                id: "tagging",
+                name: "EMP.recommendedModules.subcategories.tagging",
+                icon: "fa-solid fa-tags",
+                modules: [
                     {
                         id: "tagger",
                         name: "EMP.recommendedModules.modules.tagger.name",
@@ -127,6 +156,23 @@ export const RECOMMENDED_CATEGORIES = [
 ];
 
 function processModule(mod) {
+    if (mod.isNative) {
+        const isSupported = Boolean(adapter.supportsRegionBehaviors);
+        return {
+            ...mod,
+            name: game.i18n?.localize(mod.name) ?? mod.name,
+            description: game.i18n?.localize(mod.description) ?? mod.description,
+            note: mod.note ? (game.i18n?.localize(mod.note) ?? mod.note) : null,
+            statusKey: "native",
+            statusLabel: isSupported
+                ? (game.i18n?.localize("EMP.recommendedModules.status.nativeSupported") ?? "Native Support")
+                : (game.i18n?.localize("EMP.recommendedModules.status.nativeV14") ?? "Requires Foundry v14+"),
+            statusClass: isSupported ? "native" : "disabled",
+            statusIcon: isSupported ? "fa-solid fa-circle-check" : "fa-solid fa-circle-info",
+            isActive: isSupported
+        };
+    }
+
     const primaryMod = game.modules?.get(mod.id);
     let activeMod = null;
     let isInstalled = false;
@@ -244,7 +290,17 @@ export class RecommendedModulesApp extends adapter.foundry.HandlebarsApplication
                     const processedModules = sub.modules.map(processModule);
                     let subStatus = null;
 
-                    if (sub.requireOne) {
+                    if (sub.isNative) {
+                        const isSupported = Boolean(adapter.supportsRegionBehaviors);
+                        subStatus = {
+                            isSupported,
+                            statusClass: isSupported ? "native" : "warning",
+                            statusIcon: isSupported ? "fa-solid fa-check-circle" : "fa-solid fa-circle-info",
+                            statusLabel: isSupported
+                                ? (game.i18n?.localize("EMP.recommendedModules.status.nativeSupported") ?? "Native Support")
+                                : (game.i18n?.localize("EMP.recommendedModules.status.nativeV14") ?? "Requires Foundry v14+")
+                        };
+                    } else if (sub.requireOne) {
                         const hasActive = processedModules.some(m => m.isActive);
                         subStatus = {
                             isSupported: hasActive,

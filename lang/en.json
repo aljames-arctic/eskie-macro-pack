@@ -80,7 +80,9 @@
                 "disabled": "Disabled",
                 "missing": "Not Installed",
                 "supported": "Supported (1 Active)",
-                "requireOne": "Requires at least one of"
+                "requireOne": "Requires at least one of",
+                "nativeSupported": "Native Support",
+                "nativeV14": "Requires Foundry v14+"
             },
             "types": {
                 "recommended": "Recommended",
@@ -88,16 +90,23 @@
             },
             "categories": {
                 "assets": "Assets",
+                "eventTriggering": "Event Macro Triggering",
                 "functionality": "Functionality",
                 "automation": "Automation"
             },
             "subcategories": {
                 "visual": "Visual Assets",
                 "sound": "Sound Assets",
-                "tileTriggers": "Tile Triggers & Tagging",
+                "regionTriggers": "Region Triggering",
+                "tileTriggers": "Tile Triggering",
+                "tagging": "Tagging",
                 "objectAttaching": "Object Attaching & Linking"
             },
             "modules": {
+                "foundryRegions": {
+                    "name": "Foundry V14+ Scene Regions",
+                    "description": "Natively triggers EMP trap macros, zone animations, and interactive scene events via Region Behaviors without requiring third-party modules."
+                },
                 "eskieEffects": {
                     "name": "Eskie Effects (Patreon or Free)",
                     "description": "Custom visual assets, textures, token masks, and sound effects designed specifically for Eskie Macro Pack animations."

@@ -113,18 +113,23 @@ export async function executeTrapTrigger(context, ...rest) {
                     ?? {}
                 );
 
-                // Resolve target placeable (for 3-placeable traps)
-                const targetIds = regionDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds')
-                    ?? regionDoc.flags?.[MODULE_ID]?.trap?.trapTargetTileIds
+                // Resolve target placeable (Region or Tile for 3-placeable traps)
+                const targetIds = regionDoc.getFlag?.(MODULE_ID, 'trap.targetRegionIds')
+                    ?? regionDoc.flags?.[MODULE_ID]?.trap?.targetRegionIds
                     ?? regionDoc.getFlag?.(MODULE_ID, 'trap.targetTileIds')
                     ?? regionDoc.flags?.[MODULE_ID]?.trap?.targetTileIds
+                    ?? regionDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds')
+                    ?? regionDoc.flags?.[MODULE_ID]?.trap?.trapTargetTileIds
                     ?? [];
                 const targetId = targetIds[0]
+                    ?? regionDoc.getFlag?.(MODULE_ID, 'trap.targetRegionId')
+                    ?? regionDoc.flags?.[MODULE_ID]?.trap?.targetRegionId
                     ?? regionDoc.getFlag?.(MODULE_ID, 'trap.targetTileId')
                     ?? regionDoc.flags?.[MODULE_ID]?.trap?.targetTileId;
                 if (targetId) {
                     const targetPlaceable = adapter.getPlaceable(targetId);
                     if (targetPlaceable) {
+                        trapConfig.targetLocation = adapter.getTargetLocation(targetPlaceable);
                         trapConfig.targetTile = targetPlaceable;
                     }
                 }
@@ -208,17 +213,23 @@ export async function executeTrapTrigger(context, ...rest) {
                     ?? {}
                 );
 
-                const targetIds = tileDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds')
-                    ?? tileDoc.flags?.[MODULE_ID]?.trap?.trapTargetTileIds
+                // Resolve target placeable (Region or Tile for 3-placeable traps)
+                const targetIds = tileDoc.getFlag?.(MODULE_ID, 'trap.targetRegionIds')
+                    ?? tileDoc.flags?.[MODULE_ID]?.trap?.targetRegionIds
                     ?? tileDoc.getFlag?.(MODULE_ID, 'trap.targetTileIds')
                     ?? tileDoc.flags?.[MODULE_ID]?.trap?.targetTileIds
+                    ?? tileDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds')
+                    ?? tileDoc.flags?.[MODULE_ID]?.trap?.trapTargetTileIds
                     ?? [];
                 const targetId = targetIds[0]
+                    ?? tileDoc.getFlag?.(MODULE_ID, 'trap.targetRegionId')
+                    ?? tileDoc.flags?.[MODULE_ID]?.trap?.targetRegionId
                     ?? tileDoc.getFlag?.(MODULE_ID, 'trap.targetTileId')
                     ?? tileDoc.flags?.[MODULE_ID]?.trap?.targetTileId;
                 if (targetId) {
                     const targetPlaceable = adapter.getPlaceable(targetId);
                     if (targetPlaceable) {
+                        trapConfig.targetLocation = adapter.getTargetLocation(targetPlaceable);
                         trapConfig.targetTile = targetPlaceable;
                     }
                 }
@@ -465,6 +476,16 @@ if (adapter) {
 
         if (tileCount === 3) {
             updateData[`flags.${MODULE_ID}.trap.trapTargetTileIds`] = targetElements.map(e => e.id);
+            const targetRegionIds = targetElements.filter(e => adapter.isDocumentOfType(e, 'Region')).map(e => e.id);
+            const targetTileIds = targetElements.filter(e => adapter.isDocumentOfType(e, 'Tile')).map(e => e.id);
+            if (targetRegionIds.length > 0) {
+                updateData[`flags.${MODULE_ID}.trap.targetRegionIds`] = targetRegionIds;
+                updateData[`flags.${MODULE_ID}.trap.targetRegionId`] = targetRegionIds[0];
+            }
+            if (targetTileIds.length > 0) {
+                updateData[`flags.${MODULE_ID}.trap.targetTileIds`] = targetTileIds;
+                updateData[`flags.${MODULE_ID}.trap.targetTileId`] = targetTileIds[0];
+            }
         }
 
         const tileIds = originElements.filter(e => adapter.isDocumentOfType(e, 'Tile')).map(e => e.id);

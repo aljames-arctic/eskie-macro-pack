@@ -308,3 +308,135 @@ test('setupRegionTrap: tileCount === 1 bypasses step 2 and uses trigger region a
     globalThis.game.release = { generation: 12 };
 });
 
+test('executeTrapTrigger: passes targetLocation {x, y} to trap.play() for region and tile targets', async () => {
+    const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
+    const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
+    adapter.foundry = new FoundryV14Adapter(adapter);
+    globalThis.game.release = { generation: 14 };
+
+    let receivedConfig = null;
+
+    globalThis.eskie = {
+        traps: {
+            mock3PartTrap: {
+                play: async (_tile, _targets, config) => {
+                    receivedConfig = config;
+                }
+            }
+        }
+    };
+
+    // 1. Target is a Region placeable
+    const targetRegionDoc = {
+        id: 'target-region-1',
+        documentName: 'Region',
+        origin: { x: 500, y: 700 },
+        shapes: []
+    };
+    const targetRegionPlaceable = { id: 'target-region-1', document: targetRegionDoc };
+
+    const mockRegionDoc = {
+        id: 'reg-trig-3p',
+        documentName: 'Region',
+        getFlag: (_mod, key) => {
+            if (key === 'trap.animation') return 'eskie.traps.mock3PartTrap';
+            if (key === 'trap.originIds') return ['tile-launcher-1'];
+            if (key === 'trap.trapTargetTileIds') return ['target-region-1'];
+            if (key === 'trap.config') return {};
+            return null;
+        }
+    };
+
+    const launcherTile = { id: 'tile-launcher-1', documentName: 'Tile', document: { id: 'tile-launcher-1' } };
+
+    globalThis.canvas.tiles = {
+        get: (id) => (id === 'tile-launcher-1' ? launcherTile : null)
+    };
+    globalThis.canvas.regions = {
+        get: (id) => (id === 'target-region-1' ? targetRegionPlaceable : (id === 'reg-trig-3p' ? { document: mockRegionDoc, id } : null))
+    };
+
+    const mockEvent = { data: { token: { id: 'tok-1', object: { id: 'tok-1' } } } };
+
+    await executeTrapTrigger(mockRegionDoc, null, mockEvent);
+
+    assert.ok(receivedConfig, 'Trap should have received configuration');
+    assert.deepEqual(receivedConfig.targetLocation, { x: 500, y: 700 }, 'targetLocation should be the origin of the target region');
+
+    // 2. Target is a Tile placeable
+    const targetTileDoc = {
+        id: 'target-tile-1',
+        documentName: 'Tile',
+        document: { x: 100, y: 200, width: 2, height: 2 }
+    };
+    const targetTilePlaceable = { id: 'target-tile-1', document: targetTileDoc.document };
+
+    const mockRegionDoc2 = {
+        id: 'reg-trig-3p2',
+        documentName: 'Region',
+        getFlag: (_mod, key) => {
+            if (key === 'trap.animation') return 'eskie.traps.mock3PartTrap';
+            if (key === 'trap.originIds') return ['tile-launcher-1'];
+            if (key === 'trap.trapTargetTileIds') return ['target-tile-1'];
+            if (key === 'trap.config') return {};
+            return null;
+        }
+    };
+
+    globalThis.canvas.tiles.get = (id) => (id === 'target-tile-1' ? targetTilePlaceable : (id === 'tile-launcher-1' ? launcherTile : null));
+
+    await executeTrapTrigger(mockRegionDoc2, null, mockEvent);
+
+    assert.ok(receivedConfig, 'Trap should have received configuration');
+    // gridSize is 100, so center of 100,200 with width 2, height 2 is 200, 300
+    assert.deepEqual(receivedConfig.targetLocation, { x: 200, y: 300 }, 'targetLocation should be the center of the target tile');
+
+    delete globalThis.eskie;
+    adapter.foundry = new FoundryV12Adapter(adapter);
+    globalThis.game.release = { generation: 12 };
+});
+
+test('Trap macros accept targetLocation: { x, y } coordinates directly', async () => {
+    globalThis.game.modules.set('jb2a_patreon', { id: 'jb2a_patreon', active: true });
+    globalThis.game.modules.set('eskie-effects', { id: 'eskie-effects', active: true });
+    const origGetEntry = Sequencer.Database.getEntry;
+    Sequencer.Database.getEntry = (path) => ({ file: path });
+    const origEntryExists = Sequencer.Database.entryExists;
+    Sequencer.Database.entryExists = () => true;
+
+    try {
+        const { bullRushStatue } = await import('../../src/animation/traps/bull-rush-statue.js');
+        const { projectile } = await import('../../src/animation/traps/projectile.js');
+        const { fire } = await import('../../src/animation/traps/fire.js');
+        const { rollingBoulder } = await import('../../src/animation/traps/rolling-boulder.js');
+
+        const mockOriginTile = {
+            id: 'tile-origin-1',
+            documentName: 'Tile',
+            document: { x: 100, y: 100, width: 1, height: 1, texture: { src: 'tile.png' } },
+            center: { x: 150, y: 150 }
+        };
+
+        const targetLocation = { x: 800, y: 900 };
+
+        const seqBullRush = await bullRushStatue.create(mockOriginTile, [], { targetLocation, textureSrc: 'statue.png' });
+        assert.ok(seqBullRush, 'bullRushStatue should create Sequence when given targetLocation');
+
+        const seqProjectile = await projectile.create(mockOriginTile, [], { targetLocation });
+        assert.ok(seqProjectile, 'projectile should create Sequence when given targetLocation');
+
+        const seqFire = await fire.create(mockOriginTile, [], { targetLocation });
+        assert.ok(seqFire, 'fire should create Sequence when given targetLocation');
+
+        const seqBoulder = await rollingBoulder.create(mockOriginTile, [], { targetLocation });
+        assert.ok(seqBoulder, 'rollingBoulder should create Sequence when given targetLocation');
+    } finally {
+        Sequencer.Database.getEntry = origGetEntry;
+        Sequencer.Database.entryExists = origEntryExists;
+        globalThis.game.modules.delete('jb2a_patreon');
+        globalThis.game.modules.delete('eskie-effects');
+    }
+});
+
+
+

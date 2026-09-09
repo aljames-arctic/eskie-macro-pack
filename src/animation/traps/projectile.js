@@ -12,6 +12,7 @@ import { adapter } from '../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../utils/sound.js';
 
 const DEFAULT_CONFIG = {
+    targetLocation: null,
     targetTile: null,
     projectileType: 'arrow',
     repeats: 10,
@@ -22,17 +23,19 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { targetTile, projectileType, sound, repeats, repeatDelay, splashScale } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { targetLocation, targetTile, projectileType, sound, repeats, repeatDelay, splashScale } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInPlaceable(tile);
 
     const tileBounds = adapter.getBounds(tile);
     const tileCenter = tileBounds.center;
 
-    // Retrieve target/landing tile from config
-    const targetLoc = adapter.getCenter(targetTile);
+    // Retrieve target/landing location from config
+    const targetLoc = targetLocation
+        ? adapter.getTargetLocation(targetLocation)
+        : (targetTile ? adapter.getTargetLocation(targetTile) : null);
 
     if (!targetLoc) {
-        log.warn(`Projectile Trap: Tile "${tile.id}" has no configured target tile.`);
+        log.warn(`Projectile Trap: Tile "${tile.id}" has no configured target location.`);
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;

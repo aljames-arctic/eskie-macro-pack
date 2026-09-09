@@ -12,6 +12,7 @@ import { log } from '../../lib/logger.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
+    targetLocation: null,
     targetTile: null,
     pushDistance: 1,
     sound: { ...DEFAULT_SOUND_CONFIG },
@@ -19,7 +20,7 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { targetTile, pushDistance, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { targetLocation, targetTile, pushDistance, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const targetList = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
     const target = targetList.length ? targetList[0] : null;
@@ -30,10 +31,12 @@ async function create(tile, targets, config = {}) {
     const tileWidth = tileBounds.width;
     const tileHeight = tileBounds.height;
 
-    const targetLoc = adapter.getCenter(targetTile);
+    const targetLoc = targetLocation
+        ? adapter.getTargetLocation(targetLocation)
+        : (targetTile ? adapter.getTargetLocation(targetTile) : null);
 
     if (!targetLoc) {
-        log.warn(`Bull Rush Statue Trap: Tile "${tile.id}" has no configured target tile.`);
+        log.warn(`Bull Rush Statue Trap: Tile "${tile.id}" has no configured target location.`);
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;

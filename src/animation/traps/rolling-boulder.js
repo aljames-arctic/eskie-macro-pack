@@ -12,6 +12,7 @@ import { log } from '../../lib/logger.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
+    targetLocation: null,
     targetTile: null,
     boulder: {
         src: 'jb2a.rolling_boulder.loop.01.rock.brown',
@@ -24,21 +25,24 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { targetTile, boulder, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { targetLocation, targetTile, boulder, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    if (!targetTile) {
-        log.warn(`Rolling Boulder Trap: Tile "${tile.id}" has no configured end tile.`);
+    const endLoc = targetLocation
+        ? adapter.getTargetLocation(targetLocation)
+        : (targetTile ? adapter.getTargetLocation(targetTile) : null);
+
+    if (!endLoc) {
+        log.warn(`Rolling Boulder Trap: Placeable "${tile.id}" has no configured destination location.`);
         ui.notifications.warn(game.i18n.format('EMP.traps.rollingBoulder.noEndTile', { id: tile.id }));
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;
     }
 
-    const startLoc = adapter.getCenter(tile);
-    const endLoc = adapter.getCenter(targetTile);
+    const startLoc = adapter.getTargetLocation(tile);
 
     if (!startLoc || !endLoc) {
-        log.warn(`Rolling Boulder Trap: Could not resolve coordinates for start or end tile.`);
+        log.warn(`Rolling Boulder Trap: Could not resolve coordinates for start or end location.`);
         let seq = new Sequence();
         applySound(seq, sound);
         return seq;

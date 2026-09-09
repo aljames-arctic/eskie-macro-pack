@@ -222,6 +222,8 @@ async function setup(animation, config = {}) {
             updateData[`flags.${MODULE_ID}.trap.animation`] = animation;
             if (tileCount === 3) {
                 updateData[`flags.${MODULE_ID}.trap.trapTargetTileIds`] = targetTiles.map(t => t.id);
+                updateData[`flags.${MODULE_ID}.trap.targetTileIds`] = targetTiles.map(t => t.id);
+                updateData[`flags.${MODULE_ID}.trap.targetTileId`] = targetTiles[0]?.id ?? null;
             }
             if (config.extraFlags) {
                 for (const [k, v] of Object.entries(config.extraFlags)) {
@@ -251,12 +253,13 @@ async function setup(animation, config = {}) {
 
             const trapActionCode = `
 // Resolve the concrete Tile placeables from MATT execution scope
+const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter;
 const tilePlaceable = tile.object ?? canvas.tiles.get(tile.id);
-${targetTileId ? `const targetTile = canvas.tiles.get('${targetTileId}');` : ''}
+${targetTileId ? `const targetTile = canvas.tiles.get('${targetTileId}');
+const targetLocation = targetTile ? adapter.getTargetLocation(targetTile) : null;` : ''}
 
 // Get the specific Eskie Trap Animation Function if this tile is a trap tile
 const animation = tile.getFlag('${MODULE_ID}', 'trap.animation');
-const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter;
 const promises = [];
 
 if (animation) {
@@ -278,7 +281,7 @@ if (animation) {
             }
 
             // Play the trap animation with the contained tokens as targets
-            await trap.play(tilePlaceable, targets, { ...${JSON.stringify(trapConfig)}${targetTileId ? ', targetTile' : ''} });
+            await trap.play(tilePlaceable, targets, { ...${JSON.stringify(trapConfig)}${targetTileId ? ', targetLocation, targetTile' : ''} });
         } catch (err) {
             console.error('Eskie Macro Pack | Failed to play trap animation "' + animation + '" on tile "' + tile.id + '":', err);
             throw err;

@@ -427,15 +427,6 @@ class Adapter {
 
 export const adapter = new Adapter();
 
-try {
-    const moduleRecord = game.modules.get('eskie-macros');
-    if (moduleRecord) {
-        moduleRecord.api = { ...moduleRecord.api, adapter };
-    }
-} catch {
-    // game not initialized yet
-}
-
 export {
     Adapter,
     BaseFoundryAdapter,

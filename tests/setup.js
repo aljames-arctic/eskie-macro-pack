@@ -375,3 +375,9 @@ globalThis.ui = {
         error: () => {}
     }
 };
+
+const { adapter, Adapter } = await import('../src/adapters/index.js');
+const empModule = globalThis.game.modules.get('eskie-macros');
+if (empModule) {
+    empModule.api = { ...empModule.api, adapter, Adapter };
+}

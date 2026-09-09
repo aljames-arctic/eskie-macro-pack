@@ -422,9 +422,7 @@
             },
             "fallingSky": {
                 "step2Title": "Trap Setup - Falling from the Sky: Step 2 (Crater Tile - Optional)",
-                "step2Content": "<p>Select the <strong>Crater / Landing Tile (Optional)</strong> on the canvas if you have a crater decal to reveal on impact.</p><p>💡 <em>If you do not have a crater tile, leave your Trigger Region selected and click <strong>Continue</strong>.</em></p>",
-                "step3Title": "Trap Setup - Falling from the Sky: Step 3 (Target Area)",
-                "step3Content": "<p>Select the <strong>Target Tile or Region</strong> on the canvas where tokens will crash.</p><p>Click <strong>Continue</strong> once selected.</p>"
+                "step2Content": "<p>Select the <strong>Crater / Landing Tile (Optional)</strong> on the canvas if you have a crater decal to reveal on impact.</p><p>💡 <em>If you do not have a crater tile, leave your Trigger Region selected and click <strong>Continue</strong>.</em></p>"
             },
             "spike": {
                 "step2Content": "<p>Select the <strong>Spike Zone</strong> where spikes will emerge.</p><p>💡 <em>No tiles required. Leave your Trigger Region selected to play spikes over the trigger area.</em></p>"

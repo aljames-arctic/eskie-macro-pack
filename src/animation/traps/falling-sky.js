@@ -11,7 +11,6 @@ import { setupTrap } from './trap-manager.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
-    targetLocation: null,
     reveal: true,
     smokeSize: 2,
     startScale: 3,
@@ -23,7 +22,7 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { targetLocation, reveal, smokeSize, startScale, fallenScale, randomDelay, color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { reveal, smokeSize, startScale, fallenScale, randomDelay, color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Target selection:
     // 1. Tokens passed explicitly
@@ -152,7 +151,7 @@ async function stop(tile, config = {}) {
 }
 
 async function setup(config = {}) {
-    return setupTrap('eskie.traps.fallingSky', { tileCount: 3, ...config });
+    return setupTrap('eskie.traps.fallingSky', config);
 }
 
 export const fallingSky = {

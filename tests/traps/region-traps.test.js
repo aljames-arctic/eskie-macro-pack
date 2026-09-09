@@ -413,6 +413,12 @@ test('Trap macros accept targetLocation: { x, y } coordinates directly', async (
         const { rollingBoulder } = await import('../../src/animation/traps/rolling-boulder.js');
         const { fallingSky } = await import('../../src/animation/traps/falling-sky.js');
 
+        assert.equal(bullRushStatue.default_config.targetLocation, null, 'bullRushStatue must have targetLocation in default_config');
+        assert.equal(projectile.default_config.targetLocation, null, 'projectile must have targetLocation in default_config');
+        assert.equal(fire.default_config.targetLocation, null, 'fire must have targetLocation in default_config');
+        assert.equal(rollingBoulder.default_config.targetLocation, null, 'rollingBoulder must have targetLocation in default_config');
+        assert.equal(fallingSky.default_config.targetLocation, undefined, 'fallingSky must not have targetLocation in default_config');
+
         assert.equal(bullRushStatue.default_config.targetTile, undefined, 'bullRushStatue must not have targetTile in default_config');
         assert.equal(projectile.default_config.targetTile, undefined, 'projectile must not have targetTile in default_config');
         assert.equal(fire.default_config.targetTile, undefined, 'fire must not have targetTile in default_config');
@@ -440,8 +446,8 @@ test('Trap macros accept targetLocation: { x, y } coordinates directly', async (
         const seqBoulder = await rollingBoulder.create(mockOriginTile, [], { targetLocation });
         assert.ok(seqBoulder, 'rollingBoulder should create Sequence when given targetLocation');
 
-        const seqFallingSky = await fallingSky.create(mockOriginTile, [], { targetLocation });
-        assert.ok(seqFallingSky, 'fallingSky should create Sequence when given targetLocation');
+        const seqFallingSky = await fallingSky.create(mockOriginTile, []);
+        assert.ok(seqFallingSky, 'fallingSky should create Sequence without requiring targetLocation');
     } finally {
         Sequencer.Database.getEntry = origGetEntry;
         Sequencer.Database.entryExists = origEntryExists;

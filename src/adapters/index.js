@@ -387,6 +387,14 @@ class Adapter {
         return this.foundry.containsPoint(object, point);
     }
 
+    getRegionOrigin(region) {
+        return this.foundry.getRegionOrigin(region);
+    }
+
+    getTargetLocation(target) {
+        return this.foundry.getTargetLocation(target);
+    }
+
     async executeTrapTrigger(context, ...args) {
         const { executeTrapTrigger: runner } = await import('../animation/traps/trap-manager.js');
         return runner(context, ...args);

@@ -1301,4 +1301,58 @@ export class BaseFoundryAdapter {
         const { minX, maxX, minY, maxY } = this.getBounds(object);
         return point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY;
     }
+
+    /**
+     * Resolves the origin point { x, y } for a Region placeable or document.
+     * @param {Region|RegionDocument|null} region Target Region
+     * @returns {{ x: number, y: number }} Origin coordinates
+     */
+    getRegionOrigin(region) {
+        if (!region) return { x: 0, y: 0 };
+        const doc = region.document ?? region;
+        if (doc.origin?.x !== undefined && doc.origin?.y !== undefined) {
+            return { x: doc.origin.x, y: doc.origin.y };
+        }
+        if (region.origin?.x !== undefined && region.origin?.y !== undefined) {
+            return { x: region.origin.x, y: region.origin.y };
+        }
+        if (doc.x !== undefined && doc.y !== undefined) {
+            return { x: doc.x, y: doc.y };
+        }
+        if (region.x !== undefined && region.y !== undefined) {
+            return { x: region.x, y: region.y };
+        }
+        const shapes = doc.shapes?.contents ?? doc.shapes ?? region.shapes ?? [];
+        const shape = shapes[0] ?? doc.toObject?.()?.shapes?.[0] ?? null;
+        if (shape) {
+            if (Array.isArray(shape.points) && shape.points.length >= 2) {
+                return { x: shape.points[0], y: shape.points[1] };
+            }
+            if (shape.x !== undefined && shape.y !== undefined) {
+                return { x: shape.x, y: shape.y };
+            }
+        }
+        const bounds = this.getRegionBounds(region);
+        return { x: bounds.minX, y: bounds.minY };
+    }
+
+    /**
+     * Resolves the target location { x, y } for a placeable, document, or coordinate point.
+     * For regions: resolves the origin point { x, y }.
+     * For tiles: resolves the center point { x, y }.
+     * @param {PlaceableObject|Document|{x: number, y: number}|null} target Target placeable, document, or coordinate point
+     * @returns {{ x: number, y: number }|null} Target location coordinates
+     */
+    getTargetLocation(target) {
+        if (!target) return null;
+        if (target.x !== undefined && target.y !== undefined && !target.document && !target.object && target.width === undefined && target.height === undefined && !target.shapes) {
+            return { x: target.x, y: target.y };
+        }
+        const doc = target.document ?? target;
+        const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(target.shapes) || (Boolean(doc.bounds) && !doc.texture);
+        if (isRegion) {
+            return this.getRegionOrigin(target);
+        }
+        return this.getCenter(target);
+    }
 }

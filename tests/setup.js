@@ -30,6 +30,19 @@ globalThis.tokenAttacher = undefined;
 globalThis.MassEdit = undefined;
 globalThis.socketlib = undefined;
 globalThis.adapter = undefined;
+globalThis.Sequence = class Sequence {
+    constructor() {
+        const handler = {
+            get(_t, prop) {
+                if (prop === 'play') return async () => proxy;
+                if (prop === 'then') return undefined;
+                return (..._args) => proxy;
+            }
+        };
+        const proxy = new Proxy(this, handler);
+        return proxy;
+    }
+};
 globalThis.Sequencer = {
     EffectManager: {
         endEffects: () => {}

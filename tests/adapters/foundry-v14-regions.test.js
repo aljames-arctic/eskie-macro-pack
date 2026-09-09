@@ -245,3 +245,74 @@ test('FoundryV14Adapter: getPlaceableTexture resolves linked tile flags on Regio
     };
     assert.equal(v14.getPlaceableTexture(pureRegion), null);
 });
+
+test('FoundryV14Adapter & BaseFoundryAdapter: getTargetLocation resolves origin for regions and center for tiles', () => {
+    const v14 = new FoundryV14Adapter();
+
+    // 1. Tile placeable -> resolves center
+    const mockTile = {
+        id: 'tile-target-loc-1',
+        documentName: 'Tile',
+        document: {
+            x: 200,
+            y: 300,
+            width: 2,
+            height: 2
+        }
+    };
+    // getGridSize is 100 in test setup
+    const tileLoc = v14.getTargetLocation(mockTile);
+    assert.deepEqual(tileLoc, { x: 300, y: 400 }, 'Tile target location must be the center point');
+
+    // 2. Region with explicit origin point
+    const regionWithOrigin = {
+        documentName: 'Region',
+        document: {
+            origin: { x: 150, y: 250 },
+            shapes: []
+        }
+    };
+    const regLoc1 = v14.getTargetLocation(regionWithOrigin);
+    assert.deepEqual(regLoc1, { x: 150, y: 250 }, 'Region with origin property must resolve its origin point');
+
+    // 3. Region with polygon shape -> resolves first point as origin
+    const polygonRegion = {
+        documentName: 'Region',
+        document: {
+            shapes: [
+                {
+                    type: 'polygon',
+                    points: [450, 550, 700, 800, 400, 900]
+                }
+            ]
+        }
+    };
+    const regLoc2 = v14.getTargetLocation(polygonRegion);
+    assert.deepEqual(regLoc2, { x: 450, y: 550 }, 'Region with polygon must resolve its first vertex as origin');
+
+    // 4. Region with rectangle/circle shape -> resolves shape.x, shape.y as origin
+    const circleRegion = {
+        documentName: 'Region',
+        document: {
+            shapes: [
+                {
+                    type: 'circle',
+                    x: 600,
+                    y: 750,
+                    radius: 100
+                }
+            ]
+        }
+    };
+    const regLoc3 = v14.getTargetLocation(circleRegion);
+    assert.deepEqual(regLoc3, { x: 600, y: 750 }, 'Region with circle must resolve shape x,y as origin');
+
+    // 5. Raw coordinate point { x, y } -> preserves coordinates
+    const rawPoint = { x: 1234, y: 5678 };
+    const pointLoc = v14.getTargetLocation(rawPoint);
+    assert.deepEqual(pointLoc, { x: 1234, y: 5678 }, 'Raw coordinate point must return exact coordinates');
+
+    // 6. Null input -> returns null
+    assert.equal(v14.getTargetLocation(null), null);
+});
+

@@ -215,8 +215,16 @@ async function setup(animation, config = {}) {
         const updateData = {};
 
         if (isTrigger) {
+            const existingOriginIds = tileDoc.getFlag?.(MODULE_ID, 'trap.originIds')
+                ?? tileDoc.flags?.[MODULE_ID]?.trap?.originIds
+                ?? [];
+            const originIdList = originTiles.map(t => t.id);
+            const combinedOriginIds = [...new Set([
+                ...(Array.isArray(existingOriginIds) ? existingOriginIds : []),
+                ...originIdList
+            ])];
             updateData[`flags.${MODULE_ID}.trap.isTriggerTile`] = true;
-            updateData[`flags.${MODULE_ID}.trap.originIds`] = originTiles.map(t => t.id);
+            updateData[`flags.${MODULE_ID}.trap.originIds`] = combinedOriginIds;
         }
 
         if (isTrap) {
@@ -261,7 +269,7 @@ ${targetTileId ? `const targetTile = canvas.tiles.get('${targetTileId}');
 const targetLocation = targetTile ? adapter.getTargetLocation(targetTile) : null;` : ''}
 
 // Get the specific Eskie Trap Animation Function if this tile is a trap tile
-const animation = tile.getFlag('${MODULE_ID}', 'trap.animation');
+const animation = ${isTrap ? `'${animation}'` : `tile.getFlag('${MODULE_ID}', 'trap.animation')`};
 const promises = [];
 
 if (animation) {
@@ -292,7 +300,7 @@ if (animation) {
 }
 
 // Manually activate any other linked trap tiles concurrently
-const originIds = (tile.getFlag('${MODULE_ID}', 'trap.originIds') ?? []).filter(id => id !== tile.id);
+const originIds = (${isTrigger ? JSON.stringify(originTiles.map(t => t.id)) : `null`} ?? tile.getFlag('${MODULE_ID}', 'trap.originIds') ?? []).filter(id => id !== tile.id);
 for (const id of originIds) {
     const originTile = canvas.tiles.get(id);
     if (!originTile) continue;
@@ -302,13 +310,27 @@ for (const id of originIds) {
 await Promise.all(promises);
 `;
 
-            updateData['flags.monks-active-tiles.active'] = true;
-            updateData['flags.monks-active-tiles.trigger'] = trigger;
-            updateData['flags.monks-active-tiles.actions'] = [{
+            const existingTrigger = tileDoc.getFlag?.('monks-active-tiles', 'trigger')
+                ?? tileDoc.flags?.['monks-active-tiles']?.trigger;
+            const resolvedTrigger = isTrigger
+                ? trigger
+                : (existingTrigger ?? trigger);
+
+            const existingActions = tileDoc.getFlag?.('monks-active-tiles', 'actions')
+                ?? tileDoc.flags?.['monks-active-tiles']?.actions
+                ?? [];
+            const newAction = {
                 id: adapter.randomID(),
                 action: 'runcode',
                 data: { code: trapActionCode },
-            }];
+            };
+
+            updateData['flags.monks-active-tiles.active'] = true;
+            updateData['flags.monks-active-tiles.trigger'] = resolvedTrigger;
+            updateData['flags.monks-active-tiles.actions'] = [
+                ...(Array.isArray(existingActions) ? existingActions : []),
+                newAction
+            ];
             updateData['flags.monks-active-tiles.controlled'] = config.controlled ?? 'gm';
         }
 

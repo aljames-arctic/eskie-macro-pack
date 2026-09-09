@@ -570,5 +570,75 @@ test('Fire trap resolves distinct center coordinates for 3-region setups and gua
     }
 });
 
+test('setupRegionTrap: appends new executeScript RegionBehavior without overwriting existing behaviors', async () => {
+    globalThis.game.user = { isGM: true };
+    globalThis.game.release = { generation: 14 };
+    const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
+    adapter.foundry = new FoundryV14Adapter(adapter);
+
+    const existingBehavior = {
+        id: 'beh-existing-1',
+        name: 'Existing Custom Trap (eskie-macro-pack)',
+        type: 'executeScript',
+        system: { events: ['tokenEnter'], source: '// existing code' },
+        getFlag: (mod, key) => (mod === MODULE_ID && key === 'trap.isTrapBehavior' ? true : null),
+        update: async () => {
+            throw new Error('Should not update/overwrite existing behavior');
+        }
+    };
+
+    const createdBehaviors = [];
+    const triggerRegionDoc = {
+        id: 'region-multi-beh',
+        documentName: 'Region',
+        behaviors: [existingBehavior],
+        flags: {
+            [MODULE_ID]: {
+                trap: {
+                    isTriggerRegion: true,
+                    originIds: ['tile-vis-1']
+                }
+            }
+        },
+        getFlag: (mod, key) => (mod === MODULE_ID && key === 'trap.originIds' ? ['tile-vis-1'] : null),
+        update: async () => triggerRegionDoc,
+        createEmbeddedDocuments: async (type, [data]) => {
+            const beh = { id: `beh-new-${createdBehaviors.length + 1}`, ...data };
+            createdBehaviors.push(beh);
+            return [beh];
+        }
+    };
+
+    const visualTileDoc = {
+        id: 'tile-vis-2',
+        documentName: 'Tile',
+        update: async () => visualTileDoc
+    };
+
+    globalThis.canvas.regions = {
+        controlled: [{ document: triggerRegionDoc, id: 'region-multi-beh' }]
+    };
+    globalThis.canvas.tiles = {
+        controlled: [],
+        get: (id) => (id === 'tile-vis-2' ? { document: visualTileDoc, id } : null)
+    };
+
+    let step = 0;
+    adapter.buttonDialog = async () => {
+        step++;
+        if (step === 2) {
+            globalThis.canvas.tiles.controlled = [{ document: visualTileDoc, id: 'tile-vis-2' }];
+        }
+        return 'continue';
+    };
+
+    const setupResult = await setupRegionTrap('eskie.traps.fire', { tileCount: 2 });
+    assert.ok(setupResult);
+
+    assert.equal(createdBehaviors.length, 1, 'A new RegionBehavior must be created/appended');
+    assert.equal(createdBehaviors[0].type, 'executeScript');
+    assert.equal(createdBehaviors[0].name, `Fire Trap (${MODULE_ID})`);
+});
+
 
 

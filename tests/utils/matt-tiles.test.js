@@ -463,3 +463,77 @@ test('matt.trap executes multiple trap tiles concurrently via Promise.all', asyn
     assert.equal(trap2Resolved, true);
 });
 
+test('matt.trap.setup appends new runcode action to existing actions without overwriting', async () => {
+    const updatedTiles = new Map();
+    const existingAction = {
+        id: 'existing-action-99',
+        action: 'runcode',
+        data: { code: 'console.log("pre-existing action");' }
+    };
+
+    const triggerTileDoc = {
+        id: 'tile-trigger-multi',
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        getFlag: (_mod, key) => (key === 'actions' ? [existingAction] : (key === 'trigger' ? 'enter' : null)),
+        update: async (data) => {
+            updatedTiles.set('tile-trigger-multi', data);
+            return triggerTileDoc;
+        }
+    };
+    const triggerTile = {
+        id: 'tile-trigger-multi',
+        document: triggerTileDoc
+    };
+
+    const trapTileDoc = {
+        id: 'tile-trap-multi',
+        x: 100,
+        y: 100,
+        width: 100,
+        height: 100,
+        getFlag: (_mod, key) => (key === 'actions' ? [existingAction] : null),
+        update: async (data) => {
+            updatedTiles.set('tile-trap-multi', data);
+            return trapTileDoc;
+        }
+    };
+    const trapTile = {
+        id: 'tile-trap-multi',
+        document: trapTileDoc
+    };
+
+    globalThis.canvas.tiles = {
+        controlled: [triggerTile],
+        get: (id) => (id === 'tile-trap-multi' ? trapTile : (id === 'tile-trigger-multi' ? triggerTile : null))
+    };
+
+    let step = 0;
+    adapter.buttonDialog = async () => {
+        step++;
+        if (step === 2) {
+            globalThis.canvas.tiles.controlled = [trapTile];
+        }
+        return 'continue';
+    };
+
+    const result = await matt.trap.setup('eskie.traps.fire', { tileCount: 2 });
+    assert.ok(result);
+
+    const triggerUpdate = updatedTiles.get('tile-trigger-multi');
+    assert.ok(triggerUpdate);
+    const triggerActions = triggerUpdate['flags.monks-active-tiles.actions'];
+    assert.equal(triggerActions.length, 2, 'Trigger tile should have both existing and new action');
+    assert.equal(triggerActions[0].id, 'existing-action-99', 'Existing action must be preserved at index 0');
+    assert.equal(triggerActions[1].action, 'runcode', 'New action must be appended at index 1');
+
+    const trapUpdate = updatedTiles.get('tile-trap-multi');
+    assert.ok(trapUpdate);
+    const trapActions = trapUpdate['flags.monks-active-tiles.actions'];
+    assert.equal(trapActions.length, 2, 'Trap tile should have both existing and new action');
+    assert.equal(trapActions[0].id, 'existing-action-99', 'Existing action must be preserved at index 0');
+    assert.equal(trapActions[1].action, 'runcode', 'New action must be appended at index 1');
+});
+

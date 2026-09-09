@@ -246,10 +246,19 @@ await Promise.all(animPromises);`
     const events = config.events ?? ['tokenEnter'];
 
     for (const triggerRegion of triggerRegions) {
+        const existingOriginIds = triggerRegion.getFlag?.(MODULE_ID, 'trap.originIds')
+            ?? triggerRegion.flags?.[MODULE_ID]?.trap?.originIds
+            ?? [];
+        const currentOriginIds = originElements.map(e => e.id);
+        const combinedOriginIds = [...new Set([
+            ...(Array.isArray(existingOriginIds) ? existingOriginIds : []),
+            ...currentOriginIds
+        ])];
+
         const updateData = {
             [`flags.${MODULE_ID}.trap.isTriggerRegion`]: true,
             [`flags.${MODULE_ID}.trap.animation`]: animation,
-            [`flags.${MODULE_ID}.trap.originIds`]: originElements.map(e => e.id),
+            [`flags.${MODULE_ID}.trap.originIds`]: combinedOriginIds,
             [`flags.${MODULE_ID}.trap.config`]: trapOptions,
         };
 
@@ -268,7 +277,13 @@ await Promise.all(animPromises);`
         }
 
         if (tileIds.length > 0) {
-            updateData[`flags.${MODULE_ID}.trap.tileIds`] = tileIds;
+            const existingTileIds = triggerRegion.getFlag?.(MODULE_ID, 'trap.tileIds')
+                ?? triggerRegion.flags?.[MODULE_ID]?.trap?.tileIds
+                ?? [];
+            updateData[`flags.${MODULE_ID}.trap.tileIds`] = [...new Set([
+                ...(Array.isArray(existingTileIds) ? existingTileIds : []),
+                ...tileIds
+            ])];
         }
 
         if (config.extraFlags) {
@@ -285,35 +300,21 @@ await Promise.all(animPromises);`
 
         await triggerRegion.update(updateData);
 
-        // Check if an existing trap behavior is attached
-        const existingBehavior = triggerRegion.behaviors?.find(
-            b => b.name === behaviorName || Boolean(b.getFlag?.(MODULE_ID, 'trap.isTrapBehavior'))
-        );
-
-        if (existingBehavior) {
-            await existingBehavior.update({
-                system: {
-                    events: Array.isArray(events) ? events : [events],
-                    source: regionActionCode,
-                }
-            });
-        } else {
-            const behaviorData = adapter.formatRegionBehaviorData({
-                name: behaviorName,
-                events,
-                source: regionActionCode,
-                flags: {
-                    [MODULE_ID]: {
-                        trap: {
-                            isTrapBehavior: true,
-                            animation,
-                            originIds: originElements.map(e => e.id),
-                        }
+        const behaviorData = adapter.formatRegionBehaviorData({
+            name: behaviorName,
+            events,
+            source: regionActionCode,
+            flags: {
+                [MODULE_ID]: {
+                    trap: {
+                        isTrapBehavior: true,
+                        animation,
+                        originIds: originElements.map(e => e.id),
                     }
                 }
-            });
-            await adapter.createRegionBehavior(triggerRegion, behaviorData);
-        }
+            }
+        });
+        await adapter.createRegionBehavior(triggerRegion, behaviorData);
     }
 
     // Flag any origin placeables that are Tiles

@@ -253,7 +253,7 @@ async function setup(animation, config = {}) {
 
             const trapActionCode = `
 // Resolve the concrete Tile placeables from MATT execution scope
-const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter;
+const adapter = game.modules.get('${MODULE_ID}').api.adapter;
 const tilePlaceable = tile.object ?? canvas.tiles.get(tile.id);
 ${targetTileId ? `const targetTile = canvas.tiles.get('${targetTileId}');
 const targetLocation = targetTile ? adapter.getTargetLocation(targetTile) : null;` : ''}

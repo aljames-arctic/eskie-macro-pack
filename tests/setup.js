@@ -332,7 +332,9 @@ globalThis.game = {
     release: { generation: 12 },
     version: '12.331',
     system: { id: 'dnd5e', title: 'D&D 5e' },
-    modules: new Map(),
+    modules: new Map([
+        ['eskie-macros', { id: 'eskie-macros', active: true, api: {} }]
+    ]),
     packs: new Map(),
     user: {
         id: 'gm-user-1',

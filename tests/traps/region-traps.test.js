@@ -172,7 +172,38 @@ test('setupRegionTrap: configures RegionDocument flags and creates executeScript
     assert.ok(createdBehaviorData);
     assert.equal(createdBehaviorData.type, 'executeScript');
     assert.deepEqual(createdBehaviorData.system.events, ['tokenEnter']);
-    assert.ok(createdBehaviorData.system.source.includes('executeTrapTrigger'));
+    assert.ok(createdBehaviorData.system.source.includes(`const adapter = game.modules.get('${MODULE_ID}').api.adapter;`));
+    assert.ok(createdBehaviorData.system.source.includes('await eskie.traps.spike.play(placeable, targets,'));
+
+    // Execute the transparent script to verify direct invocation of eskie.traps.spike.play
+    let spikePlayed = false;
+    let passedTile = null;
+    let passedTargets = null;
+    globalThis.eskie = {
+        traps: {
+            spike: {
+                play: async (tile, targets) => {
+                    spikePlayed = true;
+                    passedTile = tile;
+                    passedTargets = targets;
+                }
+            }
+        }
+    };
+
+    const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+    const scriptFn = new AsyncFunction('event', createdBehaviorData.system.source);
+    await scriptFn({
+        region: triggerRegionDoc,
+        data: { token: { id: 'act-tok-10', object: { id: 'act-tok-10', name: 'Adventurer' } } }
+    });
+
+    assert.equal(spikePlayed, true, 'Generated region behavior script must directly invoke eskie.traps.spike.play()');
+    assert.equal(passedTile.id, 'tile-visual-10');
+    assert.equal(passedTargets.length, 1);
+    assert.equal(passedTargets[0].id, 'act-tok-10');
+
+    delete globalThis.eskie;
 
     adapter.foundry = new FoundryV12Adapter(adapter);
     globalThis.game.release = { generation: 12 };
@@ -304,6 +335,102 @@ test('setupRegionTrap: tileCount === 1 bypasses step 2 and uses trigger region a
     assert.equal(result.originElements.length, 1);
     assert.equal(result.originElements[0].id, 'region-door-1');
 
+    adapter.foundry = new FoundryV12Adapter(adapter);
+    globalThis.game.release = { generation: 12 };
+});
+
+test('setupRegionTrap: tileCount === 3 embeds targetLocation in generated script', async () => {
+    globalThis.game.user = { isGM: true };
+    globalThis.game.release = { generation: 14 };
+    const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
+    const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
+    adapter.foundry = new FoundryV14Adapter(adapter);
+
+    let createdBehaviorData = null;
+    const triggerRegionDoc = {
+        id: 'reg-trig-fire',
+        documentName: 'Region',
+        behaviors: [],
+        update: async () => triggerRegionDoc,
+        createEmbeddedDocuments: async (_type, [data]) => {
+            createdBehaviorData = data;
+            return [{ id: 'beh-fire', ...data }];
+        }
+    };
+
+    const launcherRegionDoc = {
+        id: 'reg-launch-fire',
+        documentName: 'Region',
+        origin: { x: 100, y: 100 },
+        document: { id: 'reg-launch-fire' }
+    };
+
+    const targetRegionDoc = {
+        id: 'reg-target-fire',
+        documentName: 'Region',
+        origin: { x: 500, y: 600 },
+        document: { id: 'reg-target-fire' }
+    };
+
+    globalThis.canvas.regions = {
+        controlled: [{ document: triggerRegionDoc, id: 'reg-trig-fire' }],
+        get: (id) => {
+            if (id === 'reg-launch-fire') return { document: launcherRegionDoc, id };
+            if (id === 'reg-target-fire') return { document: targetRegionDoc, id };
+            if (id === 'reg-trig-fire') return { document: triggerRegionDoc, id };
+            return null;
+        }
+    };
+    globalThis.canvas.tiles = { controlled: [], get: () => null };
+
+    let step = 0;
+    adapter.buttonDialog = async () => {
+        step++;
+        if (step === 2) {
+            // Step 2: Select launcher
+            globalThis.canvas.regions.controlled = [{ document: launcherRegionDoc, id: 'reg-launch-fire' }];
+        } else if (step === 3) {
+            // Step 3: Select target
+            globalThis.canvas.regions.controlled = [{ document: targetRegionDoc, id: 'reg-target-fire' }];
+        }
+        return 'continue';
+    };
+
+    const result = await setupRegionTrap('eskie.traps.fire', { tileCount: 3 });
+    assert.equal(result.triggerRegions.length, 1);
+    assert.equal(result.originElements[0].id, 'reg-launch-fire');
+    assert.equal(result.targetElements[0].id, 'reg-target-fire');
+
+    assert.ok(createdBehaviorData);
+    assert.ok(createdBehaviorData.system.source.includes("const targetPlaceable = adapter.getPlaceable('reg-target-fire');"));
+    assert.ok(createdBehaviorData.system.source.includes('targetLocation'));
+    assert.ok(createdBehaviorData.system.source.includes('await eskie.traps.fire.play(placeable, targets,'));
+
+    // Execute generated script to verify targetLocation is passed
+    let firePlayed = false;
+    let passedConfig = null;
+    globalThis.eskie = {
+        traps: {
+            fire: {
+                play: async (_placeable, _targets, config) => {
+                    firePlayed = true;
+                    passedConfig = config;
+                }
+            }
+        }
+    };
+
+    const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+    const scriptFn = new AsyncFunction('event', createdBehaviorData.system.source);
+    await scriptFn({
+        region: triggerRegionDoc,
+        data: { token: { id: 'act-tok-fire', object: { id: 'act-tok-fire' } } }
+    });
+
+    assert.equal(firePlayed, true);
+    assert.deepEqual(passedConfig.targetLocation, { x: 500, y: 600 });
+
+    delete globalThis.eskie;
     adapter.foundry = new FoundryV12Adapter(adapter);
     globalThis.game.release = { generation: 12 };
 });

@@ -138,9 +138,9 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
     getTemplatePosition(template: any, config: any = {}): any {
         if (!template || typeof template !== 'object') return [];
 
-        const doc = template.document ?? template;
-        const placeable = template.object ?? (template.document ? template : null);
-        const farpoint = placeable?.ray?.B ?? doc.ray?.B;
+        const doc = template.document ? template.document : template;
+        const placeable = template.object ? template.object : (template.document ? template : null);
+        const farpoint = placeable?.ray?.B ?? doc?.ray?.B ?? template.ray?.B;
 
         let primary = {
             x: doc.x ?? placeable?.x ?? 0,

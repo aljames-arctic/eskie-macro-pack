@@ -656,7 +656,7 @@ export class BaseFoundryAdapter {
     getSceneDimensions(scene: any = canvas?.scene): any {
         const isCurrentScene = !scene || scene === canvas?.scene;
         const dims: any = isCurrentScene ? canvas?.dimensions : null;
-        const sceneDoc = (scene as any)?.document ?? scene;
+        const sceneDoc = scene?.document ? scene.document : scene;
         const width = dims?.width ?? sceneDoc?.width ?? 4000;
         const height = dims?.height ?? sceneDoc?.height ?? 4000;
         const size = sceneDoc?.grid?.size ?? sceneDoc?.gridSize ?? dims?.size ?? canvas?.grid?.size ?? 100;
@@ -953,9 +953,9 @@ export class BaseFoundryAdapter {
         const srcCenter = this.getCenter(token);
         if (!srcCenter) return null;
 
-        const doc = target.document ?? target;
-        const w = doc.width ?? 1;
-        const h = doc.height ?? 1;
+        const doc = target.document;
+        const w = doc?.width ?? 1;
+        const h = doc?.height ?? 1;
 
         let bestPoint: { x: number, y: number } | null = null;
         let bestDist2 = Infinity;
@@ -1003,11 +1003,11 @@ export class BaseFoundryAdapter {
         };
 
         const gridSize = this.getGridSize();
-        const tDoc = token.document ?? token;
-        const tWidth = tDoc.width ?? 1;
-        const tHeight = tDoc.height ?? 1;
-        const tX = tDoc.x;
-        const tY = tDoc.y;
+        const tDoc = token.document;
+        const tWidth = tDoc?.width ?? 1;
+        const tHeight = tDoc?.height ?? 1;
+        const tX = tDoc?.x ?? token.x;
+        const tY = tDoc?.y ?? token.y;
 
         const getCenterPoint = (pt: { x: number, y: number }) => {
             if ((canvas as any)?.grid?.getCenterPoint) return (canvas as any).grid.getCenterPoint(pt);

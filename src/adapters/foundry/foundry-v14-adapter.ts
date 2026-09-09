@@ -44,7 +44,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      */
     getTileBounds(tile: any) {
         if (!tile) return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
-        const doc = tile.document ?? tile;
+        const doc = tile.document;
         const x = doc.x ?? 0;
         const y = doc.y ?? 0;
         const width = doc.width ?? 0;
@@ -85,8 +85,8 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
     getTemplatePosition(template: any, config: any = {}): any {
         if (!template) return [];
 
-        const doc = template.document ?? template;
-        const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(template.shapes);
+        const doc = template.document ? template.document : template;
+        const isRegion = doc?.documentName === 'Region' || Boolean(doc?.shapes) || Boolean(template.shapes);
 
         if (isRegion) {
             const shapes = doc.shapes?.contents ?? doc.shapes ?? template.shapes ?? [];

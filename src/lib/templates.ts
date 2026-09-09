@@ -44,7 +44,7 @@ async function getPosition(template: any, config: any = {}) {
     const token = config.token ?? config.sourceToken;
     const tokenCenter = token ? adapter.getCenter(token) : null;
     const distancePx = secondary ? Math.hypot(secondary.x - primary.x, secondary.y - primary.y) : 0;
-    const templateDoc = template ? (template.document ?? template) : null;
+    const templateDoc = template?.document ?? null;
 
     log.debug('templatelib.getPosition | Coordinates resolved:', {
         source: tokenCenter ? { ...tokenCenter, name: token?.name } : null,

@@ -23,7 +23,7 @@ async function create(token: any, config: any = {}) {
     const cfg = {
         radius,
         label: 'Cloudkill',
-        icon: token?.document?.texture?.src ?? ''
+        icon: token.document.texture.src ?? ''
     };
     let [primary, secondary, center] = await templatelib.getPosition(template, cfg);
     if (!primary && !center) return null;

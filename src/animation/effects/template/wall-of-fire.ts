@@ -19,7 +19,7 @@ async function create(token: any, config: any = {}, options: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { sound, template, distance: configDistance } = mConfig;
 
-    const tokenImg = token?.document?.texture?.src ?? 'icons/svg/fire.svg';
+    const tokenImg = token.document.texture.src ?? 'icons/svg/fire.svg';
     const cfg = {
         type: 'ray',
         distance: configDistance ?? 60,

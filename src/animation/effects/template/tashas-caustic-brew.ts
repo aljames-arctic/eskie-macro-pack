@@ -113,7 +113,7 @@ async function createTarget(source: any, config: any = {}, options: any = {}) {
     for (let target of targets) {
         const targetWidth = adapter.getTokenDimensions(target).widthUnits;
         const targetName = target.name;
-        const targetScaleX = target?.document?.texture?.scaleX ?? 1;
+        const targetScaleX = target.document.texture.scaleX ?? 1;
 
         let targetSeq = new Sequence()
             .wait(2200)

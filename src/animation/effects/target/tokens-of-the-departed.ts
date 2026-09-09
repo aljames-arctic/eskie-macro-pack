@@ -223,7 +223,7 @@ async function stopUse(first: any, second: any, third: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, rawConfig);
     const { id } = mConfig;
 
-    if (target?.id) {
+    if (target) {
         Sequencer.EffectManager.endEffects({ name: `${id}Use - ${target.id}`, object: target });
     }
 }
@@ -236,7 +236,7 @@ async function stop(first: any, second: any, third: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, rawConfig);
     const { id } = mConfig;
 
-    if (token?.id) {
+    if (token) {
         Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}`, object: token });
     }
 }

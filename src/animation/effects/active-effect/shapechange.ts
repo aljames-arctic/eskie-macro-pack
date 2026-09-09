@@ -51,7 +51,7 @@ async function createShapechange(token: any, config: any = {}) {
     const targetForm = choice === 'hybrid' ? hybridForm : wolfForm;
     const tokenDim = adapter.getTokenDimensions(token);
     const tokenWidth = tokenDim.widthUnits;
-    const scaleX = token.document?.texture?.scaleX ?? 1;
+    const scaleX = token.document.texture.scaleX;
 
     const sequence = new Sequence();
     applySound(sequence, sound);

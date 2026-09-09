@@ -14,7 +14,7 @@ const defaultDetectionConfig = {
 };
 
 const defaultValidator = async function (target: any, tags: any) {
-    const targetRace = adapter.getCreatureType(target?.actor);
+    const targetRace = adapter.getCreatureType(target.actor);
     return (targetRace && tags.includes(targetRace)) || Boolean(Tagger?.hasTags(target, tags));
 };
 

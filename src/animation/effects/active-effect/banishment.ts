@@ -48,7 +48,7 @@ function modifyPortal(portal: any, target: any) {
     if (portal?.file) return;
     
     let color = portal.color;
-    const creatureType = adapter.getCreatureType(target?.actor);
+    const creatureType = adapter.getCreatureType(target.actor);
 
     // Colors -- Red, White, Purple, Blue, Green, Yellow, Orange
         if (creatureType) {

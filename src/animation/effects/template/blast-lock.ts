@@ -66,7 +66,7 @@ async function create(token: any, config: any = {}, options: any = {}) {
     const { id, template, crosshair, radius, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Define Safe Elevation (Token height + 10)
-    const safeElevation = (token?.document?.elevation ?? 0) + 10;
+    const safeElevation = (token.document.elevation ?? 0) + 10;
 
     // 1. Select location with Crosshair
     let [position, _] = await templatelib.getPosition(template, crosshair);

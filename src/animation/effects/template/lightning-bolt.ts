@@ -56,7 +56,7 @@ async function create(token: any, config: any = {}) {
     const sourcePos = adapter.getCenter(token);
     const distPx = Math.hypot(secondary.x - primary.x, secondary.y - primary.y);
     log.debug('lightningBolt.create | Points for animation:', {
-        source: sourcePos ? { ...sourcePos, name: token?.name } : null,
+        source: sourcePos ? { ...sourcePos, name: token.name } : null,
         primary,
         secondary,
         distancePx: distPx

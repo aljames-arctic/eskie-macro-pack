@@ -47,7 +47,7 @@ async function getPosition(template: any, config: any = {}) {
     const templateDoc = template ? (template.document ? template.document : template) : null;
 
     log.debug('templatelib.getPosition | Coordinates resolved:', {
-        source: tokenCenter ? { ...tokenCenter, name: token?.name } : null,
+        source: tokenCenter ? { ...tokenCenter, name: token.name } : null,
         primary,
         secondary,
         center: center ?? primary,

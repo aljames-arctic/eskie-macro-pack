@@ -20,7 +20,7 @@ async function create(token: any, config: any = {}) {
 
     const cfg = {
         label: 'Firecracker',
-        icon: token?.document?.texture?.src ?? ''
+        icon: token.document.texture.src ?? ''
     };
     let [position, _] = await templatelib.getPosition(template, cfg);
     if (!position || position.cancelled) { return null; }

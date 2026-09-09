@@ -60,7 +60,7 @@ async function createCloud(token: any, config: any = {}) {
 
     if (token) {
         sequence.effect()
-            .name(`${id} - ${token?.id ?? 'token'}`)
+            .name(`${id} - ${token.id}`)
             .file(closest('eskie.casting.nature.01.side.one_shot.white'))
             .attachTo(token)
             .rotateTowards(targetPos)
@@ -145,7 +145,7 @@ function createEffect(token: any, config: any = {}) {
     const sequence = new Sequence();
     applySound(sequence, sound);
 
-    const tokenId = token?.id ?? 'token';
+    const tokenId = token.id;
     const tokenRotation = adapter.getTokenRotation(token);
 
     if (glow) {
@@ -193,7 +193,7 @@ async function playEffect(token: any, config: any = {}) {
 async function stop(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
-    const tokenId = token?.id ?? 'token';
+    const tokenId = token.id;
     if (token) Sequencer.EffectManager.endEffects({ name: `${id} - ${tokenId}`, object: token });
 }
 

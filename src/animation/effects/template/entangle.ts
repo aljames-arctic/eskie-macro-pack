@@ -31,7 +31,7 @@ async function create(token: any, config: any = {}) {
     if (!center && !primary) return;
     const targetPos = center ?? primary;
 
-    const tokenId = token?.id ?? 'token';
+    const tokenId = token.id;
     const seq = new Sequence();
     applySound(seq, sound);
 
@@ -108,7 +108,7 @@ async function play(token: any, config: any = {}) {
 async function stop(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
-    const tokenId = token?.id ?? 'token';
+    const tokenId = token.id;
     Sequencer.EffectManager.endEffects({ name: `${id} - ${tokenId}` });
 }
 

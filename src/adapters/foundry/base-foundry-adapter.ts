@@ -889,7 +889,7 @@ export class BaseFoundryAdapter {
      */
     getTokenRotation(token: any): number {
         if (!token) return 0;
-        return token.document?.rotation ?? 0;
+        return token.document.rotation ?? 0;
     }
 
     /**
@@ -908,8 +908,8 @@ export class BaseFoundryAdapter {
         const { size: gridSize, distance: gridDistance } = this.getSceneDimensions();
         const dist2DUnits = (dist2DPx / gridSize) * gridDistance;
 
-        const el1 = t1.document?.elevation ?? 0;
-        const el2 = t2.document?.elevation ?? 0;
+        const el1 = t1.document.elevation ?? 0;
+        const el2 = t2.document.elevation ?? 0;
         const elDiff = el1 - el2;
 
         const dist3DUnits = Math.hypot(dist2DUnits, elDiff);
@@ -954,9 +954,8 @@ export class BaseFoundryAdapter {
         const srcCenter = this.getCenter(token);
         if (!srcCenter) return null;
 
-        const doc = target.document;
-        const w = doc?.width ?? 1;
-        const h = doc?.height ?? 1;
+        const w = target.document.width ?? 1;
+        const h = target.document.height ?? 1;
 
         let bestPoint: { x: number, y: number } | null = null;
         let bestDist2 = Infinity;
@@ -1004,11 +1003,10 @@ export class BaseFoundryAdapter {
         };
 
         const gridSize = this.getGridSize();
-        const tDoc = token.document;
-        const tWidth = tDoc?.width ?? 1;
-        const tHeight = tDoc?.height ?? 1;
-        const tX = tDoc?.x ?? token.x;
-        const tY = tDoc?.y ?? token.y;
+        const tWidth = token.document.width ?? 1;
+        const tHeight = token.document.height ?? 1;
+        const tX = token.document.x ?? token.x;
+        const tY = token.document.y ?? token.y;
 
         const getCenterPoint = (pt: { x: number, y: number }) => {
             if ((canvas as any)?.grid?.getCenterPoint) return (canvas as any).grid.getCenterPoint(pt);

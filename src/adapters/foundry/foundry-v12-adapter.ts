@@ -165,7 +165,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
             };
         } else {
             const token = config.token ?? config.sourceToken;
-            const tokenCenter = token?.center ?? (token?.x !== undefined ? { x: token.x, y: token.y } : null);
+            const tokenCenter = token ? this.getCenter(token) : null;
             if (tokenCenter && Math.hypot(primary.x - tokenCenter.x, primary.y - tokenCenter.y) >= 1) {
                 secondary = primary;
                 primary = { x: tokenCenter.x, y: tokenCenter.y };

@@ -50,7 +50,7 @@ async function create(token: any, config: any = {}) {
         .belowTokens();
 
     for (const target of collectedTargets) {
-        const value = path ? adapter.getProperty(target, path) : adapter.getCreatureType(target?.actor);
+        const value = path ? adapter.getProperty(target, path) : adapter.getCreatureType(target.actor);
         const isUndead = String(value ?? '').toLowerCase().includes('undead');
 
         const distance = adapter.getDistance(token, target);

@@ -22,7 +22,7 @@ async function create(token: any, config: any = {}, options: any = {}) {
     const cfg = {
         distance,
         label: 'Web',
-        icon: token?.document?.texture?.src ?? ''
+        icon: token.document.texture.src ?? ''
     };
     let [primary, secondary, center] = await templatelib.getPosition(template, cfg);
     if (!primary && !center) return null;

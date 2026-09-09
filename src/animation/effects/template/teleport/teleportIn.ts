@@ -18,10 +18,10 @@ function create(token: any, targets: any[] = [], config: any = {}) {
     if (!position) return;
     const gridSize = adapter.getSceneDimensions(canvas?.scene).size;
     const tokenCenter = adapter.getCenter(token);
-    const tokenX = token?.x ?? (tokenCenter.x - gridSize / 2);
-    const tokenY = token?.y ?? (tokenCenter.y - gridSize / 2);
+    const tokenX = token.x;
+    const tokenY = token.y;
     const maxDistance = targets.length > 0 
-        ? Math.max(...targets.map(target => 3 * Math.max(Math.abs((target?.x ?? 0) - tokenX), Math.abs((target?.y ?? 0) - tokenY)) / gridSize + 1))
+        ? Math.max(...targets.map(target => 3 * Math.max(Math.abs(target.x - tokenX), Math.abs(target.y - tokenY)) / gridSize + 1))
         : 1;
     const tokenRotation = adapter.getTokenRotation(token);
 

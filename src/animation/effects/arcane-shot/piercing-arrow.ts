@@ -21,7 +21,7 @@ async function create(token: any, config: any = {}) {
         type: 'ray',
         distance: 30,
         width: 5,
-        icon: token?.document?.texture?.src ?? '',
+        icon: token.document.texture.src ?? '',
         label: 'Piercing Arrow',
         location: { obj: token, lockToEdge: true },
     };

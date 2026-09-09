@@ -9,6 +9,7 @@ import {
     setupRegionTrap
 } from '../../src/animation/traps/trap-manager.js';
 import { MODULE_ID } from '../../src/lib/constants.js';
+import { log } from '../../src/lib/logger.js';
 
 test('extractTrapTriggerContext: normalizes Region and Tile caller contexts', () => {
     // 1. Positional Region args (scene, region, behavior, event)
@@ -302,6 +303,7 @@ test('setupRegionTrap: enforces tile requirement when requiresTile is true', asy
     adapter.buttonDialog = async () => 'continue';
 
     const result = await setupRegionTrap('eskie.traps.floodingRoom', { tileCount: 2, requiresTile: true });
+    log._flushQueues();
     assert.equal(warned, true, 'Must warn user when required tile is missing');
     assert.equal(result, undefined, 'Must abort setup when required tile is missing');
 

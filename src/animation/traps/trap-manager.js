@@ -1,7 +1,36 @@
 import { adapter } from '../../adapters/index.js';
 import { matt } from '../utils/matt-tiles.js';
 import { MODULE_ID } from '../../lib/constants.js';
-import { log } from '../../lib/logger.js';
+import { log, notify } from '../../lib/logger.js';
+
+/**
+ * Retrieve an Eskie trap flag value from a Document or data object.
+ *
+ * @param {object} doc Document or data object
+ * @param {string} key Trap flag key
+ * @returns {*} Flag value or undefined
+ */
+function getTrapFlag(doc, key) {
+    if (!doc) return undefined;
+    if (typeof doc.getFlag === 'function') {
+        return doc.getFlag(MODULE_ID, `trap.${key}`);
+    }
+    return doc.flags?.[MODULE_ID]?.trap?.[key];
+}
+
+/**
+ * Resolve the primary target placeable ID from document trap flags.
+ *
+ * @param {object} doc Document or data object
+ * @returns {string|null} Placeable ID or null
+ */
+function getTargetPlaceableId(doc) {
+    const ids = getTrapFlag(doc, 'targetRegionIds')
+        ?? getTrapFlag(doc, 'targetTileIds')
+        ?? getTrapFlag(doc, 'trapTargetTileIds');
+    if (Array.isArray(ids) && ids.length > 0) return ids[0];
+    return getTrapFlag(doc, 'targetRegionId') ?? getTrapFlag(doc, 'targetTileId') ?? null;
+}
 
 /**
  * Normalizes polymorphic caller context across RegionBehavior execution,
@@ -17,56 +46,56 @@ export function extractTrapTriggerContext(context, ...rest) {
     // Case 1: Normalized context object
     if (!context.documentName) {
         if (context.region) {
+            const region = context.region.document ?? context.region;
             return {
                 type: 'region',
-                scene: context.scene ?? context.region.parent ?? canvas?.scene ?? null,
-                region: context.region.document ?? context.region,
-                behavior: context.behavior ?? null,
-                event: context.event ?? null,
+                scene: context.scene ?? region.parent ?? canvas.scene,
+                region,
+                behavior: context.behavior,
+                event: context.event,
             };
         }
         if (context.tile) {
             return {
                 type: 'tile',
                 tile: context.tile.document ?? context.tile,
-                token: context.token ?? null,
+                token: context.token,
             };
         }
     }
 
     // Case 2: Positional RegionBehavior arguments: (scene, region, behavior, event)
-    const isScene = context.documentName === 'Scene' || Boolean(context.regions);
-    if (isScene && rest[0]) {
+    if (context.documentName === 'Scene' && rest[0]) {
         const region = rest[0].document ?? rest[0];
         return {
             type: 'region',
             scene: context,
             region,
-            behavior: rest[1] ?? null,
-            event: rest[2] ?? null,
+            behavior: rest[1],
+            event: rest[2],
         };
     }
 
     // Case 3: RegionDocument or Region placeable passed as first positional arg: (region, behavior, event)
-    const isRegion = context.documentName === 'Region' || Boolean(context.shapes) || Boolean(context.behaviors);
+    const isRegion = context.documentName === 'Region' || context.document?.documentName === 'Region';
     if (isRegion) {
         const region = context.document ?? context;
         return {
             type: 'region',
-            scene: region.parent ?? canvas?.scene ?? null,
+            scene: region.parent ?? canvas.scene,
             region,
-            behavior: rest[0] ?? null,
-            event: rest[1] ?? null,
+            behavior: rest[0],
+            event: rest[1],
         };
     }
 
     // Case 4: TileDocument or Tile placeable passed as first positional arg: (tile, token)
-    const isTile = context.documentName === 'Tile' || Boolean(context.texture) || Boolean(context.mesh);
+    const isTile = context.documentName === 'Tile' || context.document?.documentName === 'Tile';
     if (isTile) {
         return {
             type: 'tile',
             tile: context.document ?? context,
-            token: rest[0] ?? null,
+            token: rest[0],
         };
     }
 
@@ -94,35 +123,18 @@ export async function executeTrapTrigger(context, ...rest) {
         const regionDoc = region.document ?? region;
         const regionPlaceable = regionDoc.object ?? canvas.regions.get(regionDoc.id);
 
-        const animation = regionDoc.getFlag?.(MODULE_ID, 'trap.animation')
-            ?? regionDoc.flags?.[MODULE_ID]?.trap?.animation
-            ?? behavior?.getFlag?.(MODULE_ID, 'trap.animation')
-            ?? behavior?.flags?.[MODULE_ID]?.trap?.animation;
+        const animation = getTrapFlag(regionDoc, 'animation')
+            ?? getTrapFlag(behavior, 'animation');
 
         const promises = [];
 
         if (animation) {
             const trap = adapter.getProperty(globalThis, animation);
             if (trap?.play) {
-                const trapConfig = adapter.duplicate(
-                    regionDoc.getFlag?.(MODULE_ID, 'trap.config')
-                    ?? regionDoc.flags?.[MODULE_ID]?.trap?.config
-                    ?? {}
-                );
+                const trapConfig = adapter.duplicate(getTrapFlag(regionDoc, 'config') ?? {});
 
                 // Resolve target placeable (Region or Tile for 3-placeable traps)
-                const targetIds = regionDoc.getFlag?.(MODULE_ID, 'trap.targetRegionIds')
-                    ?? regionDoc.flags?.[MODULE_ID]?.trap?.targetRegionIds
-                    ?? regionDoc.getFlag?.(MODULE_ID, 'trap.targetTileIds')
-                    ?? regionDoc.flags?.[MODULE_ID]?.trap?.targetTileIds
-                    ?? regionDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds')
-                    ?? regionDoc.flags?.[MODULE_ID]?.trap?.trapTargetTileIds
-                    ?? [];
-                const targetId = targetIds[0]
-                    ?? regionDoc.getFlag?.(MODULE_ID, 'trap.targetRegionId')
-                    ?? regionDoc.flags?.[MODULE_ID]?.trap?.targetRegionId
-                    ?? regionDoc.getFlag?.(MODULE_ID, 'trap.targetTileId')
-                    ?? regionDoc.flags?.[MODULE_ID]?.trap?.targetTileId;
+                const targetId = getTargetPlaceableId(regionDoc);
                 if (targetId) {
                     const targetPlaceable = adapter.getPlaceable(targetId);
                     if (!targetPlaceable) return;
@@ -130,14 +142,8 @@ export async function executeTrapTrigger(context, ...rest) {
                 }
 
                 // Identify animation placeables (Tiles or Regions)
-                const tileIds = regionDoc.getFlag?.(MODULE_ID, 'trap.tileIds')
-                    ?? regionDoc.flags?.[MODULE_ID]?.trap?.tileIds
-                    ?? [];
-                const originIds = (
-                    regionDoc.getFlag?.(MODULE_ID, 'trap.originIds')
-                    ?? regionDoc.flags?.[MODULE_ID]?.trap?.originIds
-                    ?? []
-                );
+                const tileIds = getTrapFlag(regionDoc, 'tileIds') ?? [];
+                const originIds = getTrapFlag(regionDoc, 'originIds') ?? [];
 
                 let animPlaceables = [];
                 if (tileIds.length > 0) {
@@ -154,9 +160,9 @@ export async function executeTrapTrigger(context, ...rest) {
 
                 for (const placeable of animPlaceables) {
                     let targets = adapter.getTokensInPlaceable(placeable);
-                    if (activatingToken && activatingToken.id && !targets.some(t => t.id === activatingToken.id)) {
+                    if (activatingToken.id && !targets.some(t => t.id === activatingToken.id)) {
                         targets.push(activatingToken);
-                    } else if (targets.length === 0 && activatingToken) {
+                    } else if (targets.length === 0) {
                         targets = [activatingToken];
                     }
 
@@ -173,14 +179,10 @@ export async function executeTrapTrigger(context, ...rest) {
         }
 
         // Trigger any external linked MATT tiles concurrently
-        const originIds = (
-            regionDoc.getFlag?.(MODULE_ID, 'trap.originIds')
-            ?? regionDoc.flags?.[MODULE_ID]?.trap?.originIds
-            ?? []
-        ).filter(id => id !== regionDoc.id);
+        const originIds = (getTrapFlag(regionDoc, 'originIds') ?? []).filter(id => id !== regionDoc.id);
 
         for (const id of originIds) {
-            const tile = canvas?.tiles?.get?.(id);
+            const tile = canvas.tiles.get(id);
             if (tile?.document?.trigger) {
                 promises.push(tile.document.trigger({ token: activatingToken }));
             }
@@ -190,39 +192,21 @@ export async function executeTrapTrigger(context, ...rest) {
     } else if (triggerContext.type === 'tile') {
         const { tile, token } = triggerContext;
         const tileDoc = tile.document ?? tile;
-        const tilePlaceable = tile.object ?? canvas?.tiles?.get?.(tileDoc.id) ?? tile;
+        const tilePlaceable = tile.object ?? canvas.tiles.get(tileDoc.id) ?? tile;
 
-        const activatingToken = token
-            ? (token.object ?? canvas?.tokens?.get?.(token.id ?? token) ?? token)
-            : null;
+        const activatingToken = token?.object ?? token;
 
-        const animation = tileDoc.getFlag?.(MODULE_ID, 'trap.animation')
-            ?? tileDoc.flags?.[MODULE_ID]?.trap?.animation;
+        const animation = getTrapFlag(tileDoc, 'animation');
 
         const promises = [];
 
         if (animation) {
             const trap = adapter.getProperty(globalThis, animation);
             if (trap?.play) {
-                const trapConfig = adapter.duplicate(
-                    tileDoc.getFlag?.(MODULE_ID, 'trap.config')
-                    ?? tileDoc.flags?.[MODULE_ID]?.trap?.config
-                    ?? {}
-                );
+                const trapConfig = adapter.duplicate(getTrapFlag(tileDoc, 'config') ?? {});
 
                 // Resolve target placeable (Region or Tile for 3-placeable traps)
-                const targetIds = tileDoc.getFlag?.(MODULE_ID, 'trap.targetRegionIds')
-                    ?? tileDoc.flags?.[MODULE_ID]?.trap?.targetRegionIds
-                    ?? tileDoc.getFlag?.(MODULE_ID, 'trap.targetTileIds')
-                    ?? tileDoc.flags?.[MODULE_ID]?.trap?.targetTileIds
-                    ?? tileDoc.getFlag?.(MODULE_ID, 'trap.trapTargetTileIds')
-                    ?? tileDoc.flags?.[MODULE_ID]?.trap?.trapTargetTileIds
-                    ?? [];
-                const targetId = targetIds[0]
-                    ?? tileDoc.getFlag?.(MODULE_ID, 'trap.targetRegionId')
-                    ?? tileDoc.flags?.[MODULE_ID]?.trap?.targetRegionId
-                    ?? tileDoc.getFlag?.(MODULE_ID, 'trap.targetTileId')
-                    ?? tileDoc.flags?.[MODULE_ID]?.trap?.targetTileId;
+                const targetId = getTargetPlaceableId(tileDoc);
                 if (targetId) {
                     const targetPlaceable = adapter.getPlaceable(targetId);
                     if (targetPlaceable) {
@@ -231,10 +215,7 @@ export async function executeTrapTrigger(context, ...rest) {
                 }
 
                 let targets = adapter.getTokensInPlaceable(tilePlaceable);
-                const isTriggerTile = Boolean(
-                    tileDoc.getFlag?.(MODULE_ID, 'trap.isTriggerTile')
-                    ?? tileDoc.flags?.[MODULE_ID]?.trap?.isTriggerTile
-                );
+                const isTriggerTile = Boolean(getTrapFlag(tileDoc, 'isTriggerTile'));
                 if (isTriggerTile && activatingToken) {
                     if (!targets.some(t => t.id === activatingToken.id)) {
                         targets.push(activatingToken);
@@ -254,14 +235,10 @@ export async function executeTrapTrigger(context, ...rest) {
             }
         }
 
-        const originIds = (
-            tileDoc.getFlag?.(MODULE_ID, 'trap.originIds')
-            ?? tileDoc.flags?.[MODULE_ID]?.trap?.originIds
-            ?? []
-        ).filter(id => id !== tileDoc.id);
+        const originIds = (getTrapFlag(tileDoc, 'originIds') ?? []).filter(id => id !== tileDoc.id);
 
         for (const id of originIds) {
-            const originTile = canvas?.tiles?.get?.(id);
+            const originTile = canvas.tiles.get(id);
             if (originTile?.document?.trigger) {
                 promises.push(originTile.document.trigger({ token: activatingToken }));
             }
@@ -281,7 +258,7 @@ export async function executeTrapTrigger(context, ...rest) {
  */
 export async function setupRegionTrap(animation, config = {}) {
     if (!game.user.isGM) {
-        return ui.notifications.error(game.i18n.localize('EMP.traps.setup.onlyGm'));
+        return notify.error(game.i18n.localize('EMP.traps.setup.onlyGm'));
     }
 
     const pathParts = animation.split('.');
@@ -310,7 +287,7 @@ export async function setupRegionTrap(animation, config = {}) {
 
     const triggerRegions = adapter.getControlledRegions();
     if (triggerRegions.length === 0) {
-        return ui.notifications.warn(game.i18n.localize('EMP.traps.setup.noTriggerRegions'));
+        return notify.warn(game.i18n.localize('EMP.traps.setup.noTriggerRegions'));
     }
 
     let originElements = [];
@@ -340,7 +317,7 @@ export async function setupRegionTrap(animation, config = {}) {
 
         if (originResult !== 'continue') return;
 
-        const controlledTiles = canvas?.tiles?.controlled?.map(t => t.document ?? t) ?? [];
+        const controlledTiles = (canvas.tiles?.controlled ?? []).map(t => t.document ?? t);
         const controlledRegions = adapter.getControlledRegions();
 
         // Enforce Tile requirement when mandatory (e.g. Bull Rush Statue)
@@ -349,13 +326,13 @@ export async function setupRegionTrap(animation, config = {}) {
             const warningMsg = game.i18n.has?.(`EMP.traps.${trapKey}.noTile`)
                 ? game.i18n.localize(`EMP.traps.${trapKey}.noTile`)
                 : game.i18n.localize('EMP.traps.setup.noOriginTiles');
-            return ui.notifications.warn(warningMsg);
+            return notify.warn(warningMsg);
         }
 
         originElements = controlledTiles.length > 0 ? controlledTiles : controlledRegions;
 
         if (originElements.length === 0) {
-            return ui.notifications.warn(game.i18n.localize('EMP.traps.setup.noOriginTiles'));
+            return notify.warn(game.i18n.localize('EMP.traps.setup.noOriginTiles'));
         }
 
         // Step 3: Prompt user to select trap target/landing placeables (Tile or Region)
@@ -378,12 +355,12 @@ export async function setupRegionTrap(animation, config = {}) {
 
         if (targetResult === 'cancel' || targetResult === false) return;
 
-        const targetTiles = canvas?.tiles?.controlled?.map(t => t.document ?? t) ?? [];
+        const targetTiles = (canvas.tiles?.controlled ?? []).map(t => t.document ?? t);
         const targetRegions = adapter.getControlledRegions();
         targetElements = targetTiles.length > 0 ? targetTiles : targetRegions;
 
         if (targetElements.length === 0) {
-            ui.notifications.warn(game.i18n.localize('EMP.traps.setup.noTargetTiles'));
+            notify.warn(game.i18n.localize('EMP.traps.setup.noTargetTiles'));
             targetElements = triggerRegions;
         }
     } else {
@@ -407,7 +384,7 @@ export async function setupRegionTrap(animation, config = {}) {
 
         if (animResult !== 'continue') return;
 
-        const controlledTiles = canvas?.tiles?.controlled?.map(t => t.document ?? t) ?? [];
+        const controlledTiles = (canvas.tiles?.controlled ?? []).map(t => t.document ?? t);
         const controlledRegions = adapter.getControlledRegions();
 
         // Enforce Tile requirement when mandatory (e.g. Flooding Room)
@@ -416,7 +393,7 @@ export async function setupRegionTrap(animation, config = {}) {
             const warningMsg = game.i18n.has?.(`EMP.traps.${trapKey}.noTile`)
                 ? game.i18n.localize(`EMP.traps.${trapKey}.noTile`)
                 : `${trapKey} requires a Tile placeable on the canvas. Trap setup cancelled.`;
-            return ui.notifications.warn(warningMsg);
+            return notify.warn(warningMsg);
         }
 
         originElements = controlledTiles.length > 0 ? controlledTiles : (controlledRegions.length > 0 ? controlledRegions : triggerRegions);
@@ -437,12 +414,12 @@ export async function setupRegionTrap(animation, config = {}) {
 
             if (extraResult !== 'continue') return;
 
-            const selectedTiles = canvas?.tiles?.controlled?.map(t => t.id) ?? [];
+            const selectedTiles = (canvas.tiles?.controlled ?? []).map(t => t.id);
             const selectedRegions = adapter.getControlledRegions().map(r => r.id);
             const selected = selectedTiles.length > 0 ? selectedTiles : selectedRegions;
 
             if (selected.length === 0) {
-                return ui.notifications.warn(game.i18n.format('EMP.traps.setup.noExtraTiles', { name: extra.label }));
+                return notify.warn(game.i18n.format('EMP.traps.setup.noExtraTiles', { name: extra.label }));
             }
             extraResults[extra.key] = selected;
         }
@@ -583,7 +560,7 @@ await Promise.all(animPromises);`
         }
     }
 
-    ui.notifications.info(`Successfully setup ${trapKey} trap using Regions for ${triggerRegions.length} trigger region(s) and ${originElements.length} placeable(s).`);
+    notify.info(`Successfully setup ${trapKey} trap using Regions for ${triggerRegions.length} trigger region(s) and ${originElements.length} placeable(s).`);
     return { triggerRegions, originElements, targetElements };
 }
 
@@ -598,7 +575,7 @@ await Promise.all(animPromises);`
  */
 export async function setupTrap(animation, config = {}) {
     if (!game.user.isGM) {
-        return ui.notifications.error(game.i18n.localize('EMP.traps.setup.onlyGm'));
+        return notify.error(game.i18n.localize('EMP.traps.setup.onlyGm'));
     }
 
     let mode = config.mode;
@@ -608,7 +585,7 @@ export async function setupTrap(animation, config = {}) {
         if (!isV14) {
             mode = 'matt';
         } else {
-            const hasMatt = Boolean(game.modules?.get('monks-active-tiles')?.active);
+            const hasMatt = Boolean(game.modules.get('monks-active-tiles')?.active);
             if (!hasMatt) {
                 mode = 'region';
             } else {

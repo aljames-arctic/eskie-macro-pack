@@ -157,12 +157,10 @@ async function play(token: any, config: any = {}, options: any = {}) {
 }
 
 function stop(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
-    if (token) {
-        const tokenName = token.name;
-        Sequencer.EffectManager.endEffects({ name: `${tokenName} Wall of Fire` });
-        Sequencer.EffectManager.endEffects({ name: `${tokenName} Wall of Fire ${id}` });
-        Sequencer.EffectManager.endEffects({ name: `${tokenName} Wall Fire Crosshair` });
-    }
+    const tokenName = token.name;
+    Sequencer.EffectManager.endEffects({ name: `${tokenName} Wall of Fire` });
+    Sequencer.EffectManager.endEffects({ name: `${tokenName} Wall of Fire ${id}` });
+    Sequencer.EffectManager.endEffects({ name: `${tokenName} Wall Fire Crosshair` });
 }
 
 export const wallOfFire = {

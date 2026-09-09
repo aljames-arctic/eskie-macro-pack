@@ -111,14 +111,12 @@ async function play(token: any, target: any, config: any = {}) {
 }
 
 async function stop(token: any, target: any, config: any = {}) {
-    if (target) {
-        Sequencer.EffectManager.endEffects({ name: `${target.name} Banishing Arrow`, object: target });
-        await new Sequence()
-            .animation()
-            .on(target)
-            .show()
-            .play();
-    }
+    Sequencer.EffectManager.endEffects({ name: `${target.name} Banishing Arrow`, object: target });
+    await new Sequence()
+        .animation()
+        .on(target)
+        .show()
+        .play();
 }
 
 export const banishingArrow = {

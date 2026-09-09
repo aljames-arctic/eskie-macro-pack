@@ -204,10 +204,8 @@ async function play(token: any, config: any = {}, options: any = {}) {
 }
 
 function stop(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
-    if (token) {
-        Sequencer.EffectManager.endEffects({ name: `${token.name} Step of the Wind (Jump)` });
-        Sequencer.EffectManager.endEffects({ name: `${token.name} Step of the Wind (Jump) ${id}` });
-    }
+    Sequencer.EffectManager.endEffects({ name: `${token.name} Step of the Wind (Jump)` });
+    Sequencer.EffectManager.endEffects({ name: `${token.name} Step of the Wind (Jump) ${id}` });
 }
 
 export const stepOfTheWindJump = {

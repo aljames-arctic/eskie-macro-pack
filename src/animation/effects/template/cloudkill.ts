@@ -109,10 +109,8 @@ async function play(token: any, config: any = {}) {
 }
 
 function stop(token: any) {
-    if (token) {
-        Sequencer.EffectManager.endEffects({ name: `Cloudkill ${token.name}` });
-        Sequencer.EffectManager.endEffects({ name: `Casting ${token.name}` });
-    }
+    Sequencer.EffectManager.endEffects({ name: `Cloudkill ${token.name}` });
+    Sequencer.EffectManager.endEffects({ name: `Casting ${token.name}` });
 }
 
 export const cloudkill = {

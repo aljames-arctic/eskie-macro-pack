@@ -565,9 +565,7 @@ async function playStarwardSword(token: any, config: any = {}, options: any = {}
 
 function stopStarwardSword(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
     Sequencer.EffectManager.endEffects({ name: "Starward Sword" });
-    if (token) {
-        Sequencer.EffectManager.endEffects({ name: `Starward Sword ${token.name} ${id}` });
-    }
+    Sequencer.EffectManager.endEffects({ name: `Starward Sword ${token.name} ${id}` });
 }
 
 export const starwardSword = {

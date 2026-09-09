@@ -194,7 +194,7 @@ async function stop(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     const tokenId = token.id;
-    if (token) Sequencer.EffectManager.endEffects({ name: `${id} - ${tokenId}`, object: token });
+    Sequencer.EffectManager.endEffects({ name: `${id} - ${tokenId}`, object: token });
 }
 
 async function clean(config: any = {}) {

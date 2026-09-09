@@ -223,9 +223,7 @@ async function stopUse(first: any, second: any, third: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, rawConfig);
     const { id } = mConfig;
 
-    if (target) {
-        Sequencer.EffectManager.endEffects({ name: `${id}Use - ${target.id}`, object: target });
-    }
+    Sequencer.EffectManager.endEffects({ name: `${id}Use - ${target.id}`, object: target });
 }
 
 async function stop(first: any, second: any, third: any = {}) {
@@ -236,9 +234,7 @@ async function stop(first: any, second: any, third: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, rawConfig);
     const { id } = mConfig;
 
-    if (token) {
-        Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}`, object: token });
-    }
+    Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}`, object: token });
 }
 
 export const tokensOfTheDeparted = {

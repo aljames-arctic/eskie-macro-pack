@@ -245,9 +245,7 @@ async function stopTarget(source: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_CAST, config);
     let targets = mConfig.targets?.length ? mConfig.targets : Array.from(game.user?.targets ?? []);
     for (let target of targets) {
-        if (target) {
-            Sequencer.EffectManager.endEffects({ name: `${target.name}CausticBrew`, object: target });
-        }
+        Sequencer.EffectManager.endEffects({ name: `${target.name}CausticBrew`, object: target });
     }
 }
 

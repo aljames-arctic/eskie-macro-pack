@@ -111,9 +111,7 @@ async function create(token: any, config: any = {}) {
             .waitUntilFinished(-1400)
 
         .thenDo(function() {
-            if (token) {
-                Sequencer.EffectManager.endEffects({ name: label, object: token });
-            }
+            Sequencer.EffectManager.endEffects({ name: label, object: token });
         });
 
     return sequence;
@@ -125,9 +123,7 @@ async function play(token: any, config: any = {}) {
 }
 
 function stop(token: any) {
-    if (token) {
-        Sequencer.EffectManager.endEffects({ name: `${token.name} Burning Hands`, object: token });
-    }
+    Sequencer.EffectManager.endEffects({ name: `${token.name} Burning Hands`, object: token });
 }
 
 export const burningHands = {

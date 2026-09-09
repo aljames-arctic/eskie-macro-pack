@@ -123,9 +123,7 @@ async function play(token: any, target: any, config: any = {}) {
 }
 
 async function stop(token: any, target: any, config: any = {}) {
-    if (target) {
-        Sequencer.EffectManager.endEffects({ name: `${target.name} Shadow Arrow`, object: target });
-    }
+    Sequencer.EffectManager.endEffects({ name: `${target.name} Shadow Arrow`, object: target });
 }
 
 export const shadowArrow = {

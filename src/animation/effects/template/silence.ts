@@ -144,9 +144,7 @@ async function playSilence(token: any, config: any = {}, options: any = {}) {
  * @param {object} options Options for stopping effects.
  */
 function stopSilence(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
-    if (token) {
-        Sequencer.EffectManager.endEffects({ name: `Silence ${token.name} ${id}` });
-    }
+    Sequencer.EffectManager.endEffects({ name: `Silence ${token.name} ${id}` });
 }
 
 export const silence = {

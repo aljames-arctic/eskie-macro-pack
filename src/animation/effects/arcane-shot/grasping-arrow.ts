@@ -97,9 +97,7 @@ async function play(token: any, target: any, config: any = {}) {
 }
 
 async function stop(token: any, target: any, config: any = {}) {
-    if (target) {
-        Sequencer.EffectManager.endEffects({ name: `Grasping Arrow ${target.name}`, object: target });
-    }
+    Sequencer.EffectManager.endEffects({ name: `Grasping Arrow ${target.name}`, object: target });
 }
 
 export const graspingArrow = {

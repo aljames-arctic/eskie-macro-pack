@@ -143,13 +143,11 @@ async function play(token: any, config: any = {}, options: any = {}) {
 }
 
 function stop(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
-    if (token) {
-        const tokenName = token.name;
-        const label = `${tokenName} Web`;
-        Sequencer.EffectManager.endEffects({ name: label });
-        Sequencer.EffectManager.endEffects({ name: `${label} ${id}` });
-        Sequencer.EffectManager.endEffects({ name: `${label} Casting` });
-    }
+    const tokenName = token.name;
+    const label = `${tokenName} Web`;
+    Sequencer.EffectManager.endEffects({ name: label });
+    Sequencer.EffectManager.endEffects({ name: `${label} ${id}` });
+    Sequencer.EffectManager.endEffects({ name: `${label} Casting` });
 }
 
 export const web = {

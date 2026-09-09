@@ -150,7 +150,7 @@ async function play(token: any, target: any, config: any = {}) {
 async function stop(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
-    if (target) Sequencer.EffectManager.endEffects({ name: `${id} - ${target.id}`, object: target });
+    Sequencer.EffectManager.endEffects({ name: `${id} - ${target.id}`, object: target });
 }
 
 export const pathOfTheGrave = {

@@ -167,7 +167,7 @@ async function play(target: any, ally: any, config: any = {}) {
 async function stop(target: any, ally: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
-    if (target) Sequencer.EffectManager.endEffects({ name: `${id} - ${target.id}` });
+    Sequencer.EffectManager.endEffects({ name: `${id} - ${target.id}` });
 }
 
 export const keeperOfSouls = {

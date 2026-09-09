@@ -129,9 +129,7 @@ async function play(token: any, config: any = {}, options: any = {}) {
 }
 
 function stop(token: any) {
-    if (token) {
-        Sequencer.EffectManager.endEffects({ name: `Casting ${token.name}`, object: token });
-    }
+    Sequencer.EffectManager.endEffects({ name: `Casting ${token.name}`, object: token });
     Sequencer.EffectManager.endEffects({ name: 'Grease' });
 }
 

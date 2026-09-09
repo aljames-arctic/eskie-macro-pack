@@ -238,10 +238,10 @@ async function playAttack(token: any, target1: any, target2?: any, config: any =
     if (seq) return seq.play();
 }
 
-async function stop(token?: any, target?: any, config: any = {}) {
+async function stop(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
-    if (token) Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}` });
+    Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}` });
 }
 
 export const wailsFromTheGrave = {

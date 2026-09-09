@@ -37,7 +37,7 @@ const DEFAULT_CONFIG = {
     },
 };
 
-async function create(token: any, config: any = {}) {
+async function create(token: Token, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { radius, scorchedEarth, persistEffect, tintMap, sound, template } = mConfig;
@@ -211,12 +211,12 @@ async function create(token: any, config: any = {}) {
     return sequence;
 }
 
-async function play(token: any, config: any = {}) {
+async function play(token: Token, config: any = {}) {
     const sequence = await create(token, config);
     if (sequence) return sequence.play({ preload: true });
 }
 
-function stop(token: any) {
+function stop(token: Token) {
     Sequencer.EffectManager.endEffects({ name: `Casting ${token.name}` });
 }
 

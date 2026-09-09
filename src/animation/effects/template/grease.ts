@@ -15,7 +15,7 @@ const DEFAULT_CONFIG = {
     }
 };
 
-async function create(token: any, config: any = {}) {
+async function create(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { template, sound } = mConfig;
 
@@ -123,12 +123,12 @@ async function create(token: any, config: any = {}) {
     return seq;
 }
 
-async function play(token: any, config: any = {}, options: any = {}) {
+async function play(token: Token, config: any = {}, options: any = {}) {
     const seq = await create(token, config);
     if (seq) { return seq.play(); }
 }
 
-function stop(token: any) {
+function stop(token: Token) {
     Sequencer.EffectManager.endEffects({ name: `Casting ${token.name}`, object: token });
     Sequencer.EffectManager.endEffects({ name: 'Grease' });
 }

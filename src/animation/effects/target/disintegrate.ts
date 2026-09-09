@@ -144,7 +144,7 @@ function getDissolveConfig() {
     ];
 }
 
-function dissolveCreate(target: any, config: any = {}) {
+function dissolveCreate(target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
@@ -157,7 +157,7 @@ function dissolveCreate(target: any, config: any = {}) {
     return seq;
 }
 
-async function dissolvePlay(target: any, config: any = {}) {
+async function dissolvePlay(target: Token, config: any = {}) {
     let dissolve = dissolveCreate(target, config);
     let hide = new Sequence().animation().on(target).show(false);
     if (dissolve && hide) {
@@ -178,7 +178,7 @@ async function dissolvePlay(target: any, config: any = {}) {
  * @param {string} config.id The unique ID for the effects sequence.
  * @returns {Sequence} A Sequencer sequence object representing the death animation.
  */
-function death(target: any, config: any = {}) {
+function death(target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, effect: { smoke: smokeEffect, spirit: spiritEffect } } = mConfig;
 
@@ -216,7 +216,7 @@ function death(target: any, config: any = {}) {
     return seq;
 }
 
-function beam(token: any, target: any, config: any = {}) {
+function beam(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, effect: { beam: beamEffects } } = mConfig;
     return beamEffect.create(token, target, { id, effects: beamEffects });
@@ -233,7 +233,7 @@ function beam(token: any, target: any, config: any = {}) {
  * 
  * @returns {Promise<Sequence>} A promise that resolves with the complete effect sequence.
  */
-async function create(token: any, target: any, config: any = {}) {
+async function create(token: Token, target: Token, config: any = {}) {
     // Merge user config with default config
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -252,7 +252,7 @@ async function create(token: any, target: any, config: any = {}) {
  * @param {object} [config={}] Configuration for the effect.
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
-async function play(token: any, target: any, config: any = {}) {
+async function play(token: Token, target: Token, config: any = {}) {
     let seq = await create(token, target, config);
     if (seq) { await seq.play(); }
 }
@@ -264,7 +264,7 @@ async function play(token: any, target: any, config: any = {}) {
  * @param {string} [config.id='disintegrate'] The id of the effect to stop.
  * @returns {Promise<void>}
  */
-async function stop(token: any, config: any = {}) {
+async function stop(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     return Sequencer.EffectManager.endEffects({ name: id, object: token });
@@ -276,7 +276,7 @@ async function stop(token: any, config: any = {}) {
  * @param {object} config Configuration for the effect.
  * @returns {Sequence} A Sequencer sequence object.
  */
-function reformCreate(target: any, config: any = {}) {
+function reformCreate(target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, duration } = mConfig;
     const reformSequence = new Sequence();
@@ -312,7 +312,7 @@ function reformCreate(target: any, config: any = {}) {
     return reformSequence;
 }
 
-async function reformPlay(target: any, config: any = {}) {
+async function reformPlay(target: Token, config: any = {}) {
     let reform = new Sequence();
     reform = reform
         .animation().on(target).show(true)

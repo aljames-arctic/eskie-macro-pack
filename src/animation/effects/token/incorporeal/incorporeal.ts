@@ -22,7 +22,7 @@ function getTintColor(color: any) {
     }
 }
 
-async function create(token: any, config: any = {}) {
+async function create(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, changeLight, sound } = mConfig;
     const tintColor = getTintColor(color);
@@ -42,7 +42,7 @@ async function create(token: any, config: any = {}) {
     }
 
     seq.effect()
-        .name(`${id} - ${token.uuid}`)
+        .name(`${id} - ${token.document.uuid}`)
         .file(closest("jb2a.extras.tmfx.outflow.circle.01"))
         .attachTo(token, { cacheLocation: true, offset: { y: 0 }, gridUnits: true, bindAlpha: false })
         .scaleToObject(1.45, { considerTokenScale: true })
@@ -55,7 +55,7 @@ async function create(token: any, config: any = {}) {
         .persist();
 
     seq.effect()
-        .name(`${id} - ${token.uuid}`)
+        .name(`${id} - ${token.document.uuid}`)
         .copySprite(token)
         .spriteRotation(-token.document.rotation)
         .attachTo(token, { bindAlpha: false })
@@ -81,21 +81,21 @@ async function create(token: any, config: any = {}) {
     return seq;
 }
 
-async function play(token: any, config: any = {}) {
+async function play(token: Token, config: any = {}) {
     let seq = await create(token, config);
     if (seq) { await seq.play(); }
 }
 
-async function stop(token: any, config: any = {}) {
+async function stop(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     if (mConfig.changeLight) {
         await token.document.update({ light: { dim: 0, bright: 0 } });
     }
-    await Sequencer.EffectManager.endEffects({ name: `${id} - ${token.uuid}`, object: token });
+    await Sequencer.EffectManager.endEffects({ name: `${id} - ${token.document.uuid}`, object: token });
 }
 
-async function clean(token: any, config: any = {}) {
+async function clean(token: Token, config: any = {}) {
     new Sequence()
         .animation()
             .on(token)

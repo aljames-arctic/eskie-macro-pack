@@ -12,7 +12,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: any, position: any, config: any = {}) {
+async function create(token: Token, position: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
@@ -78,7 +78,7 @@ async function create(token: any, position: any, config: any = {}) {
     return seq;
 }
 
-async function play(token: any, position: any, config: any = {}) {
+async function play(token: Token, position: any, config: any = {}) {
     if (!position) {
         // Sequencer Crosshairs options
         const crosshairOptions = {
@@ -101,7 +101,7 @@ async function play(token: any, position: any, config: any = {}) {
     if (seq) { await seq.play(); }
 }
 
-async function stop(token: any, config: any = {}) {
+async function stop(token: Token, config: any = {}) {
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     Sequencer.EffectManager.endEffects({ name: id, object: token });
     Sequencer.EffectManager.endEffects({ name: `${id}-con`, object: token }); // Stop the persistent condition effect

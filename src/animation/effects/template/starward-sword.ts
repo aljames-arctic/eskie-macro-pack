@@ -17,7 +17,7 @@ const DEFAULT_CONFIG = {
     }
 };
 
-async function createStarwardSword(token: any, config: any = {}, options: any = {}) {
+async function createStarwardSword(token: Token, config: any = {}, options: any = {}) {
     if (options?.type === "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { size, darkMap, cameraZoom, sound } = mConfig;
@@ -238,7 +238,7 @@ async function createStarwardSword(token: any, config: any = {}, options: any = 
 
 
                         .thenDo(function () {
-                            targets.forEach((target: any) => {
+                            targets.forEach((target: Token) => {
                                 const targetSeq = new Sequence();
                                 applySound(targetSeq, sound.impact);
                                 targetSeq
@@ -347,7 +347,7 @@ async function createStarwardSword(token: any, config: any = {}, options: any = 
                         .filter("ColorMatrix", { hue: 70 })
 
                         .thenDo(function () {
-                            targets.forEach((target: any) => {
+                            targets.forEach((target: Token) => {
                                 const targetSeq = new Sequence();
                                 applySound(targetSeq, sound.impact);
                                 targetSeq
@@ -391,7 +391,7 @@ async function createStarwardSword(token: any, config: any = {}, options: any = 
                 .zIndex(4)
 
                 .thenDo(function () {
-                    targets.forEach((target: any) => {
+                    targets.forEach((target: Token) => {
                         const targetSeq = new Sequence();
                         applySound(targetSeq, sound.impact);
                         targetSeq
@@ -518,7 +518,7 @@ async function createStarwardSword(token: any, config: any = {}, options: any = 
                 .zIndex(4)
 
                 .thenDo(function () {
-                    targets.forEach((target: any) => {
+                    targets.forEach((target: Token) => {
                         const targetSeq = new Sequence();
                         applySound(targetSeq, sound.impact);
                         targetSeq
@@ -557,13 +557,13 @@ async function createStarwardSword(token: any, config: any = {}, options: any = 
 }
 
 
-async function playStarwardSword(token: any, config: any = {}, options: any = {}) {
+async function playStarwardSword(token: Token, config: any = {}, options: any = {}) {
     if (options?.type === "aefx") return;
     let seq = await createStarwardSword(token, config, options);
     if (seq) { return seq.play(); }
 }
 
-function stopStarwardSword(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
+function stopStarwardSword(token: Token, { id = DEFAULT_CONFIG.id }: any = {}) {
     Sequencer.EffectManager.endEffects({ name: "Starward Sword" });
     Sequencer.EffectManager.endEffects({ name: `Starward Sword ${token.name} ${id}` });
 }

@@ -26,7 +26,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence|null} The created Sequence, or null if the dialog was cancelled.
  */
-async function createShapechange(token: any, config: any = {}) {
+async function createShapechange(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let { baseForm, hybridForm, wolfForm, sound } = mConfig;
     let shapechangeData = token.document.getFlag('eskie-macros', 'shapechange');
@@ -194,7 +194,7 @@ async function createShapechange(token: any, config: any = {}) {
 
         // Swap the token image to the chosen form.
         .thenDo(function () {
-            token.document.update({ 'texture.src': targetForm });
+            (token.document as any).update({ 'texture.src': targetForm });
         })
 
         // Claw slash impact — below the token for atmosphere.
@@ -228,7 +228,7 @@ async function createShapechange(token: any, config: any = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createRevert(token: any, config: any = {}) {
+async function createRevert(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { sound } = mConfig;
     const { baseForm } = token.document.getFlag('eskie-macros', 'shapechange');
@@ -285,7 +285,7 @@ async function createRevert(token: any, config: any = {}) {
 
         // Swap the token image back to the base form.
         .thenDo(function () {
-            token.document.update({ 'texture.src': baseForm });
+            (token.document as any).update({ 'texture.src': baseForm });
         })
         ;
 
@@ -299,7 +299,7 @@ async function createRevert(token: any, config: any = {}) {
  * @param {object} config Configuration options.
  * @returns {Promise<void>}
  */
-async function playShapechange(token: any, config: any = {}) {
+async function playShapechange(token: Token, config: any = {}) {
     const sequence = await createShapechange(token, config);
     if (sequence) return sequence.play();
 }
@@ -311,7 +311,7 @@ async function playShapechange(token: any, config: any = {}) {
  * @param {object} config Configuration options.
  * @returns {Promise<void>}
  */
-async function playRevert(token: any, config: any = {}) {
+async function playRevert(token: Token, config: any = {}) {
     const sequence = await createRevert(token, config);
     if (sequence) return sequence.play();
 }

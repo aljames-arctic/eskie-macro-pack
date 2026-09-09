@@ -183,7 +183,7 @@ async function playAnimateDead(undeadToken: any, config: any = {}) {
  * @param {Token} token The token to stop effects on.
  * @param {object} options Options for stopping effects.
  */
-function stopAnimateDead(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
+function stopAnimateDead(token: Token, { id = DEFAULT_CONFIG.id }: any = {}) {
     // No persistent effects to stop for Animate Dead based on the original script.
     // If there were persistent effects, this is where they would be stopped.
 }

@@ -31,7 +31,7 @@ export const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-function create(token: any, config: any = {}) {
+function create(token: Token, config: any = {}) {
     const { id, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
 
@@ -82,7 +82,7 @@ function create(token: any, config: any = {}) {
     return sequence;
 }
 
-async function play(token: any, config: any = {}) {
+async function play(token: Token, config: any = {}) {
     const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const effectFunction = `eskie.effect.sandevistan.macro.movement`;
     const code = `${effectFunction}(token.object, tile)`;
@@ -91,7 +91,7 @@ async function play(token: any, config: any = {}) {
     if (sequence) return sequence.play();
 }
 
-async function stop(token: any, config: any = {}) {
+async function stop(token: Token, config: any = {}) {
     const { id, imageDuration } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
 
@@ -114,7 +114,7 @@ async function stop(token: any, config: any = {}) {
     await endSequence.play();
 }
 
-async function travelSequence(token: any, tile: any, config: any = {}, options: any = {}) {
+async function travelSequence(token: Token, tile: Tile, config: any = {}, options: any = {}) {
     const { travelTime, label } = options;
     const { msPerImage, imageDuration, hueIteration } = config;
     const priorIterations = hueIteration ?? 0;
@@ -143,13 +143,13 @@ async function travelSequence(token: any, tile: any, config: any = {}, options: 
     }
 
     config.hueIteration = priorIterations + repeats;
-    await tile.setFlag(MODULE_ID, 'config', config);
+    await tile.document.setFlag(MODULE_ID, 'config', config);
 
     return seq;
 }
 
-async function movement(token: any, tile: any) {
-    const config = tile.getFlag(MODULE_ID, 'config') ?? {};
+async function movement(token: Token, tile: Tile) {
+    const config = tile.document.getFlag(MODULE_ID, 'config') ?? {};
     const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { travelTime, label } = await matt.movement.configure(token, tile, mergedConfig);
     const travelSeq = await travelSequence(token, tile, mergedConfig, { travelTime, label });

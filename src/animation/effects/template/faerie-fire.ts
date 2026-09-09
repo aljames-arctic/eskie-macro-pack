@@ -27,7 +27,7 @@ function getTintAndHue(color: any) {
     }
 }
 
-async function create(token: any, config: any = {}) {
+async function create(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const seq = await createCloud(token, mConfig);
     const { targets } = mConfig;
@@ -40,7 +40,7 @@ async function create(token: any, config: any = {}) {
     return seq;
 }
 
-async function createCloud(token: any, config: any = {}) {
+async function createCloud(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, template, color, sound } = mConfig;
     const { tintColor, hue, hue2 } = getTintAndHue(color);
@@ -137,7 +137,7 @@ async function createCloud(token: any, config: any = {}) {
     return sequence;
 }
 
-function createEffect(token: any, config: any = {}) {
+function createEffect(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, glow, sound } = mConfig;
     const { tintColor } = getTintAndHue(color);
@@ -175,22 +175,22 @@ function createEffect(token: any, config: any = {}) {
     return sequence;
 }
 
-async function play(token: any, config: any = {}) {
+async function play(token: Token, config: any = {}) {
     const sequence = await create(token, config);
     if (sequence) return sequence.play();
 }
 
-async function playCloud(token: any, config: any = {}) {
+async function playCloud(token: Token, config: any = {}) {
     const sequence = await createCloud(token, config);
     if (sequence) return sequence.play();
 }
 
-async function playEffect(token: any, config: any = {}) {
+async function playEffect(token: Token, config: any = {}) {
     const sequence = await createEffect(token, config);
     if (sequence) return sequence.play();
 }
 
-async function stop(token: any, config: any = {}) {
+async function stop(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     const tokenId = token.id;

@@ -5,7 +5,7 @@ import { applySound, DEFAULT_SOUND_CONFIG } from "../../../utils/sound.js";
 // Mapping of tag -> Sequencer file
 const defaultDetectionConfig = {};
 // Return true if any tag in tags is applied
-const defaultValidator = async function (target: any, tags: any) {
+const defaultValidator = async function (target: Token, tags: any) {
     return false;
 }
 
@@ -21,7 +21,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function _createDetectionEffects(target: any, config: any = {}) {
+async function _createDetectionEffects(target: Token, config: any = {}) {
     const tags = Object.keys(config.detection);
     let sequence = new Sequence();
     applySound(sequence, config.sound);
@@ -91,7 +91,7 @@ async function _createDetectionEffects(target: any, config: any = {}) {
  * @param {object} [config.detectionConfig=defaultDetectionConfig] The detection configuration.
  * @returns {Promise<Sequence>} A promise that resolves with the sequence.
  */
-async function create(token: any, config: any = {}) {
+async function create(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const gridDistance = adapter.getSceneDimensions(canvas?.scene).distance;
     const targets = canvas.tokens.placeables.filter((t) => {
@@ -122,7 +122,7 @@ async function create(token: any, config: any = {}) {
     return sequence;
 }
 
-async function play(token: any, config: any = {}) {
+async function play(token: Token, config: any = {}) {
     const seq = await create(token, config);
     if (seq) { return seq.play(); }
 }

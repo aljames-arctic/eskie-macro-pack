@@ -16,7 +16,7 @@ const DEFAULT_CONFIG = {
     }
 };
 
-async function createMelee(token: any, target: any, config: any = {}) {
+async function createMelee(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { darkMap, sound } = mConfig;
 
@@ -121,12 +121,12 @@ async function createMelee(token: any, target: any, config: any = {}) {
     return sequence;
 }
 
-async function playMelee(token: any, target: any, config: any = {}) {
+async function playMelee(token: Token, target: Token, config: any = {}) {
     const sequence = await createMelee(token, target, config);
     if (sequence) return sequence.play();
 }
 
-async function createRanged(token: any, target: any, config: any = {}) {
+async function createRanged(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { darkMap, sound } = mConfig;
 
@@ -221,12 +221,12 @@ async function createRanged(token: any, target: any, config: any = {}) {
     return sequence;
 }
 
-async function playRanged(token: any, target: any, config: any = {}) {
+async function playRanged(token: Token, target: Token, config: any = {}) {
     const sequence = await createRanged(token, target, config);
     if (sequence) return sequence.play();
 }
 
-async function createTwilightMelee(token: any, target: any, config: any = {}) {
+async function createTwilightMelee(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { darkMap, type, weight, isCrit, sound } = mConfig;
 
@@ -327,12 +327,12 @@ async function createTwilightMelee(token: any, target: any, config: any = {}) {
     return sequence;
 }
 
-async function playTwilightMelee(token: any, target: any, config: any = {}) {
+async function playTwilightMelee(token: Token, target: Token, config: any = {}) {
     const sequence = await createTwilightMelee(token, target, config);
     if (sequence) return sequence.play();
 }
 
-async function createTwilightRanged(token: any, target: any, config: any = {}) {
+async function createTwilightRanged(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { darkMap, isCrit, sound } = mConfig;
 
@@ -421,7 +421,7 @@ async function createTwilightRanged(token: any, target: any, config: any = {}) {
     return sequence;
 }
 
-async function playTwilightRanged(token: any, target: any, config: any = {}) {
+async function playTwilightRanged(token: Token, target: Token, config: any = {}) {
     const sequence = await createTwilightRanged(token, target, config);
     if (sequence) return sequence.play();
 }

@@ -15,7 +15,7 @@ const DEFAULT_CONFIG = {
     },
 };
 
-async function createHarvest(token: any, target: any, config: any = {}) {
+async function createHarvest(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
@@ -133,12 +133,12 @@ async function createHarvest(token: any, target: any, config: any = {}) {
     return seq;
 }
 
-async function playHarvest(token: any, target: any, config: any = {}) {
+async function playHarvest(token: Token, target: Token, config: any = {}) {
     const seq = await createHarvest(token, target, config);
     if (seq) return seq.play();
 }
 
-async function createUse(token: any, target: any, config: any = {}) {
+async function createUse(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
@@ -211,7 +211,7 @@ async function createUse(token: any, target: any, config: any = {}) {
     return seq;
 }
 
-async function playUse(token: any, target: any, config: any = {}) {
+async function playUse(token: Token, target: Token, config: any = {}) {
     const seq = await createUse(token, target, config);
     if (seq) return seq.play();
 }

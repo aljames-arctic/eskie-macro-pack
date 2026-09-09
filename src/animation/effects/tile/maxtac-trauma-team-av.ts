@@ -13,7 +13,7 @@ export const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(tile: any, config: any = {}) {
+async function create(tile: Tile, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { effectNameFly, effectNameLanding, sound } = mConfig;
 
@@ -247,7 +247,7 @@ async function create(tile: any, config: any = {}) {
     return sequence;
 }
 
-async function play(tile: any, config: any = {}) {
+async function play(tile: Tile, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { flyingTag } = mConfig;
 
@@ -261,7 +261,7 @@ async function play(tile: any, config: any = {}) {
     if (seq) return seq.play();
 }
 
-async function stop(tile: any, config: any = {}) {
+async function stop(tile: Tile, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { flyingTag, effectNameFly, effectNameLanding } = mConfig;
 

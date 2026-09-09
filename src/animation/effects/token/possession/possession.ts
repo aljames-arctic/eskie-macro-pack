@@ -21,7 +21,7 @@ function getTintColor(color: any) {
     }
 }
 
-async function create(token: any, target: any, config: any = {}) {
+async function create(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, sound } = mConfig;
     const tintColor = getTintColor(color);
@@ -39,7 +39,7 @@ async function create(token: any, target: any, config: any = {}) {
         .copySprite(token)
         .spriteRotation(-token.document.rotation)
         .atLocation(target)
-        .mirrorX(token.document.mirrorX)
+        .mirrorX(token.document.texture.scaleX < 0)
         .animateProperty('spriteContainer', 'position.y', { from: -1, to: 0, duration: 750, gridUnits: true, ease: "easeOutExpo" })
         .scaleToObject(1, { considerTokenScale: true })
         .duration(750)
@@ -67,7 +67,7 @@ async function create(token: any, target: any, config: any = {}) {
 
         .effect()
         .delay(500)
-        .name(`${id} - ${target.uuid}`)
+        .name(`${id} - ${target.document.uuid}`)
         .file(closest("jb2a.extras.tmfx.outflow.circle.01"))
         .attachTo(target, { cacheLocation: true, offset: { y: 0 }, gridUnits: true, bindAlpha: false })
         .scaleToObject(1.45, { considerTokenScale: true })
@@ -83,12 +83,12 @@ async function create(token: any, target: any, config: any = {}) {
 
         .effect()
         .delay(500)
-        .name(`${id} - ${target.uuid}`)
+        .name(`${id} - ${target.document.uuid}`)
         .copySprite(target)
         .spriteRotation(-target.document.rotation)
         .attachTo(target, { bindAlpha: false })
         .belowTokens()
-        .mirrorX(token.document.mirrorX)
+        .mirrorX(token.document.texture.scaleX < 0)
         .scaleToObject(1, { considerTokenScale: true })
         .loopProperty("alphaFilter", "alpha", { from: 0.75, to: 1, duration: 1500, pingPong: true, ease: "easeOutSine" })
         .filter("Glow", { color: tintColor, distance: 5, outerStrength: 4, innerStrength: 0 })
@@ -105,15 +105,15 @@ async function create(token: any, target: any, config: any = {}) {
     return seq;
 }
 
-async function play(token: any, target: any, config: any = {}) {
+async function play(token: Token, target: Token, config: any = {}) {
     let seq = await create(token, target, config);
     if (seq) { await seq.play(); }
 }
 
-async function stop(token: any, target: any, config: any = {}) {
+async function stop(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
-    await Sequencer.EffectManager.endEffects({ name: `${id} - ${target.uuid}`, object: target });
+    await Sequencer.EffectManager.endEffects({ name: `${id} - ${target.document.uuid}`, object: target });
     let sequence = new Sequence().animation().on(token).show(true);
     return sequence.play();
 }

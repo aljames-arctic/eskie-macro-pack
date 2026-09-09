@@ -24,7 +24,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options.
  * @returns {Sequence} The created Sequence object.
  */
-async function create(target: any, config: any = {}) {
+async function create(target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { werewolfForm, sound } = mConfig;
 
@@ -151,7 +151,7 @@ async function create(target: any, config: any = {}) {
  * @param {object} config Configuration options.
  * @returns {Promise<void>}
  */
-async function play(target: any, config: any = {}) {
+async function play(target: Token, config: any = {}) {
     const sequence = await create(target, config);
     if (sequence) return sequence.play();
 }

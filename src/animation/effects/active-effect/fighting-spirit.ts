@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-function create(token: any, config: any = {}) {
+function create(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
     const label = `${id} - ${token.name}`;
@@ -108,12 +108,12 @@ function create(token: any, config: any = {}) {
     return seq;
 }
 
-async function play(token: any, config: any = {}) {
+async function play(token: Token, config: any = {}) {
     const seq = await create(token, config);
     if (seq) return seq.play();
 }
 
-async function stop(token: any, config: any = {}) {
+async function stop(token: Token, config: any = {}) {
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.name}`;
     Sequencer.EffectManager.endEffects({ name: label, object: token }); 

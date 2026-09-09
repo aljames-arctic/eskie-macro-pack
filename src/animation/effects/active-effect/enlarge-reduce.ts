@@ -23,7 +23,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createEnlarge(token: any, config: any = {}) {
+async function createEnlarge(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, scaleFactor, sound } = mConfig;
 
@@ -69,7 +69,7 @@ async function createEnlarge(token: any, config: any = {}) {
         .zIndex(0)
 
         .thenDo(function () {
-            return token.document.update({
+            return (token.document as any).update({
                 height: (token.document.height > 0.5) ? token.document.height + scaleFactor : 1,
                 width: (token.document.width > 0.5) ? token.document.width + scaleFactor : 1,
                 scale: 1,
@@ -141,7 +141,7 @@ async function createEnlarge(token: any, config: any = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<Sequence>} A promise that resolves when the sequence starts playing.
  */
-async function playEnlarge(token: any, config: any = {}) {
+async function playEnlarge(token: Token, config: any = {}) {
     const sequence = await createEnlarge(token, config);
     if (sequence) return sequence.play();
 }
@@ -153,7 +153,7 @@ async function playEnlarge(token: any, config: any = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createReduce(token: any, config: any = {}) {
+async function createReduce(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, scaleFactor, sound } = mConfig;
 
@@ -198,7 +198,7 @@ async function createReduce(token: any, config: any = {}) {
         .zIndex(0)
 
         .thenDo(function () {
-            return token.document.update({
+            return (token.document as any).update({
                 height: (token.document.height - scaleFactor) > 0 ? token.document.height - scaleFactor : 0.5,
                 width: (token.document.width - scaleFactor) > 0 ? token.document.width - scaleFactor : 0.5,
                 scale: 1,
@@ -269,7 +269,7 @@ async function createReduce(token: any, config: any = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<Sequence>} A promise that resolves when the sequence starts playing.
  */
-async function playReduce(token: any, config: any = {}) {
+async function playReduce(token: Token, config: any = {}) {
     const sequence = await createReduce(token, config);
     if (sequence) return sequence.play();
 }

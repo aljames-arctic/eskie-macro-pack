@@ -41,7 +41,7 @@ const DEFAULT_CONFIG = {
  * 
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
-async function create(token: any, config: any = {}) {
+async function create(token: Token, config: any = {}) {
     // TODO(bakanabaka): Utilizes old [] -> {}
     let { id, duration, effect, facing , sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -79,7 +79,7 @@ async function create(token: any, config: any = {}) {
         .loopProperty('spriteContainer', 'position.y', { from: 0, to: -0.01, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
         .loopProperty('sprite', "width", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
         .loopProperty('sprite', "height", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
-        .mirrorY(token.document.mirrorX ?? false)
+        .mirrorY(token.document.texture.scaleX < 0)
         .waitUntilFinished(-200)
     laughEffect = (duration > 0) ? laughEffect.duration(duration) : laughEffect.persist();
 
@@ -91,12 +91,12 @@ async function create(token: any, config: any = {}) {
     return laughEffect;
 }
 
-async function play(token: any, config: any = {}) {
+async function play(token: Token, config: any = {}) {
     const seq = await create(token, config);
     if (seq) { await seq.play(); }
 }
 
-async function stop(token: any, config: any = {}) {
+async function stop(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     return Sequencer.EffectManager.endEffects({ name: mConfig.id, object: token });
 }

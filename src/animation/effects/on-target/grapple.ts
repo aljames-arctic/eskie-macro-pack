@@ -10,7 +10,7 @@ export const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-function create(token: any, target: any, config: any = {}) {
+function create(token: Token, target: Token, config: any = {}) {
     const { id, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
 
@@ -38,7 +38,7 @@ function create(token: any, target: any, config: any = {}) {
     return sequenceOn;
 }
 
-async function play(token: any, target: any, config: any = {}) {
+async function play(token: Token, target: Token, config: any = {}) {
     const targetuuid = target.document.uuid;
     const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const effectFunction = `eskie.effect.grapple.macro.movement`;
@@ -48,14 +48,14 @@ async function play(token: any, target: any, config: any = {}) {
     if (sequence) return sequence.play();
 }
 
-async function stop(token: any, target?: any, config: any = {}) {
+async function stop(token: Token, target?: Token, config: any = {}) {
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
     await matt.movement.stop(token, label);
     Sequencer.EffectManager.endEffects({ name: label, object: token });
 }
 
-async function movement(token: any, targetuuid: string, tile: any, config: any = {}) {
+async function movement(token: Token, targetuuid: string, tile: Tile, config: any = {}) {
     const targetDoc = await adapter.fromUuid(targetuuid);
     const target = targetDoc?.object;
     if (!target) return;

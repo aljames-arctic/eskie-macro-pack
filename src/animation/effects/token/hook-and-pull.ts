@@ -22,7 +22,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config - Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function create(token: any, target: any, config: any = {}) {
+async function create(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { hitTargets, timingAdjust, effect } = mConfig;
     const isHit = mConfig.isHit ?? hitTargets?.includes(target.document.id);
@@ -84,7 +84,7 @@ async function create(token: any, target: any, config: any = {}) {
  * @param {Token} target - The target token.
  * @param {object} config - Configuration options for the animation.
  */
-async function play(token: any, target: any, config: any = {}) {
+async function play(token: Token, target: Token, config: any = {}) {
     const sequence = await create(token, target, config);
     if (sequence) sequence.play();
 }
@@ -92,7 +92,7 @@ async function play(token: any, target: any, config: any = {}) {
 /**
  * Stops the Hook and Pull animation (transient effect).
  */
-function stop(token: any, config: any = {}) {
+function stop(token: Token, config: any = {}) {
     // No persistent effects to stop
 }
 

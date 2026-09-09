@@ -22,7 +22,7 @@ const DEFAULT_CONFIG = {
  * @param {string} [config.id='PetrifyingGaze'] The id of the effect.
  * @returns {Promise<Sequence>} A promise that resolves with the complete effect sequence.
  */
-async function create(token: any, targetTokens: any, config: any = {}) {
+async function create(token: Token, targetTokens: Token | Token[], config: any = {}) {
     const targets = [targetTokens].flat().filter(Boolean);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
@@ -133,7 +133,7 @@ async function create(token: any, targetTokens: any, config: any = {}) {
  * @param {object} [config={}] Configuration for the effect.
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
-async function play(token: any, targetTokens: any, config: any = {}) {
+async function play(token: Token, targetTokens: Token | Token[], config: any = {}) {
     let seq = await create(token, targetTokens, config);
     if (seq) { await seq.play(); }
 }

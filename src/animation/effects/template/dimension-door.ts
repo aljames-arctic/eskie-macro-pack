@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
     }
 };
 
-async function create(token: any, config: any = {}) {
+async function create(token: Token, config: any = {}) {
     const { id, template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const cfg = { 
@@ -96,7 +96,7 @@ async function create(token: any, config: any = {}) {
     return sequence;
 }
 
-async function play(token: any, config: any = {}) {
+async function play(token: Token, config: any = {}) {
     const sequence = await create(token, config);
     if (sequence) {
         sequence.play();

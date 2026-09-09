@@ -27,7 +27,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createWings(token: any, config: any = {}) {
+async function createWings(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, image, offset, hue, wingSize, speedMulti, swayMulti, mirrorX, mirrorY, sound } = mConfig;
 
@@ -94,7 +94,7 @@ async function createWings(token: any, config: any = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<void>} A promise that resolves when the effect is played or stopped.
  */
-async function playWings(token: any, config: any = {}) {
+async function playWings(token: Token, config: any = {}) {
     const sequence = await createWings(token, config);
     if (sequence) { sequence.play(); }
 }
@@ -105,7 +105,7 @@ async function playWings(token: any, config: any = {}) {
  * @param {Token} token The token to remove wings from.
  * @param {object} config Configuration options for the animation.
  */
-function stopWings(token: any, config: any = {}) {
+function stopWings(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 

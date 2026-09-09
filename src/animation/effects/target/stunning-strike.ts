@@ -20,7 +20,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createStunningStrike(token: any, target: any, config: any = {}) {
+async function createStunningStrike(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
@@ -90,7 +90,7 @@ async function createStunningStrike(token: any, target: any, config: any = {}) {
         .spriteRotation(-token.document.rotation)
         .atLocation(token)
         .scaleToObject(1, { considerTokenScale: true })
-        .mirrorX(token.document.mirrorX)
+        .mirrorX(token.document.texture.scaleX < 0)
         .animateProperty('spriteContainer', 'position.x', { from: 0, to: middle.x, duration: 100, ease: "easeOutExpo" })
         .animateProperty('spriteContainer', 'position.y', { from: 0, to: middle.y, duration: 100, ease: "easeOutExpo" })
         .animateProperty('spriteContainer', 'position.x', { from: 0, to: -middle.x, duration: 350, ease: "easeInOutQuad", fromEnd: true })
@@ -147,7 +147,7 @@ async function createStunningStrike(token: any, target: any, config: any = {}) {
         .opacity(0.25)
 
         .effect()
-        .name(`StunningStrike - DizzyStars - ${id} - ${target.uuid}`) // Unique name for stopping
+        .name(`StunningStrike - DizzyStars - ${id} - ${target.document.uuid}`) // Unique name for stopping
         .delay(1000)
         .file(closest("jb2a.dizzy_stars.200px.yellow"))
         .scaleIn(0, 100, { ease: "easeOutCubic" })
@@ -168,7 +168,7 @@ async function createStunningStrike(token: any, target: any, config: any = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<Sequence>} A promise that resolves when the sequence starts playing.
  */
-async function playStunningStrike(token: any, target: any, config: any = {}) {
+async function playStunningStrike(token: Token, target: Token, config: any = {}) {
     const sequence = await createStunningStrike(token, target, config);
     if (sequence) { return sequence.play(); }
 }
@@ -179,10 +179,10 @@ async function playStunningStrike(token: any, target: any, config: any = {}) {
  * @param {Token} target The token affected by the persistent effect.
  * @param {object} config Configuration options.
  */
-function stopStunningStrike(target: any, config: any = {}) {
+function stopStunningStrike(target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
-    Sequencer.EffectManager.endEffects({ name: `StunningStrike - DizzyStars - ${id} - ${target.uuid}` });
+    Sequencer.EffectManager.endEffects({ name: `StunningStrike - DizzyStars - ${id} - ${target.document.uuid}` });
 }
 
 export const stunningStrike = {

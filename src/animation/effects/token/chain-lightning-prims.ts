@@ -35,7 +35,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config - Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-function create(token: any, targetTokens: any[], config: any = {}) {
+function create(token: Token, targetTokens: any[], config: any = {}) {
     config = settingsOverride(config);
     config = adapter.mergeObject(DEFAULT_CONFIG, config);
     if (!targetTokens || targetTokens.length === 0) {
@@ -199,7 +199,7 @@ function create(token: any, targetTokens: any[], config: any = {}) {
  * @param {Array<Token>} targetTokens - An array of target tokens.
  * @param {object} config - Configuration options for the animation.
  */
-function play(token: any, targetTokens: any[], config: any = {}) {
+function play(token: Token, targetTokens: any[], config: any = {}) {
     const sequence = create(token, targetTokens, config);
     if (sequence) sequence.play();
 }

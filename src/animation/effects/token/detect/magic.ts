@@ -18,7 +18,7 @@ const defaultDetectionConfig = {
     necromancy: 'jb2a.magic_signs.rune.necromancy.complete.green',
 };
 
-const defaultValidator = async function (target: any, tags: any) {
+const defaultValidator = async function (target: Token, tags: any) {
     dependency.required([{ id: 'tagger', ref: 'Tagger' }]);
     return Tagger.hasTags(target, tags);
 }
@@ -35,12 +35,12 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: any, config: any = {}) {
+async function create(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     return detectUtil.create(token, mConfig);
 }
 
-async function play(token: any, config: any = {}) {
+async function play(token: Token, config: any = {}) {
     const seq = await create(token, config);
     if (seq) { return seq.play(); }
 }

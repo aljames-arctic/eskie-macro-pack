@@ -21,7 +21,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createSuggestion(token: any, target: any, config: any = {}) {
+async function createSuggestion(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
@@ -107,7 +107,7 @@ async function createSuggestion(token: any, target: any, config: any = {}) {
         .attachTo(target, { bindAlpha: false })
         .scaleToObject(1, { considerTokenScale: true })
         .belowTokens()
-        .mirrorX(token.document.mirrorX)
+        .mirrorX(token.document.texture.scaleX < 0)
         .loopProperty("alphaFilter", "alpha", { from: 0.75, to: 1, duration: 1500, pingPong: true, ease: "easeOutSine" })
         .filter("Glow", { color: 0x30aefd, distance: 3, outerStrength: 4, innerStrength: 0 })
         .fadeIn(500)
@@ -126,7 +126,7 @@ async function createSuggestion(token: any, target: any, config: any = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<Sequence>} A promise that resolves when the sequence starts playing.
  */
-async function playSuggestion(token: any, target: any, config: any = {}) {
+async function playSuggestion(token: Token, target: Token, config: any = {}) {
     if (!target) {
         log.warn("Suggestion: No target provided.");
         return;
@@ -140,7 +140,7 @@ async function playSuggestion(token: any, target: any, config: any = {}) {
  * @param {Token} token The token.
  * @param {object} options Options for stopping effects.
  */
-function stopSuggestion(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
+function stopSuggestion(token: Token, { id = DEFAULT_CONFIG.id }: any = {}) {
     // No persistent effects to stop for Suggestion.
 }
 

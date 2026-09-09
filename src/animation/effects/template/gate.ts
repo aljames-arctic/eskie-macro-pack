@@ -115,7 +115,7 @@ function _getPlaneConfig(destination: any) {
 }
 
 
-async function create(token: any, config: any = {}) {
+async function create(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const tokenId = token.id;
     mConfig.id = `${tokenId} - ${mConfig.id}`;
@@ -236,7 +236,7 @@ async function create(token: any, config: any = {}) {
     return seq;
 }
 
-async function play(token: any, config: any = {}, options: any = {}) {
+async function play(token: Token, config: any = {}, options: any = {}) {
     /*       Don't parse for active effects        *
      * We only care about removing when it expires */
     if (options?.type === "aefx") return;
@@ -244,7 +244,7 @@ async function play(token: any, config: any = {}, options: any = {}) {
     if (seq) { await seq.play(); }
 }
 
-async function stop(token: any, config: any = {}) {
+async function stop(token: Token, config: any = {}) {
     if (!token) return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const id = `${token.id} - ${mConfig.id}`;

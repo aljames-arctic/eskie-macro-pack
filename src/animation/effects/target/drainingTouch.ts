@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: any, target: any, config: any = {}) {
+async function create(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { color, changeLight, sound } = mConfig;
     const tintColorMap: Record<string, { tintColor: string; hue: number }> = {
@@ -45,7 +45,7 @@ async function create(token: any, target: any, config: any = {}) {
         .effect()
         .file(closest("jb2a.extras.tmfx.outflow.circle.01"))
         .atLocation(token)
-        .mirrorX(token.document.mirrorX)
+        .mirrorX(token.document.texture.scaleX < 0)
         .animateProperty('spriteContainer', 'position.x', { from: 0, to: middleposition.x, duration: 250, ease: "easeOutCubic" })
         .animateProperty('spriteContainer', 'position.y', { from: 0, to: middleposition.y, duration: 250, ease: "easeOutCubic" })
         .scaleToObject(1.45, { considerTokenScale: true })
@@ -65,7 +65,7 @@ async function create(token: any, target: any, config: any = {}) {
         .copySprite(token)
         .spriteRotation(-token.document.rotation)
         .atLocation(token)
-        .mirrorX(token.document.mirrorX)
+        .mirrorX(token.document.texture.scaleX < 0)
         .scaleToObject(1, { considerTokenScale: true })
         .animateProperty('spriteContainer', 'position.x', { from: 0, to: middleposition.x, duration: 250, ease: "easeOutCubic" })
         .animateProperty('spriteContainer', 'position.y', { from: 0, to: middleposition.y, duration: 250, ease: "easeOutCubic" })
@@ -147,7 +147,7 @@ async function create(token: any, target: any, config: any = {}) {
     return sequence;
 }
 
-async function play(token: any, target: any, config: any = {}) {
+async function play(token: Token, target: Token, config: any = {}) {
     await Tagger.addTags(token, "DrainingTouch");
     const sequence = await create(token, target, config);
     await sequence.play();
@@ -234,7 +234,7 @@ async function play(token: any, target: any, config: any = {}) {
     }
 }
 
-async function stop(token: any, config: any = {}) {
+async function stop(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     return Sequencer.EffectManager.endEffects({ name: id, object: token });

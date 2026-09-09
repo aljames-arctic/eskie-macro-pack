@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
     }
 };
 
-function createAura(token: any, config: any = {}, options: any = {}) {
+function createAura(token: Token, config: any = {}, options: any = {}) {
     const { id, opacity, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
 
@@ -52,13 +52,13 @@ function createAura(token: any, config: any = {}, options: any = {}) {
     return sequence;
 }
 
-async function playAura(token: any, config: any = {}, options: any = {}) {
+async function playAura(token: Token, config: any = {}, options: any = {}) {
     if (options?.type === "aefx") return;
     const sequence = createAura(token, config, options);
     if (sequence) return sequence.play();
 }
 
-function createDamageEffect(token: any, target: any, config: any = {}) {
+function createDamageEffect(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const sequence = new Sequence();
     applySound(sequence, mConfig.sound.damage);
@@ -132,10 +132,12 @@ function createDamageEffect(token: any, target: any, config: any = {}) {
  * @param {object} config - Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-function create(token: any, target?: any, config: any = {}) {
+function create(token: Token, target?: Token, config: any = {}) {
     const sequence = new Sequence();
     sequence.addSequence(createAura(token, config));
-    sequence.addSequence(createDamageEffect(token, target, config))
+    if (target) {
+        sequence.addSequence(createDamageEffect(token, target, config));
+    }
     return sequence;
 }
 
@@ -145,12 +147,12 @@ function create(token: any, target?: any, config: any = {}) {
  * @param {Token} target - The target token.
  * @param {object} options - Options for playing the animation, including config.
  */
-async function play(token: any, target?: any, config: any = {}) {
+async function play(token: Token, target?: Token, config: any = {}) {
     const sequence = create(token, target, config);
     if (sequence) return sequence.play();
 }
 
-async function stop(token: any, config: any = {}) {
+async function stop(token: Token, config: any = {}) {
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
     Sequencer.EffectManager.endEffects({ name: label, object: token });

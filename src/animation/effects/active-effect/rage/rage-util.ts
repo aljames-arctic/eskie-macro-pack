@@ -4,7 +4,7 @@ const DEFAULT_CONFIG = {
     id : 'rage util',
 }
 
-async function stop(token: any, config: any = {}) {
+async function stop(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     const label = `${id} - ${token.id}`;
@@ -21,7 +21,7 @@ async function stop(token: any, config: any = {}) {
     ]);
 }
 
-async function clean(token: any, config: any = {}) {
+async function clean(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     const label = `${id} - ${token.id}`;

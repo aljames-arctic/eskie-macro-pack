@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-function create(targets: any, config: any = {}) {
+function create(targets: Token | Token[], config: any = {}) {
     const targetList = [targets].flat().filter(Boolean);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     mConfig.destinationPoints = targetList.map(t => adapter.getCenter(t));
@@ -51,7 +51,7 @@ function create(targets: any, config: any = {}) {
     return shuffleSeq;
 }
 
-async function play(targets: any, config: any = {}) {
+async function play(targets: Token | Token[], config: any = {}) {
     const targetList = [targets].flat().filter(Boolean);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     mConfig.destinationPoints = targetList.map(t => adapter.getCenter(t));

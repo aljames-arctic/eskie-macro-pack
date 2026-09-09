@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-function generateOffsets(target: any, count = 3): Array<{ x: number; y: number }> {
+function generateOffsets(target: Token, count = 3): Array<{ x: number; y: number }> {
     const randomOffset: Array<{ x: number; y: number }> = [];
     const targetWidth = adapter.getTokenDimensions(target).widthUnits;
     const minDistance = 0.1 * targetWidth;
@@ -38,7 +38,7 @@ function generateOffsets(target: any, count = 3): Array<{ x: number; y: number }
     return randomOffset;
 }
 
-async function createDamageOnly(target: any, config: any = {}) {
+async function createDamageOnly(target: Token, config: any = {}) {
     let mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     mConfig = settingsOverride(mConfig);
     const { id, sound } = mConfig;
@@ -88,12 +88,12 @@ async function createDamageOnly(target: any, config: any = {}) {
     return seq;
 }
 
-async function playDamageOnly(target: any, config: any = {}) {
+async function playDamageOnly(target: Token, config: any = {}) {
     const seq = await createDamageOnly(target, config);
     if (seq) return seq.play();
 }
 
-async function createAttack(token: any, target1: any, target2?: any, config: any = {}) {
+async function createAttack(token: Token, target1: Token, target2?: Token, config: any = {}) {
     let mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     mConfig = settingsOverride(mConfig);
     const { id, type, weight, sound } = mConfig;
@@ -233,12 +233,12 @@ async function createAttack(token: any, target1: any, target2?: any, config: any
     return seq;
 }
 
-async function playAttack(token: any, target1: any, target2?: any, config: any = {}) {
+async function playAttack(token: Token, target1: Token, target2?: Token, config: any = {}) {
     const seq = await createAttack(token, target1, target2, config);
     if (seq) return seq.play();
 }
 
-async function stop(token: any, target: any, config: any = {}) {
+async function stop(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}` });

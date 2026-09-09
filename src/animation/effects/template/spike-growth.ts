@@ -67,7 +67,7 @@ async function createInitialSpikeGrowth(position: any, config: any = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Array<Sequence>} An array of Sequence objects for the persistent spikes.
  */
-async function createPersistentSpikes(token: any, centralPosition: any, config: any = {}) {
+async function createPersistentSpikes(token: Token, centralPosition: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, tint } = mConfig;
 
@@ -135,7 +135,7 @@ async function createPersistentSpikes(token: any, centralPosition: any, config: 
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<void>} A promise that resolves when the effect is played or stopped.
  */
-async function createSpikeGrowth(token: any, config: any = {}, options: any = {}) {
+async function createSpikeGrowth(token: Token, config: any = {}, options: any = {}) {
     if (options?.type === "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, size, template } = mConfig;
@@ -160,7 +160,7 @@ async function createSpikeGrowth(token: any, config: any = {}, options: any = {}
     return seq;
 }
 
-async function playSpikeGrowth(token: any, config: any = {}, options: any = {}) {
+async function playSpikeGrowth(token: Token, config: any = {}, options: any = {}) {
     /*       Don't parse for active effects        *
      * We only care about removing when it expires */
     if (options?.type === "aefx") return;
@@ -174,7 +174,7 @@ async function playSpikeGrowth(token: any, config: any = {}, options: any = {}) 
  * @param {Token} token The token that cast the spell (used to identify the effect).
  * @param {object} options Options for stopping effects.
  */
-function stopSpikeGrowth(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
+function stopSpikeGrowth(token: Token, { id = DEFAULT_CONFIG.id }: any = {}) {
     Sequencer.EffectManager.endEffects({ name: `Spike Growth ${token.name} ${id}` });
 }
 

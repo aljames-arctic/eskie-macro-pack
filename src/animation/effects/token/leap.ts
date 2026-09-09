@@ -21,7 +21,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createLeap(token: any, config: any = {}) {
+async function createLeap(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let { id, position, sound } = mConfig;
 
@@ -129,7 +129,7 @@ async function createLeap(token: any, config: any = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<Sequence>} A promise that resolves when the sequence starts playing.
  */
-async function playLeap(token: any, config: any = {}) {
+async function playLeap(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let { id } = mConfig;
 
@@ -142,7 +142,7 @@ async function playLeap(token: any, config: any = {}) {
  * @param {Token} token The token.
  * @param {object} options Options for stopping effects.
  */
-function stopLeap(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
+function stopLeap(token: Token, { id = DEFAULT_CONFIG.id }: any = {}) {
     // No persistent effects to stop for Leap.
 }
 

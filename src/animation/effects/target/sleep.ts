@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(targets: any[], config: any = {}) {
+async function create(targets: Token[], config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const sequence = new Sequence();
     applySound(sequence, mConfig.sound);
@@ -65,7 +65,7 @@ async function create(targets: any[], config: any = {}) {
     return sequence;
 }
 
-async function play(targets: any[], config: any = {}) {
+async function play(targets: Token[], config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let position = mConfig.position;
     const crosshairConfig = {
@@ -88,7 +88,7 @@ async function play(targets: any[], config: any = {}) {
     if (sequence) { return sequence.play(); }
 }
 
-function stop(targets: any[], config: any = {}) {
+function stop(targets: Token[], config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     targets.forEach(t => {
         Sequencer.EffectManager.endEffects({ name: `Sleep-${t.id}` });

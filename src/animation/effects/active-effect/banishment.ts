@@ -44,7 +44,7 @@ const DEFAULT_CONFIG = {
     }
 };
 
-function modifyPortal(portal: any, target: any) {
+function modifyPortal(portal: any, target: Token) {
     if (portal?.file) return;
     
     let color = portal.color;
@@ -133,7 +133,7 @@ function modifyPortal(portal: any, target: any) {
     return closest(`jb2a.portals.vertical.vortex.${color}`);
 }
 
-async function createBanish(target: any, config: any = {}) {
+async function createBanish(target: Token, config: any = {}) {
     config = settingsOverride(config);
     const { sound, portal } = adapter.mergeObject(DEFAULT_CONFIG, config);
     modifyPortal(portal, target);
@@ -332,12 +332,12 @@ async function createBanish(target: any, config: any = {}) {
     return sequence;
 }
 
-async function playBanish(target: any, config: any = {}) {
+async function playBanish(target: Token, config: any = {}) {
     const sequence = await createBanish(target, config);
     if (sequence) return sequence.play();
 }
 
-async function createReturn(target: any, config: any = {}) {
+async function createReturn(target: Token, config: any = {}) {
     config = settingsOverride(config);
     const { color, sound, portal } = adapter.mergeObject(DEFAULT_CONFIG, config);
     modifyPortal(portal, target);
@@ -379,12 +379,12 @@ async function createReturn(target: any, config: any = {}) {
     return sequence;
 }
 
-async function playReturn(target: any, config: any = {}) {
+async function playReturn(target: Token, config: any = {}) {
     const sequence = await createReturn(target, config);
     if (sequence) return sequence.play();
 }
 
-async function clean(target: any, config: any = {}) {
+async function clean(target: Token, config: any = {}) {
     new Sequence()
         .animation()
         .on(target)

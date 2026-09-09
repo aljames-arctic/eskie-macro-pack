@@ -16,7 +16,7 @@ const DEFAULT_CONFIG = {
     }
 };
 
-async function create(token: any, config: any = {}) {
+async function create(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, darkMap, sound } = mConfig;
 
@@ -187,26 +187,26 @@ async function create(token: any, config: any = {}) {
     return seq;
 }
 
-async function play(token: any, config: any = {}) {
+async function play(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const {form} = mConfig;
 
     const seq = await create(token, config);
     if (seq) {
         if (form.change && form.dreadForm) {
-            await token.document.update({ img: form.dreadForm });
+            await (token.document as any).update({ 'texture.src': form.dreadForm });
         }
         return seq.play();
     }
 }
 
-async function stop(token: any, config: any = {}) {
+async function stop(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const {id, form} = mConfig;
 
     Sequencer.EffectManager.endEffects({ name: id, object: token });
     if (form.change && form.baseForm) {
-        await token.document.update({ img: form.baseForm });
+        await (token.document as any).update({ 'texture.src': form.baseForm });
     }
 }
 

@@ -31,7 +31,7 @@ const DEFAULT_CONFIG = {
     teleport: true
 };
 
-async function create(token: any, targets: any, config: any = {}) {
+async function create(token: Token, targets: Token | Token[], config: any = {}) {
     config = settingsOverride(config);
     const { id, animations, sound, teleport } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const targetList = [targets].flat().filter(target => target && target.id !== token.id);
@@ -91,7 +91,7 @@ async function create(token: any, targets: any, config: any = {}) {
     return seq;
 }
 
-async function play(token: any, targets: any, config: any = {}) {
+async function play(token: Token, targets: Token | Token[], config: any = {}) {
     let seq = await create(token, targets, config);
     if (seq) { await seq.play(); }
 }

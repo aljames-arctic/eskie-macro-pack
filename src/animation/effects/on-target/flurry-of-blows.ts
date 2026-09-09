@@ -29,7 +29,7 @@ const DEFAULT_CONFIG = {
     }
 };
 
-async function create(token: any, target: any, config: any = {}) {
+async function create(token: Token, target: Token, config: any = {}) {
     config = settingsOverride(config);
     const { color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
@@ -83,7 +83,7 @@ async function create(token: any, target: any, config: any = {}) {
     return seq;
 }
 
-async function play(token: any, target: any, config: any = {}) {
+async function play(token: Token, target: Token, config: any = {}) {
     const seq = await create(token, target, config);
     if (seq) { return seq.play(); }
 }

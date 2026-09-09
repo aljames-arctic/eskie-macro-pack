@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: any, target: any, config: any = {}) {
+async function create(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
     const sequence = new Sequence();
@@ -106,7 +106,7 @@ async function create(token: any, target: any, config: any = {}) {
         .attachTo(target, { bindAlpha: false })
         .scaleToObject(1, { considerTokenScale: true })
         .opacity(0.75)
-        .mirrorX(token.document.mirrorX)
+        .mirrorX(token.document.texture.scaleX < 0)
         .tint("#e51e19")
         .fadeIn(500)
         .fadeOut(500)
@@ -161,7 +161,7 @@ async function create(token: any, target: any, config: any = {}) {
         .attachTo(target, { bindAlpha: false })
         .scaleToObject(1, { considerTokenScale: true })
         .belowTokens()
-        .mirrorX(token.document.mirrorX)
+        .mirrorX(token.document.texture.scaleX < 0)
         .loopProperty("alphaFilter", "alpha", { from: 0.75, to: 1, duration: 1500, pingPong: true, ease: "easeOutSine" })
         .filter("Glow", { color: 0xe51e19, distance: 5, outerStrength: 4, innerStrength: 0 })
         .fadeIn(1000)
@@ -172,12 +172,12 @@ async function create(token: any, target: any, config: any = {}) {
     return sequence;
 }
 
-async function play(token: any, target: any, config: any = {}) {
+async function play(token: Token, target: Token, config: any = {}) {
     const sequence = await create(token, target, config);
     if (sequence) { return sequence.play(); }
 }
 
-function stop(token: any, config: any = {}) {
+function stop(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `${id} ${token.document.name}` });

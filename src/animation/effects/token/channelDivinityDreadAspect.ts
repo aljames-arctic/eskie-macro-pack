@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(token: any, targets: any, config: any = {}) {
+async function create(token: Token, targets: Token | Token[], config: any = {}) {
     const targetList = [targets].flat().filter(Boolean);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { darkMap, sound } = mConfig;
@@ -178,7 +178,7 @@ async function create(token: any, targets: any, config: any = {}) {
     return sequence;
 }
 
-async function play(token: any, targets: any, config: any = {}) {
+async function play(token: Token, targets: Token | Token[], config: any = {}) {
     const sequence = await create(token, targets, config);
     if (sequence) { return sequence.play(); }
 }

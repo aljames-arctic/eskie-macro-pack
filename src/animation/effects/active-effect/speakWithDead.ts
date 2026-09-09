@@ -22,7 +22,7 @@ const DEFAULT_CONFIG = {
  * @param {string} config.id - A unique ID for the effect to manage persistence.
  * @returns {Sequence} The animation sequence.
  */
-function create(token: any, config: any = {}) {
+function create(token: Token, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
@@ -50,7 +50,7 @@ function create(token: any, config: any = {}) {
  * @param {object} token - The token token.
  * @param {string} id - The unique ID for the effect to manage persistence.
  */
-function _addMagicCircleEffects(token: any, id: any) {
+function _addMagicCircleEffects(token: Token, id: any) {
     let sequence = new Sequence();
     sequence
         .effect()
@@ -89,7 +89,7 @@ function _addMagicCircleEffects(token: any, id: any) {
  * @param {object} token - The token token.
  * @param {string} label - The unique ID for the effect to manage persistence.
  */
-function _addTokenVisualEffects(token: any, label: any) {
+function _addTokenVisualEffects(token: Token, label: any) {
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
     let sequence = new Sequence();
     sequence
@@ -224,7 +224,7 @@ function _addTokenVisualEffects(token: any, label: any) {
  * @param {number} yOffset - The y-offset for the flame position.
  * @param {number} smokeZIndex - The zIndex for the smoke effect.
  */
-function _addCornerFlameEffects(token: any, id: any, xOffset: any, yOffset: any, smokeZIndex: any) {
+function _addCornerFlameEffects(token: Token, id: any, xOffset: any, yOffset: any, smokeZIndex: any) {
     let sequence = new Sequence();
     sequence
         .effect()
@@ -268,7 +268,7 @@ function _addCornerFlameEffects(token: any, id: any, xOffset: any, yOffset: any,
  * @param {object} config - Configuration options.
  * @param {string} config.id - A unique ID for the effect to manage persistence.
  */
-async function play(token: any, config: any = {}) {
+async function play(token: Token, config: any = {}) {
     config = settingsOverride(config);
     const sequence = create(token, config);
     await preload(config);
@@ -303,7 +303,7 @@ async function preload(config: any) {
  * @param {object} config - Configuration options.
  * @param {string} config.id - A unique ID for the effect to manage persistence.
  */
-async function stop(token: any, config: any = {}) {
+async function stop(token: Token, config: any = {}) {
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
     let opacity = new Sequence().animation().on(token).opacity(1);

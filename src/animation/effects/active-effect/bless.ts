@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
     },
 };
 
-function createCaster(token: any, config: any = {}) {
+function createCaster(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { color, sound } = mConfig;
     const gridSize = adapter.getSceneDimensions().size;
@@ -101,12 +101,12 @@ function createCaster(token: any, config: any = {}) {
     return sequence;
 }
 
-async function playCaster(token: any, config: any = {}) {
+async function playCaster(token: Token, config: any = {}) {
     const sequence = createCaster(token, config);
     if (sequence) return sequence.play();
 }
 
-function createTarget(target: any, config: any = {}) {
+function createTarget(target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, sound } = mConfig;
     let hue = -20;
@@ -140,17 +140,17 @@ function createTarget(target: any, config: any = {}) {
     return sequence;
 }
 
-async function playTarget(target: any, config: any = {}) {
+async function playTarget(target: Token, config: any = {}) {
     const sequence = createTarget(target, config);
     if (sequence) return sequence.play();
 }
-async function stopTarget(target: any, config: any = {}) {
+async function stopTarget(target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     return Sequencer.EffectManager.endEffects({ name: `${id} - ${target.name}`, object: target });
 }
 
-function create(token: any, targets: any, config: any = {}) {
+function create(token: Token, targets: Token | Token[], config: any = {}) {
     const targetList = [targets].flat().filter(Boolean);
     const sequence = createCaster(token, config);
     targetList.forEach(target => {
@@ -159,7 +159,7 @@ function create(token: any, targets: any, config: any = {}) {
     return sequence;
 }
 
-async function play(token: any, targets: any, config: any = {}) {
+async function play(token: Token, targets: Token | Token[], config: any = {}) {
     const sequence = create(token, targets, config);
     if (sequence) { return sequence.play(); }
 }

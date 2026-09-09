@@ -12,7 +12,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: any, config: any = {}) {
+async function create(token: Token, config: any = {}) {
     const rawConfig = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, rawConfig);
     const { sound, template } = mConfig;
@@ -100,7 +100,7 @@ async function create(token: any, config: any = {}) {
     return sequence;
 }
 
-async function play(token: any, config: any = {}) {
+async function play(token: Token, config: any = {}) {
     const sequence = await create(token, config);
     if (sequence) return sequence.play();
 }

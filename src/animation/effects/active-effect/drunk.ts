@@ -20,7 +20,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: any, config: any = {}) {
+async function create(token: Token, config: any = {}) {
     const { id, duration, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
     const label = `${id} - ${token.id}`;
@@ -85,7 +85,7 @@ async function create(token: any, config: any = {}) {
     return drunkEffect;
 }
 
-async function play(token: any, config: any = {}) {
+async function play(token: Token, config: any = {}) {
     const { overlay } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const seq = await create(token, config);
@@ -102,7 +102,7 @@ async function play(token: any, config: any = {}) {
     }
 }
 
-async function stop(token: any, config: any = {}) {
+async function stop(token: Token, config: any = {}) {
     const { id, overlay } = adapter.mergeObject(DEFAULT_CONFIG, config);
     if (overlay.applyPC || overlay.applyGM) {
         const owners = adapter.getTokenOwners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });

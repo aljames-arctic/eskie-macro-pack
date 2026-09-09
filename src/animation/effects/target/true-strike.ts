@@ -24,7 +24,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createTrueStrikeCast(token: any, config: any = {}) {
+async function createTrueStrikeCast(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
@@ -38,25 +38,24 @@ async function createTrueStrikeCast(token: any, config: any = {}) {
         .scale(0.25)
         .duration(3000)
         .fadeIn(1000)
-        .fadeOut(500)
+        .fadeOut(1000)
+        .attachTo(token)
 
         .effect()
-        .file(closest("jb2a.ward.star.yellow.02"))
+        .file(closest("jb2a.glint.blue.few"))
         .atLocation(token)
         .scale(0.25)
-        .fadeIn(500)
-        .fadeOut(500)
-        .filter("ColorMatrix", { saturate: -1, brightness: 1.5 })
-        .duration(1000)
+        .duration(3000)
+        .fadeIn(1000)
+        .fadeOut(1000)
+        .attachTo(token)
 
         .effect()
-        .file(closest("jb2a.particles.outward.orange.01.03"))
-        .scaleIn(0.25, 500, { ease: "easeOutQuint" })
-        .size(2, { gridUnits: true })
-        .fadeIn(500)
+        .file(closest("jb2a.impact.003.blue"))
+        .scaleIn(0, 100, { ease: "easeOutCubic" })
+        .scaleToObject(2)
+        .delay(1000)
         .atLocation(token)
-        .duration(3500)
-        .fadeOut(2500)
 
         .effect()
         .file(closest("jb2a.extras.tmfx.border.circle.outpulse.01.fast"))
@@ -64,7 +63,7 @@ async function createTrueStrikeCast(token: any, config: any = {}) {
         .size(1.5, { gridUnits: true })
 
         .effect()
-        .name(`TrueStrike - Glint - ${id} - ${token.uuid}`) // Persistent glint effect
+        .name(`TrueStrike - Glint - ${id} - ${token.document.uuid}`) // Persistent glint effect
         .file(closest("jb2a.glint.blue.few"))
         .atLocation(token)
         .scaleToObject(1.75)
@@ -83,7 +82,7 @@ async function createTrueStrikeCast(token: any, config: any = {}) {
         .scaleToObject(2)
 
         .effect()
-        .name(`TrueStrike - Border - ${id} - ${token.uuid}`) // Persistent border effect
+        .name(`TrueStrike - Border - ${id} - ${token.document.uuid}`) // Persistent border effect
         .file(closest("jb2a.token_border.circle.spinning.orange.001"))
         .atLocation(token)
         .attachTo(token)
@@ -106,7 +105,7 @@ async function createTrueStrikeCast(token: any, config: any = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<void>} A promise that resolves when the sequence starts playing.
  */
-async function playTrueStrikeCast(token: any, config: any = {}) {
+async function playTrueStrikeCast(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Check if TrueStrike tag already exists, if so, remove it (toggle behavior)
@@ -128,7 +127,7 @@ async function playTrueStrikeCast(token: any, config: any = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createTrueStrikeAttack(token: any, target: any, config: any = {}) {
+async function createTrueStrikeAttack(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     // const { id } = mConfig; // Not directly used in this animation for naming persistent effects
 
@@ -256,7 +255,7 @@ async function createTrueStrikeAttack(token: any, target: any, config: any = {})
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<void>} A promise that resolves when the sequence finishes playing.
  */
-async function playTrueStrikeAttack(token: any, target: any, config: any = {}) {
+async function playTrueStrikeAttack(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
@@ -282,15 +281,15 @@ async function playTrueStrikeAttack(token: any, target: any, config: any = {}) {
  * @param {Token} token The token to remove effects from.
  * @param {object} config Configuration options.
  */
-async function stopTrueStrike(token: any, config: any = {}) {
+async function stopTrueStrike(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
     if (Tagger.hasTags(token, "TrueStrike")) {
         await Tagger.removeTags(token, "TrueStrike");
     }
-    Sequencer.EffectManager.endEffects({ name: `TrueStrike - Glint - ${id} - ${token.uuid}` });
-    Sequencer.EffectManager.endEffects({ name: `TrueStrike - Border - ${id} - ${token.uuid}` });
+    Sequencer.EffectManager.endEffects({ name: `TrueStrike - Glint - ${id} - ${token.document.uuid}` });
+    Sequencer.EffectManager.endEffects({ name: `TrueStrike - Border - ${id} - ${token.document.uuid}` });
 }
 
 export const trueStrike = {

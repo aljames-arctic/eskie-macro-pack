@@ -17,7 +17,7 @@ const DEFAULT_CONFIG = {
     }
 };
 
-function create(token: any, target: any, config: any = {}) {
+function create(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { type, weight, color, attacks, sound } = mConfig;
 
@@ -29,7 +29,7 @@ function create(token: any, target: any, config: any = {}) {
     if (!targetSquare) return;
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
-    function attackAnimation(token: any, target: any, config: any) {
+    function attackAnimation(token: Token, target: Token, config: any) {
         const seq = new Sequence();
         applySound(seq, { ...sound, file: sound.file ?? `psfx.impacts.${type}` });
 
@@ -109,7 +109,7 @@ function create(token: any, target: any, config: any = {}) {
     return seq;
 }
 
-async function play(token: any, target: any, config: any = {}) {
+async function play(token: Token, target: Token, config: any = {}) {
     config = settingsOverride(config);
     const seq = await create(token, target, config);
     if (seq) { return seq.play(); }

@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(target: any, config: any = {}) {
+async function create(target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let sequence = new Sequence();
     applySound(sequence, mConfig.sound);
@@ -74,7 +74,7 @@ async function create(target: any, config: any = {}) {
     return sequence;
 }
 
-async function play(target: any, config: any = {}) {
+async function play(target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { position } = mConfig;
     const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);

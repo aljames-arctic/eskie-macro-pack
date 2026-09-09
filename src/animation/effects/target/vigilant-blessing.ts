@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-function _buildSequence(recipient: any, config: any = {}) {
+function _buildSequence(recipient: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, darkMap, sound } = mConfig;
 
@@ -113,27 +113,27 @@ function _buildSequence(recipient: any, config: any = {}) {
     return seq;
 }
 
-async function create(token: any, target: any, config: any = {}) {
+async function create(token: Token, target: Token, config: any = {}) {
     if (!token || !target) return;
     return _buildSequence(target, config);
 }
 
-async function play(token: any, target: any, config: any = {}) {
+async function play(token: Token, target: Token, config: any = {}) {
     const seq = await create(token, target, config);
     if (seq) return seq.play();
 }
 
-async function createEffect(token: any, config: any = {}) {
+async function createEffect(token: Token, config: any = {}) {
     if (!token) return;
     return _buildSequence(token, config);
 }
 
-async function playEffect(token: any, config: any = {}) {
+async function playEffect(token: Token, config: any = {}) {
     const seq = await createEffect(token, config);
     if (seq) return seq.play();
 }
 
-async function stopTarget(token: any, target: any, config: any = {}) {
+async function stopTarget(token: Token, target: Token, config: any = {}) {
     if (!target) return;
     const recipient = target;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
@@ -141,14 +141,14 @@ async function stopTarget(token: any, target: any, config: any = {}) {
     Sequencer.EffectManager.endEffects({ name: `${id} - ${recipient.id}`, object: recipient });
 }
 
-async function stopEffect(token: any, config: any = {}) {
+async function stopEffect(token: Token, config: any = {}) {
     if (!token) return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}`, object: token });
 }
 
-async function stop(token: any, target: any, config: any = {}) {
+async function stop(token: Token, target: Token, config: any = {}) {
     if (!target) return;
     const recipient = target;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);

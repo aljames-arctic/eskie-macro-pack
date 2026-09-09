@@ -16,7 +16,7 @@ const DEFAULT_CONFIG = {
     }
 };
 
-async function create(token: any, config: any = {}, options: any = {}) {
+async function create(token: Token, config: any = {}, options: any = {}) {
     if (options?.type === "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, template } = mConfig;
@@ -45,13 +45,13 @@ async function create(token: any, config: any = {}, options: any = {}) {
         .addSequence(tIn);
 }
 
-async function play(token: any, config: any = {}, options: any = {}) {
+async function play(token: Token, config: any = {}, options: any = {}) {
     if (options?.type === "aefx") return;
     let seq = await create(token, config, options);
     if (seq) return seq.play();
 }
 
-function stop(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
+function stop(token: Token, { id = DEFAULT_CONFIG.id }: any = {}) {
     // Instantaneous sequence; stop handler provided for interface consistency
 }
 

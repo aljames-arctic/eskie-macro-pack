@@ -26,7 +26,7 @@ function getColor(color: any) {
     }
 }
 
-async function create(token: any, targets: any, config: any = {}) {
+async function create(token: Token, targets: Token | Token[], config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, word, sound } = mConfig;
     const targetList = [targets].flat().filter(Boolean);
@@ -135,12 +135,12 @@ async function create(token: any, targets: any, config: any = {}) {
     return seq;
 }
 
-async function play(token: any, targets: any, config: any = {}) {
+async function play(token: Token, targets: Token | Token[], config: any = {}) {
     let seq = await create(token, targets, config);
     if (seq) { await seq.play(); }
 }
 
-async function stop(token: any, config: any = {}) {
+async function stop(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: id, object: token });

@@ -32,7 +32,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-function dashEffect(source: any, target: any, sound: any) {
+function dashEffect(source: Token, target: Token, sound: any) {
     const deltaX = target.x - source.x;
     const deltaY = source.y - target.y;
     const angleRad = Math.atan2(deltaY, deltaX);
@@ -51,7 +51,7 @@ function dashEffect(source: any, target: any, sound: any) {
     return sequence;
 }
 
-function deathAnimation(target: any, sound: any) {
+function deathAnimation(target: Token, sound: any) {
     let sequence = new Sequence();
     if (sound) applySound(sequence, sound);
     sequence.animation()
@@ -117,7 +117,7 @@ function deathAnimation(target: any, sound: any) {
     return sequence;
 }
 
-async function create(source: any, target: any, config: any = {}) {
+async function create(source: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { targetDeath, teleport, cameraFocus, text } = mConfig;
 
@@ -185,12 +185,12 @@ async function create(source: any, target: any, config: any = {}) {
     return sequence;
 }
 
-async function play(source: any, target: any, config: any = {}) {
+async function play(source: Token, target: Token, config: any = {}) {
     const seq = await create(source, target, config);
     if (seq) { await seq.play(); }
 }
 
-async function clean(target: any, config: any = {}) {
+async function clean(target: Token, config: any = {}) {
     return Promise.all([
         Sequencer.EffectManager.endEffects({ name: `IaijutsuStrike` }),
         Sequencer.EffectManager.endEffects({ name: `IaijutsuText` }),

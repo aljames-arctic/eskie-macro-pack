@@ -21,7 +21,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createSurprised(token: any, config: any = {}) {
+async function createSurprised(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
@@ -30,7 +30,7 @@ async function createSurprised(token: any, config: any = {}) {
 
     sequence
         .effect()
-        .name(`Surprised - Exclamation - ${id} - ${token.uuid}`) // Unique name for stopping
+        .name(`Surprised - Exclamation - ${id} - ${token.document.uuid}`) // Unique name for stopping
         .file("https://i.imgur.com/8Yr9fMC.png")
         .atLocation(token)
         .anchor({ x: 0.5, y: 1.55 })
@@ -43,7 +43,7 @@ async function createSurprised(token: any, config: any = {}) {
         .private()
 
         .effect()
-        .name(`Surprised - Question - ${id} - ${token.uuid}`) // Unique name for stopping
+        .name(`Surprised - Question - ${id} - ${token.document.uuid}`) // Unique name for stopping
         .file("https://i.imgur.com/myWyksT.png")
         .atLocation(token)
         .anchor({ x: -0.3, y: 1.25 })
@@ -67,7 +67,7 @@ async function createSurprised(token: any, config: any = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<void>} A promise that resolves when the effect is played or stopped.
  */
-async function playSurprised(token: any, config: any = {}) {
+async function playSurprised(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
@@ -88,15 +88,15 @@ async function playSurprised(token: any, config: any = {}) {
  * @param {Token} token The token to remove the effects from.
  * @param {object} config Configuration options.
  */
-async function stopSurprised(token: any, config: any = {}) {
+async function stopSurprised(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
     if (Tagger.hasTags(token, "Surprised")) {
         await Tagger.removeTags(token, "Surprised");
     }
-    Sequencer.EffectManager.endEffects({ name: `Surprised - Exclamation - ${id} - ${token.uuid}` });
-    Sequencer.EffectManager.endEffects({ name: `Surprised - Question - ${id} - ${token.uuid}` });
+    Sequencer.EffectManager.endEffects({ name: `Surprised - Exclamation - ${id} - ${token.document.uuid}` });
+    Sequencer.EffectManager.endEffects({ name: `Surprised - Question - ${id} - ${token.document.uuid}` });
 }
 
 export const surprised = {

@@ -31,25 +31,25 @@ function getVersion(config: any = {}) {
     return map[version - 1];
 }
 
-function create(token: any, config: any = {}) {
+function create(token: Token, config: any = {}) {
     const version = getVersion(config);
     if (!version) return;
     return version.fn.create(token, version.cfg);
 }
 
-async function play(token: any, config: any = {}) {
+async function play(token: Token, config: any = {}) {
     const version = getVersion(config);
     if (!version) return;
     return version.fn.play(token, version.cfg);
 }
 
-async function stop(token: any, config: any = {}) {
+async function stop(token: Token, config: any = {}) {
     const version = getVersion(config);
     if (!version) return;
     return version.fn.stop(token, version.cfg);
 }
 
-async function clean(token: any, config: any = {}) {
+async function clean(token: Token, config: any = {}) {
     const version = getVersion(config);
     if (!version) return;
     return version.fn.clean(token, version.cfg);

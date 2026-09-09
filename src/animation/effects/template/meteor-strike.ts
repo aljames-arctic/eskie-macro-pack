@@ -18,7 +18,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(source: any, config: any = {}) {
+async function create(source: Token, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { showMarkers, markerNamePrefix, sound } = mConfig;
@@ -84,12 +84,12 @@ async function create(source: any, config: any = {}) {
     return sequence;
 }
 
-async function play(source: any, config: any = {}) {
+async function play(source: Token, config: any = {}) {
     const sequence = await create(source, config);
     if (sequence) return sequence.play();
 }
 
-function stop(source: any, config: any = {}) {
+function stop(source: Token, config: any = {}) {
     // This animation is a one-shot sequence
 }
 

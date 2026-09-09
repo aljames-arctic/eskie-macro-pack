@@ -12,12 +12,12 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function pronePlay(token: any, target: any, config: any = {}) {
+async function pronePlay(token: Token, target: Token, config: any = {}) {
     const seq = await proneCreate(token, target, config);
     if (seq) { await seq.play(); }
 }
 
-function proneCreate(token: any, target: any, config: any = {}) {
+function proneCreate(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, sound } = mConfig;
     const label = `${id} - ${token.id}`;
@@ -79,7 +79,7 @@ function proneCreate(token: any, target: any, config: any = {}) {
     return seq;
 }
 
-function chargeCreate(token: any, config: any = {}) {
+function chargeCreate(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, sound } = mConfig;
     const label = matt.getLabel(id, token);
@@ -108,7 +108,7 @@ function chargeCreate(token: any, config: any = {}) {
     return sequenceOn;
 }
 
-async function chargePlay(token: any, config: any = {}) {
+async function chargePlay(token: Token, config: any = {}) {
     const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const effectFunction = `eskie.effect.totemicAttunement.elk.charge.macro.movement`;
     const code = `${effectFunction}(token.object, tile)`;
@@ -117,14 +117,14 @@ async function chargePlay(token: any, config: any = {}) {
     if (sequence) return sequence.play();
 }
 
-async function chargeStop(token: any, config: any = {}) {
+async function chargeStop(token: Token, config: any = {}) {
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
     await matt.movement.stop(token, label);
     Sequencer.EffectManager.endEffects({ name: label, object: token });
 }
 
-async function chargeMovement(token: any, tile: any, config: any = {}) {
+async function chargeMovement(token: Token, tile: Tile, config: any = {}) {
     function travelSequence(config: any = {}) {
         const { rotation, travelTime, label } = config;
         const particleRepeats = travelTime / 100;

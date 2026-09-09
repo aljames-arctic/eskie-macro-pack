@@ -8,8 +8,8 @@ const defaultDetectionConfig = {
     undead: 'jb2a.condition.curse.01.021.purple',
 };
 
-const defaultValidator = async function (target: any, tags: any) {
-    const targetRace = adapter.getCreatureType(target.actor);
+const defaultValidator = async function (target: Token, tags: any) {
+    const targetRace = target.actor ? adapter.getCreatureType(target.actor) : null;
     return (targetRace && tags.includes(targetRace)) || Boolean(Tagger?.hasTags(target, tags));
 };
 
@@ -25,12 +25,12 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: any, config: any = {}) {
+async function create(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     return detectUtil.create(token, mConfig);
 }
 
-async function play(token: any, config: any = {}) {
+async function play(token: Token, config: any = {}) {
     const seq = await create(token, config);
     if (seq) { return seq.play(); }
 }

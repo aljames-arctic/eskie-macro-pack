@@ -21,7 +21,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<Sequence|undefined>} The created Sequence object.
  */
-async function createSilence(token: any, config: any = {}) {
+async function createSilence(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, size, template, sound } = mConfig;
 
@@ -131,7 +131,7 @@ async function createSilence(token: any, config: any = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<Sequence>} A promise that resolves when the sequence starts playing.
  */
-async function playSilence(token: any, config: any = {}, options: any = {}) {
+async function playSilence(token: Token, config: any = {}, options: any = {}) {
     if (options?.type === "aefx") return;
     const sequence = await createSilence(token, config);
     if (sequence) { return sequence.play(); }
@@ -143,7 +143,7 @@ async function playSilence(token: any, config: any = {}, options: any = {}) {
  * @param {Token} token The token that cast the spell (used to identify the effect).
  * @param {object} options Options for stopping effects.
  */
-function stopSilence(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
+function stopSilence(token: Token, { id = DEFAULT_CONFIG.id }: any = {}) {
     Sequencer.EffectManager.endEffects({ name: `Silence ${token.name} ${id}` });
 }
 

@@ -52,7 +52,7 @@ async function create(position: any, config: any = {}) {
  * @param {Token} token - The casting token.
  * @param {object} options - Options for playing the animation, including config.
  */
-async function play(token: any, position?: any, config: any = {}) {
+async function play(token: Token, position?: any, config: any = {}) {
     if (!position) {
         const crosshairConfig = {
             size: token.document.width,

@@ -14,12 +14,12 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function play(token: any, target: any, config: any = {}) {
+async function play(token: Token, target: Token, config: any = {}) {
     const seq = await create(token, target, config);
     if (seq) { await seq.play(); }
 }
 
-async function create(token: any, target: any, config: any = {}) {
+async function create(token: Token, target: Token, config: any = {}) {
     if (!token || !target) return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, attack, sound } = mConfig;

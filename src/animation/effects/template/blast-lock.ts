@@ -60,7 +60,7 @@ function findLockedDoor(position: any, radius: any) {
  * @param {object} [config={}] Configuration for the effect.
  * @returns {Promise<Sequence|null>} A promise that resolves with the Sequence object, or null if the creation fails.
  */
-async function create(token: any, config: any = {}, options: any = {}) {
+async function create(token: Token, config: any = {}, options: any = {}) {
     if (options?.type === "aefx") return null;
     config = settingsOverride(config);
     const { id, template, crosshair, radius, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
@@ -166,7 +166,7 @@ async function create(token: any, config: any = {}, options: any = {}) {
  * @param {object} [config={}] Configuration for the effect.
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
-async function play(token: any, config: any = {}, options: any = {}) {
+async function play(token: Token, config: any = {}, options: any = {}) {
     if (options?.type === "aefx") return;
     const sequence = await create(token, config, options);
     if (sequence) {
@@ -174,7 +174,7 @@ async function play(token: any, config: any = {}, options: any = {}) {
     }
 }
 
-function stop(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
+function stop(token: Token, { id = DEFAULT_CONFIG.id }: any = {}) {
     // Instantaneous effect
 }
 

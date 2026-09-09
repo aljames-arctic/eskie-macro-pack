@@ -23,7 +23,7 @@ const DEFAULT_CONFIG_CAST = {
     }
 };
 
-async function createCast(source: any, config: any = {}, options: any = {}) {
+async function createCast(source: Token, config: any = {}, options: any = {}) {
     if (options?.type === "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_CAST, config);
     const { id, size, icon, label, tag, drawIcon, drawOutline, interval, rememberControlled, sound } = mConfig;
@@ -96,13 +96,13 @@ async function createCast(source: any, config: any = {}, options: any = {}) {
     return sequence;
 }
 
-async function playCast(source: any, config: any = {}, options: any = {}) {
+async function playCast(source: Token, config: any = {}, options: any = {}) {
     if (options?.type === "aefx") return;
     const sequence = await createCast(source, config, options);
     if (sequence) return sequence.play();
 }
 
-async function createTarget(source: any, config: any = {}, options: any = {}) {
+async function createTarget(source: Token, config: any = {}, options: any = {}) {
     if (options?.type === "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_CAST, config);
     let sequence = new Sequence();
@@ -235,13 +235,13 @@ async function createTarget(source: any, config: any = {}, options: any = {}) {
     return sequence;
 }
 
-async function playTarget(source: any, config: any = {}, options: any = {}) {
+async function playTarget(source: Token, config: any = {}, options: any = {}) {
     if (options?.type === "aefx") return;
     const sequence = await createTarget(source, config, options);
     if (sequence) return sequence.play();
 }
 
-async function stopTarget(source: any, config: any = {}) {
+async function stopTarget(source: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_CAST, config);
     let targets = mConfig.targets?.length ? mConfig.targets : Array.from(game.user?.targets ?? []);
     for (let target of targets) {
@@ -261,7 +261,7 @@ export const tashasCausticBrew = {
         stop: stopTarget,
         default_config: DEFAULT_CONFIG_CAST,
     },
-    create: async function (source: any, config: any = {}, options: any = {}) {
+    create: async function (source: Token, config: any = {}, options: any = {}) {
         if (options?.type === "aefx") return;
         const sequence = new Sequence();
         const castSeq = await createCast(source, config, options);
@@ -274,7 +274,7 @@ export const tashasCausticBrew = {
         }
         return sequence;
     },
-    play: async function (source: any, config: any = {}, options: any = {}) {
+    play: async function (source: Token, config: any = {}, options: any = {}) {
         if (options?.type === "aefx") return;
         const sequence = await this.create(source, config, options);
         if (sequence) return sequence.play();

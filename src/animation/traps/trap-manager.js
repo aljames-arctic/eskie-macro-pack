@@ -242,55 +242,16 @@ for (const id of ${JSON.stringify(tileIds)}) {
 ` : ''}
 await Promise.all(animPromises);`
 
-    const triggerTileIds = triggerRegions.map(r => r.id);
-    const sourceTileIds = originElements.map(e => e.id);
-    const targetTileIds = targetElements.map(e => e.id);
-
     const behaviorName = `${trapKey.charAt(0).toUpperCase() + trapKey.slice(1)} Trap (${MODULE_ID})`;
     const events = config.events ?? ['tokenEnter'];
 
     for (const triggerRegion of triggerRegions) {
-        const actionId = adapter.randomID();
-        const actionData = {
-            id: actionId,
-            animation,
-            triggerTiles: triggerTileIds,
-            sourceTiles: sourceTileIds,
-            targetTiles: targetTileIds,
-            extraTiles: extraResults,
-            config: trapOptions,
-        };
-
         const behaviorData = adapter.formatRegionBehaviorData({
             name: behaviorName,
             events,
             source: regionActionCode,
-            flags: {
-                [MODULE_ID]: {
-                    trap: {
-                        isTrapBehavior: true,
-                        ...actionData,
-                    }
-                }
-            }
         });
-        const createdBehavior = await adapter.createRegionBehavior(triggerRegion, behaviorData);
-        const behaviorId = createdBehavior?.id ?? actionId;
-        actionData.id = behaviorId;
-
-        await triggerRegion.update({
-            [`flags.${MODULE_ID}.trap.isTriggerRegion`]: true,
-            [`flags.${MODULE_ID}.trap.actions.${behaviorId}`]: actionData,
-        });
-    }
-
-    // Flag any origin placeables that are Tiles
-    for (const origin of originElements) {
-        if (adapter.isDocumentOfType(origin, 'Tile')) {
-            await origin.update({
-                [`flags.${MODULE_ID}.trap.isTrapTile`]: true,
-            });
-        }
+        await adapter.createRegionBehavior(triggerRegion, behaviorData);
     }
 
     notify.info(`Successfully setup ${trapKey} trap using Regions for ${triggerRegions.length} trigger region(s) and ${originElements.length} placeable(s).`);

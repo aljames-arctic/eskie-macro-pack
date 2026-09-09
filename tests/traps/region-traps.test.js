@@ -124,25 +124,10 @@ test('setupRegionTrap: configures RegionDocument flags and creates executeScript
     assert.equal(setupResult.triggerRegions.length, 1);
     assert.equal(setupResult.originElements.length, 1);
 
-    // Verify Region update flags
-    const regionUpdate = updatedFlags[0];
-    assert.equal(regionUpdate[`flags.${MODULE_ID}.trap.isTriggerRegion`], true);
-    const actionKey = Object.keys(regionUpdate).find(k => k.startsWith(`flags.${MODULE_ID}.trap.actions.`));
-    assert.ok(actionKey, 'Region update should store per-command action data');
-    const actionData = regionUpdate[actionKey];
-    assert.equal(actionData.animation, 'eskie.traps.spike');
-    assert.deepEqual(actionData.sourceTiles, ['tile-visual-10']);
-    assert.deepEqual(actionData.triggerTiles, ['region-trig-10']);
-    assert.deepEqual(actionData.targetTiles, []);
-
     // Verify created RegionBehavior payload
     assert.ok(createdBehaviorData);
     assert.equal(createdBehaviorData.type, 'executeScript');
     assert.deepEqual(createdBehaviorData.system.events, ['tokenEnter']);
-    assert.equal(createdBehaviorData.flags[MODULE_ID].trap.animation, 'eskie.traps.spike');
-    assert.deepEqual(createdBehaviorData.flags[MODULE_ID].trap.sourceTiles, ['tile-visual-10']);
-    assert.deepEqual(createdBehaviorData.flags[MODULE_ID].trap.triggerTiles, ['region-trig-10']);
-    assert.deepEqual(createdBehaviorData.flags[MODULE_ID].trap.targetTiles, []);
     assert.ok(createdBehaviorData.system.source.includes(`const adapter = game.modules.get('${MODULE_ID}').api.adapter;`));
     assert.ok(createdBehaviorData.system.source.includes('eskie.traps.spike.play(placeable, targets,'));
     assert.ok(createdBehaviorData.system.source.includes('await Promise.all(animPromises);'));
@@ -600,22 +585,7 @@ test('setupRegionTrap: appends new executeScript RegionBehavior without overwrit
         id: 'region-multi-beh',
         documentName: 'Region',
         behaviors: [existingBehavior],
-        flags: {
-            [MODULE_ID]: {
-                trap: {
-                    isTriggerRegion: true,
-                    actions: {
-                        'beh-1': {
-                            id: 'beh-1',
-                            animation: 'eskie.traps.spike',
-                            sourceTiles: ['tile-vis-1'],
-                            triggerTiles: ['region-multi-beh'],
-                            targetTiles: []
-                        }
-                    }
-                }
-            }
-        },
+        flags: {},
         update: async () => triggerRegionDoc,
         createEmbeddedDocuments: async (type, [data]) => {
             const beh = { id: `beh-new-${createdBehaviors.length + 1}`, ...data };
@@ -658,18 +628,7 @@ test('setupRegionTrap: appends new executeScript RegionBehavior without overwrit
     assert.equal(createdBehaviors.length, 1, 'A new RegionBehavior must be created/appended');
     assert.equal(createdBehaviors[0].type, 'executeScript');
     assert.equal(createdBehaviors[0].name, `Fire Trap (${MODULE_ID})`);
-    assert.equal(createdBehaviors[0].flags[MODULE_ID].trap.animation, 'eskie.traps.fire');
-    assert.deepEqual(createdBehaviors[0].flags[MODULE_ID].trap.sourceTiles, ['tile-vis-2']);
-    assert.deepEqual(createdBehaviors[0].flags[MODULE_ID].trap.triggerTiles, ['region-multi-beh']);
-    assert.deepEqual(createdBehaviors[0].flags[MODULE_ID].trap.targetTiles, []);
-    assert.ok(updatedData, 'Region should be updated with new action');
-    assert.deepEqual(updatedData[`flags.${MODULE_ID}.trap.actions.${createdBehaviors[0].id}`], {
-        id: createdBehaviors[0].id,
-        animation: 'eskie.traps.fire',
-        triggerTiles: ['region-multi-beh'],
-        sourceTiles: ['tile-vis-2'],
-        targetTiles: [],
-        extraTiles: {},
-        config: {}
-    });
+    assert.ok(createdBehaviors[0].system.source.includes('eskie.traps.fire.play(placeable, targets,'));
+    assert.ok(createdBehaviors[0].system.source.includes('await Promise.all(animPromises);'));
+    assert.equal(updatedData, null, 'No region document flags should be updated');
 });

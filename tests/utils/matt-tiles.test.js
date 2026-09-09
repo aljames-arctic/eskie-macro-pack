@@ -60,22 +60,14 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
     assert.ok(triggerUpdate, 'Trigger tile should be updated with MATT configuration');
     assert.equal(triggerUpdate['flags.monks-active-tiles.active'], true);
     assert.equal(triggerUpdate['flags.monks-active-tiles.trigger'], 'enter');
-    assert.equal(triggerUpdate[`flags.${MODULE_ID}.trap.isTriggerTile`], true);
 
     const triggerAction = triggerUpdate['flags.monks-active-tiles.actions'][0];
     assert.equal(triggerAction.action, 'runcode');
-    assert.deepEqual(triggerAction.trap.sourceTiles, ['tile-trap-1']);
-    assert.deepEqual(triggerAction.trap.triggerTiles, ['tile-trigger-1']);
-    assert.deepEqual(triggerAction.trap.targetTiles, []);
     assert.ok(typeof triggerAction.data.code === 'string');
 
     // Test executing trigger action code
     const mockTriggerTile = {
-        id: 'tile-trigger-1',
-        getFlag: (mod, key) => {
-            if (mod === MODULE_ID && key === 'trap.originIds') return ['tile-trap-1'];
-            return null;
-        }
+        id: 'tile-trigger-1'
     };
     const mockActivatingToken = { id: 'tok-activating', document: { id: 'tok-activating' } };
     const triggerExecFn = new Function('token', 'tile', 'canvas', `return (async () => { ${triggerAction.data.code} })();`);
@@ -89,14 +81,9 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
     assert.ok(trapUpdate, 'Trap tile should be updated with MATT configuration');
     assert.equal(trapUpdate['flags.monks-active-tiles.active'], true);
     assert.equal(trapUpdate['flags.monks-active-tiles.trigger'], 'manual');
-    assert.equal(trapUpdate[`flags.${MODULE_ID}.trap.isTrapTile`], true);
 
     const trapAction = trapUpdate['flags.monks-active-tiles.actions'][0];
     assert.equal(trapAction.action, 'runcode');
-    assert.deepEqual(trapAction.trap.sourceTiles, ['tile-trap-1']);
-    assert.deepEqual(trapAction.trap.triggerTiles, ['tile-trigger-1']);
-    assert.deepEqual(trapAction.trap.targetTiles, []);
-    assert.equal(trapAction.trap.animation, 'eskie.traps.spike');
     assert.ok(typeof trapAction.data.code === 'string');
 
     // Verify the code string resolves adapter via module API
@@ -138,11 +125,7 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
             x: 100,
             y: 100,
             width: 100,
-            height: 100,
-            getFlag: (mod, key) => {
-                if (mod === MODULE_ID && key === 'trap.animation') return 'eskie.traps.spike';
-                return null;
-            }
+            height: 100
         },
         x: 100,
         y: 100,
@@ -153,8 +136,7 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
     // In MATT runtime, "tile" in action scope is a TileDocument, and canvas.tiles.get(id) returns the placeable
     const mockTrapTileDoc = {
         id: 'tile-trap-1',
-        object: mockTrapTilePlaceable,
-        getFlag: (mod, key) => (mod === MODULE_ID && key === 'trap.animation' ? 'eskie.traps.spike' : null)
+        object: mockTrapTilePlaceable
     };
     globalThis.canvas.tiles = {
         get: (id) => (id === 'tile-trap-1' ? mockTrapTilePlaceable : null)
@@ -201,15 +183,8 @@ test('matt.trap.setup correctly handles when the trigger tile is the trap tile (
     assert.ok(selfUpdate, 'Single tile should be updated');
     assert.equal(selfUpdate['flags.monks-active-tiles.active'], true);
     assert.equal(selfUpdate['flags.monks-active-tiles.trigger'], 'enter', 'Combined tile should have enter trigger');
-    assert.equal(selfUpdate[`flags.${MODULE_ID}.trap.isTriggerTile`], true);
-    assert.equal(selfUpdate[`flags.${MODULE_ID}.trap.isTrapTile`], true);
     const action = selfUpdate['flags.monks-active-tiles.actions'][0];
     assert.equal(action.action, 'runcode');
-    assert.deepEqual(action.trap.sourceTiles, ['tile-self-1']);
-    assert.deepEqual(action.trap.triggerTiles, ['tile-self-1']);
-    assert.deepEqual(action.trap.targetTiles, []);
-    assert.equal(action.trap.animation, 'eskie.traps.spike');
-    assert.deepEqual(selfUpdate[`flags.${MODULE_ID}.trap.actions.${action.id}`], action.trap);
 
     // Test execution of combined action
     let playCalled = false;
@@ -244,12 +219,7 @@ test('matt.trap.setup correctly handles when the trigger tile is the trap tile (
     };
     const mockTileDoc = {
         id: 'tile-self-1',
-        object: mockTilePlaceable,
-        getFlag: (mod, key) => {
-            if (mod === MODULE_ID && key === 'trap.animation') return 'eskie.traps.spike';
-            if (mod === MODULE_ID && key === 'trap.originIds') return ['tile-self-1'];
-            return null;
-        }
+        object: mockTilePlaceable
     };
     mockTilePlaceable.document = mockTileDoc;
     globalThis.canvas.tiles.get = (id) => (id === 'tile-self-1' ? mockTilePlaceable : null);
@@ -442,11 +412,7 @@ test('matt.trap executes multiple trap tiles concurrently via Promise.all', asyn
     // Execute the action code
     const mockTriggerDoc = {
         id: 'tile-trigger-parallel',
-        object: triggerTile,
-        getFlag: (mod, key) => {
-            if (mod === MODULE_ID && key === 'trap.originIds') return ['tile-trap-parallel-1', 'tile-trap-parallel-2'];
-            return null;
-        }
+        object: triggerTile
     };
 
     const execFn = new Function('token', 'tile', 'canvas', `return (async () => { ${triggerAction.data.code} })();`);
@@ -535,11 +501,7 @@ test('matt.trap.setup appends new runcode action to existing actions without ove
     assert.equal(triggerActions.length, 2, 'Trigger tile should have both existing and new action');
     assert.equal(triggerActions[0].id, 'existing-action-99', 'Existing action must be preserved at index 0');
     assert.equal(triggerActions[1].action, 'runcode', 'New action must be appended at index 1');
-    assert.deepEqual(triggerActions[1].trap.triggerTiles, ['tile-trigger-multi']);
-    assert.deepEqual(triggerActions[1].trap.sourceTiles, ['tile-trap-multi']);
-    assert.deepEqual(triggerActions[1].trap.targetTiles, []);
-    assert.equal(triggerActions[1].trap.animation, 'eskie.traps.fire');
-    assert.deepEqual(triggerUpdate[`flags.${MODULE_ID}.trap.actions.${triggerActions[1].id}`], triggerActions[1].trap);
+    assert.ok(triggerActions[1].data.code.includes('eskie.traps.fire'));
 
     const trapUpdate = updatedTiles.get('tile-trap-multi');
     assert.ok(trapUpdate);
@@ -547,10 +509,6 @@ test('matt.trap.setup appends new runcode action to existing actions without ove
     assert.equal(trapActions.length, 2, 'Trap tile should have both existing and new action');
     assert.equal(trapActions[0].id, 'existing-action-99', 'Existing action must be preserved at index 0');
     assert.equal(trapActions[1].action, 'runcode', 'New action must be appended at index 1');
-    assert.deepEqual(trapActions[1].trap.triggerTiles, ['tile-trigger-multi']);
-    assert.deepEqual(trapActions[1].trap.sourceTiles, ['tile-trap-multi']);
-    assert.deepEqual(trapActions[1].trap.targetTiles, []);
-    assert.equal(trapActions[1].trap.animation, 'eskie.traps.fire');
-    assert.deepEqual(trapUpdate[`flags.${MODULE_ID}.trap.actions.${trapActions[1].id}`], trapActions[1].trap);
+    assert.ok(trapActions[1].data.code.includes('eskie.traps.fire'));
 });
 

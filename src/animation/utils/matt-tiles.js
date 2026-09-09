@@ -203,51 +203,23 @@ async function setup(animation, config = {}) {
     const targetTileIds = new Set(targetTiles.map(t => t.id));
 
     const allTiles = new Map();
-    for (const t of [...triggerTiles, ...originTiles, ...targetTiles]) {
+    for (const t of [...triggerTiles, ...originTiles]) {
         allTiles.set(t.id, t);
     }
 
     for (const [tileId, tileDoc] of allTiles) {
         const isTrigger = triggerTileIds.has(tileId);
-        const isTrap = originTileIds.has(tileId);
-        const isTarget = targetTileIds.has(tileId);
 
-        const updateData = {};
+        const rawTrigger = config.trigger ?? 'enter';
+        const trigger = isTrigger
+            ? (Array.isArray(rawTrigger) ? (rawTrigger[0] ?? 'enter') : rawTrigger)
+            : 'manual';
 
-        if (isTrigger) {
-            updateData[`flags.${MODULE_ID}.trap.isTriggerTile`] = true;
-        }
+        const { tileCount: _tc, extraFlags: _ef, extraTiles: _et, trigger: _tr, controlled: _co, playPath: _pp, ...trapOptions } = config;
+        const targetTileId = tileCount === 3 ? (targetTiles[0]?.id ?? null) : null;
+        const trapConfig = { ...trapOptions };
 
-        if (isTrap) {
-            updateData[`flags.${MODULE_ID}.trap.isTrapTile`] = true;
-        }
-
-        if (isTarget) {
-            updateData[`flags.${MODULE_ID}.trap.isTargetTile`] = true;
-        }
-
-        if (isTrigger || isTrap) {
-            const rawTrigger = config.trigger ?? 'enter';
-            const trigger = isTrigger
-                ? (Array.isArray(rawTrigger) ? (rawTrigger[0] ?? 'enter') : rawTrigger)
-                : 'manual';
-
-            const { tileCount: _tc, extraFlags: _ef, extraTiles: _et, trigger: _tr, controlled: _co, playPath: _pp, ...trapOptions } = config;
-            const targetTileId = tileCount === 3 ? (targetTiles[0]?.id ?? null) : null;
-            const trapConfig = { ...trapOptions };
-
-            const actionId = adapter.randomID();
-            const actionTrapData = {
-                id: actionId,
-                animation,
-                triggerTiles: triggerTiles.map(t => t.id),
-                sourceTiles: originTiles.map(t => t.id),
-                targetTiles: targetTiles.map(t => t.id),
-                extraTiles: extraTileResults,
-                config: trapConfig,
-            };
-
-            const trapActionCode = `
+        const trapActionCode = `
 // Action-scoped placeable groups for this run command
 const triggerTileIds = ${JSON.stringify(triggerTiles.map(t => t.id))};
 const sourceTileIds = ${JSON.stringify(originTiles.map(t => t.id))};
@@ -303,31 +275,30 @@ if (triggerTileIds.includes(tile.id)) {
 await Promise.all(promises);
 `;
 
-            const existingTrigger = tileDoc.getFlag?.('monks-active-tiles', 'trigger')
-                ?? tileDoc.flags?.['monks-active-tiles']?.trigger;
-            const resolvedTrigger = isTrigger
-                ? trigger
-                : (existingTrigger ?? trigger);
+        const existingTrigger = tileDoc.getFlag?.('monks-active-tiles', 'trigger')
+            ?? tileDoc.flags?.['monks-active-tiles']?.trigger;
+        const resolvedTrigger = isTrigger
+            ? trigger
+            : (existingTrigger ?? trigger);
 
-            const existingActions = tileDoc.getFlag?.('monks-active-tiles', 'actions')
-                ?? tileDoc.flags?.['monks-active-tiles']?.actions
-                ?? [];
-            const newAction = {
-                id: actionId,
-                action: 'runcode',
-                data: { code: trapActionCode },
-                trap: actionTrapData,
-            };
+        const existingActions = tileDoc.getFlag?.('monks-active-tiles', 'actions')
+            ?? tileDoc.flags?.['monks-active-tiles']?.actions
+            ?? [];
+        const newAction = {
+            id: adapter.randomID(),
+            action: 'runcode',
+            data: { code: trapActionCode },
+        };
 
-            updateData['flags.monks-active-tiles.active'] = true;
-            updateData['flags.monks-active-tiles.trigger'] = resolvedTrigger;
-            updateData['flags.monks-active-tiles.actions'] = [
+        const updateData = {
+            'flags.monks-active-tiles.active': true,
+            'flags.monks-active-tiles.trigger': resolvedTrigger,
+            'flags.monks-active-tiles.actions': [
                 ...(Array.isArray(existingActions) ? existingActions : []),
                 newAction
-            ];
-            updateData[`flags.${MODULE_ID}.trap.actions.${actionId}`] = actionTrapData;
-            updateData['flags.monks-active-tiles.controlled'] = config.controlled ?? 'gm';
-        }
+            ],
+            'flags.monks-active-tiles.controlled': config.controlled ?? 'gm',
+        };
 
         await socket.tile.edit(tileId, updateData);
     }

@@ -12,30 +12,18 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: any, targetOrTargets?: any, config: any = {}) {
+async function create(token: any, targets: any[] = [], config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { color, sound } = mConfig;
 
     if (!token) return;
 
-    let target1: any = null;
-    let target2: any = null;
-
-    if (Array.isArray(targetOrTargets)) {
-        target1 = targetOrTargets[0];
-        target2 = targetOrTargets[1] ?? target1;
-    } else if (targetOrTargets) {
-        target1 = targetOrTargets;
-        target2 = mConfig.secondaryTarget ?? target1;
-    } else {
-        const userTargets = Array.from(game.user?.targets ?? []);
-        target1 = userTargets[0];
-        target2 = userTargets[1] ?? target1;
-    }
+    const userTargets = targets.length > 0 ? targets : Array.from(game.user?.targets ?? []);
+    const target1 = userTargets[0];
+    const target2 = userTargets[1] ?? mConfig.secondaryTarget ?? target1;
 
     if (!target1) return;
-    if (!target2) target2 = target1;
 
     const effectSize = 2 + (0.25 * 2);
     const effectOffset = -0.75 - (0.25 * 2);
@@ -93,8 +81,8 @@ async function create(token: any, targetOrTargets?: any, config: any = {}) {
     return sequence;
 }
 
-async function play(token: any, targetOrTargets?: any, config: any = {}) {
-    const sequence = await create(token, targetOrTargets, config);
+async function play(token: any, targets: any[] = [], config: any = {}) {
+    const sequence = await create(token, targets, config);
     if (sequence) return sequence.play();
 }
 

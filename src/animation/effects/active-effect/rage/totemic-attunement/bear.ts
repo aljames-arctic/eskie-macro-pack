@@ -12,7 +12,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function play(token: any, targets?: any, config: any = {}) {
+async function play(token: any, targets: any[] = [], config: any = {}) {
     const seq = await create(token, targets, config);
     if (seq) { await seq.play(); }
 }
@@ -54,7 +54,7 @@ function targetSequence(target: any, config: any = {}) {
     return seq;
 }
 
-function create(token: any, targets?: any, config: any = {}) {
+function create(token: any, targets: any[] = [], config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
     const label = `${id} - ${token.id}`;
@@ -72,8 +72,9 @@ function create(token: any, targets?: any, config: any = {}) {
         .repeats(8, 250,250)
         .zIndex(1);
 
-    const targetList = (Array.isArray(targets) ? targets : [targets]).filter(Boolean);
-    for (const target of targetList) seq.addSequence(targetSequence(target, mConfig));
+    for (const target of targets) {
+        if (target) seq.addSequence(targetSequence(target, mConfig));
+    }
 
     return seq;
 }

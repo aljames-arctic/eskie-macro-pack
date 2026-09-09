@@ -12,31 +12,23 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: any, targetOrConfig?: any, config: any = {}) {
-    const isTarget = Boolean(targetOrConfig?.document || targetOrConfig?.center || targetOrConfig?.x);
-    const target = isTarget ? targetOrConfig : null;
-    const rawConfig = settingsOverride(isTarget ? config : (targetOrConfig ?? config));
+async function create(token: any, config: any = {}) {
+    const rawConfig = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, rawConfig);
     const { sound, template } = mConfig;
 
-    let position: any = null;
-    if (template) {
-        const [primary, secondary, center] = await templatelib.getPosition(template);
-        position = center ?? primary;
-    } else if (target?.center || (target?.x !== undefined && target?.y !== undefined)) {
-        position = adapter.getCenter(target);
-    } else {
-        const crosshairConfig = {
-            type: 'ray',
-            distance: 30,
-            width: 5,
-            icon: token?.document?.texture?.src ?? '',
-            label: 'Piercing Arrow',
-            location: { obj: token, lockToEdge: true },
-        };
-        position = await Sequencer.Crosshair.show(crosshairConfig);
-        if (!position || position.cancelled) return null;
-    }
+    const crosshairConfig = {
+        type: 'ray',
+        distance: 30,
+        width: 5,
+        icon: token?.document?.texture?.src ?? '',
+        label: 'Piercing Arrow',
+        location: { obj: token, lockToEdge: true },
+    };
+
+    const [primary, secondary, center] = await templatelib.getPosition(template, crosshairConfig);
+    if (!primary && !center) return null;
+    const position = center ?? primary;
 
     const sequence = new Sequence();
     applySound(sequence, sound);
@@ -108,8 +100,8 @@ async function create(token: any, targetOrConfig?: any, config: any = {}) {
     return sequence;
 }
 
-async function play(token: any, targetOrConfig?: any, config: any = {}) {
-    const sequence = await create(token, targetOrConfig, config);
+async function play(token: any, config: any = {}) {
+    const sequence = await create(token, config);
     if (sequence) return sequence.play();
 }
 
@@ -125,4 +117,3 @@ export const piercingArrow = {
 };
 
 adapter.autorec.register('piercingArrow', 'template', 'eskie.effect.arcaneShot.piercingArrow', DEFAULT_CONFIG, '0.0.1', 'Piercing Arrow');
-adapter.autorec.register('piercingArrow', 'ranged-target', 'eskie.effect.arcaneShot.piercingArrow', DEFAULT_CONFIG, '0.0.1', 'Piercing Arrow');

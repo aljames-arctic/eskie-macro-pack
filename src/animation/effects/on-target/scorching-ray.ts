@@ -12,23 +12,16 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token: any, targets?: any, config: any = {}) {
+async function create(token: any, targets: any[] = [], config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { rayCount, sound, rayCounts: explicitCounts } = mConfig;
 
     if (!token) return;
 
-    let targetList: any[] = [];
-    if (Array.isArray(targets)) {
-        targetList = targets;
-    } else if (targets) {
-        targetList = [targets];
-    } else if (mConfig.targets?.length) {
-        targetList = mConfig.targets;
-    } else {
-        targetList = Array.from(game.user?.targets ?? []);
-    }
+    const targetList: any[] = (targets && targets.length > 0)
+        ? targets
+        : (mConfig.targets?.length ? mConfig.targets : Array.from(game.user?.targets ?? []));
 
     if (targetList.length === 0) return;
 
@@ -98,7 +91,7 @@ async function create(token: any, targets?: any, config: any = {}) {
     return sequence;
 }
 
-async function play(token, targets, config = {}) {
+async function play(token: any, targets: any[] = [], config: any = {}) {
     const sequence = await create(token, targets, config);
     if (sequence) return sequence.play();
 }

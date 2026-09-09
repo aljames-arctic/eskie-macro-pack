@@ -702,6 +702,7 @@ test('Fire trap resolves distinct center coordinates for 3-region setups and gua
 
     try {
         const { fire } = await import('../../src/animation/traps/fire.js');
+        const { projectile } = await import('../../src/animation/traps/projectile.js');
 
         // Three distinct regions on canvas (Trigger, Origin/Nozzle, Target)
         const originRegion = {
@@ -737,9 +738,18 @@ test('Fire trap resolves distinct center coordinates for 3-region setups and gua
         const seqValid = await fire.create(originRegion, [], { targetLocation: targetLoc });
         assert.ok(seqValid, 'Fire trap should successfully create animation sequence with distinct region locations');
 
-        // Identical coordinates guard: distance < 1 returns early gracefully without throwing
-        const seqZeroDistance = await fire.create(originRegion, [], { targetLocation: { x: 300, y: 400 } });
-        assert.ok(seqZeroDistance, 'Fire trap should return graceful sequence when target location equals origin location');
+        // Identical coordinates guard: distance < 1 fails loudly
+        await assert.rejects(
+            async () => await fire.create(originRegion, [], { targetLocation: { x: 300, y: 400 } }),
+            /target location is identical to origin location/,
+            'Fire trap should fail loudly when target location equals origin location'
+        );
+
+        await assert.rejects(
+            async () => await projectile.create(originRegion, [], { targetLocation: { x: 300, y: 400 } }),
+            /target location is identical to origin location/,
+            'Projectile trap should fail loudly when target location equals origin location'
+        );
     } finally {
         Sequencer.Database.getEntry = origGetEntry;
         Sequencer.Database.entryExists = origEntryExists;

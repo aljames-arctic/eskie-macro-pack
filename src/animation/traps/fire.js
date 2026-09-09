@@ -8,7 +8,7 @@ import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { setupTrap } from './trap-manager.js';
 
-import { log } from '../../lib/logger.js';
+import { log, notify } from '../../lib/logger.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
@@ -33,11 +33,11 @@ async function create(tile, targets, config = {}) {
 
     const tileCenter = adapter.getTargetLocation(tile);
 
-    if (!tileCenter || Math.hypot(targetLoc.x - tileCenter.x, targetLoc.y - tileCenter.y) < 1) {
-        log.warn(`Fire Trap: Placeable "${tile.id}" target location is identical to origin location.`);
-        let seq = new Sequence();
-        applySound(seq, sound);
-        return seq;
+    if (Math.hypot(targetLoc.x - tileCenter.x, targetLoc.y - tileCenter.y) < 1) {
+        const errorMsg = `Fire Trap: Placeable "${tile.id}" target location is identical to origin location.`;
+        log.error(errorMsg);
+        notify.error(errorMsg);
+        throw new Error(errorMsg);
     }
 
     let seq = new Sequence();

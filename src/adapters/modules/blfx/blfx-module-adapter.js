@@ -255,9 +255,7 @@ if (typeof effect !== 'undefined' && effect) {
     config.activeEffect = effect;
 }
 const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter ?? foundry.utils;
-const animation = '${animation}';
-const subPath = animation.replace(/^eskie\\./, '');
-const effectFn = adapter.getProperty(game.modules.get('${MODULE_ID}')?.api?.animation, subPath) ?? adapter.getProperty(eskie, subPath);
+const effectFn = adapter.getProperty(globalThis, '${animation}');
 if (effectFn?.play) {
     if (source && target && source.id !== target.id) {
         await effectFn.play(source, target, config);
@@ -277,9 +275,7 @@ const targets = (typeof targetTokens !== 'undefined' && targetTokens) || (typeof
 if (template) config.template = template;
 if (targets?.length) config.targets = targets;
 const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter ?? foundry.utils;
-const animation = '${animation}';
-const subPath = animation.replace(/^eskie\\./, '');
-const effect = adapter.getProperty(game.modules.get('${MODULE_ID}')?.api?.animation, subPath) ?? adapter.getProperty(eskie, subPath);
+const effect = adapter.getProperty(globalThis, '${animation}');
 if (effect?.play) {
     await effect.play(token, config);
 }`;
@@ -293,9 +289,7 @@ const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof wor
 const targets = (typeof targetTokens !== 'undefined' && targetTokens?.length) ? targetTokens : [];
 if (targets.length) config.targets = targets;
 const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter ?? foundry.utils;
-const animation = '${animation}';
-const subPath = animation.replace(/^eskie\\./, '');
-const effect = adapter.getProperty(game.modules.get('${MODULE_ID}')?.api?.animation, subPath) ?? adapter.getProperty(eskie, subPath);
+const effect = adapter.getProperty(globalThis, '${animation}');
 if (effect?.play && token) {
     await effect.play(token, config);
 }`;
@@ -308,9 +302,7 @@ const config = ${serializedConfig};
 const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
 const target = (typeof targetTokens !== 'undefined' && (targetTokens?.first?.() ?? Array.from(targetTokens ?? [])[0])) || (typeof workflow !== 'undefined' && (workflow?.targets?.first?.() ?? Array.from(workflow?.targets ?? [])[0])) || Array.from(game.user?.targets ?? [])[0] || null;
 const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter ?? foundry.utils;
-const animation = '${animation}';
-const subPath = animation.replace(/^eskie\\./, '');
-const effect = adapter.getProperty(game.modules.get('${MODULE_ID}')?.api?.animation, subPath) ?? adapter.getProperty(eskie, subPath);
+const effect = adapter.getProperty(globalThis, '${animation}');
 if (effect?.play) {
     if (target) {
         await effect.play(token, target, config);
@@ -325,9 +317,7 @@ const config = ${serializedConfig};
 
 const token = (typeof sourceToken !== 'undefined' && sourceToken) || (typeof workflow !== 'undefined' && workflow?.token) || canvas?.tokens?.controlled?.[0] || null;
 const adapter = game.modules.get('${MODULE_ID}')?.api?.adapter ?? foundry.utils;
-const animation = '${animation}';
-const subPath = animation.replace(/^eskie\\./, '');
-const effect = adapter.getProperty(game.modules.get('${MODULE_ID}')?.api?.animation, subPath) ?? adapter.getProperty(eskie, subPath);
+const effect = adapter.getProperty(globalThis, '${animation}');
 if (effect?.play && token) {
     await effect.play(token, config);
 }`;

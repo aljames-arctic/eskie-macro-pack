@@ -130,7 +130,6 @@ export async function executeTrapTrigger(context, ...rest) {
                     const targetPlaceable = adapter.getPlaceable(targetId);
                     if (targetPlaceable) {
                         trapConfig.targetLocation = adapter.getTargetLocation(targetPlaceable);
-                        trapConfig.targetTile = targetPlaceable;
                     }
                 }
 
@@ -230,7 +229,6 @@ export async function executeTrapTrigger(context, ...rest) {
                     const targetPlaceable = adapter.getPlaceable(targetId);
                     if (targetPlaceable) {
                         trapConfig.targetLocation = adapter.getTargetLocation(targetPlaceable);
-                        trapConfig.targetTile = targetPlaceable;
                     }
                 }
 

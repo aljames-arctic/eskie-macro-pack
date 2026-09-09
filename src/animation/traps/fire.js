@@ -13,19 +13,16 @@ import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
     targetLocation: null,
-    targetTile: null,
     size: 3.5,
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { targetLocation, targetTile, size, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { targetLocation, size, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInPlaceable(tile);
 
-    const targetLoc = targetLocation
-        ? adapter.getTargetLocation(targetLocation)
-        : (targetTile ? adapter.getTargetLocation(targetTile) : null);
+    const targetLoc = targetLocation ? adapter.getTargetLocation(targetLocation) : null;
 
     if (!targetLoc) {
         log.warn(`Fire Trap: Tile "${tile.id}" has no configured target location.`);

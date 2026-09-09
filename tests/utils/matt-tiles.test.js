@@ -293,7 +293,7 @@ test('adapter.getTokensInTile returns only overlapping tokens', () => {
     assert.deepEqual(adapter.getTokensInTile(null), []);
 });
 
-test('matt.trap.setup configures targetTile in trap config for 3-tile setups', async () => {
+test('matt.trap.setup configures targetLocation in trap config for 3-tile setups', async () => {
     const updatedTiles = new Map();
     globalThis.game.user = { isGM: true, id: 'gm-user-1' };
     globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', active: true });
@@ -362,7 +362,8 @@ test('matt.trap.setup configures targetTile in trap config for 3-tile setups', a
     await execFn(null, mockTrapDoc, globalThis.canvas);
 
     assert.ok(playConfigReceived, 'Play function should be called');
-    assert.equal(playConfigReceived.targetTile, targetTile, 'Play config must receive targetTile placeable');
+    assert.ok(playConfigReceived.targetLocation, 'Play config must receive targetLocation coordinate');
+    assert.equal(playConfigReceived.targetTile, undefined, 'Play config must not receive targetTile');
     assert.equal(playConfigReceived.tile, undefined, 'Play config must not contain nested tile object');
 });
 

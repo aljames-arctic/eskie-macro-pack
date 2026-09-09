@@ -13,7 +13,6 @@ import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
     targetLocation: null,
-    targetTile: null,
     boulder: {
         src: 'jb2a.rolling_boulder.loop.01.rock.brown',
         speed: 200,
@@ -25,11 +24,9 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { targetLocation, targetTile, boulder, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { targetLocation, boulder, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    const endLoc = targetLocation
-        ? adapter.getTargetLocation(targetLocation)
-        : (targetTile ? adapter.getTargetLocation(targetTile) : null);
+    const endLoc = targetLocation ? adapter.getTargetLocation(targetLocation) : null;
 
     if (!endLoc) {
         log.warn(`Rolling Boulder Trap: Placeable "${tile.id}" has no configured destination location.`);

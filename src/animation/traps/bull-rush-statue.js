@@ -13,14 +13,13 @@ import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
     targetLocation: null,
-    targetTile: null,
     pushDistance: 1,
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { targetLocation, targetTile, pushDistance, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { targetLocation, pushDistance, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const targetList = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
     const target = targetList.length ? targetList[0] : null;
@@ -31,9 +30,7 @@ async function create(tile, targets, config = {}) {
     const tileWidth = tileBounds.width;
     const tileHeight = tileBounds.height;
 
-    const targetLoc = targetLocation
-        ? adapter.getTargetLocation(targetLocation)
-        : (targetTile ? adapter.getTargetLocation(targetTile) : null);
+    const targetLoc = targetLocation ? adapter.getTargetLocation(targetLocation) : null;
 
     if (!targetLoc) {
         log.warn(`Bull Rush Statue Trap: Tile "${tile.id}" has no configured target location.`);

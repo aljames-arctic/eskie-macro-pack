@@ -281,7 +281,7 @@ if (animation) {
             }
 
             // Play the trap animation with the contained tokens as targets
-            await trap.play(tilePlaceable, targets, { ...${JSON.stringify(trapConfig)}${targetTileId ? ', targetLocation, targetTile' : ''} });
+            await trap.play(tilePlaceable, targets, { ...${JSON.stringify(trapConfig)}${targetTileId ? ', targetLocation' : ''} });
         } catch (err) {
             console.error('Eskie Macro Pack | Failed to play trap animation "' + animation + '" on tile "' + tile.id + '":', err);
             throw err;

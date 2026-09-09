@@ -12,7 +12,6 @@ import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
 const DEFAULT_CONFIG = {
     targetLocation: null,
-    targetTile: null,
     reveal: true,
     smokeSize: 2,
     startScale: 3,
@@ -24,22 +23,12 @@ const DEFAULT_CONFIG = {
 
 async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
-    const { targetLocation, targetTile, reveal, smokeSize, startScale, fallenScale, randomDelay, color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { targetLocation, reveal, smokeSize, startScale, fallenScale, randomDelay, color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Target selection:
-    // 1. Look for tokens on target tile
-    // 2. Look for tokens on the trap tile itself
-    // 3. Fallback to targets passed
-    let finalTargets = [];
-
-    if (targetTile) {
-        finalTargets.push(...adapter.getTokensInPlaceable(targetTile));
-    }
-
-    if (finalTargets.length === 0) {
-        finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
-    }
-
+    // 1. Tokens passed explicitly
+    // 2. Tokens on the trap placeable itself
+    let finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
     finalTargets = Array.from(new Set(finalTargets));
 
     let seq = new Sequence();

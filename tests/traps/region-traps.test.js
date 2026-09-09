@@ -362,6 +362,7 @@ test('executeTrapTrigger: passes targetLocation {x, y} to trap.play() for region
 
     assert.ok(receivedConfig, 'Trap should have received configuration');
     assert.deepEqual(receivedConfig.targetLocation, { x: 500, y: 700 }, 'targetLocation should be the origin of the target region');
+    assert.equal(receivedConfig.targetTile, undefined, 'targetTile must not be passed to trap config');
 
     // 2. Target is a Tile placeable
     const targetTileDoc = {
@@ -390,6 +391,7 @@ test('executeTrapTrigger: passes targetLocation {x, y} to trap.play() for region
     assert.ok(receivedConfig, 'Trap should have received configuration');
     // gridSize is 100, so center of 100,200 with width 2, height 2 is 200, 300
     assert.deepEqual(receivedConfig.targetLocation, { x: 200, y: 300 }, 'targetLocation should be the center of the target tile');
+    assert.equal(receivedConfig.targetTile, undefined, 'targetTile must not be passed to trap config');
 
     delete globalThis.eskie;
     adapter.foundry = new FoundryV12Adapter(adapter);
@@ -409,6 +411,13 @@ test('Trap macros accept targetLocation: { x, y } coordinates directly', async (
         const { projectile } = await import('../../src/animation/traps/projectile.js');
         const { fire } = await import('../../src/animation/traps/fire.js');
         const { rollingBoulder } = await import('../../src/animation/traps/rolling-boulder.js');
+        const { fallingSky } = await import('../../src/animation/traps/falling-sky.js');
+
+        assert.equal(bullRushStatue.default_config.targetTile, undefined, 'bullRushStatue must not have targetTile in default_config');
+        assert.equal(projectile.default_config.targetTile, undefined, 'projectile must not have targetTile in default_config');
+        assert.equal(fire.default_config.targetTile, undefined, 'fire must not have targetTile in default_config');
+        assert.equal(rollingBoulder.default_config.targetTile, undefined, 'rollingBoulder must not have targetTile in default_config');
+        assert.equal(fallingSky.default_config.targetTile, undefined, 'fallingSky must not have targetTile in default_config');
 
         const mockOriginTile = {
             id: 'tile-origin-1',
@@ -430,6 +439,9 @@ test('Trap macros accept targetLocation: { x, y } coordinates directly', async (
 
         const seqBoulder = await rollingBoulder.create(mockOriginTile, [], { targetLocation });
         assert.ok(seqBoulder, 'rollingBoulder should create Sequence when given targetLocation');
+
+        const seqFallingSky = await fallingSky.create(mockOriginTile, [], { targetLocation });
+        assert.ok(seqFallingSky, 'fallingSky should create Sequence when given targetLocation');
     } finally {
         Sequencer.Database.getEntry = origGetEntry;
         Sequencer.Database.entryExists = origEntryExists;

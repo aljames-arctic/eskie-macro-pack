@@ -273,13 +273,13 @@ if (animation) {
 
             // If this trap tile is also the trigger tile, ensure the activating token that stepped on it is included
             const isTriggerTile = Boolean(tile.getFlag('${MODULE_ID}', 'trap.isTriggerTile'));
+            const activatingTarget = token?.object ? token.object : token;
             if (isTriggerTile && token) {
-                const activatingTarget = token.object ?? canvas.tokens?.get?.(token.id) ?? token;
                 if (!targets.some(t => t.id === token.id)) {
                     targets.push(activatingTarget);
                 }
             } else if (targets.length === 0 && token) {
-                targets = [token.object ?? canvas.tokens?.get?.(token.id) ?? token];
+                targets = [activatingTarget];
             }
 
             // Play the trap animation with the contained tokens as targets

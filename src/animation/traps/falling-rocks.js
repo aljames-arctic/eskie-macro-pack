@@ -24,7 +24,7 @@ async function create(tile, targets, config = {}) {
 
     const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
 
-    const tileDoc = tile.document ?? tile;
+    const tileDoc = tile.document;
     const tileBounds = adapter.getBounds(tile);
     const tileCenter = tileBounds.center;
     const tileWidth = tileBounds.width;

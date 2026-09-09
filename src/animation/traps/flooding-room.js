@@ -19,7 +19,7 @@ async function create(tile, targets, config = {}) {
     config = settingsOverride(config);
     const { fadeTime, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    const tileDoc = tile.document ?? tile;
+    const tileDoc = tile.document;
 
     // Retrieve water spray origin tiles from flags
     const originIds = tileDoc.getFlag(MODULE_ID, 'trap.floodingRoomSplashOrigins') ?? [];
@@ -27,7 +27,7 @@ async function create(tile, targets, config = {}) {
     
     if (splashOrigins.length === 0 && game.modules.get('tagger')?.active) {
         const taggedOrigins = await Tagger.getByTag('Flooding Room Trap Origin');
-        splashOrigins = taggedOrigins.map(t => t.object ?? t).filter(Boolean);
+        splashOrigins = taggedOrigins.map(t => (t.object ? t.object : t)).filter(Boolean);
     }
 
     let seq = new Sequence();

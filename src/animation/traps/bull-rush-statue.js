@@ -24,7 +24,7 @@ async function create(tile, targets, config = {}) {
     const targetList = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
     const target = targetList.length ? targetList[0] : null;
 
-    const tileDoc = tile.document ?? tile;
+    const tileDoc = tile.document;
     const tileBounds = adapter.getBounds(tile);
     const tileCenter = tileBounds.center;
     const tileWidth = tileBounds.width;
@@ -39,9 +39,9 @@ async function create(tile, targets, config = {}) {
         return seq;
     }
 
-    const textureSrc = adapter.getPlaceableTexture(tile) ?? config.textureSrc ?? config.src ?? closest('jb2a.boulder.01.brown');
-    const scaleX = tileDoc?.texture?.scaleX ?? 1;
-    const scaleY = tileDoc?.texture?.scaleY ?? 1;
+    const textureSrc = config.textureSrc ?? adapter.getPlaceableTexture(tile) ?? closest('jb2a.boulder.01.brown');
+    const scaleX = tileDoc.texture?.scaleX ?? 1;
+    const scaleY = tileDoc.texture?.scaleY ?? 1;
 
     let seq = new Sequence();
     applySound(seq, sound);

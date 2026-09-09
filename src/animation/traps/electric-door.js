@@ -94,7 +94,7 @@ async function setup(config = {}) {
     const result = await setupTrap('eskie.traps.electricDoor', setupConfig);
     if (!result) return;
 
-    const hasMatt = Boolean(game.modules?.get('monks-active-tiles')?.active);
+    const hasMatt = Boolean(game.modules.get('monks-active-tiles')?.active);
     if (hasMatt) {
         const triggerTiles = result.triggerTiles ?? [];
 

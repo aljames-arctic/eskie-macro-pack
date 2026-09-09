@@ -76,7 +76,7 @@ async function create(tile, targets, config = {}) {
                 .scaleToObject(0.25, { considerTokenScale: false })
                 .scaleIn(0, 250, { ease: 'easeOutBack' })
                 .loopProperty('spriteContainer', 'position.y', { from: 0, to: 0.025, duration: 500, pingPong: true, gridUnits: true, ease: 'easeInSine' })
-                .tint(game.user?.color?.css ?? '#ffffff')
+                .tint(game.user.color?.css ?? '#ffffff')
                 .opacity(0.9)
                 .duration(1000)
                 .waitUntilFinished()

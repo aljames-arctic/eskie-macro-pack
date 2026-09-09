@@ -47,7 +47,7 @@ export function extractTrapTriggerContext(context, ...rest) {
     // Case 1: Normalized context object
     if (!context.documentName) {
         if (context.region) {
-            const region = context.region.document ?? context.region;
+            const region = context.region.document ? context.region.document : context.region;
             return {
                 type: 'region',
                 scene: context.scene ?? region.parent ?? canvas.scene,
@@ -59,7 +59,7 @@ export function extractTrapTriggerContext(context, ...rest) {
         if (context.tile) {
             return {
                 type: 'tile',
-                tile: context.tile.document ?? context.tile,
+                tile: context.tile.document ? context.tile.document : context.tile,
                 token: context.token,
             };
         }
@@ -67,7 +67,7 @@ export function extractTrapTriggerContext(context, ...rest) {
 
     // Case 2: Positional RegionBehavior arguments: (scene, region, behavior, event)
     if (context.documentName === 'Scene' && rest[0]) {
-        const region = rest[0].document ?? rest[0];
+        const region = rest[0].document ? rest[0].document : rest[0];
         return {
             type: 'region',
             scene: context,
@@ -80,7 +80,7 @@ export function extractTrapTriggerContext(context, ...rest) {
     // Case 3: RegionDocument or Region placeable passed as first positional arg: (region, behavior, event)
     const isRegion = context.documentName === 'Region' || context.document?.documentName === 'Region';
     if (isRegion) {
-        const region = context.document ?? context;
+        const region = context.document ? context.document : context;
         return {
             type: 'region',
             scene: region.parent ?? canvas.scene,
@@ -95,7 +95,7 @@ export function extractTrapTriggerContext(context, ...rest) {
     if (isTile) {
         return {
             type: 'tile',
-            tile: context.document ?? context,
+            tile: context.document ? context.document : context,
             token: rest[0],
         };
     }
@@ -121,8 +121,8 @@ export async function executeTrapTrigger(context, ...rest) {
         const activatingToken = event?.data?.token?.object;
         if (!activatingToken) return;
 
-        const regionDoc = region.document ?? region;
-        const regionPlaceable = regionDoc.object ?? canvas.regions.get(regionDoc.id);
+        const regionDoc = region;
+        const regionPlaceable = regionDoc.object ? regionDoc.object : canvas.regions.get(regionDoc.id);
 
         const animation = getTrapFlag(regionDoc, 'animation')
             ?? getTrapFlag(behavior, 'animation');
@@ -192,10 +192,10 @@ export async function executeTrapTrigger(context, ...rest) {
         await Promise.all(promises);
     } else if (triggerContext.type === 'tile') {
         const { tile, token } = triggerContext;
-        const tileDoc = tile.document ?? tile;
-        const tilePlaceable = tile.object ?? canvas.tiles.get(tileDoc.id) ?? tile;
+        const tileDoc = tile;
+        const tilePlaceable = tileDoc.object ? tileDoc.object : canvas.tiles.get(tileDoc.id);
 
-        const activatingToken = token?.object ?? token;
+        const activatingToken = token?.object ? token.object : token;
 
         const animation = getTrapFlag(tileDoc, 'animation');
 
@@ -322,7 +322,7 @@ export async function setupRegionTrap(animation, config = {}) {
 
         if (originResult !== 'continue') return;
 
-        const controlledTiles = (canvas.tiles?.controlled ?? []).map(t => t.document ?? t);
+        const controlledTiles = canvas.tiles.controlled.map(t => t.document);
         const controlledRegions = adapter.getControlledRegions();
 
         // Enforce Tile requirement when mandatory (e.g. Bull Rush Statue)
@@ -363,7 +363,7 @@ export async function setupRegionTrap(animation, config = {}) {
 
         if (targetResult === 'cancel' || targetResult === false) return;
 
-        const targetTiles = (canvas.tiles?.controlled ?? []).map(t => t.document ?? t);
+        const targetTiles = canvas.tiles.controlled.map(t => t.document);
         const targetRegions = adapter.getControlledRegions();
         targetElements = targetTiles.length > 0 ? targetTiles : targetRegions;
 
@@ -394,7 +394,7 @@ export async function setupRegionTrap(animation, config = {}) {
 
         if (animResult !== 'continue') return;
 
-        const controlledTiles = (canvas.tiles?.controlled ?? []).map(t => t.document ?? t);
+        const controlledTiles = canvas.tiles.controlled.map(t => t.document);
         const controlledRegions = adapter.getControlledRegions();
 
         // Enforce Tile requirement when mandatory (e.g. Flooding Room)
@@ -425,7 +425,7 @@ export async function setupRegionTrap(animation, config = {}) {
 
             if (extraResult !== 'continue') return;
 
-            const selectedTiles = (canvas.tiles?.controlled ?? []).map(t => t.id);
+            const selectedTiles = canvas.tiles.controlled.map(t => t.id);
             const selectedRegions = adapter.getControlledRegions().map(r => r.id);
             const selected = selectedTiles.length > 0 ? selectedTiles : selectedRegions;
 

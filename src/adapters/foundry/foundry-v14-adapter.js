@@ -236,7 +236,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      */
     getControlledRegions() {
         const controlled = canvas?.regions?.controlled ?? [];
-        return controlled.map(r => r.document ?? r);
+        return controlled.map(r => r.document);
     }
 
     /**
@@ -381,7 +381,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
         if (!region) return [];
         const doc = region.document ?? region;
         const tokens = doc.tokens ?? region.tokens ?? [];
-        return Array.from(tokens, t => t.object ?? t).filter(Boolean);
+        return Array.from(tokens, t => (t.object ? t.object : t)).filter(Boolean);
     }
 
     /**

@@ -14,7 +14,7 @@ import { rollingBoulder } from './rolling-boulder.js';
 import { spike } from './spike.js';
 
 // High level setup function to select between different traps to configure
-async function setup (config = {}) {
+async function setup (config: Record<string, unknown> = {}): Promise<any> {
     const activeTrapKeys = Object.keys(traps).filter(key => key !== 'setup' && key !== 'setupTrap' && key !== 'setupRegionTrap');
     const buttons = activeTrapKeys.map(key => {
         const fallback = key

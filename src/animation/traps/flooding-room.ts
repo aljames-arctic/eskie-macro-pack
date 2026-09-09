@@ -10,12 +10,19 @@ import { setupTrap } from './trap-manager.js';
 
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
-const DEFAULT_CONFIG = {
+import type { SoundConfig, TrapConfig, TrapModule } from '../../types/animation.js';
+
+export interface FloodingRoomTrapConfig extends TrapConfig {
+    fadeTime?: number;
+    sound?: SoundConfig;
+}
+
+const DEFAULT_CONFIG: FloodingRoomTrapConfig = {
     fadeTime: 10000,
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(tile, targets, config = {}) {
+async function create(tile: Tile, targets?: Token[] | null, config: FloodingRoomTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { fadeTime, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -70,13 +77,13 @@ async function create(tile, targets, config = {}) {
     return seq;
 }
 
-async function play(tile, targets, config = {}) {
+async function play(tile: Tile, targets?: Token[] | null, config: FloodingRoomTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(tile, targets, config);
     return seq.play();
 }
 
-async function stop(tile, config = {}) {
+async function stop(tile: Tile, config: FloodingRoomTrapConfig = {}): Promise<void> {
     // Clear water splash effects
     await Sequencer.EffectManager.endEffects({ name: `flooding-room-splash-${tile.id}` });
 
@@ -90,7 +97,7 @@ async function stop(tile, config = {}) {
         .play();
 }
 
-async function setup(config = {}) {
+async function setup(config: Record<string, unknown> = {}): Promise<any> {
     const setupConfig = {
         requiresTile: true,
         extraTiles: [
@@ -105,7 +112,7 @@ async function setup(config = {}) {
     return setupTrap('eskie.traps.floodingRoom', setupConfig);
 }
 
-export const floodingRoom = {
+export const floodingRoom: TrapModule<FloodingRoomTrapConfig> = {
     create,
     play,
     stop,

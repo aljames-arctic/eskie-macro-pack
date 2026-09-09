@@ -12,8 +12,8 @@ import { localize, format } from '../../lib/utils.js';
  * @param {object} [config={}] Setup configuration options
  * @returns {Promise<{ triggerRegions: RegionDocument[], originElements: PlaceableObject[], targetElements: PlaceableObject[] }|void>}
  */
-export async function setupRegionTrap(animation, config = {}) {
-    if (!game.user.isGM) {
+export async function setupRegionTrap(animation: string, config: Record<string, any> = {}): Promise<{ triggerRegions: any[], originElements: any[], targetElements: any[] } | void> {
+    if (!game.user?.isGM) {
         return notify.error(localize('EMP.traps.setup.onlyGm'));
     }
 
@@ -48,8 +48,8 @@ export async function setupRegionTrap(animation, config = {}) {
         return notify.warn(localize('EMP.traps.setup.noTriggerRegions'));
     }
 
-    let originElements = [];
-    let targetElements = [];
+    let originElements: any[] = [];
+    let targetElements: any[] = [];
 
     if (tileCount === 1) {
         // Pure single-region trap (e.g. Electric Door): Trigger region IS the animation region
@@ -267,8 +267,8 @@ await Promise.all(animPromises);`
  * @param {object} [config={}] Setup configuration options
  * @returns {Promise<object|void>}
  */
-export async function setupTrap(animation, config = {}) {
-    if (!game.user.isGM) {
+export async function setupTrap(animation: string, config: Record<string, any> = {}): Promise<any> {
+    if (!game.user?.isGM) {
         return notify.error(localize('EMP.traps.setup.onlyGm'));
     }
 

@@ -1,6 +1,15 @@
 import { log } from './logger.js';
 import { localize } from './utils.js';
 
+export interface Dependency {
+    id: string;
+    min?: string;
+    max?: string;
+    ref?: string;
+    description?: string;
+    url?: string;
+}
+
 /**
  * Checks if the versions are in ascending order.
  * @param {string} [min] - The minimum version.
@@ -9,7 +18,7 @@ import { localize } from './utils.js';
  * @returns {boolean} Whether the versions are in ascending order.
  * @private
  */
-function _isAscending(min, version, max) {
+function _isAscending(min?: string, version?: string, max?: string): boolean {
     if ((Boolean(min) || Boolean(max)) && !version) return false;
     let isValidVersion = true;
     const isNewer = foundry?.utils?.isNewerVersion;
@@ -21,12 +30,11 @@ function _isAscending(min, version, max) {
 
 /**
  * Retrieves the dependency entity from game modules or Foundry game instance.
- * @param {object} dependency - The dependency object to look up.
- * @param {string} dependency.id - The identifier of the dependency.
- * @returns {object|undefined} The module or game object if found.
+ * @param {Dependency} dependency - The dependency object to look up.
+ * @returns {any} The module or game object if found.
  * @private
  */
-function _getEntity(dependency) {
+function _getEntity(dependency: Dependency): any {
     const depId = dependency?.id;
     if (!depId) return undefined;
     if (depId === 'foundry') return game;
@@ -35,25 +43,22 @@ function _getEntity(dependency) {
 
 /**
  * Extracts the current version string for a dependency entity.
- * @param {object} dependency - The dependency object.
- * @param {object} [entity] - Optional pre-resolved dependency entity.
+ * @param {Dependency} dependency - The dependency object.
+ * @param {any} [entity] - Optional pre-resolved dependency entity.
  * @returns {string|undefined} The version string if present.
  * @private
  */
-function _getVersion(dependency, entity = _getEntity(dependency)) {
+function _getVersion(dependency: Dependency, entity: any = _getEntity(dependency)): string | undefined {
     return entity?.version ?? (dependency?.id === 'foundry' ? game?.version : undefined);
 }
 
 /**
  * Checks if the dependency is installed.
- * @param {object} dependency - The dependency object to check.
- * @param {string} dependency.id - The identifier of the dependency.
- * @param {string} [dependency.min] - Minimum allowable version.
- * @param {string} [dependency.max] - Maximum allowable version.
+ * @param {Dependency} dependency - The dependency object to check.
  * @returns {boolean} Whether the dependency is installed and within the valid version range.
  * @private
  */
-function _isInstalled(dependency) {
+function _isInstalled(dependency: Dependency): boolean {
     if (!dependency?.id) return false;
     const entity = _getEntity(dependency);
     if (!entity) return false;
@@ -63,14 +68,11 @@ function _isInstalled(dependency) {
 
 /**
  * Checks if the dependency is installed and activated.
- * @param {object} dependency - The dependency object to check.
- * @param {string} dependency.id - The identifier of the dependency.
- * @param {string} [dependency.min] - Minimum allowable version.
- * @param {string} [dependency.max] - Maximum allowable version.
+ * @param {Dependency} dependency - The dependency object to check.
  * @returns {boolean} Whether the dependency is activated and within the valid version range.
  * @private
  */
-function _isActivated(dependency) {
+function _isActivated(dependency: Dependency): boolean {
     if (!dependency?.id) return false;
     const entity = _getEntity(dependency);
     if (!entity) return false;
@@ -87,7 +89,7 @@ function _isActivated(dependency) {
  * @returns {string} The message with version information appended.
  * @private
  */
-function _versionMessageAppend(dependency, version) {
+function _versionMessageAppend(dependency: Dependency, version?: string): string {
     let msg = '';
     if (dependency?.min) msg += `\n\t${localize('EMP.Dependency.MinVersion', 'Minimum version: ')}${dependency.min}`;
     if (dependency?.max) msg += `\n\t${localize('EMP.Dependency.MaxVersion', 'Maximum version: ')}${dependency.max}`;
@@ -107,13 +109,11 @@ function _versionMessageAppend(dependency, version) {
 
 /**
  * Checks if a dependency is activated and optionally logs a warning if it is not.
- * @param {object} dependency - The dependency to check.
- * @param {string} dependency.id - The identifier of the dependency.
- * @param {string} [dependency.ref] - Optional human-readable reference name.
+ * @param {Dependency} dependency - The dependency to check.
  * @param {string} [warnMessage] - Optional warning message prefix to log if not activated.
  * @returns {boolean} Whether the dependency is activated.
  */
-function isActivated(dependency, warnMessage) {
+function isActivated(dependency: Dependency, warnMessage?: string): boolean {
     if (!dependency?.id) return false;
     const valid = _isActivated(dependency);
     if (!valid && warnMessage) {
@@ -131,13 +131,11 @@ function isActivated(dependency, warnMessage) {
 
 /**
  * Checks if a dependency is installed and optionally logs a warning if it is not.
- * @param {object} dependency - The dependency to check.
- * @param {string} dependency.id - The identifier of the dependency.
- * @param {string} [dependency.ref] - Optional human-readable reference name.
+ * @param {Dependency} dependency - The dependency to check.
  * @param {string} [warnMessage] - Optional warning message prefix to log if not installed.
  * @returns {boolean} Whether the dependency is installed.
  */
-function isInstalled(dependency, warnMessage) {
+function isInstalled(dependency: Dependency, warnMessage?: string): boolean {
     if (!dependency?.id) return false;
     const valid = _isInstalled(dependency);
     if (!valid && warnMessage) {
@@ -155,21 +153,20 @@ function isInstalled(dependency, warnMessage) {
 
 /**
  * Checks if a recommended dependency is activated.
- * @param {object} dependency - The dependency to check.
- * @param {string} dependency.id - The identifier of the dependency.
+ * @param {Dependency} dependency - The dependency to check.
  * @returns {boolean} Whether the dependency is activated.
  */
-function hasRecommended(dependency) {
+function hasRecommended(dependency: Dependency): boolean {
     if (!dependency?.id) return false;
     return isActivated(dependency, localize('EMP.Dependency.RecommendInstalling', 'Recommend installing the following:'));
 }
 
 /**
  * Checks if at least one of a list of recommended dependencies is activated.
- * @param {Array<object>} dependencyList - The list of dependencies to check.
+ * @param {Dependency[]} dependencyList - The list of dependencies to check.
  * @returns {boolean} Whether at least one dependency is activated.
  */
-function hasSomeRecommended(dependencyList) {
+function hasSomeRecommended(dependencyList: Dependency[]): boolean {
     if (!dependencyList?.length) return false;
     for (const dependency of dependencyList) {
         if (isActivated(dependency)) return true;
@@ -187,10 +184,10 @@ function hasSomeRecommended(dependencyList) {
 
 /**
  * Checks if a required dependency is activated and throws an error if it is not.
- * @param {object|Array<object>} dependencyList - The dependency or list of dependencies to check.
+ * @param {Dependency|Dependency[]} dependencyList - The dependency or list of dependencies to check.
  * @returns {void} Throws an error if any required dependency is missing.
  */
-function required(dependencyList) {
+function required(dependencyList: Dependency | Dependency[]): void {
     const list = Array.isArray(dependencyList) ? dependencyList : [dependencyList];
     let errorMsg = localize('EMP.Dependency.RequiresAll', 'Requires all of the following to be installed and activated:\n');
     let dependencyMet = true;
@@ -214,10 +211,10 @@ function required(dependencyList) {
 
 /**
  * Checks if at least one of a list of required dependencies is activated and throws an error if not.
- * @param {Array<object>} dependencyList - The list of dependencies to check.
+ * @param {Dependency[]} dependencyList - The list of dependencies to check.
  * @returns {void} Throws an error if no required dependency is activated.
  */
-function someRequired(dependencyList) {
+function someRequired(dependencyList: Dependency[]): void {
     if (!dependencyList?.length) {
         throw new Error('No dependencies specified for someRequired.\n');
     }

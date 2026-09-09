@@ -11,7 +11,22 @@ import { setupTrap } from './trap-manager.js';
 import { log } from '../../lib/logger.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
-const DEFAULT_CONFIG = {
+import type { SoundConfig, TrapConfig, TrapModule } from '../../types/animation.js';
+
+export interface BoulderConfig {
+    src?: string;
+    speed?: number;
+    size?: number;
+    playbackRate?: number;
+}
+
+export interface RollingBoulderTrapConfig extends TrapConfig {
+    targetLocation?: { x: number; y: number } | string | null;
+    boulder?: BoulderConfig;
+    sound?: SoundConfig;
+}
+
+const DEFAULT_CONFIG: RollingBoulderTrapConfig = {
     targetLocation: null,
     boulder: {
         src: 'jb2a.rolling_boulder.loop.01.rock.brown',
@@ -22,7 +37,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(trapObject, targets, config = {}) {
+async function create(trapObject: Tile, targets?: Token[] | null, config: RollingBoulderTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { targetLocation, boulder, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -122,21 +137,21 @@ async function create(trapObject, targets, config = {}) {
         .zIndex(4);
 }
 
-async function play(trapObject, targets, config = {}) {
+async function play(trapObject: Tile, targets?: Token[] | null, config: RollingBoulderTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(trapObject, targets, config);
     return seq.play();
 }
 
-async function stop(trapObject, config = {}) {
+async function stop(trapObject: Tile, config: RollingBoulderTrapConfig = {}): Promise<void> {
     // No persistent effects to stop
 }
 
-async function setup(config = {}) {
+async function setup(config: Record<string, unknown> = {}): Promise<any> {
     return setupTrap('eskie.traps.rollingBoulder', { tileCount: 3, ...config });
 }
 
-export const rollingBoulder = {
+export const rollingBoulder: TrapModule<RollingBoulderTrapConfig> = {
     create,
     play,
     stop,

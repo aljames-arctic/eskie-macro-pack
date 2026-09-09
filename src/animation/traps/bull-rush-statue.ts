@@ -11,13 +11,23 @@ import { log } from '../../lib/logger.js';
 
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
-const DEFAULT_CONFIG = {
+import type { SoundConfig, TrapConfig, TrapModule } from '../../types/animation.js';
+
+export interface BullRushStatueConfig extends TrapConfig {
+    targetLocation?: { x: number; y: number } | string | null;
+    pushDistance?: number;
+    sound?: SoundConfig;
+    textureSrc?: string;
+    playbackRate?: number;
+}
+
+const DEFAULT_CONFIG: BullRushStatueConfig = {
     targetLocation: null,
     pushDistance: 1,
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(tile, targets, config = {}) {
+async function create(tile: Tile, targets?: Token[] | null, config: BullRushStatueConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { targetLocation, pushDistance, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -133,21 +143,21 @@ async function create(tile, targets, config = {}) {
     return seq;
 }
 
-async function play(tile, targets, config = {}) {
+async function play(tile: Tile, targets?: Token[] | null, config: BullRushStatueConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(tile, targets, config);
     return seq.play();
 }
 
-async function stop(tile, config = {}) {
+async function stop(tile: Tile, config: BullRushStatueConfig = {}): Promise<void> {
     // No persistent effects to stop
 }
 
-async function setup(config = {}) {
+async function setup(config: Record<string, unknown> = {}): Promise<any> {
     return setupTrap('eskie.traps.bullRushStatue', { tileCount: 3, requiresTile: true, ...config });
 }
 
-export const bullRushStatue = {
+export const bullRushStatue: TrapModule<BullRushStatueConfig> = {
     create,
     play,
     stop,

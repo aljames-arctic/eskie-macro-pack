@@ -11,13 +11,21 @@ import { setupTrap } from './trap-manager.js';
 import { log, notify } from '../../lib/logger.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
-const DEFAULT_CONFIG = {
+import type { SoundConfig, TrapConfig, TrapModule } from '../../types/animation.js';
+
+export interface FireTrapConfig extends TrapConfig {
+    targetLocation?: { x: number; y: number } | string | null;
+    size?: number;
+    sound?: SoundConfig;
+}
+
+const DEFAULT_CONFIG: FireTrapConfig = {
     targetLocation: null,
     size: 3.5,
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(trapObject, targets, config = {}) {
+async function create(trapObject: Tile, targets?: Token[] | null, config: FireTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { targetLocation, size, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInPlaceable(trapObject);
@@ -73,21 +81,21 @@ async function create(trapObject, targets, config = {}) {
     return seq;
 }
 
-async function play(trapObject, targets, config = {}) {
+async function play(trapObject: Tile, targets?: Token[] | null, config: FireTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(trapObject, targets, config);
     return seq.play();
 }
 
-async function stop(trapObject, config = {}) {
+async function stop(trapObject: Tile, config: FireTrapConfig = {}): Promise<void> {
     // No persistent effects to stop
 }
 
-async function setup(config = {}) {
+async function setup(config: Record<string, unknown> = {}): Promise<any> {
     return setupTrap('eskie.traps.fire', { tileCount: 3, ...config });
 }
 
-export const fire = {
+export const fire: TrapModule<FireTrapConfig> = {
     create,
     play,
     stop,

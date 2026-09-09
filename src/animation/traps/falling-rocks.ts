@@ -10,13 +10,21 @@ import { MODULE_ID } from '../../lib/constants.js';
 
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
-const DEFAULT_CONFIG = {
+import type { SoundConfig, TrapConfig, TrapModule } from '../../types/animation.js';
+
+export interface FallingRocksTrapConfig extends TrapConfig {
+    label?: string;
+    dustBrightness?: number;
+    sound?: SoundConfig;
+}
+
+const DEFAULT_CONFIG: FallingRocksTrapConfig = {
     label: 'Falling Rocks',
     dustBrightness: 0.8,
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(trapObject, targets, config = {}) {
+async function create(trapObject: Tile, targets?: Token[] | null, config: FallingRocksTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { label, dustBrightness, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -119,13 +127,13 @@ async function create(trapObject, targets, config = {}) {
     return seq;
 }
 
-async function play(trapObject, targets, config = {}) {
+async function play(trapObject: Tile, targets?: Token[] | null, config: FallingRocksTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(trapObject, targets, config);
     return seq.play();
 }
 
-async function stop(trapObject, config = {}) {
+async function stop(trapObject: Tile, config: FallingRocksTrapConfig = {}): Promise<void> {
     const { label } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const trapDoc = trapObject.document;
     
@@ -150,7 +158,7 @@ async function stop(trapObject, config = {}) {
     }
 }
 
-async function cleanToken(token, config = {}) {
+async function cleanToken(token: Token, config: FallingRocksTrapConfig = {}): Promise<any> {
     const { label } = adapter.mergeObject(DEFAULT_CONFIG, config);
     await Sequencer.EffectManager.endEffects({ name: `${label}-${token.name}-${token.id}` });
     // Restore token opacity
@@ -161,11 +169,15 @@ async function cleanToken(token, config = {}) {
         .play();
 }
 
-async function setup(config = {}) {
+async function setup(config: Record<string, unknown> = {}): Promise<any> {
     return setupTrap('eskie.traps.fallingRocks', config);
 }
 
-export const fallingRocks = {
+export interface FallingRocksModule extends TrapModule<FallingRocksTrapConfig> {
+    cleanToken: (token: Token, config?: FallingRocksTrapConfig) => Promise<any>;
+}
+
+export const fallingRocks: FallingRocksModule = {
     create,
     cleanToken, // Clears the opacity flag of a token
     play,

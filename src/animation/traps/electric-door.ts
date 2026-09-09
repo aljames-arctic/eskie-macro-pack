@@ -10,13 +10,21 @@ import { setupTrap } from './trap-manager.js';
 
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
-const DEFAULT_CONFIG = {
+import type { SoundConfig, TrapConfig, TrapModule } from '../../types/animation.js';
+
+export interface ElectricDoorConfig extends TrapConfig {
+    repeats?: number;
+    repeatDelay?: number;
+    sound?: SoundConfig;
+}
+
+const DEFAULT_CONFIG: ElectricDoorConfig = {
     repeats: 5,
     repeatDelay: 300,
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(trapObject, targets, config = {}) {
+async function create(trapObject: Tile, targets?: Token[] | null, config: ElectricDoorConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { repeats, repeatDelay, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -73,17 +81,17 @@ async function create(trapObject, targets, config = {}) {
     return seq;
 }
 
-async function play(trapObject, targets, config = {}) {
+async function play(trapObject: Tile, targets?: Token[] | null, config: ElectricDoorConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(trapObject, targets, config);
     return seq.play();
 }
 
-async function stop(trapObject, config = {}) {
+async function stop(trapObject: Tile, config: ElectricDoorConfig = {}): Promise<void> {
     // No persistent effects to stop
 }
 
-async function setup(config = {}) {
+async function setup(config: Record<string, unknown> = {}): Promise<any> {
     const setupConfig = {
         tileCount: 1,
         trigger: 'door',
@@ -137,7 +145,7 @@ async function setup(config = {}) {
     return result;
 }
 
-export const electricDoor = {
+export const electricDoor: TrapModule<ElectricDoorConfig> = {
     create,
     play,
     stop,

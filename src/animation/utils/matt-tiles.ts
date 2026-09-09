@@ -11,15 +11,15 @@ const DEFAULT_CONFIG = {
 };
 
 //Determine movement direction and center point
-function getCenter(tile) {
+function getCenter(tile: Tile): { x: number; y: number } {
     return adapter.getCenter(tile);
 }
 
-function getLabel(id, token) {
+function getLabel(id: string, token: Token): string {
     return `${id} - ${token.id}`;
 }
 
-async function start(token, code, config = {}) {
+async function start(token: Token, code: string, config: Record<string, unknown> = {}): Promise<void> {
     dependency.required([{id: 'tagger', ref: "Tagger"},
                         {id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers"}]);
 
@@ -62,7 +62,7 @@ async function start(token, code, config = {}) {
     await tile.setFlag(MODULE_ID, 'config', nonInfoConfig);
 }
 
-async function configure(token, tile, config = {}) {
+async function configure(token: Token, tile: Tile, config: Record<string, unknown> = {}): Promise<any> {
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = getLabel(id, token);
 
@@ -85,7 +85,7 @@ async function configure(token, tile, config = {}) {
     const dy = tileOrigin.y - tilePosition.y;
     const angleRadians = Math.atan2(dy, dx);
     const distance = Math.hypot(tileOrigin.x - tilePosition.x, tileOrigin.y - tilePosition.y);
-    const tokenSpeed = token._getAnimationMovementSpeed();
+    const tokenSpeed = (token as any)._getAnimationMovementSpeed();
     const speed = (tokenSpeed * adapter.getSceneDimensions().size) / (1 * SECONDS);
     const rotation = angleRadians * (180 / Math.PI);
     const travelTime = (distance / speed) - latency;
@@ -93,7 +93,7 @@ async function configure(token, tile, config = {}) {
     return { rotation, travelTime, label, delta: {x: dx, y: dy} };
 }
 
-async function setup(animation, config = {}) {
+async function setup(animation: string, config: Record<string, unknown> = {}): Promise<any> {
     dependency.required([{ id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers" }]);
 
     if (!game.user.isGM) return notify.error(localize('EMP.traps.setup.onlyGm'));
@@ -300,10 +300,10 @@ await Promise.all(promises);
     return { triggerTiles, originTiles, targetTiles };
 }
 
-async function stop(token, label) {
+async function stop(token: Token, label: string): Promise<void> {
     const tiles = Tagger.getByTag(label);
     await adapter.detachPlaceableElements(tiles, token);
-    tiles.forEach(async (tile) => await socket.tile.destroy(tile.id));
+    tiles.forEach(async (tile: any) => await socket.tile.destroy(tile.id));
 }
 
 export const matt = {

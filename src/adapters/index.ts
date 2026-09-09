@@ -19,6 +19,11 @@ import { log } from '../lib/logger.js';
  * Centralizes and abstracts Foundry platform generations (V12, V13, V14+), Game Systems, and Third-Party Modules.
  */
 class Adapter {
+    foundry: BaseFoundryAdapter;
+    system: BaseSystemAdapter;
+    modules: Map<string, BaseModuleAdapter>;
+    private _initialized: boolean;
+
     constructor() {
         this.foundry = new BaseFoundryAdapter(this);
         this.system = new GenericSystemAdapter(this.foundry);

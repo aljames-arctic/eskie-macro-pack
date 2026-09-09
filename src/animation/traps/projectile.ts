@@ -10,8 +10,18 @@ import { setupTrap } from './trap-manager.js';
 import { log, notify } from '../../lib/logger.js';
 import { adapter } from '../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../utils/sound.js';
+import type { SoundConfig, TrapConfig, TrapModule } from '../../types/animation.js';
 
-const DEFAULT_CONFIG = {
+export interface ProjectileTrapConfig extends TrapConfig {
+    targetLocation?: { x: number; y: number } | string | null;
+    projectileType?: 'arrow' | 'dart' | 'javelin' | string;
+    repeats?: number;
+    repeatDelay?: number;
+    splashScale?: number;
+    sound?: SoundConfig;
+}
+
+const DEFAULT_CONFIG: ProjectileTrapConfig = {
     targetLocation: null,
     projectileType: 'arrow',
     repeats: 10,
@@ -20,7 +30,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(trapObject, targets, config = {}) {
+async function create(trapObject: Tile, targets?: Token[] | null, config: ProjectileTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { targetLocation, projectileType, sound, repeats, repeatDelay, splashScale } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInPlaceable(trapObject);
@@ -106,7 +116,7 @@ async function create(trapObject, targets, config = {}) {
                     .atLocation(target)
                     .size(splashScale * targetWidth * targetScaleX, { gridUnits: true })
                     .spriteOffset({ x: -0.25 }, { gridUnits: true })
-                    .rotateTowards(tileCenter);
+                    .rotateTowards(trapCenter);
             } else if (projectileType === 'dart') {
                 seq = seq
                     // Green poison tint effect
@@ -161,18 +171,18 @@ async function create(trapObject, targets, config = {}) {
     return seq;
 }
 
-async function play(trapObject, targets, config = {}) {
+async function play(trapObject: Tile, targets?: Token[] | null, config: ProjectileTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(trapObject, targets, config);
     return seq.play();
 }
 
-async function stop(trapObject, config = {}) {
+async function stop(trapObject: Tile, config: ProjectileTrapConfig = {}): Promise<void> {
     // No persistent effects to stop
 }
 
-async function setup(config = {}) {
-    let projectileType = config.projectileType;
+async function setup(config: Record<string, unknown> = {}): Promise<any> {
+    let projectileType = config.projectileType as string | undefined;
     if (!projectileType) {
         projectileType = await adapter.buttonDialog({
             title: game.i18n.localize('EMP.traps.projectile.chooseTypeTitle'),
@@ -194,11 +204,11 @@ async function setup(config = {}) {
         ...config
     };
 
-    const playPath = config.playPath ?? 'eskie.traps.projectile';
+    const playPath = (config.playPath as string | undefined) ?? 'eskie.traps.projectile';
     return setupTrap(playPath, setupConfig);
 }
 
-export const projectile = {
+export const projectile: TrapModule<ProjectileTrapConfig> = {
     create,
     play,
     stop,

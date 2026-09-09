@@ -9,14 +9,23 @@ import { setupTrap } from './trap-manager.js';
 
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
-const DEFAULT_CONFIG = {
+import type { SoundConfig, TrapConfig, TrapModule } from '../../types/animation.js';
+
+export interface PitfallTrapConfig extends TrapConfig {
+    reveal?: boolean;
+    smokeSize?: number;
+    fallenScale?: number;
+    sound?: SoundConfig;
+}
+
+const DEFAULT_CONFIG: PitfallTrapConfig = {
     reveal: true,
     smokeSize: 2,
     fallenScale: 0.3,
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(trapObject, targets, config = {}) {
+async function create(trapObject: Tile, targets?: Token[] | null, config: PitfallTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { reveal, smokeSize, fallenScale, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -105,13 +114,13 @@ async function create(trapObject, targets, config = {}) {
     return seq;
 }
 
-async function play(trapObject, targets, config = {}) {
+async function play(trapObject: Tile, targets?: Token[] | null, config: PitfallTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(trapObject, targets, config);
     return seq.play();
 }
 
-async function stop(trapObject, config = {}) {
+async function stop(trapObject: Tile, config: PitfallTrapConfig = {}): Promise<void> {
     config = settingsOverride(config);
     const { sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -148,11 +157,11 @@ async function stop(trapObject, config = {}) {
     await seq.play();
 }
 
-async function setup(config = {}) {
+async function setup(config: Record<string, unknown> = {}): Promise<any> {
     return setupTrap('eskie.traps.pitfall', config);
 }
 
-export const pitfall = {
+export const pitfall: TrapModule<PitfallTrapConfig> = {
     create,
     play,
     stop,

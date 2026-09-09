@@ -10,7 +10,19 @@ import { setupTrap } from './trap-manager.js';
 
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
-const DEFAULT_CONFIG = {
+import type { SoundConfig, TrapConfig, TrapModule } from '../../types/animation.js';
+
+export interface FallingSkyTrapConfig extends TrapConfig {
+    reveal?: boolean;
+    smokeSize?: number;
+    startScale?: number;
+    fallenScale?: number;
+    randomDelay?: number;
+    color?: string;
+    sound?: SoundConfig;
+}
+
+const DEFAULT_CONFIG: FallingSkyTrapConfig = {
     reveal: true,
     smokeSize: 2,
     startScale: 3,
@@ -20,7 +32,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(trapObject, targets, config = {}) {
+async function create(trapObject: Tile, targets?: Token[] | null, config: FallingSkyTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { reveal, smokeSize, startScale, fallenScale, randomDelay, color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -42,7 +54,7 @@ async function create(trapObject, targets, config = {}) {
     }
 
     if (finalTargets.length > 0) {
-        const targetSeqs = [];
+        const targetSeqs: any[] = [];
         finalTargets.forEach(target => {
             const { widthUnits: targetWidth, widthPx, heightPx } = adapter.getTokenDimensions(target);
             const targetRotation = adapter.getTokenRotation(target);
@@ -132,13 +144,13 @@ async function create(trapObject, targets, config = {}) {
     return seq;
 }
 
-async function play(trapObject, targets, config = {}) {
+async function play(trapObject: Tile, targets?: Token[] | null, config: FallingSkyTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(trapObject, targets, config);
     return seq.play();
 }
 
-async function stop(trapObject, config = {}) {
+async function stop(trapObject: Tile, config: FallingSkyTrapConfig = {}): Promise<void> {
     if (!trapObject) return;
     if (adapter.isDocumentOfType(trapObject, 'Tile')) {
         await new Sequence()
@@ -150,11 +162,11 @@ async function stop(trapObject, config = {}) {
     }
 }
 
-async function setup(config = {}) {
+async function setup(config: Record<string, unknown> = {}): Promise<any> {
     return setupTrap('eskie.traps.fallingSky', config);
 }
 
-export const fallingSky = {
+export const fallingSky: TrapModule<FallingSkyTrapConfig> = {
     create,
     play,
     stop,

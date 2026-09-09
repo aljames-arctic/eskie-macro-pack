@@ -22,11 +22,10 @@ async function create(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { slowParry, type, weight, color, sound } = mConfig;
 
-    if (!token) return;
-    const tgt = target ?? token;
+    if (!token || !target) return;
 
     const src = adapter.getCenter(token);
-    const tgtCenter = adapter.getCenter(tgt);
+    const tgtCenter = adapter.getCenter(target);
 
     const baseRad = Math.atan2(tgtCenter.y - src.y, tgtCenter.x - src.x);
     const baseDeg = deg(baseRad);
@@ -46,7 +45,7 @@ async function create(token, target, config = {}) {
             .name('Parry')
             .copySprite(token)
             .atLocation(token)
-            .rotateTowards(tgt)
+            .rotateTowards(target)
             .animateProperty('spriteContainer', 'position.x', { from: 0, to: -0.6, duration: 250, gridUnits: true, ease: 'easeOutCubic', delay: 100 })
             .animateProperty('spriteContainer', 'position.x', { from: 0, to: 0.6, duration: 400, gridUnits: true, ease: 'easeOutSine', delay: 450 })
             .duration(1000)
@@ -58,7 +57,7 @@ async function create(token, target, config = {}) {
             .effect()
                 .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.normal.01`))
                 .atLocation(token)
-                .rotateTowards(tgt)
+                .rotateTowards(target)
                 .scaleToObject(2, { considerTokenScale: true })
                 .spriteOffset({ x: -1.675 * tokenWidth }, { gridUnits: true })
                 .randomizeMirrorY()
@@ -75,7 +74,7 @@ async function create(token, target, config = {}) {
             .effect()
                 .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.slow.01`))
                 .atLocation(token)
-                .rotateTowards(tgt)
+                .rotateTowards(target)
                 .scaleToObject(2, { considerTokenScale: true })
                 .spriteOffset({ x: -1.675 * tokenWidth }, { gridUnits: true })
                 .randomizeMirrorY()
@@ -84,7 +83,7 @@ async function create(token, target, config = {}) {
             .effect()
                 .file(closest('eskie.particle.07.orange'))
                 .atLocation(token)
-                .rotateTowards(tgt)
+                .rotateTowards(target)
                 .scaleToObject(1.5, { considerTokenScale: true })
                 .zIndex(1.1)
                 .spriteOffset({ x: -1.25 * tokenWidth }, { gridUnits: true });

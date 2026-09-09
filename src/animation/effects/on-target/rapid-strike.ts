@@ -25,7 +25,8 @@ function create(token, target, config = {}) {
     const weightIndex = { light: 0, medium: 1, heavy: 2 }[weight] ?? 2;
     const effectSize = 2 + (0.25 * weightIndex);
     const effectOffset = -0.75 - (0.25 * weightIndex);
-    const targetSquare = adapter.getNearestSquareCenter(token, target) ?? adapter.getCenter(target);
+    const targetSquare = adapter.getNearestSquareCenter(token, target);
+    if (!targetSquare) return;
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
     function attackAnimation(token, target, config) {

@@ -953,8 +953,9 @@ export class BaseFoundryAdapter {
         const srcCenter = this.getCenter(token);
         if (!srcCenter) return null;
 
-        const w = target.document?.width ?? target.width ?? 1;
-        const h = target.document?.height ?? target.height ?? 1;
+        const doc = target.document ?? target;
+        const w = doc.width ?? 1;
+        const h = doc.height ?? 1;
 
         let bestPoint: { x: number, y: number } | null = null;
         let bestDist2 = Infinity;
@@ -975,7 +976,7 @@ export class BaseFoundryAdapter {
             }
         }
 
-        return bestPoint;
+        return bestPoint ?? this.getCenter(target);
     }
 
     /**

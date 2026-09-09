@@ -24,7 +24,7 @@ function resolveDistinctPositions(positions: any[], config: any = {}, template: 
  */
 async function getPosition(template: any, config: any = {}) {
     let positions;
-    const isTemplateObject = Boolean(template && typeof template === 'object' && (template.x !== undefined || template.document !== undefined || template.shapes !== undefined || template.direction !== undefined));
+    const isTemplateObject = Boolean(template?.document || template?.shapes || template?.direction !== undefined || template?.x !== undefined);
 
     if (isTemplateObject) {
         positions = adapter.getTemplatePosition(template, config);
@@ -42,21 +42,22 @@ async function getPosition(template: any, config: any = {}) {
 
     const [primary, secondary, center] = positions;
     const token = config.token ?? config.sourceToken;
-    const tokenCenter = token?.center ?? (token?.x !== undefined ? { x: token.x, y: token.y } : null);
+    const tokenCenter = token ? adapter.getCenter(token) : null;
     const distancePx = secondary ? Math.hypot(secondary.x - primary.x, secondary.y - primary.y) : 0;
+    const templateDoc = template ? (template.document ?? template) : null;
 
     log.debug('templatelib.getPosition | Coordinates resolved:', {
-        source: tokenCenter ? { ...tokenCenter, name: token?.document?.name ?? token?.name } : null,
+        source: tokenCenter ? { ...tokenCenter, name: token?.name } : null,
         primary,
         secondary,
         center: center ?? primary,
         distancePx,
-        template: template ? {
-            x: template.x ?? template.document?.x,
-            y: template.y ?? template.document?.y,
-            direction: template.direction ?? template.document?.direction,
-            distance: template.distance ?? template.document?.distance,
-            type: template.t ?? template.document?.t ?? template.documentName
+        template: templateDoc ? {
+            x: templateDoc.x,
+            y: templateDoc.y,
+            direction: templateDoc.direction,
+            distance: templateDoc.distance,
+            type: templateDoc.t ?? templateDoc.documentName
         } : null
     });
 

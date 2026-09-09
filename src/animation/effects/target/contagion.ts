@@ -35,7 +35,8 @@ async function create(token, target, config = {}) {
 
     if (!token || !target) return;
 
-    const targetSquare = adapter.getNearestSquareCenter(token, target) ?? adapter.getCenter(target);
+    const targetSquare = adapter.getNearestSquareCenter(token, target);
+    if (!targetSquare) return;
     const sceneCoverGU = getSceneCoverSizeGU(target);
     const { widthUnits: tokenWidth } = adapter.getTokenDimensions(token);
 

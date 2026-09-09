@@ -28,7 +28,8 @@ async function createMelee(token, target, config = {}) {
     const effectOffset = -0.75 - (0.25 * weightIndex);
 
     //Determine nearest targetSquare
-    const targetSquare = adapter.getNearestSquareCenter(token, target) ?? adapter.getCenter(target);
+    const targetSquare = adapter.getNearestSquareCenter(token, target);
+    if (!targetSquare) return;
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
     let seq = new Sequence();

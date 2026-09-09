@@ -18,7 +18,8 @@ async function create(token, target, config = {}) {
 
     if (!token || !target) return;
 
-    const targetSquare = adapter.getNearestSquareCenter(token, target) ?? adapter.getCenter(target);
+    const targetSquare = adapter.getNearestSquareCenter(token, target);
+    if (!targetSquare) return;
     const targetCenter = adapter.getCenter(target);
     const targetOffset = { x: targetSquare.x - targetCenter.x, y: targetSquare.y - targetCenter.y };
     const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);

@@ -216,25 +216,28 @@ async function playUse(token, target, config = {}) {
     if (seq) return seq.play();
 }
 
-async function stopUse(tokenOrTarget, maybeTarget, config = {}) {
-    const isTargetSecond = Boolean(maybeTarget && (maybeTarget.id || maybeTarget.document));
-    const target = isTargetSecond ? maybeTarget : tokenOrTarget;
-    const rawConfig = isTargetSecond ? config : (maybeTarget && !maybeTarget.id && !maybeTarget.document ? maybeTarget : config);
+async function stopUse(first, second, third = {}) {
+    const isTargetSecond = Boolean(second?.id);
+    const target = isTargetSecond ? second : first;
+    const rawConfig = isTargetSecond ? third : (second?.id ? third : (second ?? third));
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, rawConfig);
     const { id } = mConfig;
 
-    if (target) {
+    if (target?.id) {
         Sequencer.EffectManager.endEffects({ name: `${id}Use - ${target.id}`, object: target });
     }
 }
 
-async function stop(token, target, config = {}) {
-    await stopUse(token, target, config);
-    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
+async function stop(first, second, third = {}) {
+    await stopUse(first, second, third);
+    const isTargetSecond = Boolean(second?.id);
+    const token = isTargetSecond ? first : first;
+    const rawConfig = isTargetSecond ? third : (second?.id ? third : (second ?? third));
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, rawConfig);
     const { id } = mConfig;
-    const actualToken = target ? token : (token ?? target);
-    if (actualToken) {
-        Sequencer.EffectManager.endEffects({ name: `${id} - ${actualToken.id}`, object: actualToken });
+
+    if (token?.id) {
+        Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}`, object: token });
     }
 }
 

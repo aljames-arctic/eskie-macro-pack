@@ -26,7 +26,8 @@ async function create(token, target, config = {}) {
     const count = attack?.count ?? 2;
     const label = `${id} - ${token.id}`;
 
-    const location = adapter.getNearestSquareCenter(token, target) ?? adapter.getCenter(target);
+    const location = adapter.getNearestSquareCenter(token, target);
+    if (!location) return;
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
     let seq = new Sequence();

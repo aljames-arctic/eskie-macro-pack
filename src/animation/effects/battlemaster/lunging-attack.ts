@@ -28,7 +28,8 @@ async function create(token, target, config = {}) {
     const effectSize = 2 + (0.25 * weightIndex);
     const effectOffset = -0.75 - (0.25 * weightIndex);
 
-    const targetSquare = adapter.getNearestSquareCenter(token, target) ?? adapter.getCenter(target);
+    const targetSquare = adapter.getNearestSquareCenter(token, target);
+    if (!targetSquare) return;
 
     const src = adapter.getCenter(token);
     const tgt = adapter.getCenter(target);

@@ -109,7 +109,8 @@ async function createAttack(token: any, target1: any, target2?: any, config: any
     const effectSize = 2 + (0.25 * weightIndex);
     const effectOffset = -0.75 - (0.25 * weightIndex);
 
-    const targetSquare = adapter.getNearestSquareCenter(token, target1) ?? adapter.getCenter(target1);
+    const targetSquare = adapter.getNearestSquareCenter(token, target1);
+    if (!targetSquare) return;
     const dx = targetSquare.x - tokenCenter.x;
     const dy = targetSquare.y - tokenCenter.y;
     const sx = Math.sign(dx);

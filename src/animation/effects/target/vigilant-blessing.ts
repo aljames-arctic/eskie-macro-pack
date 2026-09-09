@@ -11,12 +11,9 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(token, target, config = {}) {
+function _buildSequence(recipient, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, darkMap, sound } = mConfig;
-
-    const recipient = target ?? token;
-    if (!recipient) return;
 
     const label = `${id} - ${recipient.id}`;
     const seq = new Sequence();
@@ -116,13 +113,19 @@ async function create(token, target, config = {}) {
     return seq;
 }
 
+async function create(token, target, config = {}) {
+    if (!token || !target) return;
+    return _buildSequence(target, config);
+}
+
 async function play(token, target, config = {}) {
     const seq = await create(token, target, config);
     if (seq) return seq.play();
 }
 
 async function createEffect(token, config = {}) {
-    return create(token, token, config);
+    if (!token) return;
+    return _buildSequence(token, config);
 }
 
 async function playEffect(token, config = {}) {
@@ -130,11 +133,27 @@ async function playEffect(token, config = {}) {
     if (seq) return seq.play();
 }
 
-async function stop(token, target, config = {}) {
+async function stopTarget(token, target, config = {}) {
+    const recipient = target ?? token;
+    if (!recipient) return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
+    Sequencer.EffectManager.endEffects({ name: `${id} - ${recipient.id}`, object: recipient });
+}
+
+async function stopEffect(token, config = {}) {
+    if (!token) return;
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id } = mConfig;
+    Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}`, object: token });
+}
+
+async function stop(token, target, config = {}) {
     const recipient = target ?? token;
-    if (recipient) Sequencer.EffectManager.endEffects({ name: `${id} - ${recipient.id}`, object: recipient });
+    if (!recipient) return;
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { id } = mConfig;
+    Sequencer.EffectManager.endEffects({ name: `${id} - ${recipient.id}`, object: recipient });
 }
 
 export const vigilantBlessing = {
@@ -144,11 +163,13 @@ export const vigilantBlessing = {
     target: {
         create,
         play,
+        stop: stopTarget,
         default_config: DEFAULT_CONFIG
     },
     effect: {
         create: createEffect,
         play: playEffect,
+        stop: stopEffect,
         default_config: DEFAULT_CONFIG
     },
     default_config: DEFAULT_CONFIG

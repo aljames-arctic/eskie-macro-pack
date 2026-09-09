@@ -28,8 +28,8 @@ async function create(token: any, targets: any[] = [], config: any = {}) {
     const effectSize = 2 + (0.25 * 2);
     const effectOffset = -0.75 - (0.25 * 2);
 
-    const p1 = adapter.getNearestSquareCenter(token, target1) ?? adapter.getCenter(target1);
-    const p2 = adapter.getNearestSquareCenter(token, target2) ?? adapter.getCenter(target2);
+    const p1 = adapter.getNearestSquareCenter(token, target1);
+    const p2 = target2 ? adapter.getNearestSquareCenter(token, target2) : null;
     const targetSquare = (p1 && p2)
         ? { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 }
         : (p1 ?? adapter.getCenter(token));

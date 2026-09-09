@@ -395,11 +395,6 @@ class Adapter {
         return this.foundry.getTargetLocation(target);
     }
 
-    async executeTrapTrigger(context, ...args) {
-        const { executeTrapTrigger: runner } = await import('../animation/traps/trap-manager.js');
-        return runner(context, ...args);
-    }
-
     /* -------------------------------------------- */
     /*  System Layer Delegates                      */
     /* -------------------------------------------- */

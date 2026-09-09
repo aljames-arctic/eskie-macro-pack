@@ -3,49 +3,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { adapter } from '../../src/adapters/index.js';
 import {
-    extractTrapTriggerContext,
-    executeTrapTrigger,
     setupTrap,
     setupRegionTrap
 } from '../../src/animation/traps/trap-manager.js';
 import { MODULE_ID } from '../../src/lib/constants.js';
 import { log } from '../../src/lib/logger.js';
-
-test('extractTrapTriggerContext: normalizes Region and Tile caller contexts', () => {
-    // 1. Positional Region args (scene, region, behavior, event)
-    const mockScene = { id: 'scene-1', documentName: 'Scene', regions: new Map() };
-    const mockRegionDoc = { id: 'reg-1', documentName: 'Region' };
-    const mockBehavior = { id: 'beh-1' };
-    const mockEvent = { name: 'tokenEnter', data: { token: { id: 'tok-1' } } };
-
-    const ctx1 = extractTrapTriggerContext(mockScene, mockRegionDoc, mockBehavior, mockEvent);
-    assert.equal(ctx1.type, 'region');
-    assert.equal(ctx1.scene, mockScene);
-    assert.equal(ctx1.region, mockRegionDoc);
-    assert.equal(ctx1.behavior, mockBehavior);
-    assert.equal(ctx1.event, mockEvent);
-
-    // 2. Positional Tile args (tile, token)
-    const mockTileDoc = { id: 'tile-1', documentName: 'Tile' };
-    const mockTokenDoc = { id: 'tok-1', documentName: 'Token' };
-
-    const ctx2 = extractTrapTriggerContext(mockTileDoc, mockTokenDoc);
-    assert.equal(ctx2.type, 'tile');
-    assert.equal(ctx2.tile, mockTileDoc);
-    assert.equal(ctx2.token, mockTokenDoc);
-
-    // 3. Object context { region, event }
-    const ctx3 = extractTrapTriggerContext({ region: mockRegionDoc, event: mockEvent });
-    assert.equal(ctx3.type, 'region');
-    assert.equal(ctx3.region, mockRegionDoc);
-    assert.equal(ctx3.event, mockEvent);
-
-    // 4. Object context { tile, token }
-    const ctx4 = extractTrapTriggerContext({ tile: mockTileDoc, token: mockTokenDoc });
-    assert.equal(ctx4.type, 'tile');
-    assert.equal(ctx4.tile, mockTileDoc);
-    assert.equal(ctx4.token, mockTokenDoc);
-});
 
 test('setupTrap: routes dynamically based on generation and MATT availability', async () => {
     globalThis.game.user = { isGM: true, id: 'gm-user-1' };
@@ -214,66 +176,6 @@ test('setupRegionTrap: configures RegionDocument flags and creates executeScript
 
     adapter.foundry = new FoundryV12Adapter(adapter);
     globalThis.game.release = { generation: 12 };
-});
-
-test('executeTrapTrigger: triggers playback for Region and linked origin placeables', async () => {
-    let trapPlayed = false;
-    let passedTile = null;
-    let passedTargets = null;
-
-    // Register a mock trap on globalThis.eskie.traps
-    globalThis.eskie = {
-        traps: {
-            mockTrap: {
-                play: async (tile, targets) => {
-                    trapPlayed = true;
-                    passedTile = tile;
-                    passedTargets = targets;
-                }
-            }
-        }
-    };
-
-    const activatingToken = { id: 'act-tok-1', name: 'Activating Token' };
-    const tokenDoc = { id: 'act-tok-1', object: activatingToken };
-
-    const targetPlaceable = {
-        id: 'tile-anim-1',
-        documentName: 'Tile',
-        document: { id: 'tile-anim-1' }
-    };
-
-    const mockRegionDoc = {
-        id: 'region-trig-99',
-        documentName: 'Region',
-        getFlag: (_mod, key) => {
-            if (key === 'trap.animation') return 'eskie.traps.mockTrap';
-            if (key === 'trap.originIds') return ['tile-anim-1'];
-            if (key === 'trap.config') return {};
-            return null;
-        }
-    };
-
-    globalThis.canvas.tiles = {
-        get: (id) => (id === 'tile-anim-1' ? targetPlaceable : null)
-    };
-    globalThis.canvas.regions = {
-        get: (id) => (id === 'region-trig-99' ? { document: mockRegionDoc, id } : null)
-    };
-
-    const mockEvent = {
-        data: {
-            token: tokenDoc
-        }
-    };
-
-    await executeTrapTrigger(mockRegionDoc, null, mockEvent);
-
-    assert.equal(trapPlayed, true, 'Trap animation play() must be called');
-    assert.equal(passedTile, targetPlaceable, 'Target placeable should be passed to play()');
-    assert.deepEqual(passedTargets, [activatingToken], 'Activating token should be passed as targets');
-
-    delete globalThis.eskie;
 });
 
 test('setupRegionTrap: enforces tile requirement when requiresTile is true', async () => {
@@ -538,96 +440,6 @@ test('setupRegionTrap: multiple trap regions fire simultaneously via Promise.all
 
     assert.equal(executionOrder.length, 3, 'All 3 trap regions must execute');
     assert.equal(maxConcurrent, 3, 'All 3 trap regions must execute simultaneously (maxConcurrent === 3)');
-
-    delete globalThis.eskie;
-    adapter.foundry = new FoundryV12Adapter(adapter);
-    globalThis.game.release = { generation: 12 };
-});
-
-test('executeTrapTrigger: passes targetLocation {x, y} to trap.play() for region and tile targets', async () => {
-    const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
-    const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
-    adapter.foundry = new FoundryV14Adapter(adapter);
-    globalThis.game.release = { generation: 14 };
-
-    let receivedConfig = null;
-
-    globalThis.eskie = {
-        traps: {
-            mock3PartTrap: {
-                play: async (_tile, _targets, config) => {
-                    receivedConfig = config;
-                }
-            }
-        }
-    };
-
-    // 1. Target is a Region placeable
-    const targetRegionDoc = {
-        id: 'target-region-1',
-        documentName: 'Region',
-        origin: { x: 500, y: 700 },
-        shapes: []
-    };
-    const targetRegionPlaceable = { id: 'target-region-1', document: targetRegionDoc };
-
-    const mockRegionDoc = {
-        id: 'reg-trig-3p',
-        documentName: 'Region',
-        getFlag: (_mod, key) => {
-            if (key === 'trap.animation') return 'eskie.traps.mock3PartTrap';
-            if (key === 'trap.originIds') return ['tile-launcher-1'];
-            if (key === 'trap.trapTargetTileIds') return ['target-region-1'];
-            if (key === 'trap.config') return {};
-            return null;
-        }
-    };
-
-    const launcherTile = { id: 'tile-launcher-1', documentName: 'Tile', document: { id: 'tile-launcher-1' } };
-
-    globalThis.canvas.tiles = {
-        get: (id) => (id === 'tile-launcher-1' ? launcherTile : null)
-    };
-    globalThis.canvas.regions = {
-        get: (id) => (id === 'target-region-1' ? targetRegionPlaceable : (id === 'reg-trig-3p' ? { document: mockRegionDoc, id } : null))
-    };
-
-    const mockEvent = { data: { token: { id: 'tok-1', object: { id: 'tok-1' } } } };
-
-    await executeTrapTrigger(mockRegionDoc, null, mockEvent);
-
-    assert.ok(receivedConfig, 'Trap should have received configuration');
-    assert.deepEqual(receivedConfig.targetLocation, { x: 500, y: 700 }, 'targetLocation should be the origin of the target region');
-    assert.equal(receivedConfig.targetTile, undefined, 'targetTile must not be passed to trap config');
-
-    // 2. Target is a Tile placeable
-    const targetTileDoc = {
-        id: 'target-tile-1',
-        documentName: 'Tile',
-        document: { x: 100, y: 200, width: 2, height: 2 }
-    };
-    const targetTilePlaceable = { id: 'target-tile-1', document: targetTileDoc.document };
-
-    const mockRegionDoc2 = {
-        id: 'reg-trig-3p2',
-        documentName: 'Region',
-        getFlag: (_mod, key) => {
-            if (key === 'trap.animation') return 'eskie.traps.mock3PartTrap';
-            if (key === 'trap.originIds') return ['tile-launcher-1'];
-            if (key === 'trap.trapTargetTileIds') return ['target-tile-1'];
-            if (key === 'trap.config') return {};
-            return null;
-        }
-    };
-
-    globalThis.canvas.tiles.get = (id) => (id === 'target-tile-1' ? targetTilePlaceable : (id === 'tile-launcher-1' ? launcherTile : null));
-
-    await executeTrapTrigger(mockRegionDoc2, null, mockEvent);
-
-    assert.ok(receivedConfig, 'Trap should have received configuration');
-    // gridSize is 100, so center of 100,200 with width 2, height 2 is 200, 300
-    assert.deepEqual(receivedConfig.targetLocation, { x: 200, y: 300 }, 'targetLocation should be the center of the target tile');
-    assert.equal(receivedConfig.targetTile, undefined, 'targetTile must not be passed to trap config');
 
     delete globalThis.eskie;
     adapter.foundry = new FoundryV12Adapter(adapter);

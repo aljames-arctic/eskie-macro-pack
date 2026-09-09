@@ -161,7 +161,7 @@ test('rollingBoulder.create dynamically calculates duration from tile distance a
 
     const waitCall = mainBoulder.calls.find(c => c.method === 'waitUntilFinished');
     assert.ok(waitCall, 'Main boulder must call waitUntilFinished');
-    assert.equal(waitCall.value, undefined, 'Main boulder must wait until fully finished without premature negative duration offset');
+    assert.equal(waitCall.value, -250, 'Main boulder must wait until finished with negative duration offset');
 
     const smokePuff = seq.effects.find(eff =>
         eff.calls.some(c => c.method === 'file' && String(c.value).includes('smoke.puff.centered'))

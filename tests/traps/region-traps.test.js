@@ -203,6 +203,11 @@ test('setupRegionTrap: configures RegionDocument flags and creates executeScript
     assert.equal(passedTargets.length, 1);
     assert.equal(passedTargets[0].id, 'act-tok-10');
 
+    // Verify early abort when event.data.token is missing
+    spikePlayed = false;
+    await scriptFn({ region: triggerRegionDoc, data: {} });
+    assert.equal(spikePlayed, false, 'Must abort early when event.data.token is missing');
+
     delete globalThis.eskie;
 
     adapter.foundry = new FoundryV12Adapter(adapter);
@@ -429,6 +434,15 @@ test('setupRegionTrap: tileCount === 3 embeds targetLocation in generated script
 
     assert.equal(firePlayed, true);
     assert.deepEqual(passedConfig.targetLocation, { x: 500, y: 600 });
+
+    // Test early abort when targetPlaceable is missing
+    firePlayed = false;
+    globalThis.canvas.regions.get = (id) => (id === 'reg-launch-fire' ? { document: launcherRegionDoc, id } : null);
+    await scriptFn({
+        region: triggerRegionDoc,
+        data: { token: { id: 'act-tok-fire', object: { id: 'act-tok-fire' } } }
+    });
+    assert.equal(firePlayed, false, 'Must abort early when targetPlaceable does not exist');
 
     delete globalThis.eskie;
     adapter.foundry = new FoundryV12Adapter(adapter);

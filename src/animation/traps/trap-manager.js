@@ -88,14 +88,13 @@ export async function executeTrapTrigger(context, ...rest) {
 
     if (triggerContext.type === 'region') {
         const { region, event, behavior } = triggerContext;
+        if (!event?.data?.token) return;
+
         const regionDoc = region.document ?? region;
-        const regionPlaceable = regionDoc.object ?? canvas?.regions?.get?.(regionDoc.id) ?? regionDoc;
+        const regionPlaceable = regionDoc.object ?? canvas.regions.get(regionDoc.id);
 
         // Activating token from Region event data
-        const rawToken = event?.data?.token;
-        const activatingToken = rawToken
-            ? (rawToken.object ?? canvas?.tokens?.get?.(rawToken.id ?? rawToken) ?? rawToken)
-            : null;
+        const activatingToken = event.data.token.object ?? event.data.token;
 
         const animation = regionDoc.getFlag?.(MODULE_ID, 'trap.animation')
             ?? regionDoc.flags?.[MODULE_ID]?.trap?.animation
@@ -128,9 +127,8 @@ export async function executeTrapTrigger(context, ...rest) {
                     ?? regionDoc.flags?.[MODULE_ID]?.trap?.targetTileId;
                 if (targetId) {
                     const targetPlaceable = adapter.getPlaceable(targetId);
-                    if (targetPlaceable) {
-                        trapConfig.targetLocation = adapter.getTargetLocation(targetPlaceable);
-                    }
+                    if (!targetPlaceable) return;
+                    trapConfig.targetLocation = adapter.getTargetLocation(targetPlaceable);
                 }
 
                 // Identify animation placeables (Tiles or Regions)
@@ -150,13 +148,15 @@ export async function executeTrapTrigger(context, ...rest) {
                     animPlaceables = originIds.map(id => adapter.getPlaceable(id)).filter(Boolean);
                 }
 
-                if (animPlaceables.length === 0) {
+                if (animPlaceables.length === 0 && regionPlaceable) {
                     animPlaceables = [regionPlaceable];
                 }
 
+                if (animPlaceables.length === 0) return;
+
                 for (const placeable of animPlaceables) {
                     let targets = adapter.getTokensInPlaceable(placeable);
-                    if (activatingToken && !targets.some(t => t.id === activatingToken.id)) {
+                    if (activatingToken && activatingToken.id && !targets.some(t => t.id === activatingToken.id)) {
                         targets.push(activatingToken);
                     } else if (targets.length === 0 && activatingToken) {
                         targets = [activatingToken];
@@ -456,44 +456,46 @@ export async function setupRegionTrap(animation, config = {}) {
     const originIds = originElements.map(e => e.id);
     const tileIds = originElements.filter(e => adapter.isDocumentOfType(e, 'Tile')).map(e => e.id);
 
+    const hasOptions = Object.keys(trapOptions).length > 0;
+    const optionsStr = targetId
+        ? (hasOptions ? `{ ...${JSON.stringify(trapOptions)}, targetLocation }` : '{ targetLocation }')
+        : (hasOptions ? JSON.stringify(trapOptions) : '{}');
+
     const regionActionCode = `
 // Resolve the unified adapter from Eskie Macro Pack
 const adapter = game.modules.get('${MODULE_ID}').api.adapter;
 
 // Activating token from Region trigger event
-const regionEvent = typeof event !== 'undefined' ? event : arguments[0];
-const rawToken = regionEvent?.data?.token;
-const activatingToken = rawToken ? (rawToken.object ?? adapter.getPlaceable(rawToken.id ?? rawToken) ?? rawToken) : null;
+if (!event.data?.token) return;
+const token = event.data.token.object ?? event.data.token;
 ${targetId ? `
 // Target placeable (Region or Tile) and coordinate location
 const targetPlaceable = adapter.getPlaceable('${targetId}');
-const targetLocation = targetPlaceable ? adapter.getTargetLocation(targetPlaceable) : null;
+if (!targetPlaceable) return;
+const targetLocation = adapter.getTargetLocation(targetPlaceable);
 ` : ''}
 // Origin / launcher placeables (Regions or Tiles)
-const originIds = ${JSON.stringify(originIds)};
-let animPlaceables = originIds.map(id => adapter.getPlaceable(id)).filter(Boolean);
-if (animPlaceables.length === 0 && regionEvent?.region) {
-    animPlaceables = [regionEvent.region.object ?? regionEvent.region];
-}
+const animPlaceables = ${JSON.stringify(originIds)}.map(id => adapter.getPlaceable(id)).filter(Boolean);
+if (animPlaceables.length === 0) return;
 
 // Execute the trap animation for each launcher placeable
 for (const placeable of animPlaceables) {
     let targets = adapter.getTokensInPlaceable(placeable);
-    if (activatingToken && activatingToken.id && !targets.some(t => t.id === activatingToken.id)) {
-        targets.push(activatingToken);
-    } else if (targets.length === 0 && activatingToken) {
-        targets = [activatingToken];
+    if (token.id && !targets.some(t => t.id === token.id)) {
+        targets.push(token);
+    } else if (targets.length === 0) {
+        targets = [token];
     }
 
-    await ${animation}.play(placeable, targets, { ...${JSON.stringify(trapOptions)}${targetId ? ', targetLocation' : ''} });
+    await ${animation}.play(placeable, targets, ${optionsStr});
 }
 ${tileIds.length > 0 ? `
 // Trigger any linked external MATT tiles concurrently
 for (const id of ${JSON.stringify(tileIds)}) {
-    if (id === regionEvent?.region?.id) continue;
+    if (id === event.region?.id) continue;
     const tile = canvas.tiles.get(id);
     if (tile?.document?.trigger) {
-        await tile.document.trigger({ token: activatingToken });
+        await tile.document.trigger({ token });
     }
 }
 ` : ''}`.trim();

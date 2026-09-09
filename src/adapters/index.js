@@ -427,9 +427,13 @@ class Adapter {
 
 export const adapter = new Adapter();
 
-const moduleRecord = globalThis.game?.modules?.get?.('eskie-macros');
-if (moduleRecord) {
-    moduleRecord.api = { ...moduleRecord.api, adapter };
+try {
+    const moduleRecord = game.modules.get('eskie-macros');
+    if (moduleRecord) {
+        moduleRecord.api = { ...moduleRecord.api, adapter };
+    }
+} catch {
+    // game not initialized yet
 }
 
 export {

@@ -267,7 +267,10 @@ const promises = [];
 if (animation) {
     promises.push((async () => {
         try {
-            const trap = adapter.getProperty(globalThis, animation);
+            const subPath = animation.replace(/^eskie\./, '');
+            const moduleApi = game.modules.get('${MODULE_ID}')?.api;
+            const trap = (moduleApi?.animation ? adapter.getProperty(moduleApi.animation, subPath) : null)
+                ?? adapter.getProperty(eskie, subPath);
             // Collect all tokens contained within / overlapping this trap tile via adapter
             let targets = adapter.getTokensInTile(tilePlaceable);
 

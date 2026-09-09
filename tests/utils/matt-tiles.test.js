@@ -96,7 +96,7 @@ test('matt.trap.setup configures trigger tiles to manually activate trap tiles a
 
     // Verify the code string resolves adapter via module API
     assert.ok(trapAction.data.code.includes(`const adapter = game.modules.get('${MODULE_ID}').api.adapter;`), 'Generated code should resolve adapter from module API');
-    assert.ok(trapAction.data.code.includes('const trap = adapter.getProperty(globalThis, animation);'), 'Generated code should invoke getProperty on resolved adapter');
+    assert.ok(trapAction.data.code.includes('adapter.getProperty(eskie, subPath)'), 'Generated code should resolve trap animation without globalThis');
     assert.ok(trapAction.data.code.includes('let targets = adapter.getTokensInTile(tilePlaceable);'), 'Generated code should delegate token containment lookup directly to adapter.getTokensInTile');
 
     // Test executing trap action code

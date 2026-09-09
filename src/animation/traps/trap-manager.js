@@ -34,6 +34,43 @@ function getTargetPlaceableId(doc) {
 }
 
 /**
+ * Resolves a trap animation object from its dot-separated animation path
+ * without accessing globalThis.
+ *
+ * Checks module public API first, then falls back to ambient eskie global.
+ *
+ * @param {string} animationPath Dot-separated animation path (e.g. 'eskie.traps.spike')
+ * @returns {object|null} Resolved trap object with play method, or null
+ */
+function resolveTrapAnimation(animationPath) {
+    if (!animationPath) return null;
+
+    if (animationPath.startsWith('eskie.')) {
+        const subPath = animationPath.slice(6);
+        const api = game.modules.get(MODULE_ID)?.api;
+        const fromApi = adapter.getProperty(api?.animation, subPath)
+            ?? adapter.getProperty(api, subPath);
+        if (fromApi?.play) return fromApi;
+
+        try {
+            const fromEskie = adapter.getProperty(eskie, subPath);
+            if (fromEskie?.play) return fromEskie;
+        } catch {
+            // eskie global not available
+        }
+    }
+
+    try {
+        const fromEskie = adapter.getProperty(eskie, animationPath);
+        if (fromEskie?.play) return fromEskie;
+    } catch {
+        // eskie global not available
+    }
+
+    return null;
+}
+
+/**
  * Normalizes polymorphic caller context across RegionBehavior execution,
  * Monk's Active Tile Triggers, standalone macros, or direct function invocations.
  *
@@ -130,7 +167,7 @@ export async function executeTrapTrigger(context, ...rest) {
         const promises = [];
 
         if (animation) {
-            const trap = adapter.getProperty(globalThis, animation);
+            const trap = resolveTrapAnimation(animation);
             if (trap?.play) {
                 const trapConfig = adapter.duplicate(getTrapFlag(regionDoc, 'config') ?? {});
 
@@ -202,7 +239,7 @@ export async function executeTrapTrigger(context, ...rest) {
         const promises = [];
 
         if (animation) {
-            const trap = adapter.getProperty(globalThis, animation);
+            const trap = resolveTrapAnimation(animation);
             if (trap?.play) {
                 const trapConfig = adapter.duplicate(getTrapFlag(tileDoc, 'config') ?? {});
 

@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-function create(targets, config = {}) {
+function create(targets: any, config: any = {}) {
     const targetList = [targets].flat().filter(Boolean);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     mConfig.destinationPoints = targetList.map(t => adapter.getCenter(t));
@@ -30,7 +30,7 @@ function create(targets, config = {}) {
     if (targetList.length === 0) return shuffleSeq;
 
     if (sendToCenter) {
-        let centerPoint = destinationPoints.reduce((acc, { x, y }) => ({ x: acc.x + x, y: acc.y + y }), { x: 0, y: 0 });
+        let centerPoint = destinationPoints.reduce((acc: any, { x, y }: any) => ({ x: acc.x + x, y: acc.y + y }), { x: 0, y: 0 });
         centerPoint.x /= destinationPoints.length;
         centerPoint.y /= destinationPoints.length;
         for (const t of targetList) {
@@ -51,7 +51,7 @@ function create(targets, config = {}) {
     return shuffleSeq;
 }
 
-async function play(targets, config = {}) {
+async function play(targets: any, config: any = {}) {
     const targetList = [targets].flat().filter(Boolean);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     mConfig.destinationPoints = targetList.map(t => adapter.getCenter(t));

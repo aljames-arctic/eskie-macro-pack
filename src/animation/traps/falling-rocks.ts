@@ -146,11 +146,11 @@ async function stop(trapObject: Tile, config: FallingRocksTrapConfig = {}): Prom
     if (pinnedIds.length > 0) {
         // 3. Convert IDs to actual canvas token objects, filtering out any that no longer exist
         const tokensToClean = pinnedIds
-            .map(tokenId => adapter.getPlaceable(tokenId))
+            .map((tokenId: any) => adapter.getPlaceable(tokenId))
             .filter(Boolean);
 
         // 4. Trigger the unbury sequence for all tokens simultaneously and wait for them to finish
-        const cleanPromises = tokensToClean.map(token => cleanToken(token, config));
+        const cleanPromises = tokensToClean.map((token: any) => cleanToken(token, config));
         await Promise.all(cleanPromises);
 
         // 5. Clean up the flag so these tokens aren't accidentally processed again later

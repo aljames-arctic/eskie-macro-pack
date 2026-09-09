@@ -6,7 +6,7 @@ import { token, tokenSockets } from './token.js';
 import { tokenMaskSockets } from './token-mask.js';
 import { object } from './object.js';
 
-export let socketlibInstance;
+export let socketlibInstance: any;
 
 /**
  * Socketlib Module Adapter.

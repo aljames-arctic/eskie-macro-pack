@@ -16,7 +16,7 @@ const DEFAULT_CONFIG = {
     }
 };
 
-async function create(token, config = {}) {
+async function create(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, darkMap, sound } = mConfig;
 
@@ -187,7 +187,7 @@ async function create(token, config = {}) {
     return seq;
 }
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const {form} = mConfig;
 
@@ -200,7 +200,7 @@ async function play(token, config = {}) {
     }
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const {id, form} = mConfig;
 

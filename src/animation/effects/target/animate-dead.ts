@@ -21,7 +21,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createAnimateDead(undeadToken, config = {}) {
+async function createAnimateDead(undeadToken: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, choice, sound } = mConfig;
 
@@ -172,7 +172,7 @@ async function createAnimateDead(undeadToken, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<Sequence>} A promise that resolves when the sequence starts playing.
  */
-async function playAnimateDead(undeadToken, config = {}) {
+async function playAnimateDead(undeadToken: any, config: any = {}) {
     const sequence = await createAnimateDead(undeadToken, config);
     if (sequence) { return sequence.play(); }
 }
@@ -183,7 +183,7 @@ async function playAnimateDead(undeadToken, config = {}) {
  * @param {Token} token The token to stop effects on.
  * @param {object} options Options for stopping effects.
  */
-function stopAnimateDead(token, { id = DEFAULT_CONFIG.id } = {}) {
+function stopAnimateDead(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
     // No persistent effects to stop for Animate Dead based on the original script.
     // If there were persistent effects, this is where they would be stopped.
 }

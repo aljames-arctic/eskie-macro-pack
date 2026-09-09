@@ -6,7 +6,7 @@ const DEFAULT_CONFIG = {
     dim: true,
 };
 
-function create(config = {}) {
+function create(config: any = {}) {
     const { id, dim } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     let sequence = new Sequence();
@@ -36,12 +36,12 @@ function create(config = {}) {
     return sequence;
 }
 
-async function play(config = {}) {
+async function play(config: any = {}) {
     let seq = create(config);
     await seq.play();
 }
 
-async function stop(config = {}) {
+async function stop(config: any = {}) {
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     return Sequencer.EffectManager.endEffects({ name: id });
 }

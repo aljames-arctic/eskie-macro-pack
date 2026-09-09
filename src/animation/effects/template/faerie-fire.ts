@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-function getTintAndHue(color) {
+function getTintAndHue(color: any) {
     switch (color) {
         case 'blue':
             return { tintColor: '0x2eb9dc', hue: '100', hue2: '0' };
@@ -27,7 +27,7 @@ function getTintAndHue(color) {
     }
 }
 
-async function create(token, config = {}) {
+async function create(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const seq = await createCloud(token, mConfig);
     const { targets } = mConfig;
@@ -40,7 +40,7 @@ async function create(token, config = {}) {
     return seq;
 }
 
-async function createCloud(token, config = {}) {
+async function createCloud(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, template, color, sound } = mConfig;
     const { tintColor, hue, hue2 } = getTintAndHue(color);
@@ -137,7 +137,7 @@ async function createCloud(token, config = {}) {
     return sequence;
 }
 
-function createEffect(token, config = {}) {
+function createEffect(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, glow, sound } = mConfig;
     const { tintColor } = getTintAndHue(color);
@@ -175,29 +175,29 @@ function createEffect(token, config = {}) {
     return sequence;
 }
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const sequence = await create(token, config);
     if (sequence) return sequence.play();
 }
 
-async function playCloud(token, config = {}) {
+async function playCloud(token: any, config: any = {}) {
     const sequence = await createCloud(token, config);
     if (sequence) return sequence.play();
 }
 
-async function playEffect(token, config = {}) {
+async function playEffect(token: any, config: any = {}) {
     const sequence = await createEffect(token, config);
     if (sequence) return sequence.play();
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     const tokenId = token?.id ?? 'token';
     if (token) Sequencer.EffectManager.endEffects({ name: `${id} - ${tokenId}`, object: token });
 }
 
-async function clean(config = {}) {
+async function clean(config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `${id}` });

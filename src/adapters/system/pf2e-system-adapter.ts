@@ -51,7 +51,7 @@ export class Pf2eSystemAdapter extends BaseSystemAdapter {
             // Extract ability robustly: first from context, then from modifiers list, and finally fallback to modifierName
             let rawAbility = pf2eContext.ability ?? null;
             if (!rawAbility && pf2eFlags) {
-                const abilityModifier = pf2eFlags.modifiers?.find(m => m.type === "ability");
+                const abilityModifier = pf2eFlags.modifiers?.find((m: any) => m.type === "ability");
                 if (abilityModifier) {
                     rawAbility = abilityModifier.ability ?? null; // e.g., 'con', 'dex', 'wis'
                 } else {

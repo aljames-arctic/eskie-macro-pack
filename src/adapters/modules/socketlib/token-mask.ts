@@ -87,7 +87,7 @@ async function cleanUpTokenMask(tokenId: any, animationId: any, tileIds: any, de
 
     // Always delete the tiles, even if the target object was already deleted
     if (tileIds && tileIds.length > 0) {
-        await Promise.all(tileIds.map(tileId => tile.destroy(tileId)));
+        await Promise.all(tileIds.map((tileId: any) => tile.destroy(tileId)));
     }
 
     if (object) {
@@ -105,7 +105,7 @@ async function cleanUpTokenMask(tokenId: any, animationId: any, tileIds: any, de
 /**
  * Socketlib handler to execute coordinated token mask playback as GM.
  */
-async function playTokenMaskGM(tokenId, config = {}) {
+async function playTokenMaskGM(tokenId: any, config: any = {}) {
     if (!game.user.isGM) return;
     const object = adapter.getPlaceable(tokenId);
     if (!object) return;

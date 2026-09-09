@@ -15,7 +15,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(token, config = {}) {
+async function create(token: any, config: any = {}) {
     const { id, duration, scale, file , sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const dims = adapter.getTokenDimensions(token);
     const tokenHeight = dims.heightUnits;
@@ -55,12 +55,12 @@ async function create(token, config = {}) {
     return angryEffect;
 }
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const seq = await create(token, config);
     if (seq) { await seq.play(); }
 }
 
-async function stop(token, {id = 'angry'} = {}) {
+async function stop(token: any, {id = 'angry'}: any = {}) {
     return Sequencer.EffectManager.endEffects({ name: id, object: token });
 }
 

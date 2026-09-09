@@ -16,7 +16,7 @@ export const BASE_ABILITY_MAP = {
  * @param {Record<string, string>} [customMap={}] System-specific alias mappings
  * @returns {string|null} Normalized ability name or null
  */
-export function parseAndNormalizeAbility(rawAbility, combinedText = "", customMap = {}) {
+export function parseAndNormalizeAbility(rawAbility: any, combinedText = "", customMap: any = {}) {
     let raw = rawAbility;
     if (!raw) {
         // Strip HTML tags to prevent tags like <strong> from matching "str"

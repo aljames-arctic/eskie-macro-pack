@@ -5,7 +5,7 @@ import { applySound, DEFAULT_SOUND_CONFIG } from "../../../utils/sound.js";
 // Mapping of tag -> Sequencer file
 const defaultDetectionConfig = {};
 // Return true if any tag in tags is applied
-const defaultValidator = async function (target, tags) {
+const defaultValidator = async function (target: any, tags: any) {
     return false;
 }
 

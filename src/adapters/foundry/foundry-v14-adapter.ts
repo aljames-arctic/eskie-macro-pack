@@ -19,7 +19,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {number} [_scale=1] Additional scale multiplier (unused in V14 centered origin)
      * @returns {{x: number, y: number}} Offset coordinates
      */
-    getRevealOffset(object, _scale = 1) {
+    getRevealOffset(object: any, _scale = 1) {
         if (!object) return { x: 0, y: 0 };
         return object.center ?? { x: object.x, y: object.y };
     }
@@ -30,7 +30,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {PlaceableObject} object Token or Tile placeable
      * @returns {{x: number, y: number}} Offset coordinates
      */
-    getShapeOffset(object) {
+    getShapeOffset(object: any) {
         if (!object) return { x: 0, y: 0 };
         return object.center ?? { x: object.x, y: object.y };
     }
@@ -42,7 +42,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {Tile} tile Target tile placeable
      * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number, anchor: {x: number, y: number} }}
      */
-    getTileBounds(tile) {
+    getTileBounds(tile: any) {
         if (!tile) return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
         const doc = tile.document ?? tile;
         const x = doc.x ?? 0;

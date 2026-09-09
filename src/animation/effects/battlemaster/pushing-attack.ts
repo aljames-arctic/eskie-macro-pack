@@ -15,14 +15,14 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token, target, config = {}) {
+async function create(token: any, target: any, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { pushDistance, type, weight, color, sound } = mConfig;
 
     if (!token || !target) return;
 
-    const weightIndex = { light: 0, medium: 1, heavy: 2 }[weight] ?? 2;
+    const weightIndex = ({ light: 0, medium: 1, heavy: 2 } as Record<string, number>)[weight] ?? 2;
     const effectSize = 2 + (0.25 * weightIndex);
     const effectOffset = -0.75 - (0.25 * weightIndex);
 
@@ -161,7 +161,7 @@ async function create(token, target, config = {}) {
     return sequence;
 }
 
-async function play(token, target, config = {}) {
+async function play(token: any, target: any, config: any = {}) {
     const sequence = await create(token, target, config);
     if (sequence) return sequence.play();
 }

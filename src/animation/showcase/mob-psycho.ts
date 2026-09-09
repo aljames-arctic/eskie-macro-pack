@@ -7,7 +7,7 @@ const DEFAULT_CONFIG = {
 }
 
 //SET TEXT STYLE
-function getColor(number) {
+function getColor(number: any) {
     const zero = "#FFFFFF";
     const twenty = "#09ffef";
     const fourty = "#1efe25";
@@ -23,7 +23,7 @@ function getColor(number) {
     return getColorGradient(startColor, endColor, step, totalSteps);
 }
 
-function getColorGradient(startColor, endColor, step, totalSteps) {
+function getColorGradient(startColor: any, endColor: any, step: any, totalSteps: any) {
     // Remove the '#'
     const startHex = startColor.startsWith("#") ? startColor.substring(1) : startColor;
     const endHex = endColor.startsWith("#") ? endColor.substring(1) : endColor;
@@ -50,7 +50,7 @@ function getColorGradient(startColor, endColor, step, totalSteps) {
     const a = hasAlpha ? Math.round(startA + (endA - startA) * t) : 255;
 
     // Helper to format to 2-digit hex
-    const toHex = (c) => ("0" + c.toString(16)).slice(-2);
+    const toHex = (c: any) => ("0" + c.toString(16)).slice(-2);
 
     // Construct the new hex color string
     let newHex = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
@@ -61,7 +61,7 @@ function getColorGradient(startColor, endColor, step, totalSteps) {
     return newHex;
 }
 
-async function play(startNumber, endNumber, config = {}) {
+async function play(startNumber: any, endNumber: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { baseDuration, finalDuration } = mConfig;
 

@@ -78,13 +78,13 @@ export class TokenAttacherModuleAdapter extends BaseModuleAdapter {
 export const tokenAttacherAdapter = new TokenAttacherModuleAdapter();
 
 export const tokenAttacher = {
-    attachElementsToToken: (elements, targetToken, suppressNotification = true) =>
+    attachElementsToToken: (elements: any, targetToken: any, suppressNotification = true) =>
         tokenAttacherAdapter.attachElementsToToken(elements, targetToken, suppressNotification),
-    detachElementsFromToken: (elements, targetToken, suppressNotification = true) =>
+    detachElementsFromToken: (elements: any, targetToken: any, suppressNotification = true) =>
         tokenAttacherAdapter.detachElementsFromToken(elements, targetToken, suppressNotification),
-    attach: (elements, targetToken, suppressNotification = true) =>
+    attach: (elements: any, targetToken: any, suppressNotification = true) =>
         tokenAttacherAdapter.attach(elements, targetToken, suppressNotification),
-    detach: (elements, targetToken, suppressNotification = true) =>
+    detach: (elements: any, targetToken: any, suppressNotification = true) =>
         tokenAttacherAdapter.detach(elements, targetToken, suppressNotification),
     get api() {
         return tokenAttacherAdapter.api;

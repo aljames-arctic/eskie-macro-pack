@@ -25,7 +25,7 @@ const DEFAULT_CONFIG = {
     emote: 'eskie.emote.angry.02',
 };
 
-async function create(token, config = {}) {
+async function create(token: any, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let {
@@ -99,12 +99,12 @@ async function create(token, config = {}) {
     return sequence;
 }
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const sequence = await create(token, config);
     if (sequence) return sequence.play();
 }
 
-function stop(token, config = {}) {
+function stop(token: any, config: any = {}) {
     // This animation is a fixed duration showcase
 }
 

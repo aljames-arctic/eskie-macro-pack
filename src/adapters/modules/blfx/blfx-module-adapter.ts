@@ -114,7 +114,7 @@ export const EMP_BLFX_Registry = {};
 /**
  * Standard trigger key mapping for BLFX Custom Auto-Recognition.
  */
-export const BLFX_TRIGGER_MAP = {
+export const BLFX_TRIGGER_MAP: Record<string, string> = {
     melee: "afterAttack",
     "melee-target": "afterAttack",
     range: "afterAttack",
@@ -143,7 +143,7 @@ export const BLFX_TRIGGER_MAP = {
 /**
  * Standard display names for BLFX trigger categories.
  */
-export const BLFX_TRIGGER_NAMES = {
+export const BLFX_TRIGGER_NAMES: Record<string, string> = {
     afterItemUse: "After Activity Use (Default)",
     afterAttack: "After Attack Roll",
     afterDamage: "After Damage Roll",
@@ -240,7 +240,7 @@ export function resolveBlfxMacroType(triggerMode: string, trigger: string, key: 
  * @param {object} config Configuration object passed to the effect
  * @returns {string} Generated JavaScript snippet
  */
-export function buildBlfxMacroCommand(animation, trigger, config) {
+export function buildBlfxMacroCommand(animation: any, trigger: any, config: any) {
     const standardized = standardizeBlfxTrigger(trigger);
     const serializedConfig = JSON.stringify(config ?? {}, null, 4);
 
@@ -353,7 +353,7 @@ export function buildBlfxPayload(registry = EMP_BLFX_Registry) {
  * @param {object} empRegistry EMP's internal BLFX registry
  * @returns {object} Merged payload ready for the blfx.register.CustomAutoRec hook
  */
-export function mergeBlfxCustomAutoRec(existingData, empRegistry = EMP_BLFX_Registry) {
+export function mergeBlfxCustomAutoRec(existingData: any, empRegistry = EMP_BLFX_Registry) {
     let baseCustomTree = {};
     if (typeof existingData === 'string') {
         try { existingData = JSON.parse(existingData); } catch {}
@@ -639,7 +639,7 @@ export const blfxAdapter = new BlfxModuleAdapter();
 export const blfx = {
     register: blfxAdapter.register.bind(blfxAdapter),
     buildBlfxPayload: () => blfxAdapter.buildPayload(),
-    mergeBlfxCustomAutoRec: (existingData, empRegistry) => mergeBlfxCustomAutoRec(existingData, empRegistry ?? blfxAdapter.registry),
+    mergeBlfxCustomAutoRec: (existingData: any, empRegistry: any) => mergeBlfxCustomAutoRec(existingData, empRegistry ?? blfxAdapter.registry),
     submit: (force = false) => blfxAdapter.submit(force),
     isAutorecAvailable: isBlfxAutorecAvailable,
     isCustomAutoRecUpdatesEnabled: isBlfxCustomAutoRecUpdatesEnabled,

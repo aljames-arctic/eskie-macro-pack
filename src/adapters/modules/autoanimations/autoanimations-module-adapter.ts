@@ -26,7 +26,7 @@ export const EMP_AA_Menu = {
  * @param {string} trigger Input trigger name
  * @returns {string} Standardized trigger key
  */
-export function standardizeTrigger(trigger) {
+export function standardizeTrigger(trigger: any) {
     const cleanTrigger = (trigger ?? "").toLowerCase();
     switch (cleanTrigger) {
         case "ontoken":
@@ -59,7 +59,7 @@ export function standardizeTrigger(trigger) {
 
 // Convert object to stringified JSON and escape quotes
 // For instance: { key: "value" } -> "{ "key": \"value\"}"
-function JSONformatObject(obj, depth = 1) {
+function JSONformatObject(obj: any, depth = 1) {
     if (obj === null) return 'null';
     if (obj === undefined) return 'undefined';
     const type = typeof obj;
@@ -125,9 +125,9 @@ export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
      * @param {string} [fallback=key] Fallback label
      * @returns {object} The autorec entry
      */
-    createAutorecEntry(key, trigger, animation, config, version = "0.0.0", fallback = key) {
+    createAutorecEntry(key: any, trigger: any, animation: any, config: any, version = "0.0.0", fallback = key) {
         const stdTrigger = this.standardizeTrigger(trigger);
-        const defaultMenu = defaultMenuSettings[stdTrigger];
+        const defaultMenu = (defaultMenuSettings as Record<string, any>)[stdTrigger];
         const defaultEntry = foundryPlatform.deepClone(defaultMenu[0]);
         const compendium = `Compendium.${MODULE_ID}.eskie-aa-integration`;
 
@@ -231,11 +231,11 @@ export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
 
 export const autoanimationsAdapter = new AutoanimationsModuleAdapter();
 
-export function createAutorecEntry(key, trigger, animation, config, version = "0.0.0", fallback = key) {
+export function createAutorecEntry(key: any, trigger: any, animation: any, config: any, version = "0.0.0", fallback = key) {
     return autoanimationsAdapter.createAutorecEntry(key, trigger, animation, config, version, fallback);
 }
 
-export function register(key, trigger, animation, config, version = "0.0.0", fallback = key, options = {}) {
+export function register(key: any, trigger: any, animation: any, config: any, version = "0.0.0", fallback = key, options: any = {}) {
     return autoanimationsAdapter.register(key, trigger, animation, config, version, fallback, options);
 }
 

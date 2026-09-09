@@ -18,7 +18,7 @@ export const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-function create(token, config = {}) {
+function create(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, effect, sound } = mConfig;
     const label = `${id} - ${token.id}`;
@@ -144,7 +144,7 @@ function create(token, config = {}) {
     return seq;
 }
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { rageImg } = mConfig;
 
@@ -158,7 +158,7 @@ async function play(token, config = {}) {
     if (seq) { await seq.play(); }
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { rageImg } = mConfig;
 
@@ -174,7 +174,7 @@ async function stop(token, config = {}) {
     return util.stop(token, mConfig);
 }
 
-async function clean(token, config = {}) {
+async function clean(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     return util.clean(token, mConfig);
 }

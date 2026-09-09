@@ -5,7 +5,7 @@ const DEFAULT_CONFIG = {
     delay: 2250
 }
 
-function create(token, config = {}) {
+function create(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { delay } = mConfig;
 
@@ -168,17 +168,17 @@ function create(token, config = {}) {
     return seq;
 }
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const seq = await create(token, config);
     if (seq) { return seq.play(); }
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     Sequencer.EffectManager.endEffects({ name: `${token.document.name}Top` });
     Sequencer.EffectManager.endEffects({ name: `${token.document.name}Bottom` });
 }
 
-async function clean(token, config = {}) {
+async function clean(token: any, config: any = {}) {
     return Promise.all([
         new Sequence().animation().on(token).opacity(1).play(),
         stop(token, config),

@@ -155,7 +155,7 @@ export const RECOMMENDED_CATEGORIES = [
     }
 ];
 
-function processModule(mod) {
+function processModule(mod: any) {
     if (mod.isNative) {
         const isSupported = Boolean(adapter.supportsRegionBehaviors);
         return {
@@ -290,7 +290,7 @@ export class RecommendedModulesApp extends (adapter.foundry.HandlebarsApplicatio
                     const processedModules = sub.modules.map(processModule);
                     let subStatus: Record<string, any> | null = null;
 
-                    if (sub.isNative) {
+                    if ((sub as any).isNative) {
                         const isSupported = Boolean(adapter.supportsRegionBehaviors);
                         subStatus = {
                             isSupported,
@@ -300,7 +300,7 @@ export class RecommendedModulesApp extends (adapter.foundry.HandlebarsApplicatio
                                 ? (game.i18n?.localize("EMP.recommendedModules.status.nativeSupported") ?? "Native Support")
                                 : (game.i18n?.localize("EMP.recommendedModules.status.nativeV14") ?? "Requires Foundry v14+")
                         };
-                    } else if (sub.requireOne) {
+                    } else if ((sub as any).requireOne) {
                         const hasActive = processedModules.some(m => m.isActive);
                         subStatus = {
                             isSupported: hasActive,

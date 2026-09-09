@@ -30,11 +30,11 @@ async function create(tile: Tile, targets?: Token[] | null, config: FloodingRoom
 
     // Retrieve water spray origin tiles from flags
     const originIds = tileDoc.getFlag(MODULE_ID, 'trap.floodingRoomSplashOrigins') ?? [];
-    let splashOrigins = originIds.map(id => adapter.getPlaceable(id)).filter(Boolean);
+    let splashOrigins = originIds.map((id: any) => adapter.getPlaceable(id)).filter(Boolean);
     
     if (splashOrigins.length === 0 && game.modules.get('tagger')?.active) {
         const taggedOrigins = await Tagger.getByTag('Flooding Room Trap Origin');
-        splashOrigins = taggedOrigins.map(t => (t.object ? t.object : t)).filter(Boolean);
+        splashOrigins = taggedOrigins.map((t: any) => (t.object ? t.object : t)).filter(Boolean);
     }
 
     let seq = new Sequence();
@@ -48,7 +48,7 @@ async function create(tile: Tile, targets?: Token[] | null, config: FloodingRoom
 
     // Spawn persistent water splashes at each origin tile pointing towards the water tile
     if (splashOrigins.length > 0) {
-        splashOrigins.forEach(origin => {
+        splashOrigins.forEach((origin: any) => {
             const originBounds = adapter.getBounds(origin);
             const originCenter = adapter.getCenter(origin);
 

@@ -65,7 +65,7 @@ class Adapter {
      * @param {string} moduleId Unique module identifier
      * @returns {BaseModuleAdapter|undefined}
      */
-    getModule(moduleId) {
+    getModule(moduleId: any) {
         return this.modules.get(moduleId);
     }
 
@@ -74,7 +74,7 @@ class Adapter {
      * @param {string} moduleId Unique module identifier
      * @returns {boolean}
      */
-    hasModule(moduleId) {
+    hasModule(moduleId: any) {
         return this.modules.has(moduleId);
     }
 
@@ -132,35 +132,35 @@ class Adapter {
         return this.foundry.generation;
     }
 
-    isNewerVersion(a, b) {
+    isNewerVersion(a: any, b: any) {
         return this.foundry.isNewerVersion(a, b);
     }
 
-    fromUuidSync(uuid, options = {}) {
+    fromUuidSync(uuid: any, options = {}) {
         return this.foundry.fromUuidSync(uuid, options);
     }
 
-    async fromUuid(uuid, options = {}) {
+    async fromUuid(uuid: any, options = {}) {
         return this.foundry.fromUuid(uuid, options);
     }
 
-    mergeObject(original, other = {}, options = {}) {
+    mergeObject(original: any, other = {}, options = {}) {
         return this.foundry.mergeObject(original, other, options);
     }
 
-    duplicate(obj) {
+    duplicate(obj: any) {
         return this.foundry.duplicate(obj);
     }
 
-    deepClone(obj) {
+    deepClone(obj: any) {
         return this.foundry.deepClone(obj);
     }
 
-    getProperty(obj, path) {
+    getProperty(obj: any, path: any) {
         return this.foundry.getProperty(obj, path);
     }
 
-    setProperty(obj, path, value) {
+    setProperty(obj: any, path: any, value: any) {
         return this.foundry.setProperty(obj, path, value);
     }
 
@@ -168,55 +168,55 @@ class Adapter {
         return this.foundry.randomID(length);
     }
 
-    isEmpty(obj) {
+    isEmpty(obj: any) {
         return this.foundry.isEmpty(obj);
     }
 
-    hasProperty(obj, path) {
+    hasProperty(obj: any, path: any) {
         return this.foundry.hasProperty(obj, path);
     }
 
-    slugify(text, options = {}) {
+    slugify(text: any, options = {}) {
         return this.foundry.slugify(text, options);
     }
 
-    diffObject(original, other, options = {}) {
+    diffObject(original: any, other: any, options = {}) {
         return this.foundry.diffObject(original, other, options);
     }
 
-    flattenObject(obj, d = 0) {
+    flattenObject(obj: any, d = 0) {
         return this.foundry.flattenObject(obj, d);
     }
 
-    expandObject(obj, d = 0) {
+    expandObject(obj: any, d = 0) {
         return this.foundry.expandObject(obj, d);
     }
 
-    debounce(fn, delay) {
+    debounce(fn: any, delay: any) {
         return this.foundry.debounce(fn, delay);
     }
 
-    async enrichHTML(content, options = {}) {
+    async enrichHTML(content: any, options = {}) {
         return this.foundry.enrichHTML(content, options);
     }
 
-    getCombatantsByToken(combat, token) {
+    getCombatantsByToken(combat: any, token: any) {
         return this.foundry.getCombatantsByToken(combat, token);
     }
 
-    getCombatantByToken(combat, token) {
+    getCombatantByToken(combat: any, token: any) {
         return this.foundry.getCombatantByToken(combat, token);
     }
 
-    getUserPermissionTier(user) {
+    getUserPermissionTier(user: any) {
         return this.foundry.getUserPermissionTier(user);
     }
 
-    isUserDocumentOwner(user, doc) {
+    isUserDocumentOwner(user: any, doc: any) {
         return this.foundry.isUserDocumentOwner(user, doc);
     }
 
-    isUserInCharge(token, user = game?.user) {
+    isUserInCharge(token: any, user = game?.user) {
         return this.foundry.isUserInCharge(token, user);
     }
 
@@ -224,27 +224,27 @@ class Adapter {
     /*  Tile & Placeable Geometric Operations       */
     /* -------------------------------------------- */
 
-    getRevealOffset(object, scale = 1) {
+    getRevealOffset(object: any, scale = 1) {
         return this.foundry.getRevealOffset(object, scale);
     }
 
-    getShapeOffset(object) {
+    getShapeOffset(object: any) {
         return this.foundry.getShapeOffset(object);
     }
 
-    getTileOffset(object, type, scale = 1) {
+    getTileOffset(object: any, type: any, scale = 1) {
         return this.foundry.getTileOffset(object, type, scale);
     }
 
-    getTemplatePosition(template, config = {}) {
+    getTemplatePosition(template: any, config = {}) {
         return this.foundry.getTemplatePosition(template, config);
     }
 
-    getCrosshairPosition(position, config = {}) {
+    getCrosshairPosition(position: any, config = {}) {
         return this.foundry.getCrosshairPosition(position, config);
     }
 
-    resolveDistinctPositions(positions, config = {}, template = null) {
+    resolveDistinctPositions(positions: any, config = {}, template = null) {
         return this.foundry.resolveDistinctPositions(positions, config, template);
     }
 
@@ -264,83 +264,83 @@ class Adapter {
         return this.foundry.getSceneCenter(scene);
     }
 
-    getCenter(target) {
+    getCenter(target: any) {
         return this.foundry.getCenter(target);
     }
 
-    getTokenDimensions(token) {
+    getTokenDimensions(token: any) {
         return this.foundry.getTokenDimensions(token);
     }
 
-    getTokenRotation(token) {
+    getTokenRotation(token: any) {
         return this.foundry.getTokenRotation(token);
     }
 
-    getInterpolatedPoints(point1, point2, stepDistancePx = 100) {
+    getInterpolatedPoints(point1: any, point2: any, stepDistancePx = 100) {
         return this.foundry.getInterpolatedPoints(point1, point2, stepDistancePx);
     }
 
-    getBestAdjacentLocation(token, target) {
+    getBestAdjacentLocation(token: any, target: any) {
         return this.foundry.getBestAdjacentLocation(token, target);
     }
 
-    buttonDialog(buttonData, options = {}) {
+    buttonDialog(buttonData: any, options = {}) {
         return this.foundry.buttonDialog(buttonData, options);
     }
 
-    getDocumentName(target) {
+    getDocumentName(target: any) {
         return this.foundry.getDocumentName(target);
     }
 
-    isDocumentOfType(target, type) {
+    isDocumentOfType(target: any, type: any) {
         return this.foundry.isDocumentOfType(target, type);
     }
 
-    getPlaceable(id) {
+    getPlaceable(id: any) {
         return this.foundry.getPlaceable(id);
     }
 
-    async loadTemplates(paths) {
+    async loadTemplates(paths: any) {
         return this.foundry.loadTemplates(paths);
     }
 
-    getSpeakerToken(message, extractedTokenId = null) {
+    getSpeakerToken(message: any, extractedTokenId = null) {
         return this.foundry.getSpeakerToken(message, extractedTokenId);
     }
 
-    getSpeakerActor(message) {
+    getSpeakerActor(message: any) {
         return this.foundry.getSpeakerActor(message);
     }
 
-    getDistance(t1, t2) {
+    getDistance(t1: any, t2: any) {
         return this.foundry.getDistance(t1, t2);
     }
 
-    getNearestSquareCenter(token, target) {
+    getNearestSquareCenter(token: any, target: any) {
         return this.foundry.getNearestSquareCenter(token, target);
     }
 
-    getTokenOwners(token, config = {}) {
+    getTokenOwners(token: any, config = {}) {
         return this.foundry.getTokenOwners(token, config);
     }
 
-    getTileBounds(tile) {
+    getTileBounds(tile: any) {
         return this.foundry.getTileBounds(tile);
     }
 
-    getTokensInTile(tile) {
+    getTokensInTile(tile: any) {
         return this.foundry.getTokensInTile(tile);
     }
 
-    attachPlaceableElements(elements, target) {
+    attachPlaceableElements(elements: any, target: any) {
         return this.foundry.attachPlaceableElements(elements, target);
     }
 
-    detachPlaceableElements(elements, target) {
+    detachPlaceableElements(elements: any, target: any) {
         return this.foundry.detachPlaceableElements(elements, target);
     }
 
-    formatDeletionUpdate(path, keyId) {
+    formatDeletionUpdate(path: any, keyId: any) {
         return this.foundry.formatDeletionUpdate(path, keyId);
     }
 
@@ -356,43 +356,43 @@ class Adapter {
         return this.foundry.getControlledRegions();
     }
 
-    getRegionBounds(region) {
+    getRegionBounds(region: any) {
         return this.foundry.getRegionBounds(region);
     }
 
-    getTokensInRegion(region) {
+    getTokensInRegion(region: any) {
         return this.foundry.getTokensInRegion(region);
     }
 
-    createRegionBehavior(region, behaviorData) {
+    createRegionBehavior(region: any, behaviorData: any) {
         return this.foundry.createRegionBehavior(region, behaviorData);
     }
 
-    formatRegionBehaviorData(config) {
+    formatRegionBehaviorData(config: any) {
         return this.foundry.formatRegionBehaviorData(config);
     }
 
-    getPlaceableTexture(placeable) {
+    getPlaceableTexture(placeable: any) {
         return this.foundry.getPlaceableTexture(placeable);
     }
 
-    getBounds(object) {
+    getBounds(object: any) {
         return this.foundry.getBounds(object);
     }
 
-    getTokensInPlaceable(object) {
+    getTokensInPlaceable(object: any) {
         return this.foundry.getTokensInPlaceable(object);
     }
 
-    containsPoint(object, point) {
+    containsPoint(object: any, point: any) {
         return this.foundry.containsPoint(object, point);
     }
 
-    getRegionOrigin(region) {
+    getRegionOrigin(region: any) {
         return this.foundry.getRegionOrigin(region);
     }
 
-    getTargetLocation(target) {
+    getTargetLocation(target: any) {
         return this.foundry.getTargetLocation(target);
     }
 
@@ -400,15 +400,15 @@ class Adapter {
     /*  System Layer Delegates                      */
     /* -------------------------------------------- */
 
-    qualifyMessage(message) {
+    qualifyMessage(message: any) {
         return this.system.qualifyMessage(message);
     }
 
-    extractRolls(message) {
+    extractRolls(message: any) {
         return this.system.extractRolls(message);
     }
 
-    normalizeAbility(rawAbility, combinedText = "", customMap = {}) {
+    normalizeAbility(rawAbility: any, combinedText = "", customMap = {}) {
         return this.system.normalizeAbility(rawAbility, combinedText, customMap);
     }
 
@@ -416,7 +416,7 @@ class Adapter {
         return this.system.getSpellLevel(config);
     }
 
-    getCreatureType(actor) {
+    getCreatureType(actor: any) {
         return this.system.getCreatureType(actor);
     }
 }

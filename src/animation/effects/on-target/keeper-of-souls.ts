@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(target, ally, config = {}) {
+async function create(target: any, ally: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
@@ -159,12 +159,12 @@ async function create(target, ally, config = {}) {
     return seq;
 }
 
-async function play(target, ally, config = {}) {
+async function play(target: any, ally: any, config: any = {}) {
     const seq = await create(target, ally, config);
     if (seq) return seq.play();
 }
 
-async function stop(target, ally, config = {}) {
+async function stop(target: any, ally: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     if (target) Sequencer.EffectManager.endEffects({ name: `${id} - ${target.id}` });

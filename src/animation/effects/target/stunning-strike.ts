@@ -20,7 +20,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createStunningStrike(token, target, config = {}) {
+async function createStunningStrike(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
@@ -168,7 +168,7 @@ async function createStunningStrike(token, target, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<Sequence>} A promise that resolves when the sequence starts playing.
  */
-async function playStunningStrike(token, target, config = {}) {
+async function playStunningStrike(token: any, target: any, config: any = {}) {
     const sequence = await createStunningStrike(token, target, config);
     if (sequence) { return sequence.play(); }
 }
@@ -179,7 +179,7 @@ async function playStunningStrike(token, target, config = {}) {
  * @param {Token} target The token affected by the persistent effect.
  * @param {object} config Configuration options.
  */
-function stopStunningStrike(target, config = {}) {
+function stopStunningStrike(target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `StunningStrike - DizzyStars - ${id} - ${target.uuid}` });

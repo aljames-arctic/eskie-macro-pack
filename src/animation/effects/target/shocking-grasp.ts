@@ -19,7 +19,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function create(token, target, config = {}) {
+async function create(token: any, target: any, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { sound } = mConfig;
@@ -108,7 +108,7 @@ async function create(token, target, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<Sequence>} A promise that resolves when the sequence starts playing.
  */
-async function play(token, target, config = {}) {
+async function play(token: any, target: any, config: any = {}) {
     if (!target) return;
     const sequence = await create(token, target, config);
     if (sequence) return sequence.play({ preload: true });

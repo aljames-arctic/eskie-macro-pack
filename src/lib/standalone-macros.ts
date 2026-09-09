@@ -194,12 +194,12 @@ const AA_MACRO_ICON_MAP = {
  * @param {string} filename - The script filename (e.g. "speak-with-dead.js").
  * @returns {string} The formatted Title Case name ("Speak With Dead").
  */
-export function formatMacroTitle(filename) {
+export function formatMacroTitle(filename: any) {
     const baseName = filename.replace(/\.(js|ts)$/i, '');
     return baseName
         .split(/[-_]+/)
         .filter(Boolean)
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .map((word: any) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
         .join(' ');
 }
 
@@ -356,8 +356,8 @@ export async function updateAaIntegrationCompendium(options: any = {}) {
             }
 
             const commandContent = await response.text();
-            const macroTitle = AA_MACRO_NAME_MAP[filename] ?? formatMacroTitle(filename);
-            const macroIcon = AA_MACRO_ICON_MAP[filename] ?? 'icons/svg/lightning.svg';
+            const macroTitle = (AA_MACRO_NAME_MAP as Record<string, string>)[filename] ?? formatMacroTitle(filename);
+            const macroIcon = (AA_MACRO_ICON_MAP as Record<string, string>)[filename] ?? 'icons/svg/lightning.svg';
             const existingEntry = existingIndex.find((entry: any) => entry.name === macroTitle);
 
             const macroPayload = {
@@ -404,7 +404,7 @@ export async function updateAaIntegrationCompendium(options: any = {}) {
  * @param {object} [options] - Optional sync parameters.
  * @returns {Promise<void>}
  */
-export async function updateMacroCompendiums(options = {}) {
+export async function updateMacroCompendiums(options: any = {}) {
     await updateStandaloneMacroCompendium(options);
     await updateAaIntegrationCompendium(options);
 }

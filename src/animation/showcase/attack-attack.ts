@@ -6,8 +6,8 @@ const DEFAULT_CONFIG = {
     zoom: 1.8,
 }
 
-async function validate(red, blue) {
-    async function wait(ms) {
+async function validate(red: any, blue: any) {
+    async function wait(ms: any) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
@@ -63,7 +63,7 @@ function create(red: any, blue: any, config: any = {}) {
     return seq;
 }
 
-function getPositions(red, blue) {
+function getPositions(red: any, blue: any) {
     // Original layout per Eskie -- interpolated for ease of use
     // https://discord.com/channels/813354083061989438/1448383476457013349/1448383505406099538
     /***********************************************************
@@ -71,7 +71,7 @@ function getPositions(red, blue) {
      *  | 00 | 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 |
      *    b1             b3   b2   b4
      ***********************************************************/
-    function interpolatePos(r, b, t, count) {
+    function interpolatePos(r: any, b: any, t: any, count: any) {
         const redCenter = adapter.getCenter(r);
         const blueCenter = adapter.getCenter(b);
         const x = blueCenter.x + (redCenter.x - blueCenter.x) * t/count;
@@ -92,7 +92,7 @@ function getPositions(red, blue) {
     }
 }
 
-function midpoint(a, b) {
+function midpoint(a: any, b: any) {
     return {x: (a.x + b.x)/2, y: (a.y + b.y)/2 };
 }
 

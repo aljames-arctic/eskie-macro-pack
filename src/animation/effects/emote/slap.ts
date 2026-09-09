@@ -48,7 +48,7 @@ const DEFAULT_CONFIG = {
  * 
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
-async function create(location, config = {}) {
+async function create(location: any, config: any = {}) {
     // TODO(bakanabaka): Utilizes old mergeObject
     let { id, duration, effect , sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -89,7 +89,7 @@ async function create(location, config = {}) {
     return slapEffect;
 }
 
-async function play(config = {}, crosshairOptions = undefined) {
+async function play(config: any = {}, crosshairOptions = undefined) {
     let crosshairConfig = {
         size:0.5,
         icon: closest('eskie.crosshair.circle.fantasy_01') ?? 'icons/svg/circle.svg',
@@ -111,7 +111,7 @@ async function play(config = {}, crosshairOptions = undefined) {
     if (seq) { await seq.play(); }
 }
 
-async function stop(config = {}) {
+async function stop(config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     return Sequencer.EffectManager.endEffects({ name: mConfig.id });
 }

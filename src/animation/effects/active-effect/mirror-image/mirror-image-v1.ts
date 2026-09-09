@@ -21,7 +21,7 @@ export const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function create(token, config = {}) {
+async function create(token: any, config: any = {}) {
     config = settingsOverride(config);
     const { id, imageNumber, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
@@ -159,7 +159,7 @@ async function create(token, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<void>} A promise that resolves when the sequence starts playing.
  */
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
@@ -181,7 +181,7 @@ async function play(token, config = {}) {
  * @param {Token} token The token to remove mirror images from.
  * @param {object} config Configuration options.
  */
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     if (!token) return;
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}*`;

@@ -8,7 +8,7 @@ import { log } from '../../../lib/logger.js';
  * @param {string} id - The ID of the object (Token or Tile) to edit.
  * @param {object} [updates={}] - The updates to apply.
  */
-async function edit(id, updates = {}) {
+async function edit(id: any, updates: any = {}) {
     const isToken = !!canvas.tokens.get(id);
     const isTile = !!canvas.tiles.get(id);
 

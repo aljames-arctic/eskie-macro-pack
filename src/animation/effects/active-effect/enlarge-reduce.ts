@@ -23,7 +23,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createEnlarge(token, config = {}) {
+async function createEnlarge(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, scaleFactor, sound } = mConfig;
 
@@ -141,7 +141,7 @@ async function createEnlarge(token, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<Sequence>} A promise that resolves when the sequence starts playing.
  */
-async function playEnlarge(token, config = {}) {
+async function playEnlarge(token: any, config: any = {}) {
     const sequence = await createEnlarge(token, config);
     if (sequence) return sequence.play();
 }
@@ -153,7 +153,7 @@ async function playEnlarge(token, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createReduce(token, config = {}) {
+async function createReduce(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, scaleFactor, sound } = mConfig;
 
@@ -269,7 +269,7 @@ async function createReduce(token, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<Sequence>} A promise that resolves when the sequence starts playing.
  */
-async function playReduce(token, config = {}) {
+async function playReduce(token: any, config: any = {}) {
     const sequence = await createReduce(token, config);
     if (sequence) return sequence.play();
 }

@@ -33,7 +33,7 @@ const DEFAULT_CONFIG = {
  * @param {number} radius - The search radius in grid units.
  * @returns {Wall} The found Wall object, or undefined.
  */
-function findLockedDoor(position, radius) {
+function findLockedDoor(position: any, radius: any) {
     const { size: gridSize, distance: gridDist } = adapter.getSceneDimensions(canvas?.scene);
     const radiusPx = (radius / gridDist) * gridSize;
 
@@ -174,7 +174,7 @@ async function play(token: any, config: any = {}, options: any = {}) {
     }
 }
 
-function stop(token, { id = DEFAULT_CONFIG.id } = {}) {
+function stop(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
     // Instantaneous effect
 }
 

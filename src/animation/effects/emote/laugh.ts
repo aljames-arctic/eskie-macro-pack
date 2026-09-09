@@ -41,7 +41,7 @@ const DEFAULT_CONFIG = {
  * 
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
-async function create(token, config = {}) {
+async function create(token: any, config: any = {}) {
     // TODO(bakanabaka): Utilizes old [] -> {}
     let { id, duration, effect, facing , sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -91,12 +91,12 @@ async function create(token, config = {}) {
     return laughEffect;
 }
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const seq = await create(token, config);
     if (seq) { await seq.play(); }
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     return Sequencer.EffectManager.endEffects({ name: mConfig.id, object: token });
 }

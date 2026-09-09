@@ -26,7 +26,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence|null} The created Sequence, or null if the dialog was cancelled.
  */
-async function createShapechange(token, config = {}) {
+async function createShapechange(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let { baseForm, hybridForm, wolfForm, sound } = mConfig;
     let shapechangeData = token.document.getFlag('eskie-macros', 'shapechange');
@@ -228,7 +228,7 @@ async function createShapechange(token, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createRevert(token, config = {}) {
+async function createRevert(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { sound } = mConfig;
     const { baseForm } = token.document.getFlag('eskie-macros', 'shapechange');
@@ -299,7 +299,7 @@ async function createRevert(token, config = {}) {
  * @param {object} config Configuration options.
  * @returns {Promise<void>}
  */
-async function playShapechange(token, config = {}) {
+async function playShapechange(token: any, config: any = {}) {
     const sequence = await createShapechange(token, config);
     if (sequence) return sequence.play();
 }
@@ -311,7 +311,7 @@ async function playShapechange(token, config = {}) {
  * @param {object} config Configuration options.
  * @returns {Promise<void>}
  */
-async function playRevert(token, config = {}) {
+async function playRevert(token: any, config: any = {}) {
     const sequence = await createRevert(token, config);
     if (sequence) return sequence.play();
 }

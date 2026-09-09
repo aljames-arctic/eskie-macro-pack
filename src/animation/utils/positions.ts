@@ -78,7 +78,7 @@ async function selectMultiple(config: any = {}) {
  * @param {string} [prefix='Marker'] The prefix used when creating the markers.
  */
 async function clearMarkers(prefix = 'Marker') {
-    const effects = Sequencer.EffectManager.getEffects().filter(e => e.data.name?.startsWith(prefix));
+    const effects = Sequencer.EffectManager.getEffects().filter((e: any) => e.data.name?.startsWith(prefix));
     return Sequencer.EffectManager.endEffects({ effects });
 }
 
@@ -87,7 +87,7 @@ async function clearMarkers(prefix = 'Marker') {
  * 
  * @param {string} name The exact name of the marker effect.
  */
-async function clearMarker(name) {
+async function clearMarker(name: any) {
     return Sequencer.EffectManager.endEffects({ name });
 }
 

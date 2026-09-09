@@ -92,7 +92,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {number} [scale=1] Additional scale multiplier
      * @returns {{x: number, y: number}} Offset coordinates
      */
-    getRevealOffset(object, scale = 1) {
+    getRevealOffset(object: any, scale = 1) {
         if (!object) return { x: 0, y: 0 };
         const doc = object.document;
         const isToken = this.isDocumentOfType(object, 'Token');
@@ -116,7 +116,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {PlaceableObject} object Token or Tile placeable
      * @returns {{x: number, y: number}} Offset coordinates
      */
-    getShapeOffset(object) {
+    getShapeOffset(object: any) {
         if (!object) return { x: 0, y: 0 };
         return {
             x: object.x,

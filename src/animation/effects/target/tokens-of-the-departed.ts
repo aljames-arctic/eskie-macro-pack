@@ -15,7 +15,7 @@ const DEFAULT_CONFIG = {
     },
 };
 
-async function createHarvest(token, target, config = {}) {
+async function createHarvest(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
@@ -133,12 +133,12 @@ async function createHarvest(token, target, config = {}) {
     return seq;
 }
 
-async function playHarvest(token, target, config = {}) {
+async function playHarvest(token: any, target: any, config: any = {}) {
     const seq = await createHarvest(token, target, config);
     if (seq) return seq.play();
 }
 
-async function createUse(token, target, config = {}) {
+async function createUse(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
@@ -211,12 +211,12 @@ async function createUse(token, target, config = {}) {
     return seq;
 }
 
-async function playUse(token, target, config = {}) {
+async function playUse(token: any, target: any, config: any = {}) {
     const seq = await createUse(token, target, config);
     if (seq) return seq.play();
 }
 
-async function stopUse(first, second, third = {}) {
+async function stopUse(first: any, second: any, third: any = {}) {
     const isTargetSecond = Boolean(second?.id);
     const target = isTargetSecond ? second : first;
     const rawConfig = isTargetSecond ? third : (second?.id ? third : (second ?? third));
@@ -228,7 +228,7 @@ async function stopUse(first, second, third = {}) {
     }
 }
 
-async function stop(first, second, third = {}) {
+async function stop(first: any, second: any, third: any = {}) {
     await stopUse(first, second, third);
     const isTargetSecond = Boolean(second?.id);
     const token = isTargetSecond ? first : first;

@@ -9,19 +9,19 @@ const DEFAULT_CONFIG = {
     rotation: 0
 };
 
-async function create(object, config = {}) {
+async function create(object: any, config: any = {}) {
     const { id, deleteObject, speed, color, rotation } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const tokenOverlay = `eskie.burn.token_mask.${color}.no_base.${speed}.01`;
     const revealOverlay = `eskie.texture_mask.tile_base.burn.01.${speed}`;
     return tokenMaskEffect.create(object, { id, deleteObject, tokenOverlay, revealOverlay, rotation });
 }
 
-async function play(object, config = {}) {
+async function play(object: any, config: any = {}) {
     const seq = await create(object, config);
     if (seq) return seq.play();
 }
 
-async function stop(object, config = {}) {
+async function stop(object: any, config: any = {}) {
     const { id, deleteObject, speed, color, rotation } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const tokenOverlay = `eskie.burn.token_mask.${color}.no_base.${speed}.01`;
     const revealOverlay = `eskie.texture_mask.tile_base.burn.01.${speed}`;

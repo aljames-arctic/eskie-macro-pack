@@ -1,10 +1,10 @@
 import { log } from "./logger.js";
 
-export function deprecation(newObj, oldPath, newPath, dateStr) {
-    const wrapped = {};
+export function deprecation(newObj: any, oldPath: any, newPath: any, dateStr: any) {
+    const wrapped: Record<string, any> = {};
     for (const [key, val] of Object.entries(newObj)) {
         if (typeof val === 'function') {
-            wrapped[key] = async function (...args) {
+            wrapped[key] = async function (...args: any[]) {
                 log.warn(`Deprecation Warning: '${oldPath}.${key}' is deprecated and will be removed on ${dateStr}. Please update your call to use '${newPath}.${key}' instead.`);
                 return val(...args);
             };

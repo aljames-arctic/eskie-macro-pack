@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
     }
 };
 
-async function create(token, target, config = {}) {
+async function create(token: any, target: any, config: any = {}) {
     const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, damageType, sound } = mergedConfig;
 
@@ -27,7 +27,7 @@ async function create(token, target, config = {}) {
         thunder: {color: "white", orb: "white", hue: 0, impact: "blue"},
     };
 
-    const {color, orb, hue, impact} = colorMapping[damageType] ?? colorMapping.fire;
+    const {color, orb, hue, impact} = (colorMapping as Record<string, any>)[damageType] ?? colorMapping.fire;
 
     const srcCenter = adapter.getCenter(token);
     const tgtCenter = adapter.getCenter(target);
@@ -104,7 +104,7 @@ async function create(token, target, config = {}) {
     return seq;
 }
 
-async function play(token, target, config = {}) {
+async function play(token: any, target: any, config: any = {}) {
     const seq = await create(token, target, config);
     if (seq) { return seq.play(); }
 }

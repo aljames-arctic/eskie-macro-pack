@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
     },
 };
 
-function createCaster(token, config = {}) {
+function createCaster(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { color, sound } = mConfig;
     const gridSize = adapter.getSceneDimensions().size;
@@ -101,12 +101,12 @@ function createCaster(token, config = {}) {
     return sequence;
 }
 
-async function playCaster(token, config = {}) {
+async function playCaster(token: any, config: any = {}) {
     const sequence = createCaster(token, config);
     if (sequence) return sequence.play();
 }
 
-function createTarget(target, config = {}) {
+function createTarget(target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, sound } = mConfig;
     let hue = -20;
@@ -140,17 +140,17 @@ function createTarget(target, config = {}) {
     return sequence;
 }
 
-async function playTarget(target, config = {}) {
+async function playTarget(target: any, config: any = {}) {
     const sequence = createTarget(target, config);
     if (sequence) return sequence.play();
 }
-async function stopTarget(target, config = {}) {
+async function stopTarget(target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     return Sequencer.EffectManager.endEffects({ name: `${id} - ${target.name}`, object: target });
 }
 
-function create(token, targets, config = {}) {
+function create(token: any, targets: any, config: any = {}) {
     const targetList = [targets].flat().filter(Boolean);
     const sequence = createCaster(token, config);
     targetList.forEach(target => {
@@ -159,7 +159,7 @@ function create(token, targets, config = {}) {
     return sequence;
 }
 
-async function play(token, targets, config = {}) {
+async function play(token: any, targets: any, config: any = {}) {
     const sequence = create(token, targets, config);
     if (sequence) { return sequence.play(); }
 }

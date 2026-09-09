@@ -17,19 +17,19 @@ const DEFAULT_CONFIG = {
     }
 };
 
-function create(token, target, config = {}) {
+function create(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { type, weight, color, attacks, sound } = mConfig;
 
     //Determine Attack Size
-    const weightIndex = { light: 0, medium: 1, heavy: 2 }[weight] ?? 2;
+    const weightIndex = ({ light: 0, medium: 1, heavy: 2 } as Record<string, number>)[weight] ?? 2;
     const effectSize = 2 + (0.25 * weightIndex);
     const effectOffset = -0.75 - (0.25 * weightIndex);
     const targetSquare = adapter.getNearestSquareCenter(token, target);
     if (!targetSquare) return;
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
 
-    function attackAnimation(token, target, config) {
+    function attackAnimation(token: any, target: any, config: any) {
         const seq = new Sequence();
         applySound(seq, { ...sound, file: sound.file ?? `psfx.impacts.${type}` });
 
@@ -109,7 +109,7 @@ function create(token, target, config = {}) {
     return seq;
 }
 
-async function play(token, target, config = {}) {
+async function play(token: any, target: any, config: any = {}) {
     config = settingsOverride(config);
     const seq = await create(token, target, config);
     if (seq) { return seq.play(); }

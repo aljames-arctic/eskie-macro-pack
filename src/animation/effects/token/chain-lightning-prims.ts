@@ -46,7 +46,7 @@ function create(token: any, targetTokens: any[], config: any = {}) {
     // Build the Minimum Spanning Tree using Prim's Algorithm
     const { sound } = config;
     const N = targetTokens.length;
-    const A = primMST(targetTokens, (t1, t2) => adapter.getDistance(t1, t2), config.fudgeFactor);
+    const A = primMST(targetTokens, (t1: any, t2: any) => adapter.getDistance(t1, t2), config.fudgeFactor);
 
     // 1. Build propagationLevels of levels using BFS on the MST tree structure
     // propagationLevels = [ 

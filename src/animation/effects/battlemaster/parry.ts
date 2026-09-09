@@ -15,9 +15,9 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-function deg(rad) { return (rad * 180) / Math.PI; }
+function deg(rad: any) { return (rad * 180) / Math.PI; }
 
-async function create(token, target, config = {}) {
+async function create(token: any, target: any, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { slowParry, type, weight, color, sound } = mConfig;
@@ -98,7 +98,7 @@ async function create(token, target, config = {}) {
     return sequence;
 }
 
-async function play(token, target, config = {}) {
+async function play(token: any, target: any, config: any = {}) {
     const sequence = await create(token, target, config);
     if (sequence) return sequence.play({ preload: true });
 }

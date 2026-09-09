@@ -25,13 +25,13 @@ const DEFAULT_CONFIG = {
  *
  * @returns {Promise<Sequence>} A promise that resolves with the Sequence object.
  */
-async function create(token, config = {}) {
+async function create(token: any, config: any = {}) {
     const { id, targets, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     let sequence = new Sequence();
     applySound(sequence, sound);
     sequence.thenDo(function () {
-        targets.forEach(target => {
+        targets.forEach((target: any) => {
             new Sequence()
                 .effect()
                 .name(`${target.name} ${id}`)
@@ -133,7 +133,7 @@ async function create(token, config = {}) {
         .duration(2000)
 
         .thenDo(function () {
-            targets.forEach(target => {
+            targets.forEach((target: any) => {
                 const gridSize = adapter.getGridSize();
                 const tokenPos = adapter.getCenter(token);
                 const targetPos = adapter.getCenter(target);
@@ -194,7 +194,7 @@ async function create(token, config = {}) {
  *
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const seq = await create(token, config);
     if (seq) { await seq.play(); }
 }
@@ -208,7 +208,7 @@ async function play(token, config = {}) {
  *
  * @returns {Promise<boolean>} A promise that resolves to true if effects were ended, false otherwise.
  */
-async function stop(token, { id = 'armsOfHadar' } = {}) {
+async function stop(token: any, { id = 'armsOfHadar' }: any = {}) {
     return Promise.all([
         Sequencer.EffectManager.endEffects({ name: id, object: token })
     ]);

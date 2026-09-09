@@ -8,11 +8,11 @@ const tileTrackers = new Map();
 /**
  * Helper function to wait for a tile to be replicated and loaded on all active players' clients.
  */
-async function waitForTileReplication(tileId) {
+async function waitForTileReplication(tileId: any) {
     const activeUsers = game.users.filter(u => u.active);
     const expectedUserIds = activeUsers.map(u => u.id);
     
-    let resolvePromise;
+    let resolvePromise: any;
     const promise = new Promise((resolve) => {
         resolvePromise = resolve;
     });
@@ -47,10 +47,10 @@ async function waitForTileReplication(tileId) {
 /**
  * Socketlib handler to locally verify a tile exists in the client's scene.
  */
-async function verifyTileReceivedLocal(tileId, gmUserId, trackerId) {
+async function verifyTileReceivedLocal(tileId: any, gmUserId: any, trackerId: any) {
     const hasTile = () => canvas.scene?.tiles?.has(tileId);
     
-    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+    const sleep = (ms: any) => new Promise(r => setTimeout(r, ms));
     let attempts = 0;
     while (!hasTile() && attempts < 100) { // Max 5 seconds
         await sleep(50);
@@ -63,7 +63,7 @@ async function verifyTileReceivedLocal(tileId, gmUserId, trackerId) {
 /**
  * Socketlib handler for clients to report back tile replication completion.
  */
-async function reportTileReceived(tileId, userId, trackerId) {
+async function reportTileReceived(tileId: any, userId: any, trackerId: any) {
     const tracker = tileTrackers.get(trackerId);
     if (tracker) {
         tracker.received.add(userId);
@@ -77,7 +77,7 @@ async function reportTileReceived(tileId, userId, trackerId) {
 /**
  * Socketlib handler to execute waitForTileReplication as GM.
  */
-async function waitForTileReplicationGM(tileId) {
+async function waitForTileReplicationGM(tileId: any) {
     if (!game.user.isGM) return;
     return waitForTileReplication(tileId);
 }
@@ -88,7 +88,7 @@ async function waitForTileReplicationGM(tileId) {
  * @param {object} [updates={}] - An object containing the updates to apply to the tile.
  * @returns {Promise<TileDocument>} The updated tile document.
  */
-async function editTile(id, updates = {}) {
+async function editTile(id: any, updates: any = {}) {
     const tile = canvas.tiles.get(id);
     if (!tile) return;
     return tile.document.update(updates);
@@ -99,7 +99,7 @@ async function editTile(id, updates = {}) {
  * @param {object} [updates={}] - An object containing the data for the new tile.
  * @returns {Promise<TileDocument[]>} An array containing the new tile document.
  */
-async function createTile(updates = {}) {
+async function createTile(updates: any = {}) {
     const DEFAULT_TILE_UPDATES = {
         width: 1,
         height: 1
@@ -113,7 +113,7 @@ async function createTile(updates = {}) {
  * @param {string[]} ids - An array of IDs of the tiles to delete.
  * @returns {Promise<TileDocument[]>} An array containing the deleted tile documents.
  */
-async function destroyTiles(ids) {
+async function destroyTiles(ids: any) {
     if (!canvas.scene) return [];
     return canvas.scene.deleteEmbeddedDocuments("Tile", ids);
 }
@@ -133,7 +133,7 @@ export const tileSockets = {
  * @param {object} [updates={}] - An object containing the updates to apply to the tile.
  * @returns {Promise<TileDocument>} The updated tile document.
  */
-async function edit(id, updates = {}) {
+async function edit(id: any, updates: any = {}) {
     if (game.user.isGM) return editTile(id, updates);
     return socketlib.executeAsGM("editTile", id, updates);
 }
@@ -143,7 +143,7 @@ async function edit(id, updates = {}) {
  * @param {object} [updates={}] - An object containing the data for the new tile.
  * @returns {Promise<TileDocument[]>} An array containing the new tile document.
  */
-async function create(updates = {}) {
+async function create(updates: any = {}) {
     if (game.user.isGM) return createTile(updates);
     return socketlib.executeAsGM("createTile", updates);
 }
@@ -153,7 +153,7 @@ async function create(updates = {}) {
  * @param {string|string[]} id - The ID of the tile to delete, or an array of IDs.
  * @returns {Promise<TileDocument[]>} An array containing the deleted tile document.
  */
-async function destroy(id) {
+async function destroy(id: any) {
     const ids = [id].flat();
     if (game.user.isGM) return destroyTiles(ids);
     return socketlib.executeAsGM("destroyTiles", ids);
@@ -164,7 +164,7 @@ async function destroy(id) {
  * @param {string} tileId - The ID of the tile to synchronize.
  * @returns {Promise<void>}
  */
-async function sync(tileId) {
+async function sync(tileId: any) {
     if (game.user.isGM) return waitForTileReplication(tileId);
     return socketlib.executeAsGM("waitForTileReplicationGM", tileId);
 }

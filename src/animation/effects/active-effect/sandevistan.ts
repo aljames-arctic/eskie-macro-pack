@@ -9,10 +9,10 @@ import { MODULE_ID } from "../../../lib/constants.js";
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
-function hslToHex(h, s, l) {
+function hslToHex(h: any, s: any, l: any) {
     l /= 100;
     const a = s * Math.min(l, 1 - l) / 100;
-    const f = n => {
+    const f = (n: any) => {
         const k = (n + h / 30) % 12;
         const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
         let hex = Math.round(255 * color).toString(16);

@@ -62,7 +62,7 @@ async function create(tile: Tile, targets?: Token[] | null, config: BullRushStat
         y: targetLoc.y - startCenter.y
     };
 
-    const getDirection = (value) => {
+    const getDirection = (value: any) => {
         if (value > 0) return 1;
         if (value < 0) return -1;
         return 0;

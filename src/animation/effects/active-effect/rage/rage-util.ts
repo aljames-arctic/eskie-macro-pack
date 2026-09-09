@@ -4,7 +4,7 @@ const DEFAULT_CONFIG = {
     id : 'rage util',
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     const label = `${id} - ${token.id}`;
@@ -21,7 +21,7 @@ async function stop(token, config = {}) {
     ]);
 }
 
-async function clean(token, config = {}) {
+async function clean(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     const label = `${id} - ${token.id}`;
@@ -32,7 +32,7 @@ async function clean(token, config = {}) {
     ]);
 }
 
-function hexValue(color) {
+function hexValue(color: any) {
     switch (color) {
         case "red": return "#FF0000";
         case "orange": return "#FF8800";

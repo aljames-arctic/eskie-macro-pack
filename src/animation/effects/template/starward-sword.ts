@@ -65,7 +65,7 @@ async function createStarwardSword(token: any, config: any = {}, options: any = 
     }
     // Loop 10 times
     for (let i = 0; i < 10; i++) {
-        let angle;
+        let angle: number;
 
         // Generate a new random angle for even iterations
         if (i % 2 === 0) {
@@ -238,7 +238,7 @@ async function createStarwardSword(token: any, config: any = {}, options: any = 
 
 
                         .thenDo(function () {
-                            targets.forEach(target => {
+                            targets.forEach((target: any) => {
                                 const targetSeq = new Sequence();
                                 applySound(targetSeq, sound.impact);
                                 targetSeq
@@ -347,7 +347,7 @@ async function createStarwardSword(token: any, config: any = {}, options: any = 
                         .filter("ColorMatrix", { hue: 70 })
 
                         .thenDo(function () {
-                            targets.forEach(target => {
+                            targets.forEach((target: any) => {
                                 const targetSeq = new Sequence();
                                 applySound(targetSeq, sound.impact);
                                 targetSeq
@@ -391,7 +391,7 @@ async function createStarwardSword(token: any, config: any = {}, options: any = 
                 .zIndex(4)
 
                 .thenDo(function () {
-                    targets.forEach(target => {
+                    targets.forEach((target: any) => {
                         const targetSeq = new Sequence();
                         applySound(targetSeq, sound.impact);
                         targetSeq
@@ -518,7 +518,7 @@ async function createStarwardSword(token: any, config: any = {}, options: any = 
                 .zIndex(4)
 
                 .thenDo(function () {
-                    targets.forEach(target => {
+                    targets.forEach((target: any) => {
                         const targetSeq = new Sequence();
                         applySound(targetSeq, sound.impact);
                         targetSeq

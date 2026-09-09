@@ -28,7 +28,7 @@ const DEFAULT_CONFIG = {
 }
 
 /* Works for tokens and tiles */
-async function createMaskTiles(object, config = {}) {
+async function createMaskTiles(object: any, config: any = {}) {
     const { widthPx, heightPx } = adapter.getTokenDimensions(object);
 
     const { revealOverlay, rotation } = adapter.mergeObject(DEFAULT_CONFIG, config);
@@ -290,7 +290,7 @@ async function create(object: any, config: any = {}) {
 /**
  * Coordinated play function that broadcasts local playback to all clients.
  */
-async function playSocketed(object, config = {}) {
+async function playSocketed(object: any, config: any = {}) {
     const { id, deleteObject, revealOverlay, tokenOverlay, rotation, tint } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Pre-resolve paths
@@ -312,7 +312,7 @@ async function playSocketed(object, config = {}) {
     // 4. Set up the tracking promise for all active users
     const activeUserIds = game.users.filter(u => u.active).map(u => u.id);
 
-    let resolvePromise;
+    let resolvePromise: any;
     const promise = new Promise((resolve) => {
         resolvePromise = resolve;
     });
@@ -363,7 +363,7 @@ async function playSocketed(object, config = {}) {
 /**
  * Public entry point to play the coordinated multi-client effect.
  */
-async function play(object, config = {}) {
+async function play(object: any, config: any = {}) {
     const seq = await create(object, config);
     if (seq) return seq.play();
 }
@@ -371,7 +371,7 @@ async function play(object, config = {}) {
 /**
  * Internal entry point to play the local animation sequence on this client.
  */
-async function playLocal(object, tileIds, animationId, config = {}) {
+async function playLocal(object: any, tileIds: any, animationId: any, config: any = {}) {
     const seq = await createLocal(object, tileIds, animationId, config);
     if (seq) return seq.play({ remote: false });
 }
@@ -379,7 +379,7 @@ async function playLocal(object, tileIds, animationId, config = {}) {
 /**
  * Internal entry point to execute the local stop/cleanup sequence.
  */
-async function stopLocal(object, config = {}) {
+async function stopLocal(object: any, config: any = {}) {
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${object.id}`;
 

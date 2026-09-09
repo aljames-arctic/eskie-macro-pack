@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-function getColor(color) {
+function getColor(color: any) {
     if (!color) return { hue: -35, hex: '#00FF00' }; // default to green
     switch (color.toLowerCase()) {
         case 'red': return { hue: 0, hex: '#FF0000' };
@@ -26,7 +26,7 @@ function getColor(color) {
     }
 }
 
-async function create(token, targets, config = {}) {
+async function create(token: any, targets: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, word, sound } = mConfig;
     const targetList = [targets].flat().filter(Boolean);
@@ -135,12 +135,12 @@ async function create(token, targets, config = {}) {
     return seq;
 }
 
-async function play(token, targets, config = {}) {
+async function play(token: any, targets: any, config: any = {}) {
     let seq = await create(token, targets, config);
     if (seq) { await seq.play(); }
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: id, object: token });

@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-function getSceneCoverSizeGU(target) {
+function getSceneCoverSizeGU(target: any) {
     const { size: gs, sceneRect: rect } = adapter.getSceneDimensions(canvas?.scene);
     const corners = [
         { x: rect.x, y: rect.y },
@@ -28,7 +28,7 @@ function getSceneCoverSizeGU(target) {
     return (2 * maxDist) / gs + 2;
 }
 
-async function create(token, target, config = {}) {
+async function create(token: any, target: any, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { sound } = mConfig;
@@ -118,7 +118,7 @@ async function create(token, target, config = {}) {
     return sequence;
 }
 
-async function play(token, target, config = {}) {
+async function play(token: any, target: any, config: any = {}) {
     const sequence = await create(token, target, config);
     if (sequence) return sequence.play();
 }

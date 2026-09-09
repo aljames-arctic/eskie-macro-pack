@@ -7,7 +7,7 @@ import { socketlib } from "./socketlib-module-adapter.js";
  * @param {object} [updates={}] - An object containing the updates to apply to the token.
  * @returns {Promise<TokenDocument>} The updated token document.
  */
-async function editToken(id, updates = {}) {
+async function editToken(id: any, updates: any = {}) {
     const token = canvas.tokens.get(id);
     if (!token) return;
     return token.document.update(updates);
@@ -47,7 +47,7 @@ export const tokenSockets = {
  * @param {object} [updates={}] - An object containing the updates to apply to the token.
  * @returns {Promise<TokenDocument>} The updated token document.
  */
-async function edit(id, updates = {}) {
+async function edit(id: any, updates: any = {}) {
     if (game.user.isGM) return editToken(id, updates);
     return socketlib.executeAsGM("editToken", id, updates);
 }
@@ -57,7 +57,7 @@ async function edit(id, updates = {}) {
  * @param {object} [updates={}] - An object containing the data for the new token.
  * @returns {Promise<TokenDocument[]>} An array containing the new token document.
  */
-async function create(position, updates = {}) {
+async function create(position: any, updates: any = {}) {
     if (game.user.isGM) return createToken(updates);
     return socketlib.executeAsGM("createToken", position, updates);
 }
@@ -67,7 +67,7 @@ async function create(position, updates = {}) {
  * @param {string} id - The ID of the token to delete.
  * @returns {Promise<TokenDocument[]>} An array containing the deleted token document.
  */
-async function destroy(id) {
+async function destroy(id: any) {
     if (game.user.isGM) return destroyToken(id);
     return socketlib.executeAsGM("destroyToken", id);
 }

@@ -124,13 +124,13 @@ export class BaseFoundryAdapter {
      * @param {object} [options={}] Extra options forwarded to DialogV2.wait()
      * @returns {Promise<string|false>} The chosen button's value as a string, or false on cancel.
      */
-    async buttonDialog(buttonData, options = {}) {
+    async buttonDialog(buttonData: any, options = {}) {
         const dialogCls = this.DialogV2;
         if (!dialogCls?.wait) {
             throw new Error("DialogV2 is not available in the current Foundry environment.");
         }
         const opt = this.mergeObject({ position: { width: 300 } }, options, { inplace: false });
-        const buttons = (buttonData.buttons ?? []).map(btn => ({
+        const buttons = (buttonData.buttons ?? []).map((btn: any) => ({
             label: btn.label,
             action: String(btn.value),
             default: false
@@ -168,7 +168,7 @@ export class BaseFoundryAdapter {
      * @param {Object} [options={}] Browse options
      * @returns {Promise<{ target: string, files: string[], dirs: string[] }>}
      */
-    async browseDirectory(source, target, options = {}) {
+    async browseDirectory(source: any, target: any, options = {}) {
         return this.FilePicker.browse(source, target, options);
     }
 
@@ -209,7 +209,7 @@ export class BaseFoundryAdapter {
      * @param {Object} [options={}] Merge options
      * @returns {Object}
      */
-    mergeObject(original, other = {}, options = {}) {
+    mergeObject(original: any, other = {}, options = {}) {
         const mergedOptions = { inplace: false, ...options };
         return foundry.utils.mergeObject(original, other, mergedOptions);
     }
@@ -219,7 +219,7 @@ export class BaseFoundryAdapter {
      * @param {Object} obj Target object
      * @returns {Object}
      */
-    duplicate(obj) {
+    duplicate(obj: any) {
         return foundry.utils.duplicate(obj);
     }
 
@@ -228,7 +228,7 @@ export class BaseFoundryAdapter {
      * @param {Object} obj Target object
      * @returns {Object}
      */
-    deepClone(obj) {
+    deepClone(obj: any) {
         return foundry.utils.deepClone(obj);
     }
 
@@ -238,7 +238,7 @@ export class BaseFoundryAdapter {
      * @param {string} path Dot path
      * @returns {*}
      */
-    getProperty(obj, path) {
+    getProperty(obj: any, path: any) {
         return foundry.utils.getProperty(obj, path);
     }
 
@@ -249,7 +249,7 @@ export class BaseFoundryAdapter {
      * @param {*} value Property value
      * @returns {boolean}
      */
-    setProperty(obj, path, value) {
+    setProperty(obj: any, path: any, value: any) {
         return foundry.utils.setProperty(obj, path, value);
     }
 
@@ -267,7 +267,7 @@ export class BaseFoundryAdapter {
      * @param {Object} obj Target object
      * @returns {boolean}
      */
-    isEmpty(obj) {
+    isEmpty(obj: any) {
         return foundry.utils.isEmpty(obj);
     }
 
@@ -277,7 +277,7 @@ export class BaseFoundryAdapter {
      * @param {string} b Target version string to compare against
      * @returns {boolean}
      */
-    isNewerVersion(a, b) {
+    isNewerVersion(a: any, b: any) {
         return foundry.utils.isNewerVersion(a, b);
     }
 
@@ -287,7 +287,7 @@ export class BaseFoundryAdapter {
      * @param {string} path Dot-separated property path
      * @returns {boolean}
      */
-    hasProperty(obj, path) {
+    hasProperty(obj: any, path: any) {
         return foundry.utils.hasProperty(obj, path);
     }
 
@@ -359,7 +359,7 @@ export class BaseFoundryAdapter {
      * @param {Object} [options={}] Enrichment options (rollData, secrets, relativeTo, etc.)
      * @returns {Promise<string>}
      */
-    async enrichHTML(content, options = {}) {
+    async enrichHTML(content: any, options = {}) {
         if (!content) return '';
         if (this.TextEditor?.enrichHTML) {
             return this.TextEditor.enrichHTML(content, { secrets: false, async: true, ...options });
@@ -409,7 +409,7 @@ export class BaseFoundryAdapter {
      * @param {User} user Concrete User document
      * @returns {number|null} 1 for Player, 2 for Trusted, 3 for GM, or null if invalid/none
      */
-    getUserPermissionTier(user) {
+    getUserPermissionTier(user: any) {
         if (!user) return null;
         if (user.isGM) return USER_PERMISSION_TIERS.GM;
 
@@ -438,7 +438,7 @@ export class BaseFoundryAdapter {
      * @param {Document|null} doc Concrete Document (Actor or TokenDocument)
      * @returns {boolean} True if the user has an ownership role
      */
-    isUserDocumentOwner(user, doc) {
+    isUserDocumentOwner(user: any, doc: any) {
         if (!user || !doc) return false;
 
         // GM / Co-GM always has ownership over all documents in Foundry
@@ -470,10 +470,10 @@ export class BaseFoundryAdapter {
      * @param {User} [user=game.user] Target user to evaluate (defaults to active client user)
      * @returns {boolean} True if the user is in-charge of the token
      */
-    isUserInCharge(token, user = game.user) {
+    isUserInCharge(token: any, user = game.user) {
         if (!token || !user) return false;
 
-        const isOwner = (u) => this.isUserDocumentOwner(u, token.actor) || this.isUserDocumentOwner(u, token.document);
+        const isOwner = (u: any) => this.isUserDocumentOwner(u, token.actor) || this.isUserDocumentOwner(u, token.document);
 
         if (!isOwner(user)) {
             return false;
@@ -790,7 +790,7 @@ export class BaseFoundryAdapter {
      * @param {string|null} [extractedTokenId=null] Optional pre-extracted token ID
      * @returns {Token|null}
      */
-    getSpeakerToken(message, extractedTokenId = null) {
+    getSpeakerToken(message: any, extractedTokenId = null) {
         const canvasObj = canvas;
         if (!canvasObj?.ready || !canvasObj.tokens) return null;
 
@@ -815,7 +815,7 @@ export class BaseFoundryAdapter {
      * @param {ChatMessage|object|null} message Chat message or speaker context
      * @returns {Actor|null}
      */
-    getSpeakerActor(message) {
+    getSpeakerActor(message: any) {
         const speaker = message?.speaker ?? message;
         if (speaker && ChatMessage?.getSpeakerActor) {
             const actor = ChatMessage.getSpeakerActor(speaker);
@@ -834,7 +834,7 @@ export class BaseFoundryAdapter {
      * @param {PlaceableObject|Document|{x: number, y: number}|null} target Target placeable, document, or coordinate point
      * @returns {{ x: number, y: number }} Center coordinates
      */
-    getCenter(target) {
+    getCenter(target: any) {
         if (!target) return null;
         if (target.center && typeof target.center.x === 'number' && typeof target.center.y === 'number') {
             return { x: target.center.x, y: target.center.y };
@@ -864,7 +864,7 @@ export class BaseFoundryAdapter {
      * @param {Token} token Target token placeable
      * @returns {{ widthPx: number, heightPx: number, widthUnits: number, heightUnits: number, radiusPx: number }}
      */
-    getTokenDimensions(token) {
+    getTokenDimensions(token: any) {
         if (!token) return { widthPx: 0, heightPx: 0, widthUnits: 1, heightUnits: 1, radiusPx: 0 };
         const gridSize = this.getGridSize();
         const widthUnits = token.document.width ?? 1;
@@ -1064,7 +1064,7 @@ export class BaseFoundryAdapter {
         const applyPC = config.applyPC !== false;
         const applyGM = config.applyGM !== false;
 
-        const isOwner = (u) => this.isUserDocumentOwner(u, token.actor) || this.isUserDocumentOwner(u, token.document);
+        const isOwner = (u: any) => this.isUserDocumentOwner(u, token.actor) || this.isUserDocumentOwner(u, token.document);
 
         const usersCollection = game?.users;
         const allUsers = usersCollection?.contents
@@ -1087,7 +1087,7 @@ export class BaseFoundryAdapter {
      * @param {Tile} tile Target tile placeable
      * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number, anchor: {x: number, y: number} }}
      */
-    getTileBounds(tile) {
+    getTileBounds(tile: any) {
         if (!tile) return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0, y: 0 } };
         const doc = tile.document;
         const x = doc.x;
@@ -1112,7 +1112,7 @@ export class BaseFoundryAdapter {
      * @param {Tile} tile Target Tile placeable
      * @returns {Token[]} Array of matching Token placeables
      */
-    getTokensInTile(tile) {
+    getTokensInTile(tile: any) {
         if (!tile) return [];
         const { minX: tileMinX, maxX: tileMaxX, minY: tileMinY, maxY: tileMaxY } = this.getTileBounds(tile);
 
@@ -1160,7 +1160,7 @@ export class BaseFoundryAdapter {
      * @param {PlaceableObject} target Target Token or Tile placeable
      * @returns {Promise<unknown>}
      */
-    async attachPlaceableElements(elements, target) {
+    async attachPlaceableElements(elements: any, target: any) {
         const isTile = this.isDocumentOfType(target, 'Tile');
 
         if (isTile) {
@@ -1192,7 +1192,7 @@ export class BaseFoundryAdapter {
      * @param {PlaceableObject} target Target Token or Tile placeable
      * @returns {Promise<unknown>}
      */
-    async detachPlaceableElements(elements, target) {
+    async detachPlaceableElements(elements: any, target: any) {
         const isTile = this.isDocumentOfType(target, 'Tile');
 
         if (isTile) {
@@ -1294,7 +1294,7 @@ export class BaseFoundryAdapter {
      * @param {object} _behaviorData Behavior configuration data
      * @returns {Promise<RegionBehavior|null>}
      */
-    async createRegionBehavior(_region, _behaviorData) {
+    async createRegionBehavior(_region: any, _behaviorData: any) {
         return null;
     }
 
@@ -1304,7 +1304,7 @@ export class BaseFoundryAdapter {
      * @param {object} _config Behavior creation options
      * @returns {object}
      */
-    formatRegionBehaviorData(_config) {
+    formatRegionBehaviorData(_config: any) {
         return {};
     }
 
@@ -1313,7 +1313,7 @@ export class BaseFoundryAdapter {
      * @param {PlaceableObject|Document|null} placeable Target placeable or document
      * @returns {string|null}
      */
-    getPlaceableTexture(placeable) {
+    getPlaceableTexture(placeable: any) {
         if (!placeable) return null;
         const doc = placeable.document ?? placeable;
         return doc.texture?.src ?? doc.src ?? null;
@@ -1325,7 +1325,7 @@ export class BaseFoundryAdapter {
      * @param {PlaceableObject|Document|null} object Target placeable or document
      * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number, anchor: {x: number, y: number} }}
      */
-    getBounds(object) {
+    getBounds(object: any) {
         if (!object) {
             return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
         }
@@ -1343,7 +1343,7 @@ export class BaseFoundryAdapter {
      * @param {PlaceableObject|Document|null} object Target placeable or document
      * @returns {Token[]} Array of matching Token placeables
      */
-    getTokensInPlaceable(object) {
+    getTokensInPlaceable(object: any) {
         if (!object) return [];
         const doc = object.document ?? object;
         const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(object.shapes) || (Boolean(doc.bounds) && !doc.texture);
@@ -1360,7 +1360,7 @@ export class BaseFoundryAdapter {
      * @param {{ x: number, y: number }} point Point coordinates
      * @returns {boolean}
      */
-    containsPoint(object, point) {
+    containsPoint(object: any, point: any) {
         if (!object || !point) return false;
         const { minX, maxX, minY, maxY } = this.getBounds(object);
         return point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY;
@@ -1373,7 +1373,7 @@ export class BaseFoundryAdapter {
      * @param {Region|RegionDocument|null} region Target Region
      * @returns {{ x: number, y: number }} Origin coordinates
      */
-    getRegionOrigin(region) {
+    getRegionOrigin(region: any) {
         if (!region) return { x: 0, y: 0 };
         const doc = region.document ?? region;
         if (doc.origin && typeof doc.origin.x === 'number' && typeof doc.origin.y === 'number') {
@@ -1391,7 +1391,7 @@ export class BaseFoundryAdapter {
      * @param {PlaceableObject|Document|{x: number, y: number}|null} target Target placeable, document, or coordinate point
      * @returns {{ x: number, y: number }|null} Target location coordinates
      */
-    getTargetLocation(target) {
+    getTargetLocation(target: any) {
         if (!target) return null;
         if (typeof target.x === 'number' && typeof target.y === 'number' && !target.document && !target.object && target.width === undefined && target.height === undefined && !target.shapes) {
             return { x: target.x, y: target.y };

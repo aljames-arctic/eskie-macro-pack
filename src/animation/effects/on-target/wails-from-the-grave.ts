@@ -105,7 +105,7 @@ async function createAttack(token: any, target1: any, target2?: any, config: any
     const target1Rotation = adapter.getTokenRotation(target1);
     const target2Rotation = adapter.getTokenRotation(target2);
 
-    const weightIndex = { light: 0, medium: 1, heavy: 2 }[weight] ?? 1;
+    const weightIndex = ({ light: 0, medium: 1, heavy: 2 } as Record<string, number>)[weight] ?? 1;
     const effectSize = 2 + (0.25 * weightIndex);
     const effectOffset = -0.75 - (0.25 * weightIndex);
 

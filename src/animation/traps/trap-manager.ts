@@ -165,7 +165,7 @@ export async function setupRegionTrap(animation: string, config: Record<string, 
         originElements = controlledTiles.length > 0 ? controlledTiles : (controlledRegions.length > 0 ? controlledRegions : triggerRegions);
     }
 
-    const extraResults = {};
+    const extraResults: Record<string, any> = {};
     if (config.extraTiles) {
         for (const extra of config.extraTiles) {
             const extraResult = await adapter.buttonDialog({

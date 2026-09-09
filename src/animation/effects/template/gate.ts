@@ -37,7 +37,7 @@ const DEFAULT_CONFIG = {
     ]
 };
 
-async function _getDestination(destinations) {
+async function _getDestination(destinations: any) {
     let content = `
         <div class="form-group" style="padding: 4px 0;">
             <label style="font-weight: 600; display: block; margin-bottom: 6px;">Destination:</label>
@@ -89,7 +89,7 @@ async function _getDestination(destinations) {
     });
 }
 
-function _getPlaneConfig(destination) {
+function _getPlaneConfig(destination: any) {
     const planeConfigs = {
         'First World': { portalColor: 'green', circleColor: 'green', castColor: 'green', planeImage: 'https://i.imgur.com/nilqRZB.png', pulseColor: 'green', saturation: 0, hue: 0, weather: { type: 'stars', options: { tint: { value: '#feb4fb' } } }, filter: { type: 'color', options: { color: { value: '#cf8ee6' }, saturation: 1.1, contrast: 1.1 } } },
         'Astral Plane': { portalColor: 'purple', circleColor: 'purple', castColor: 'purple', planeImage: 'https://i.imgur.com/iqkmZHK.png', pulseColor: 'purple', saturation: 0, hue: 0, weather: { type: 'stars', options: { tint: { value: '#feb4fb' } } }, filter: { type: 'color', options: { color: { value: '#cf8ee6' }, saturation: 1.1, contrast: 1.1 } } },
@@ -111,7 +111,7 @@ function _getPlaneConfig(destination) {
         'Abaddon': { portalColor: 'green', circleColor: 'green', castColor: 'green', planeImage: 'https://i.imgur.com/J8QPuFk.png', pulseColor: 'green', saturation: -0.5, hue: 0, weather: { type: 'stars', options: { tint: { value: '#000000' } } }, filter: { type: 'color', options: { color: { value: '#72dab7' }, saturation: 1.1, contrast: 1.1 } } },
         'Abyss': { portalColor: 'purple', circleColor: 'purple', castColor: 'purple', planeImage: 'https://i.imgur.com/fBApWFK.png', pulseColor: 'purple', saturation: 0, hue: 0, weather: { type: 'stars', options: { tint: { value: '#000000' } } }, filter: { type: 'color', options: { color: { value: '#d372da' }, saturation: 1.1, contrast: 1.1 } } },
     };
-    return planeConfigs[destination];
+    return (planeConfigs as Record<string, any>)[destination];
 }
 
 

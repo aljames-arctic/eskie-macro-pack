@@ -12,7 +12,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-function getTintColor(color) {
+function getTintColor(color: any) {
     switch (color) {
         case "teal": return '#6ff087';
         case "green": return '#6cde3b';
@@ -22,7 +22,7 @@ function getTintColor(color) {
     }
 }
 
-async function create(token, config = {}) {
+async function create(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, changeLight, sound } = mConfig;
     const tintColor = getTintColor(color);
@@ -81,12 +81,12 @@ async function create(token, config = {}) {
     return seq;
 }
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     let seq = await create(token, config);
     if (seq) { await seq.play(); }
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     if (mConfig.changeLight) {
@@ -95,7 +95,7 @@ async function stop(token, config = {}) {
     await Sequencer.EffectManager.endEffects({ name: `${id} - ${token.uuid}`, object: token });
 }
 
-async function clean(token, config = {}) {
+async function clean(token: any, config: any = {}) {
     new Sequence()
         .animation()
             .on(token)

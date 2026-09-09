@@ -16,12 +16,12 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const seq = await create(token, config);
     if (seq) { await seq.play(); }
 }
 
-function create(token, config = {}) {
+function create(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, flight, sound } = mConfig;
     const { wingSize, flaps, sway } = flight;
@@ -132,7 +132,7 @@ function create(token, config = {}) {
     return seq;
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
 

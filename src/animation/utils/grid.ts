@@ -8,7 +8,7 @@ import { adapter } from '../../adapters/index.js';
  * @param {Token} target - The target token.
  * @returns {object} The center point {x, y} of the best adjacent grid cell.
  */
-export function getBestAdjacentLocation(token, target) {
+export function getBestAdjacentLocation(token: any, target: any) {
     return adapter.getBestAdjacentLocation(token, target);
 }
 

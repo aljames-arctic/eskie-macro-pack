@@ -46,7 +46,7 @@ const DEFAULT_CONFIG = {
  * @param {object} options.offset The offset for the mask.
  * @param {Array<object>} options.steps The steps of the animation, containing radius, duration, and fill.
  */
-function _dissolve({ id, target, offset, steps, shape }) {
+function _dissolve({ id, target, offset, steps, shape }: any) {
     let seq = new Sequence()
         // Make the original target token invisible
         .animation()
@@ -75,7 +75,7 @@ function _dissolve({ id, target, offset, steps, shape }) {
     return seq;
 }
 
-function _reform({ id, target, allSteps, shape }) {
+function _reform({ id, target, allSteps, shape }: any) {
     const formingSequence = new Sequence();
 
     for (const step of allSteps) {
@@ -144,7 +144,7 @@ function getDissolveConfig() {
     ];
 }
 
-function dissolveCreate(target, config = {}) {
+function dissolveCreate(target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
@@ -157,7 +157,7 @@ function dissolveCreate(target, config = {}) {
     return seq;
 }
 
-async function dissolvePlay(target, config = {}) {
+async function dissolvePlay(target: any, config: any = {}) {
     let dissolve = dissolveCreate(target, config);
     let hide = new Sequence().animation().on(target).show(false);
     if (dissolve && hide) {
@@ -178,7 +178,7 @@ async function dissolvePlay(target, config = {}) {
  * @param {string} config.id The unique ID for the effects sequence.
  * @returns {Sequence} A Sequencer sequence object representing the death animation.
  */
-function death(target, config = {}) {
+function death(target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, effect: { smoke: smokeEffect, spirit: spiritEffect } } = mConfig;
 
@@ -216,7 +216,7 @@ function death(target, config = {}) {
     return seq;
 }
 
-function beam(token, target, config = {}) {
+function beam(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, effect: { beam: beamEffects } } = mConfig;
     return beamEffect.create(token, target, { id, effects: beamEffects });
@@ -233,7 +233,7 @@ function beam(token, target, config = {}) {
  * 
  * @returns {Promise<Sequence>} A promise that resolves with the complete effect sequence.
  */
-async function create(token, target, config = {}) {
+async function create(token: any, target: any, config: any = {}) {
     // Merge user config with default config
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -252,7 +252,7 @@ async function create(token, target, config = {}) {
  * @param {object} [config={}] Configuration for the effect.
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
-async function play(token, target, config = {}) {
+async function play(token: any, target: any, config: any = {}) {
     let seq = await create(token, target, config);
     if (seq) { await seq.play(); }
 }
@@ -264,7 +264,7 @@ async function play(token, target, config = {}) {
  * @param {string} [config.id='disintegrate'] The id of the effect to stop.
  * @returns {Promise<void>}
  */
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     return Sequencer.EffectManager.endEffects({ name: id, object: token });
@@ -276,7 +276,7 @@ async function stop(token, config = {}) {
  * @param {object} config Configuration for the effect.
  * @returns {Sequence} A Sequencer sequence object.
  */
-function reformCreate(target, config = {}) {
+function reformCreate(target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, duration } = mConfig;
     const reformSequence = new Sequence();
@@ -312,7 +312,7 @@ function reformCreate(target, config = {}) {
     return reformSequence;
 }
 
-async function reformPlay(target, config = {}) {
+async function reformPlay(target: any, config: any = {}) {
     let reform = new Sequence();
     reform = reform
         .animation().on(target).show(true)

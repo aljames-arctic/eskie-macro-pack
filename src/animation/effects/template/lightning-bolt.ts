@@ -33,7 +33,7 @@ const DEFAULT_CONFIG = {
     }
 };
 
-async function create(token, config = {}) {
+async function create(token: any, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, template, tintMap, sound } = mConfig;
@@ -143,12 +143,12 @@ async function create(token, config = {}) {
     return sequence;
 }
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const sequence = await create(token, config);    
     if (sequence) return sequence.play({ preload: true });
 }
 
-function stop(token) {
+function stop(token: any) {
     if (token) {
         Sequencer.EffectManager.endEffects({ name: `Casting ${token.name}` });
     }

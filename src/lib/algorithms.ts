@@ -7,7 +7,7 @@
  * @param {number} [fudgeFactor=0] - The fudge factor to allow grouping close nodes.
  * @returns {Array<Array<number>>} An N x N adjacency matrix where 0 represents an edge and Infinity represents no edge.
  */
-export function primMST(nodes, getDistance, fudgeFactor = 0) {
+export function primMST(nodes: any, getDistance: any, fudgeFactor = 0) {
     const N = nodes.length;
     const A = Array.from({ length: N }, () => Array(N).fill(Infinity));
     if (N <= 1) return A;

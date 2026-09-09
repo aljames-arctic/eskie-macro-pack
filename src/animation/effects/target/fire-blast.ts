@@ -47,7 +47,7 @@ const DEFAULT_CONFIG = {
     },
 };
 
-async function create(source, target, config = {}) {
+async function create(source: any, target: any, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { pushDistance, knockbackDuration, returnDuration, sound } = mConfig;
@@ -264,12 +264,12 @@ async function create(source, target, config = {}) {
     return sequence;
 }
 
-async function play(source, target, config = {}) {
+async function play(source: any, target: any, config: any = {}) {
     const sequence = await create(source, target, config);
     if (sequence) return sequence.play();
 }
 
-function stop(target, config = {}) {
+function stop(target: any, config: any = {}) {
     // This animation is one-shot
 }
 

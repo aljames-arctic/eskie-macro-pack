@@ -22,7 +22,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-function create(token, config = {}) {
+function create(token: any, config: any = {}) {
     const { overlay, configs, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const seq = new Sequence();
     applySound(seq, sound);
@@ -40,15 +40,15 @@ function create(token, config = {}) {
     return seq;
 }
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const seq = create(token, config);
     if (seq) return seq.play();
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     const { id, overlay, configs } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const owners = adapter.getTokenOwners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
-    return Promise.all(configs.map(c => blur.stop(owners, c)));
+    return Promise.all(configs.map((c: any) => blur.stop(owners, c)));
 }
 
 export const blurredVision = {

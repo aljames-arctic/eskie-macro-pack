@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token, target, config = {}) {
+async function create(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { color, changeLight, sound } = mConfig;
     const tintColorMap: Record<string, { tintColor: string; hue: number }> = {
@@ -147,7 +147,7 @@ async function create(token, target, config = {}) {
     return sequence;
 }
 
-async function play(token, target, config = {}) {
+async function play(token: any, target: any, config: any = {}) {
     await Tagger.addTags(token, "DrainingTouch");
     const sequence = await create(token, target, config);
     await sequence.play();
@@ -234,7 +234,7 @@ async function play(token, target, config = {}) {
     }
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     return Sequencer.EffectManager.endEffects({ name: id, object: token });

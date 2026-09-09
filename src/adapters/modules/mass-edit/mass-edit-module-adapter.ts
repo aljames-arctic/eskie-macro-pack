@@ -72,10 +72,10 @@ export class MassEditModuleAdapter extends BaseModuleAdapter {
 export const massEditAdapter = new MassEditModuleAdapter();
 
 export const massEdit = {
-    link: (elements, target) => massEditAdapter.link(elements, target),
-    removeLinks: (elements, target) => massEditAdapter.removeLinks(elements, target),
-    attach: (elements, target) => massEditAdapter.attach(elements, target),
-    detach: (elements, target) => massEditAdapter.detach(elements, target),
+    link: (elements: any, target: any) => massEditAdapter.link(elements, target),
+    removeLinks: (elements: any, target: any) => massEditAdapter.removeLinks(elements, target),
+    attach: (elements: any, target: any) => massEditAdapter.attach(elements, target),
+    detach: (elements: any, target: any) => massEditAdapter.detach(elements, target),
     get linker() {
         return massEditAdapter.linker;
     }

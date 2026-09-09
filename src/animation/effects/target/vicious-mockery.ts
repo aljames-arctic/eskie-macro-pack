@@ -23,7 +23,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object for the casting.
  */
-async function createViciousMockeryCast(token, config = {}) {
+async function createViciousMockeryCast(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     // const { id } = mConfig; // Not directly used in this animation for naming persistent effects
 
@@ -87,7 +87,7 @@ async function createViciousMockeryCast(token, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object for the impact.
  */
-async function createViciousMockeryImpact(target, word, config = {}) {
+async function createViciousMockeryImpact(target: any, word: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     // const { id } = mConfig; // Not directly used in this animation for naming persistent effects
 
@@ -203,7 +203,7 @@ async function createViciousMockeryImpact(target, word, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<void>} A promise that resolves when the effect sequences finish playing.
  */
-async function playViciousMockery(token, target, config = {}) {
+async function playViciousMockery(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { word } = mConfig;
 
@@ -221,7 +221,7 @@ async function playViciousMockery(token, target, config = {}) {
  * @param {Token} token The token.
  * @param {object} options Options for stopping effects.
  */
-function stopViciousMockery(token, { id = DEFAULT_CONFIG.id } = {}) {
+function stopViciousMockery(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
     // No persistent effects to stop for Vicious Mockery.
 }
 

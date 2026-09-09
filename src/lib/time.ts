@@ -3,7 +3,7 @@
  * @param {number} ms - The number of milliseconds to wait.
  * @returns {Promise<void>} A promise that resolves after the specified delay.
  */
-async function wait(ms) {
+async function wait(ms: any) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -15,7 +15,7 @@ async function wait(ms) {
  * @param {number} [options.interval=100] - The interval at which to check the condition in milliseconds.
  * @returns {Promise<number>} A promise that resolves with the time elapsed in milliseconds, or rejects if the timeout is reached.
  */
-async function waitUntil(condition, {timeout=2000, interval=100}={}) {
+async function waitUntil(condition: any, {timeout=2000, interval=100}: any = {}) {
     return new Promise((resolve, reject) => {
         const startTime = game.time.serverTime;
         const check = () => {

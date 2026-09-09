@@ -22,7 +22,7 @@ const DEFAULT_CONFIG = {
     }
 };
 
-async function create(object, config = {}) {
+async function create(object: any, config: any = {}) {
     config = settingsOverride(config);
     const { id, tintColor, duration, shatterColor, deleteObject, sound } =
         adapter.mergeObject(DEFAULT_CONFIG, config);
@@ -118,7 +118,7 @@ async function create(object, config = {}) {
                 .belowTokens(false);
 
             // Token Overlay colorMatrix for shatter mask
-            function colorMatrix(seq) {
+            function colorMatrix(seq: any) {
                 return seq.tint('#03e8fc')
                     .filter("ColorMatrix", { brightness: 1.5 })
                     .filter("Glow", {
@@ -156,12 +156,12 @@ async function create(object, config = {}) {
     return sequence;
 }
 
-async function play(object, config = {}) {
+async function play(object: any, config: any = {}) {
     const sequence = await create(object, config);
     if (sequence) return sequence.play();
 }
 
-async function stop(object, config = {}) {
+async function stop(object: any, config: any = {}) {
     const { id, shatterColor, deleteObject } =
         adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id}-${object.id}`;

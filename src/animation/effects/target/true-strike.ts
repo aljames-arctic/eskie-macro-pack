@@ -24,7 +24,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createTrueStrikeCast(token, config = {}) {
+async function createTrueStrikeCast(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
@@ -106,7 +106,7 @@ async function createTrueStrikeCast(token, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<void>} A promise that resolves when the sequence starts playing.
  */
-async function playTrueStrikeCast(token, config = {}) {
+async function playTrueStrikeCast(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Check if TrueStrike tag already exists, if so, remove it (toggle behavior)
@@ -128,7 +128,7 @@ async function playTrueStrikeCast(token, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createTrueStrikeAttack(token, target, config = {}) {
+async function createTrueStrikeAttack(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     // const { id } = mConfig; // Not directly used in this animation for naming persistent effects
 
@@ -256,7 +256,7 @@ async function createTrueStrikeAttack(token, target, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<void>} A promise that resolves when the sequence finishes playing.
  */
-async function playTrueStrikeAttack(token, target, config = {}) {
+async function playTrueStrikeAttack(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 
@@ -282,7 +282,7 @@ async function playTrueStrikeAttack(token, target, config = {}) {
  * @param {Token} token The token to remove effects from.
  * @param {object} config Configuration options.
  */
-async function stopTrueStrike(token, config = {}) {
+async function stopTrueStrike(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
 

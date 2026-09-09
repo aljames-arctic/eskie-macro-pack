@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(token, targets = [], config = {}) {
+async function create(token: any, targets: any[] = [], config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, darkMap, sound } = mConfig;
 
@@ -131,21 +131,21 @@ async function create(token, targets = [], config = {}) {
     return sequence;
 }
 
-async function play(token, targets = [], config = {}) {
+async function play(token: any, targets: any[] = [], config: any = {}) {
     const seq = await create(token, targets, config);
     if (seq) return seq.play();
 }
 
-async function createEffect(token, config = {}) {
+async function createEffect(token: any, config: any = {}) {
     return create(token, [], config);
 }
 
-async function playEffect(token, config = {}) {
+async function playEffect(token: any, config: any = {}) {
     const seq = await createEffect(token, config);
     if (seq) return seq.play();
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     if (token) Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}` });

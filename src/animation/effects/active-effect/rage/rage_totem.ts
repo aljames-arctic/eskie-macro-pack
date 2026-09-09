@@ -17,17 +17,17 @@ export const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     let seq = create(token, config);
     if (seq) { await seq.play(); }
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     return util.stop(token, mConfig);
 }
 
-async function clean(token, config = {}) {
+async function clean(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     return util.clean(token, mConfig);
 }
@@ -40,7 +40,7 @@ export const rageTotem = {
     default_config: DEFAULT_CONFIG,
 };
 
-function create(token, config = {}) {
+function create(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, spirit, effect, sound } = mConfig;
     const label = `${id} - ${token.id}`;

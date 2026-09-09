@@ -17,12 +17,12 @@ const DEFAULT_CONFIG_MELEE = {
     }
 };
 
-async function createMelee(token, target, config = {}) {
+async function createMelee(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_MELEE, config);
     const { id, color, type, weight, sound } = mConfig;
 
     //Determine Attack Size
-    const weightIndex = { light: 0, medium: 1, heavy: 2 }[weight] ?? 1;
+    const weightIndex = ({ light: 0, medium: 1, heavy: 2 } as Record<string, number>)[weight] ?? 1;
 
     const effectSize = 2 + (0.25 * weightIndex);
     const effectOffset = -0.75 - (0.25 * weightIndex);
@@ -80,7 +80,7 @@ async function createMelee(token, target, config = {}) {
     return seq;
 }
 
-async function playMelee(token, target, config = {}) {
+async function playMelee(token: any, target: any, config: any = {}) {
     const seq = await createMelee(token, target, config);
     if (seq) { return seq.play(); }
 }
@@ -103,7 +103,7 @@ const DEFAULT_CONFIG_RANGED = {
     }
 };
 
-function createRanged(token, target, config = {}) {
+function createRanged(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_RANGED, config);
     const { id, color, sound } = mConfig;
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
@@ -152,7 +152,7 @@ function createRanged(token, target, config = {}) {
     return seq;
 }
 
-async function playRanged(token, target, config = {}) {
+async function playRanged(token: any, target: any, config: any = {}) {
     const seq = await createRanged(token, target, config);
     if (seq) { return seq.play(); }
 }

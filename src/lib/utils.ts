@@ -4,7 +4,7 @@
  * @param {string} [fallback=key] - The fallback string if the key is not found (defaults to key)
  * @returns {string} The localized string or fallback
  */
-export function localize(key, fallback = key) {
+export function localize(key: any, fallback = key) {
     return game.i18n?.has?.(key) ? (game.i18n.localize?.(key) ?? fallback) : fallback;
 }
 
@@ -15,6 +15,6 @@ export function localize(key, fallback = key) {
  * @param {string} [fallback=key] - The fallback string if the key is not found
  * @returns {string} The formatted string or fallback
  */
-export function format(key, data = {}, fallback = key) {
+export function format(key: any, data: any = {}, fallback = key) {
     return game.i18n?.has?.(key) ? (game.i18n.format?.(key, data) ?? fallback) : fallback;
 }

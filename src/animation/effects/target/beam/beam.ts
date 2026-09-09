@@ -16,7 +16,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-function create(token, target, config = {}) {
+function create(token: any, target: any, config: any = {}) {
     let mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let { id, effects } = mConfig;
 
@@ -100,12 +100,12 @@ function create(token, target, config = {}) {
     return seq;
 }
 
-async function play(token, target, config = {}) {
+async function play(token: any, target: any, config: any = {}) {
     const seq = await create(token, target, config);
     if (seq) { await seq.play(); }
 }
 
-async function stop(token, target, config = {}) {
+async function stop(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     return Promise.all([

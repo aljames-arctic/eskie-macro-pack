@@ -23,7 +23,7 @@ export const DEFAULT_SOUND_CONFIG = {
  * @param {number} [defaultDelay=0] Fallback delay in milliseconds
  * @returns {Sequence} The modified Sequence instance
  */
-export function applySound(sequence, soundConfig, defaultDelay = 0) {
+export function applySound(sequence: any, soundConfig: any, defaultDelay = 0) {
     if (!sequence || !soundConfig) return sequence;
 
     if (typeof game !== 'undefined' && game.settings?.get && game.settings.get(MODULE_ID, 'enableSounds') === false) {

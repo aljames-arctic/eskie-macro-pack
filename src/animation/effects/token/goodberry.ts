@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
     },
 };
 
-async function createCast(token, config = {}) {
+async function createCast(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, sound } = mConfig;
 
@@ -47,12 +47,12 @@ async function createCast(token, config = {}) {
     return seq;
 }
 
-async function playCast(token, config = {}) {
+async function playCast(token: any, config: any = {}) {
     const seq = await createCast(token, config);
     if (seq) return seq.play();
 }
 
-async function createUse(token, config = {}) {
+async function createUse(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, sound } = mConfig;
 
@@ -108,12 +108,12 @@ async function createUse(token, config = {}) {
     return seq;
 }
 
-async function playUse(token, config = {}) {
+async function playUse(token: any, config: any = {}) {
     const seq = await createUse(token, config);
     if (seq) return seq.play();
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}` });

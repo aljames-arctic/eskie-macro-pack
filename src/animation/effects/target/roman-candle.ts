@@ -12,7 +12,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(token, config = {}) {
+async function create(token: any, config: any = {}) {
     var items = Sequencer.Database.getPathsUnder('jb2a.bolt.fire');
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -101,7 +101,7 @@ async function create(token, config = {}) {
     return seq;
 }
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const seq = await create(token, config);
     if (seq) { seq.play(); }
 }

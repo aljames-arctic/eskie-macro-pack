@@ -21,7 +21,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createSuggestion(token, target, config = {}) {
+async function createSuggestion(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
@@ -126,7 +126,7 @@ async function createSuggestion(token, target, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<Sequence>} A promise that resolves when the sequence starts playing.
  */
-async function playSuggestion(token, target, config = {}) {
+async function playSuggestion(token: any, target: any, config: any = {}) {
     if (!target) {
         log.warn("Suggestion: No target provided.");
         return;
@@ -140,7 +140,7 @@ async function playSuggestion(token, target, config = {}) {
  * @param {Token} token The token.
  * @param {object} options Options for stopping effects.
  */
-function stopSuggestion(token, { id = DEFAULT_CONFIG.id } = {}) {
+function stopSuggestion(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
     // No persistent effects to stop for Suggestion.
 }
 

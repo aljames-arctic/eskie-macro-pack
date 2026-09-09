@@ -3,7 +3,7 @@ import { deathEffect } from './sun-halo-dragon/death-effect.js';
 import { adapter } from '../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../utils/sound.js';
 
-async function getPositions(token) {
+async function getPositions(token: any) {
     const pos1 = {x: token.x, y: token.y };
     const pos2 = adjustTeleport(await Sequencer.Crosshair.show());
     return { pos1, pos2 };
@@ -11,7 +11,7 @@ async function getPositions(token) {
 
 // (HACKY) This is annoying... Crosshair.show returns .center(.x, .y)
 // But all other Sequencer effects seem to use the token(.x, .y) not token.center(.x, .y)
-function adjustTeleport(coordinates) {
+function adjustTeleport(coordinates: any) {
     const size = adapter.getSceneDimensions().size;
     return {
         x: coordinates.x - size / 2,
@@ -38,17 +38,17 @@ const DEFAULT_CONFIG = {
     }
 };
 
-function xdelta(p1, p2) {
+function xdelta(p1: any, p2: any) {
     const size = adapter.getSceneDimensions().size;
     return (p2.x - p1.x) / size;
 }
 
-function ydelta(p1, p2) {
+function ydelta(p1: any, p2: any) {
     const size = adapter.getSceneDimensions().size;
     return (p2.y - p1.y) / size;
 }
 
-async function create(token, targets = [], config = {}) {
+async function create(token: any, targets: any[] = [], config: any = {}) {
     const { impact, screen, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { pos1, pos2 } = await getPositions(token);
     const mirrorY = pos1.x > pos2.x;
@@ -229,13 +229,13 @@ async function create(token, targets = [], config = {}) {
     return seq;
 }
 
-async function play(token, targets, config = {}) {
+async function play(token: any, targets: any, config: any = {}) {
     const seq = await create(token, targets, config);
     if (seq) { return seq.play(); }
 }
 
-async function clean(token, targets, config = {}){
-    targets.forEach(target => {
+async function clean(token: any, targets: any, config: any = {}){
+    targets.forEach((target: any) => {
         deathEffect.clean(target, config);
     });
 }

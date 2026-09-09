@@ -133,23 +133,23 @@ export class AutorecManager {
 
 export const autorecManager = new AutorecManager();
 
-export function register(key, trigger, animation, config, version = "0.0.0", fallback = key, options = {}) {
+export function register(key: any, trigger: any, animation: any, config: any, version = "0.0.0", fallback = key, options: any = {}) {
     return autorecManager.register(key, trigger, animation, config, version, fallback, options);
 }
 
-export function CONCENTRATING(key, fallback = key) {
+export function CONCENTRATING(key: any, fallback = key) {
     return autorecManager.CONCENTRATING(key, fallback);
 }
 
-export function MELEE(key, fallback = key) {
+export function MELEE(key: any, fallback = key) {
     return autorecManager.MELEE(key, fallback);
 }
 
-export function RANGED(key, fallback = key) {
+export function RANGED(key: any, fallback = key) {
     return autorecManager.RANGED(key, fallback);
 }
 
-export async function submit(options = {}) {
+export async function submit(options: any = {}) {
     return autorecManager.submit(options);
 }
 

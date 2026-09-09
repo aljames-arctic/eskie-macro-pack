@@ -21,7 +21,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function createSurprised(token, config = {}) {
+async function createSurprised(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
@@ -67,7 +67,7 @@ async function createSurprised(token, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<void>} A promise that resolves when the effect is played or stopped.
  */
-async function playSurprised(token, config = {}) {
+async function playSurprised(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 
@@ -88,7 +88,7 @@ async function playSurprised(token, config = {}) {
  * @param {Token} token The token to remove the effects from.
  * @param {object} config Configuration options.
  */
-async function stopSurprised(token, config = {}) {
+async function stopSurprised(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
 

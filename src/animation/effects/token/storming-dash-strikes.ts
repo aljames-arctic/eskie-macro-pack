@@ -16,7 +16,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function _crosshairImage(crosshairs, token) {
+async function _crosshairImage(crosshairs: any, token: any) {
     new Sequence()
         .effect()
         .name('StormDash Crosshair')
@@ -35,7 +35,7 @@ async function _crosshairImage(crosshairs, token) {
     }
 }
 
-async function create(source, config = {}) {
+async function create(source: any, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { sound, positions: dashPositions = [] } = mConfig;
@@ -226,7 +226,7 @@ async function create(source, config = {}) {
     return sequence;
 }
 
-async function play(source, config = {}) {
+async function play(source: any, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -246,7 +246,7 @@ async function play(source, config = {}) {
                     rememberControlled: true,
                 },
                 {
-                    show: (crosshair) => _crosshairImage(crosshair, source),
+                    show: (crosshair: any) => _crosshairImage(crosshair, source),
                 }
             );
 
@@ -281,7 +281,7 @@ async function play(source, config = {}) {
     if (sequence) return sequence.play();
 }
 
-async function stop(source, config = {}) {
+async function stop(source: any, config: any = {}) {
     return Promise.all([
         Sequencer.EffectManager.endEffects({ name: 'StormDash Crosshair*', object: source }),
         Sequencer.EffectManager.endEffects({ name: 'Storm Dash Strikes', object: source }),

@@ -113,7 +113,7 @@ export class Logger {
     _ensureGroupsStarted() {
         for (const entry of this._groupStack) {
             if (entry.enabled && !entry.started) {
-                const style = GROUP_STYLES[entry.level] ?? GROUP_STYLES.info;
+                const style = (GROUP_STYLES as Record<string, string>)[entry.level] ?? GROUP_STYLES.info;
                 const shouldCollapse = entry.forceCollapse ?? (entry.level === "debug" || entry.level === "info");
                 const consoleFn = (shouldCollapse && console.groupCollapsed) ? console.groupCollapsed : console.group;
                 consoleFn(`%c${MODULE_TLA} | ${entry.message}`, style, ...entry.groupArgs);
@@ -132,14 +132,14 @@ export class Logger {
      * @param {...*} args Optional verbosity level as first argument, followed by group payload
      * @private
      */
-    _createGroup(forceCollapse, message, ...args) {
+    _createGroup(forceCollapse: any, message: any, ...args: any[]) {
         let level = "info";
         let groupArgs = args;
-        if (args.length > 0 && VERBOSITY_LEVELS[args[0]] !== undefined) {
+        if (args.length > 0 && (VERBOSITY_LEVELS as Record<string, number>)[args[0]] !== undefined) {
             level = args[0];
             groupArgs = args.slice(1);
         }
-        const enabled = this.getVerbosityLevel() >= VERBOSITY_LEVELS[level];
+        const enabled = this.getVerbosityLevel() >= ((VERBOSITY_LEVELS as Record<string, number>)[level] ?? 0);
         this._groupStack.push({
             message,
             level,
@@ -156,7 +156,7 @@ export class Logger {
      * @param {...*} args - Additional arguments to pass to console.error.
      * @returns {void}
      */
-    error(message, ...args) {
+    error(message: any, ...args: any[]) {
         if (this.getVerbosityLevel() >= VERBOSITY_LEVELS.error) {
             this._ensureGroupsStarted();
             console.error(`${MODULE_TLA} | ${message}`, ...args);
@@ -169,7 +169,7 @@ export class Logger {
      * @param {...*} args - Additional arguments to pass to console.warn.
      * @returns {void}
      */
-    warn(message, ...args) {
+    warn(message: any, ...args: any[]) {
         if (this.getVerbosityLevel() >= VERBOSITY_LEVELS.warn) {
             this._ensureGroupsStarted();
             console.warn(`${MODULE_TLA} | ${message}`, ...args);
@@ -182,7 +182,7 @@ export class Logger {
      * @param {...*} args - Additional arguments to pass to console.log.
      * @returns {void}
      */
-    info(message, ...args) {
+    info(message: any, ...args: any[]) {
         if (this.getVerbosityLevel() >= VERBOSITY_LEVELS.info) {
             this._ensureGroupsStarted();
             console.log(`${MODULE_TLA} | ${message}`, ...args);
@@ -195,7 +195,7 @@ export class Logger {
      * @param {...*} args - Additional arguments to inspect or trace.
      * @returns {void}
      */
-    debug(message, ...args) {
+    debug(message: any, ...args: any[]) {
         if (this.getVerbosityLevel() >= VERBOSITY_LEVELS.debug) {
             this._ensureGroupsStarted();
             const timestamp = game?.time?.serverTime ?? "Unknown";
@@ -211,7 +211,7 @@ export class Logger {
      * @param {...*} args - Optional verbosity level ('error'|'warn'|'info'|'debug') and additional arguments for console.group.
      * @returns {void}
      */
-    group(message, ...args) {
+    group(message: any, ...args: any[]) {
         this._createGroup(null, message, ...args);
     }
 
@@ -222,7 +222,7 @@ export class Logger {
      * @param {...*} args - Optional verbosity level and additional arguments.
      * @returns {void}
      */
-    groupCollapsed(message, ...args) {
+    groupCollapsed(message: any, ...args: any[]) {
         this._createGroup(true, message, ...args);
     }
 
@@ -233,7 +233,7 @@ export class Logger {
      * @param {...*} args - Optional verbosity level and additional arguments.
      * @returns {void}
      */
-    groupExpanded(message, ...args) {
+    groupExpanded(message: any, ...args: any[]) {
         this._createGroup(false, message, ...args);
     }
 

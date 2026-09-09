@@ -6,7 +6,7 @@ const defaultDetectionConfig = {
     diseased: 'jb2a.magic_signs.rune.conjuration.complete.pink',
 };
 
-const defaultValidator = async function (target, tags) {
+const defaultValidator = async function (target: any, tags: any) {
     for (let tag of tags) {
         if (target.actor.statuses.has(tag)) { return true; }
     }
@@ -25,12 +25,12 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token, config = {}) {
+async function create(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     return detectUtil.create(token, mConfig);
 }
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const seq = await create(token, config);
     if (seq) { return seq.play(); }
 }

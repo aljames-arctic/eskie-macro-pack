@@ -86,7 +86,7 @@ async function stop(trapObject, config = {}) {
 async function setup(config = {}) {
     const setupConfig = {
         tileCount: 1,
-        trigger: ['door'],
+        trigger: 'door',
         controlled: 'all',
         ...config
     };

@@ -207,13 +207,10 @@ async function setup(animation, config = {}) {
         allTiles.set(t.id, t);
     }
 
+    const configuredTrigger = config.trigger ?? 'enter';
+
     for (const [tileId, tileDoc] of allTiles) {
         const isTrigger = triggerTileIds.has(tileId);
-
-        const rawTrigger = config.trigger ?? 'enter';
-        const trigger = isTrigger
-            ? (Array.isArray(rawTrigger) ? (rawTrigger[0] ?? 'enter') : rawTrigger)
-            : 'manual';
 
         const { tileCount: _tc, extraFlags: _ef, extraTiles: _et, trigger: _tr, controlled: _co, playPath: _pp, ...trapOptions } = config;
         const targetTileId = tileCount === 3 ? (targetTiles[0]?.id ?? null) : null;
@@ -275,15 +272,11 @@ if (triggerTileIds.includes(tile.id)) {
 await Promise.all(promises);
 `;
 
-        const existingTrigger = tileDoc.getFlag?.('monks-active-tiles', 'trigger')
-            ?? tileDoc.flags?.['monks-active-tiles']?.trigger;
         const resolvedTrigger = isTrigger
-            ? trigger
-            : (existingTrigger ?? trigger);
+            ? configuredTrigger
+            : (tileDoc.getFlag?.('monks-active-tiles', 'trigger') ?? 'manual');
 
-        const existingActions = tileDoc.getFlag?.('monks-active-tiles', 'actions')
-            ?? tileDoc.flags?.['monks-active-tiles']?.actions
-            ?? [];
+        const existingActions = tileDoc.getFlag?.('monks-active-tiles', 'actions') ?? [];
         const newAction = {
             id: adapter.randomID(),
             action: 'runcode',
@@ -294,7 +287,7 @@ await Promise.all(promises);
             'flags.monks-active-tiles.active': true,
             'flags.monks-active-tiles.trigger': resolvedTrigger,
             'flags.monks-active-tiles.actions': [
-                ...(Array.isArray(existingActions) ? existingActions : []),
+                ...existingActions,
                 newAction
             ],
             'flags.monks-active-tiles.controlled': config.controlled ?? 'gm',

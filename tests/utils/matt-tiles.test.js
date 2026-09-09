@@ -512,3 +512,32 @@ test('matt.trap.setup appends new runcode action to existing actions without ove
     assert.ok(trapActions[1].data.code.includes('eskie.traps.fire'));
 });
 
+test('matt.trap.setup respects custom trigger string (e.g. door)', async () => {
+    const updatedTiles = new Map();
+    globalThis.game.user = { isGM: true, id: 'gm-user-1' };
+    globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', active: true });
+
+    const doorTileDoc = {
+        id: 'tile-door-1',
+        flags: {},
+        update: async (data) => {
+            updatedTiles.set('tile-door-1', data);
+            return doorTileDoc;
+        }
+    };
+
+    globalThis.canvas.tiles = {
+        controlled: [{ document: doorTileDoc, id: 'tile-door-1' }],
+        get: (id) => (id === 'tile-door-1' ? { document: doorTileDoc, id } : null)
+    };
+
+    adapter.buttonDialog = async () => 'continue';
+
+    await matt.trap.setup('eskie.traps.electricDoor', { tileCount: 1, trigger: 'door' });
+
+    const doorUpdate = updatedTiles.get('tile-door-1');
+    assert.ok(doorUpdate);
+    assert.equal(doorUpdate['flags.monks-active-tiles.trigger'], 'door', 'Custom trigger string should be set on the tile');
+});
+
+

@@ -183,15 +183,14 @@ function hasSomeRecommended(dependencyList: Dependency[]): boolean {
 
 /**
  * Checks if a required dependency is activated and throws an error if it is not.
- * @param {Dependency|Dependency[]} dependencyList - The dependency or list of dependencies to check.
+ * @param {Dependency[]} dependencyList - The list of dependencies to check.
  * @returns {void} Throws an error if any required dependency is missing.
  */
-function required(dependencyList: Dependency | Dependency[]): void {
-    const list = Array.isArray(dependencyList) ? dependencyList : [dependencyList];
+function required(dependencyList: Dependency[] = []): void {
     let errorMsg = localize('EMP.Dependency.RequiresAll', 'Requires all of the following to be installed and activated:\n');
     let dependencyMet = true;
 
-    for (const dependency of list) {
+    for (const dependency of dependencyList) {
         if (!dependency?.id) continue;
         if (_isActivated(dependency)) continue;
         dependencyMet = false;

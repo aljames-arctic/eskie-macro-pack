@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token: any, config: any = {}, options: any = {}) {
-    if (options?.type == 'aefx') return;
+    if (options?.type === 'aefx') return;
     const { id, template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const cfg = {

@@ -12,7 +12,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token: any, config: any = {}, options: any = {}) {
-    if (options?.type == "aefx") return;
+    if (options?.type === "aefx") return;
     let { id, template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const tokenName = token.name;
     const tokenCenter = adapter.getCenter(token);
@@ -197,7 +197,7 @@ async function create(token: any, config: any = {}, options: any = {}) {
 }
 
 async function play(token: any, config: any = {}, options: any = {}) {
-    if (options?.type == "aefx") return;
+    if (options?.type === "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const sequence = await create(token, mConfig, options);
     if (sequence) { return sequence.play(); }

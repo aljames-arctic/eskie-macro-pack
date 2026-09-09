@@ -61,7 +61,7 @@ function findLockedDoor(position, radius) {
  * @returns {Promise<Sequence|null>} A promise that resolves with the Sequence object, or null if the creation fails.
  */
 async function create(token: any, config: any = {}, options: any = {}) {
-    if (options?.type == "aefx") return null;
+    if (options?.type === "aefx") return null;
     config = settingsOverride(config);
     const { id, template, crosshair, radius, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -167,7 +167,7 @@ async function create(token: any, config: any = {}, options: any = {}) {
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
 async function play(token: any, config: any = {}, options: any = {}) {
-    if (options?.type == "aefx") return;
+    if (options?.type === "aefx") return;
     const sequence = await create(token, config, options);
     if (sequence) {
         await sequence.play();

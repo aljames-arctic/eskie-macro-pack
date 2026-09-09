@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token: any, config: any = {}, options: any = {}) {
-    if (options?.type == "aefx") return;
+    if (options?.type === "aefx") return;
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { distance, sound, template } = mConfig;
@@ -137,7 +137,7 @@ async function create(token: any, config: any = {}, options: any = {}) {
 }
 
 async function play(token: any, config: any = {}, options: any = {}) {
-    if (options?.type == "aefx") return;
+    if (options?.type === "aefx") return;
     const sequence = await create(token, config, options);
     if (sequence) return sequence.play();
 }

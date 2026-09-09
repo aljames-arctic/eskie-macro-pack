@@ -136,7 +136,7 @@ async function createPersistentSpikes(token: any, centralPosition: any, config: 
  * @returns {Promise<void>} A promise that resolves when the effect is played or stopped.
  */
 async function createSpikeGrowth(token: any, config: any = {}, options: any = {}) {
-    if (options?.type == "aefx") return;
+    if (options?.type === "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, size, template } = mConfig;
 
@@ -163,7 +163,7 @@ async function createSpikeGrowth(token: any, config: any = {}, options: any = {}
 async function playSpikeGrowth(token: any, config: any = {}, options: any = {}) {
     /*       Don't parse for active effects        *
      * We only care about removing when it expires */
-    if (options?.type == "aefx") return;
+    if (options?.type === "aefx") return;
     let seq = await createSpikeGrowth(token, config);
     if (seq) { return seq.play(); }
 }

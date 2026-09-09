@@ -123,7 +123,7 @@ async function create(source, target, config = {}) {
 
     let position;
 
-    if (teleport === true) {
+    if (teleport) {
         let crosshairsConfig = {
             size: 1,
             icon: 'icons/skills/melee/blade-tip-orange.webp',
@@ -161,7 +161,7 @@ async function create(source, target, config = {}) {
 
     sequence.addSequence(dashEffect(source, target, mConfig.sound));
 
-    if (teleport == true) {
+    if (teleport) {
         sequence.animation()
             .on(source)
             .teleportTo(position, { offset: { x: -1, y: -1 } })
@@ -172,7 +172,7 @@ async function create(source, target, config = {}) {
 
     sequence.addSequence(await textUtil.create(target, "居合術", text));
 
-    if (targetDeath === true) {
+    if (targetDeath) {
         sequence.addSequence(deathAnimation(target, mConfig.sound));
     }
 

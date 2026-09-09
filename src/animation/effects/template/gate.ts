@@ -239,7 +239,7 @@ async function create(token: any, config: any = {}) {
 async function play(token: any, config: any = {}, options: any = {}) {
     /*       Don't parse for active effects        *
      * We only care about removing when it expires */
-    if (options?.type == "aefx") return;
+    if (options?.type === "aefx") return;
     let seq = await create(token, config);
     if (seq) { await seq.play(); }
 }

@@ -17,10 +17,10 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token: any, config: any = {}, options: any = {}) {
-    if (options?.type == "aefx") return;
+    if (options?.type === "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, template } = mConfig;
-    const targets = mConfig.targets ?? (Array.isArray(config.targets) ? config.targets : Array.from(game.user?.targets ?? []));
+    const targets = mConfig.targets ?? Array.from(game.user?.targets ?? []);
 
     const cfg = { 
         radius: 1,
@@ -46,7 +46,7 @@ async function create(token: any, config: any = {}, options: any = {}) {
 }
 
 async function play(token: any, config: any = {}, options: any = {}) {
-    if (options?.type == "aefx") return;
+    if (options?.type === "aefx") return;
     let seq = await create(token, config, options);
     if (seq) return seq.play();
 }

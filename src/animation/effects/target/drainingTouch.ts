@@ -14,25 +14,13 @@ const DEFAULT_CONFIG = {
 async function create(token, target, config = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { color, changeLight, sound } = mConfig;
-    let tintColor;
-    let hue;
-
-    if (color == "teal") {
-        tintColor = '#6ff087'
-        hue = 35
-    }
-    else if (color == "green") {
-        tintColor = '#6cde3b'
-        hue = 0
-    }
-    else if (color == "blue") {
-        tintColor = '#74e2cf'
-        hue = 75
-    }
-    else if (color == "red") {
-        tintColor = '#e22c47'
-        hue = -95
-    }
+    const tintColorMap: Record<string, { tintColor: string; hue: number }> = {
+        teal: { tintColor: '#6ff087', hue: 35 },
+        green: { tintColor: '#6cde3b', hue: 0 },
+        blue: { tintColor: '#74e2cf', hue: 75 },
+        red: { tintColor: '#e22c47', hue: -95 }
+    };
+    const { tintColor, hue } = tintColorMap[color] ?? tintColorMap.teal;
 
     const tokenCenter = adapter.getCenter(token);
     const targetCenter = adapter.getCenter(target);
@@ -168,11 +156,13 @@ async function play(token, target, config = {}) {
     if (Tagger.hasTags(token, "Incorporeal")) {
         const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
         const { color, changeLight, sound } = mConfig;
-        let tintColor;
-        if (color == "teal") { tintColor = '#6ff087' }
-        else if (color == "green") { tintColor = '#6cde3b' }
-        else if (color == "blue") { tintColor = '#74e2cf' }
-        else if (color == "red") { tintColor = '#e22c47' }
+        const tintColors: Record<string, string> = {
+            teal: '#6ff087',
+            green: '#6cde3b',
+            blue: '#74e2cf',
+            red: '#e22c47'
+        };
+        const tintColor = tintColors[color] ?? '#6ff087';
 
         // Make attacker into a poltergeist
         new Sequence()
@@ -180,7 +170,7 @@ async function play(token, target, config = {}) {
             .on(token)
             .opacity(0)
             .thenDo(function () {
-                if (changeLight == true) {
+                if (changeLight) {
                     var light = { dim: 0, bright: 1, alpha: 0.25, luminosity: 0.55, color: tintColor, animation: { type: "torch", speed: 4, intensity: 5 }, attenuation: 0.85, contrast: 0, shadows: 0 };
                     token.document.update({ light })
                 }
@@ -232,7 +222,7 @@ async function play(token, target, config = {}) {
                 if (!Tagger.hasTags(token, "DrainingTouch")) {
                     if (!Tagger.hasTags(token, "Possession")) {
                         Tagger.removeTags(token, "Incorporeal");
-                        if (changeLight == true) {
+                        if (changeLight) {
                             var light = { dim: 0, bright: 0 };
                             token.document.update({ light });
                         }

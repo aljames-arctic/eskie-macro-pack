@@ -18,7 +18,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function createStarwardSword(token: any, config: any = {}, options: any = {}) {
-    if (options?.type == "aefx") return;
+    if (options?.type === "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { size, darkMap, cameraZoom, sound } = mConfig;
     let { targets } = mConfig;
@@ -171,13 +171,13 @@ async function createStarwardSword(token: any, config: any = {}, options: any = 
 
 
         .thenDo(function () {
-            if (cameraZoom == true) {
+            if (cameraZoom) {
                 canvas?.animatePan?.({ duration: 50, x: tokenCenter.x, y: tokenCenter.y, scale: 0.420 });
             }
         });
     //Slashes
     for (let e = 0; e < 10; e++) {
-        if (e == 0) {
+        if (e === 0) {
             for (let u = 0; u < 5; u++) {
                 if (u === 4) {
                     const slashSeq = new Sequence();
@@ -558,7 +558,7 @@ async function createStarwardSword(token: any, config: any = {}, options: any = 
 
 
 async function playStarwardSword(token: any, config: any = {}, options: any = {}) {
-    if (options?.type == "aefx") return;
+    if (options?.type === "aefx") return;
     let seq = await createStarwardSword(token, config, options);
     if (seq) { return seq.play(); }
 }

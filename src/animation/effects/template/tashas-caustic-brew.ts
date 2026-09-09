@@ -24,7 +24,7 @@ const DEFAULT_CONFIG_CAST = {
 };
 
 async function createCast(source: any, config: any = {}, options: any = {}) {
-    if (options?.type == "aefx") return;
+    if (options?.type === "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_CAST, config);
     const { id, size, icon, label, tag, drawIcon, drawOutline, interval, rememberControlled, sound } = mConfig;
 
@@ -97,13 +97,13 @@ async function createCast(source: any, config: any = {}, options: any = {}) {
 }
 
 async function playCast(source: any, config: any = {}, options: any = {}) {
-    if (options?.type == "aefx") return;
+    if (options?.type === "aefx") return;
     const sequence = await createCast(source, config, options);
     if (sequence) return sequence.play();
 }
 
 async function createTarget(source: any, config: any = {}, options: any = {}) {
-    if (options?.type == "aefx") return;
+    if (options?.type === "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG_CAST, config);
     let sequence = new Sequence();
     applySound(sequence, mConfig.sound.burn);
@@ -236,7 +236,7 @@ async function createTarget(source: any, config: any = {}, options: any = {}) {
 }
 
 async function playTarget(source: any, config: any = {}, options: any = {}) {
-    if (options?.type == "aefx") return;
+    if (options?.type === "aefx") return;
     const sequence = await createTarget(source, config, options);
     if (sequence) return sequence.play();
 }
@@ -264,7 +264,7 @@ export const tashasCausticBrew = {
         default_config: DEFAULT_CONFIG_CAST,
     },
     create: async function (source: any, config: any = {}, options: any = {}) {
-        if (options?.type == "aefx") return;
+        if (options?.type === "aefx") return;
         const sequence = new Sequence();
         const castSeq = await createCast(source, config, options);
         if (!castSeq) return;
@@ -277,7 +277,7 @@ export const tashasCausticBrew = {
         return sequence;
     },
     play: async function (source: any, config: any = {}, options: any = {}) {
-        if (options?.type == "aefx") return;
+        if (options?.type === "aefx") return;
         const sequence = await this.create(source, config, options);
         if (sequence) return sequence.play();
     },

@@ -132,7 +132,7 @@ async function createSilence(token: any, config: any = {}) {
  * @returns {Promise<Sequence>} A promise that resolves when the sequence starts playing.
  */
 async function playSilence(token: any, config: any = {}, options: any = {}) {
-    if (options?.type == "aefx") return;
+    if (options?.type === "aefx") return;
     const sequence = await createSilence(token, config);
     if (sequence) { return sequence.play(); }
 }

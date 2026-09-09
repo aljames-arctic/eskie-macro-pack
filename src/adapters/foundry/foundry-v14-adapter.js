@@ -92,7 +92,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
             const shapes = doc.shapes?.contents ?? doc.shapes ?? template.shapes ?? [];
             const shape = shapes[0] ?? doc.toObject?.()?.shapes?.[0] ?? null;
 
-            const primary = {
+            let primary = {
                 x: shape?.x ?? doc.x ?? template.x ?? 0,
                 y: shape?.y ?? doc.y ?? template.y ?? 0
             };

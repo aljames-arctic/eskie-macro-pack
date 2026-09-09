@@ -251,8 +251,8 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
             return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
         }
 
-        const doc = region.document ?? region;
-        const placeable = region.object ?? doc.object ?? region;
+        const doc = region.document ? region.document : region;
+        const placeable = region.document ? region : (region.object ? region.object : region);
 
         // Authoritative PIXI.Rectangle bounding box computed by Foundry canvas
         const bounds = placeable.bounds ?? doc.bounds;
@@ -379,7 +379,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      */
     getTokensInRegion(region: any): any[] {
         if (!region) return [];
-        const doc = region.document ?? region;
+        const doc = region.document ? region.document : region;
         const tokens = doc.tokens ?? region.tokens ?? [];
         return Array.from(tokens, (t: any) => (t.object ? t.object : t)).filter(Boolean);
     }
@@ -393,7 +393,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      */
     async createRegionBehavior(region: any, behaviorData: any): Promise<any> {
         if (!region) return null;
-        const doc = region.document ?? region;
+        const doc = region.document ? region.document : region;
         if (!doc.createEmbeddedDocuments) return null;
         const [created] = await doc.createEmbeddedDocuments('RegionBehavior', [behaviorData]);
         return created ?? null;
@@ -451,7 +451,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
         const directTexture = super.getPlaceableTexture(placeable);
         if (directTexture) return directTexture;
 
-        const doc = placeable.document ?? placeable;
+        const doc = placeable.document ? placeable.document : placeable;
         const isRegion = doc.documentName === 'Region' || placeable.documentName === 'Region' || Boolean(doc.shapes) || Boolean(placeable.shapes);
         if (isRegion) {
             const tileId = doc.getFlag?.(MODULE_ID, 'trap.tileId')
@@ -476,7 +476,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      */
     containsPoint(object: any, point: any): boolean {
         if (!object || !point) return false;
-        const doc = object.document ?? object;
+        const doc = object.document ? object.document : object;
         const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(object.shapes);
         if (isRegion) {
             const placeable = object.object ?? doc.object ?? object;

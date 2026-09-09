@@ -744,7 +744,8 @@ export class BaseFoundryAdapter {
      */
     getDocumentName(target: any): string | undefined {
         if (!target) return undefined;
-        return target.document?.documentName ?? target.documentName ?? undefined;
+        const doc = target.document ? target.document : target;
+        return doc.documentName;
     }
 
     /**
@@ -888,7 +889,7 @@ export class BaseFoundryAdapter {
      */
     getTokenRotation(token: any): number {
         if (!token) return 0;
-        return token.document?.rotation ?? token.rotation ?? 0;
+        return token.document?.rotation ?? 0;
     }
 
     /**
@@ -907,8 +908,8 @@ export class BaseFoundryAdapter {
         const { size: gridSize, distance: gridDistance } = this.getSceneDimensions();
         const dist2DUnits = (dist2DPx / gridSize) * gridDistance;
 
-        const el1 = t1.document?.elevation ?? t1.elevation ?? 0;
-        const el2 = t2.document?.elevation ?? t2.elevation ?? 0;
+        const el1 = t1.document?.elevation ?? 0;
+        const el2 = t2.document?.elevation ?? 0;
         const elDiff = el1 - el2;
 
         const dist3DUnits = Math.hypot(dist2DUnits, elDiff);
@@ -1259,9 +1260,9 @@ export class BaseFoundryAdapter {
         if (!region) {
             return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
         }
-        const doc = region.document ?? region;
-        const placeable = region.object ?? doc.object ?? region;
-        const center = placeable.center ?? doc.center;
+        const doc = region.document ? region.document : region;
+        const placeable = region.document ? region : (region.object ? region.object : region);
+        const center = placeable?.center ?? doc.center;
         if (center && typeof center.x === 'number' && typeof center.y === 'number') {
             return { minX: center.x, maxX: center.x, minY: center.y, maxY: center.y, center: { x: center.x, y: center.y }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
         }
@@ -1315,7 +1316,7 @@ export class BaseFoundryAdapter {
      */
     getPlaceableTexture(placeable: any) {
         if (!placeable) return null;
-        const doc = placeable.document ?? placeable;
+        const doc = placeable.document ? placeable.document : placeable;
         return doc.texture?.src ?? doc.src ?? null;
     }
 
@@ -1329,7 +1330,7 @@ export class BaseFoundryAdapter {
         if (!object) {
             return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
         }
-        const doc = object.document ?? object;
+        const doc = object.document ? object.document : object;
         const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(object.shapes) || (Boolean(doc.bounds) && !doc.texture);
         if (isRegion) {
             return this.getRegionBounds(object);
@@ -1345,7 +1346,7 @@ export class BaseFoundryAdapter {
      */
     getTokensInPlaceable(object: any) {
         if (!object) return [];
-        const doc = object.document ?? object;
+        const doc = object.document ? object.document : object;
         const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(object.shapes) || (Boolean(doc.bounds) && !doc.texture);
         if (isRegion) {
             return this.getTokensInRegion(object);
@@ -1375,7 +1376,7 @@ export class BaseFoundryAdapter {
      */
     getRegionOrigin(region: any) {
         if (!region) return { x: 0, y: 0 };
-        const doc = region.document ?? region;
+        const doc = region.document ? region.document : region;
         if (doc.origin && typeof doc.origin.x === 'number' && typeof doc.origin.y === 'number') {
             return { x: doc.origin.x, y: doc.origin.y };
         }
@@ -1396,7 +1397,7 @@ export class BaseFoundryAdapter {
         if (typeof target.x === 'number' && typeof target.y === 'number' && !target.document && !target.object && target.width === undefined && target.height === undefined && !target.shapes) {
             return { x: target.x, y: target.y };
         }
-        const doc = target.document ?? target;
+        const doc = target.document ? target.document : target;
         if (doc.origin && typeof doc.origin.x === 'number' && typeof doc.origin.y === 'number') {
             return { x: doc.origin.x, y: doc.origin.y };
         }

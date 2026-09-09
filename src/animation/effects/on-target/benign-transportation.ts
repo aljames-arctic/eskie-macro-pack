@@ -66,8 +66,8 @@ async function create(token: any, targets: any, config: any = {}) {
         seq.thenDo(async () => {
             const aDims = adapter.getTokenDimensions(A);
             const bDims = adapter.getTokenDimensions(B);
-            await A.document?.update?.({ x: BDest.x - (aDims.widthPx / 2), y: BDest.y - (aDims.heightPx / 2) }, { animate: false });
-            await B.document?.update?.({ x: ADest.x - (bDims.widthPx / 2), y: ADest.y - (bDims.heightPx / 2) }, { animate: false });
+            await A.document.update({ x: BDest.x - (aDims.widthPx / 2), y: BDest.y - (aDims.heightPx / 2) }, { animate: false });
+            await B.document.update({ x: ADest.x - (bDims.widthPx / 2), y: ADest.y - (bDims.heightPx / 2) }, { animate: false });
         });
     }
     // 3. Play intro animations at the new locations

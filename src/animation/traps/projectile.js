@@ -38,6 +38,13 @@ async function create(tile, targets, config = {}) {
         return seq;
     }
 
+    if (!tileCenter || Math.hypot(targetLoc.x - tileCenter.x, targetLoc.y - tileCenter.y) < 1) {
+        log.warn(`Projectile Trap: Placeable "${tile.id}" target location is identical to origin location.`);
+        let seq = new Sequence();
+        applySound(seq, sound);
+        return seq;
+    }
+
     let seq = new Sequence();
     applySound(seq, sound);
     if (projectileType === 'javelin') {

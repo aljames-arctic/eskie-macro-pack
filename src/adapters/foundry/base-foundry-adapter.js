@@ -797,12 +797,16 @@ export class BaseFoundryAdapter {
             return { x: target.x, y: target.y };
         }
         const doc = target.document ? target.document : target;
+        const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(target.shapes) || (Boolean(doc.bounds) && !doc.texture);
+        if (isRegion) {
+            return this.getRegionBounds(target).center;
+        }
         const gridSize = this.getGridSize();
         const width = (doc.width ?? 1) * gridSize;
         const height = (doc.height ?? 1) * gridSize;
         return {
-            x: doc.x + width / 2,
-            y: doc.y + height / 2
+            x: (doc.x ?? 0) + width / 2,
+            y: (doc.y ?? 0) + height / 2
         };
     }
 
@@ -1196,11 +1200,20 @@ export class BaseFoundryAdapter {
 
     /**
      * Calculate bounding box and center for a Region.
-     * Legacy baseline returns default zero-bound structure.
-     * @param {Region|RegionDocument} _region Target Region
+     * Legacy baseline evaluates center if present, otherwise returns default zero-bound structure.
+     * @param {Region|RegionDocument} region Target Region
      * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number, anchor: {x: number, y: number} }}
      */
-    getRegionBounds(_region) {
+    getRegionBounds(region) {
+        if (!region) {
+            return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
+        }
+        const doc = region.document ?? region;
+        const placeable = region.object ?? doc.object ?? region;
+        const center = placeable.center ?? doc.center;
+        if (center && typeof center.x === 'number' && typeof center.y === 'number') {
+            return { minX: center.x, maxX: center.x, minY: center.y, maxY: center.y, center: { x: center.x, y: center.y }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
+        }
         return {
             minX: 0,
             maxX: 0,
@@ -1304,54 +1317,40 @@ export class BaseFoundryAdapter {
 
     /**
      * Resolves the origin point { x, y } for a Region placeable or document.
+     * If an explicit origin point is defined on the document or placeable, returns that point.
+     * Otherwise delegates to the Region's center coordinates.
      * @param {Region|RegionDocument|null} region Target Region
      * @returns {{ x: number, y: number }} Origin coordinates
      */
     getRegionOrigin(region) {
         if (!region) return { x: 0, y: 0 };
         const doc = region.document ?? region;
-        if (doc.origin?.x !== undefined && doc.origin?.y !== undefined) {
+        if (doc.origin && typeof doc.origin.x === 'number' && typeof doc.origin.y === 'number') {
             return { x: doc.origin.x, y: doc.origin.y };
         }
-        if (region.origin?.x !== undefined && region.origin?.y !== undefined) {
+        if (region.origin && typeof region.origin.x === 'number' && typeof region.origin.y === 'number') {
             return { x: region.origin.x, y: region.origin.y };
         }
-        if (doc.x !== undefined && doc.y !== undefined) {
-            return { x: doc.x, y: doc.y };
-        }
-        if (region.x !== undefined && region.y !== undefined) {
-            return { x: region.x, y: region.y };
-        }
-        const shapes = doc.shapes?.contents ?? doc.shapes ?? region.shapes ?? [];
-        const shape = shapes[0] ?? doc.toObject?.()?.shapes?.[0] ?? null;
-        if (shape) {
-            if (Array.isArray(shape.points) && shape.points.length >= 2) {
-                return { x: shape.points[0], y: shape.points[1] };
-            }
-            if (shape.x !== undefined && shape.y !== undefined) {
-                return { x: shape.x, y: shape.y };
-            }
-        }
-        const bounds = this.getRegionBounds(region);
-        return { x: bounds.minX, y: bounds.minY };
+        return this.getCenter(region);
     }
 
     /**
      * Resolves the target location { x, y } for a placeable, document, or coordinate point.
-     * For regions: resolves the origin point { x, y }.
-     * For tiles: resolves the center point { x, y }.
+     * For regions, tiles, and tokens: resolves the center point { x, y } (or explicit origin if defined).
      * @param {PlaceableObject|Document|{x: number, y: number}|null} target Target placeable, document, or coordinate point
      * @returns {{ x: number, y: number }|null} Target location coordinates
      */
     getTargetLocation(target) {
         if (!target) return null;
-        if (target.x !== undefined && target.y !== undefined && !target.document && !target.object && target.width === undefined && target.height === undefined && !target.shapes) {
+        if (typeof target.x === 'number' && typeof target.y === 'number' && !target.document && !target.object && target.width === undefined && target.height === undefined && !target.shapes) {
             return { x: target.x, y: target.y };
         }
         const doc = target.document ?? target;
-        const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(target.shapes) || (Boolean(doc.bounds) && !doc.texture);
-        if (isRegion) {
-            return this.getRegionOrigin(target);
+        if (doc.origin && typeof doc.origin.x === 'number' && typeof doc.origin.y === 'number') {
+            return { x: doc.origin.x, y: doc.origin.y };
+        }
+        if (target.origin && typeof target.origin.x === 'number' && typeof target.origin.y === 'number') {
+            return { x: target.origin.x, y: target.origin.y };
         }
         return this.getCenter(target);
     }

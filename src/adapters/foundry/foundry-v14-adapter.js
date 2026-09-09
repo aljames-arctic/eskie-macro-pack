@@ -283,13 +283,27 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
 
                 if (type === 'polygon' || Array.isArray(shape.points)) {
                     const points = shape.points ?? [];
-                    for (let i = 0; i < points.length; i += 2) {
-                        const px = points[i];
-                        const py = points[i + 1];
-                        if (px < minX) minX = px;
-                        if (px > maxX) maxX = px;
-                        if (py < minY) minY = py;
-                        if (py > maxY) maxY = py;
+                    if (points.length > 0) {
+                        if (typeof points[0] === 'number') {
+                            for (let i = 0; i < points.length; i += 2) {
+                                const px = points[i];
+                                const py = points[i + 1];
+                                if (px < minX) minX = px;
+                                if (px > maxX) maxX = px;
+                                if (py < minY) minY = py;
+                                if (py > maxY) maxY = py;
+                            }
+                        } else {
+                            for (const pt of points) {
+                                if (!pt) continue;
+                                const px = pt.x ?? 0;
+                                const py = pt.y ?? 0;
+                                if (px < minX) minX = px;
+                                if (px > maxX) maxX = px;
+                                if (py < minY) minY = py;
+                                if (py > maxY) maxY = py;
+                            }
+                        }
                     }
                 } else if (type === 'circle' || (shape.radius !== undefined && shape.width === undefined)) {
                     const cx = shape.x ?? 0;
@@ -328,8 +342,22 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
             }
         }
 
-        const fallbackX = doc.x ?? placeable.x ?? 0;
-        const fallbackY = doc.y ?? placeable.y ?? 0;
+        const center = placeable.center ?? doc.center;
+        if (center && typeof center.x === 'number' && typeof center.y === 'number') {
+            return {
+                minX: center.x,
+                maxX: center.x,
+                minY: center.y,
+                maxY: center.y,
+                center: { x: center.x, y: center.y },
+                width: 0,
+                height: 0,
+                anchor: { x: 0.5, y: 0.5 }
+            };
+        }
+
+        const fallbackX = typeof doc.x === 'number' ? doc.x : (typeof placeable.x === 'number' && placeable.x !== 0 ? placeable.x : 0);
+        const fallbackY = typeof doc.y === 'number' ? doc.y : (typeof placeable.y === 'number' && placeable.y !== 0 ? placeable.y : 0);
         return {
             minX: fallbackX,
             maxX: fallbackX,
@@ -406,6 +434,8 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
         if (!id) return null;
         return super.getPlaceable(id)
             ?? canvas?.regions?.get?.(id)
+            ?? canvas?.scene?.regions?.get?.(id)?.object
+            ?? canvas?.scene?.regions?.get?.(id)
             ?? null;
     }
 

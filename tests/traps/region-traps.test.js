@@ -456,5 +456,61 @@ test('Trap macros accept targetLocation: { x, y } coordinates directly', async (
     }
 });
 
+test('Fire trap resolves distinct center coordinates for 3-region setups and guards against zero-distance stretch', async () => {
+    globalThis.game.modules.set('jb2a_patreon', { id: 'jb2a_patreon', active: true });
+    globalThis.game.modules.set('eskie-effects', { id: 'eskie-effects', active: true });
+    const origGetEntry = Sequencer.Database.getEntry;
+    Sequencer.Database.getEntry = (path) => ({ file: path });
+    const origEntryExists = Sequencer.Database.entryExists;
+    Sequencer.Database.entryExists = () => true;
+
+    try {
+        const { fire } = await import('../../src/animation/traps/fire.js');
+
+        // Three distinct regions on canvas (Trigger, Origin/Nozzle, Target)
+        const originRegion = {
+            id: 'region-origin-nozzle',
+            documentName: 'Region',
+            x: 0,
+            y: 0,
+            center: { x: 300, y: 400 },
+            bounds: { x: 250, y: 350, width: 100, height: 100 },
+            document: { id: 'region-origin-nozzle', documentName: 'Region' }
+        };
+
+        const targetRegion = {
+            id: 'region-target-landing',
+            documentName: 'Region',
+            x: 0,
+            y: 0,
+            center: { x: 900, y: 400 },
+            bounds: { x: 850, y: 350, width: 100, height: 100 },
+            document: { id: 'region-target-landing', documentName: 'Region' }
+        };
+
+        const { adapter } = await import('../../src/adapters/index.js');
+
+        const originLoc = adapter.getTargetLocation(originRegion);
+        const targetLoc = adapter.getTargetLocation(targetRegion);
+
+        assert.deepEqual(originLoc, { x: 300, y: 400 }, 'Origin region location must resolve its center coordinates');
+        assert.deepEqual(targetLoc, { x: 900, y: 400 }, 'Target region location must resolve its center coordinates');
+        assert.notDeepEqual(originLoc, targetLoc, 'Origin and target locations must be distinct coordinates');
+
+        // Valid execution: positive distance between origin and target
+        const seqValid = await fire.create(originRegion, [], { targetLocation: targetLoc });
+        assert.ok(seqValid, 'Fire trap should successfully create animation sequence with distinct region locations');
+
+        // Identical coordinates guard: distance < 1 returns early gracefully without throwing
+        const seqZeroDistance = await fire.create(originRegion, [], { targetLocation: { x: 300, y: 400 } });
+        assert.ok(seqZeroDistance, 'Fire trap should return graceful sequence when target location equals origin location');
+    } finally {
+        Sequencer.Database.getEntry = origGetEntry;
+        Sequencer.Database.entryExists = origEntryExists;
+        globalThis.game.modules.delete('jb2a_patreon');
+        globalThis.game.modules.delete('eskie-effects');
+    }
+});
+
 
 

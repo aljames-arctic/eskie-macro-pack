@@ -145,7 +145,7 @@ export async function executeTrapTrigger(context, ...rest) {
 
                 let animPlaceables = [];
                 if (tileIds.length > 0) {
-                    animPlaceables = tileIds.map(id => canvas?.tiles?.get?.(id) ?? adapter.getPlaceable(id)).filter(Boolean);
+                    animPlaceables = tileIds.map(id => adapter.getPlaceable(id)).filter(Boolean);
                 } else if (originIds.length > 0) {
                     animPlaceables = originIds.map(id => adapter.getPlaceable(id)).filter(Boolean);
                 }

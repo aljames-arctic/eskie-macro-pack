@@ -13,14 +13,14 @@ const status = {
     ready: false,
 };
 
-export function setupApiCalls(exportedFunctions) {
+export function setupApiCalls(exportedFunctions: Record<string, unknown>): void {
     globalThis.eskie = Object.assign(
         globalThis.eskie ?? {},
         exportedFunctions
     );
 }
 
-export function setupModule() {
+export function setupModule(): void {
     const { effect, mask, overlay, showcase, traps } = animation;
 
     // Expose only active sequencer play/animation namespaces on globalThis.eskie
@@ -33,7 +33,7 @@ export function setupModule() {
     });
 
     // Attach module public API to game.modules.get('eskie-macros').api
-    const moduleRecord = game.modules.get(MODULE_ID);
+    const moduleRecord = game.modules?.get(MODULE_ID) as any;
     if (moduleRecord) {
         moduleRecord.api = {
             Adapter,

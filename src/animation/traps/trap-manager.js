@@ -88,13 +88,11 @@ export async function executeTrapTrigger(context, ...rest) {
 
     if (triggerContext.type === 'region') {
         const { region, event, behavior } = triggerContext;
-        if (!event?.data?.token) return;
+        const activatingToken = event?.data?.token?.object;
+        if (!activatingToken) return;
 
         const regionDoc = region.document ?? region;
         const regionPlaceable = regionDoc.object ?? canvas.regions.get(regionDoc.id);
-
-        // Activating token from Region event data
-        const activatingToken = event.data.token.object ?? event.data.token;
 
         const animation = regionDoc.getFlag?.(MODULE_ID, 'trap.animation')
             ?? regionDoc.flags?.[MODULE_ID]?.trap?.animation
@@ -466,8 +464,8 @@ export async function setupRegionTrap(animation, config = {}) {
 const adapter = game.modules.get('${MODULE_ID}').api.adapter;
 
 // Activating token from Region trigger event
-if (!event.data?.token) return;
-const token = event.data.token.object ?? event.data.token;
+const token = event.data?.token?.object;
+if (!token) return;
 ${targetId ? `
 // Target placeable (Region or Tile) and coordinate location
 const targetPlaceable = adapter.getPlaceable('${targetId}');

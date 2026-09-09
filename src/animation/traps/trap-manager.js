@@ -2,6 +2,7 @@ import { adapter } from '../../adapters/index.js';
 import { matt } from '../utils/matt-tiles.js';
 import { MODULE_ID } from '../../lib/constants.js';
 import { log, notify } from '../../lib/logger.js';
+import { localize, format } from '../../lib/utils.js';
 
 /**
  * Retrieve an Eskie trap flag value from a Document or data object.
@@ -258,7 +259,7 @@ export async function executeTrapTrigger(context, ...rest) {
  */
 export async function setupRegionTrap(animation, config = {}) {
     if (!game.user.isGM) {
-        return notify.error(game.i18n.localize('EMP.traps.setup.onlyGm'));
+        return notify.error(localize('EMP.traps.setup.onlyGm'));
     }
 
     const pathParts = animation.split('.');
@@ -266,18 +267,20 @@ export async function setupRegionTrap(animation, config = {}) {
     const tileCount = config.tileCount ?? 2;
 
     // Step 1: Prompt user to select trigger regions
-    const step1Title = game.i18n.has?.(`EMP.traps.${trapKey}.step1Title`)
-        ? game.i18n.localize(`EMP.traps.${trapKey}.step1Title`)
-        : game.i18n.format('EMP.traps.setup.step1RegionTitle', { name: trapKey });
-    const step1Content = game.i18n.has?.(`EMP.traps.${trapKey}.step1Content`)
-        ? game.i18n.localize(`EMP.traps.${trapKey}.step1Content`)
-        : game.i18n.localize('EMP.traps.setup.step1RegionContent');
+    const step1Title = localize(
+        `EMP.traps.${trapKey}.step1Title`,
+        format('EMP.traps.setup.step1RegionTitle', { name: trapKey })
+    );
+    const step1Content = localize(
+        `EMP.traps.${trapKey}.step1Content`,
+        localize('EMP.traps.setup.step1RegionContent')
+    );
 
     const triggerResult = await adapter.buttonDialog({
         title: step1Title,
         buttons: [
-            { label: game.i18n.localize('EMP.traps.common.continue'), value: 'continue' },
-            { label: game.i18n.localize('EMP.traps.common.cancel'), value: 'cancel' },
+            { label: localize('EMP.traps.common.continue'), value: 'continue' },
+            { label: localize('EMP.traps.common.cancel'), value: 'cancel' },
         ],
     }, {
         content: step1Content
@@ -287,7 +290,7 @@ export async function setupRegionTrap(animation, config = {}) {
 
     const triggerRegions = adapter.getControlledRegions();
     if (triggerRegions.length === 0) {
-        return notify.warn(game.i18n.localize('EMP.traps.setup.noTriggerRegions'));
+        return notify.warn(localize('EMP.traps.setup.noTriggerRegions'));
     }
 
     let originElements = [];
@@ -298,18 +301,20 @@ export async function setupRegionTrap(animation, config = {}) {
         originElements = triggerRegions;
     } else if (tileCount === 3) {
         // Step 2: Prompt user to select trap origin/launcher placeables (Tile or Region)
-        const originTitle = game.i18n.has?.(`EMP.traps.${trapKey}.step2Title`)
-            ? game.i18n.localize(`EMP.traps.${trapKey}.step2Title`)
-            : game.i18n.format('EMP.traps.setup.step2OriginRegionTitle', { name: trapKey });
-        const originContent = game.i18n.has?.(`EMP.traps.${trapKey}.step2Content`)
-            ? game.i18n.localize(`EMP.traps.${trapKey}.step2Content`)
-            : game.i18n.localize('EMP.traps.setup.step2OriginRegionContent');
+        const originTitle = localize(
+            `EMP.traps.${trapKey}.step2Title`,
+            format('EMP.traps.setup.step2OriginRegionTitle', { name: trapKey })
+        );
+        const originContent = localize(
+            `EMP.traps.${trapKey}.step2Content`,
+            localize('EMP.traps.setup.step2OriginRegionContent')
+        );
 
         const originResult = await adapter.buttonDialog({
             title: originTitle,
             buttons: [
-                { label: game.i18n.localize('EMP.traps.common.continue'), value: 'continue' },
-                { label: game.i18n.localize('EMP.traps.common.cancel'), value: 'cancel' },
+                { label: localize('EMP.traps.common.continue'), value: 'continue' },
+                { label: localize('EMP.traps.common.cancel'), value: 'cancel' },
             ],
         }, {
             content: originContent
@@ -323,31 +328,34 @@ export async function setupRegionTrap(animation, config = {}) {
         // Enforce Tile requirement when mandatory (e.g. Bull Rush Statue)
         const requiresTile = Boolean(config.requiresTile || trapKey === 'bullRushStatue');
         if (requiresTile && controlledTiles.length === 0) {
-            const warningMsg = game.i18n.has?.(`EMP.traps.${trapKey}.noTile`)
-                ? game.i18n.localize(`EMP.traps.${trapKey}.noTile`)
-                : game.i18n.localize('EMP.traps.setup.noOriginTiles');
+            const warningMsg = localize(
+                `EMP.traps.${trapKey}.noTile`,
+                localize('EMP.traps.setup.noOriginTiles')
+            );
             return notify.warn(warningMsg);
         }
 
         originElements = controlledTiles.length > 0 ? controlledTiles : controlledRegions;
 
         if (originElements.length === 0) {
-            return notify.warn(game.i18n.localize('EMP.traps.setup.noOriginTiles'));
+            return notify.warn(localize('EMP.traps.setup.noOriginTiles'));
         }
 
         // Step 3: Prompt user to select trap target/landing placeables (Tile or Region)
-        const targetTitle = game.i18n.has?.(`EMP.traps.${trapKey}.step3Title`)
-            ? game.i18n.localize(`EMP.traps.${trapKey}.step3Title`)
-            : game.i18n.format('EMP.traps.setup.step3TargetRegionTitle', { name: trapKey });
-        const targetContent = game.i18n.has?.(`EMP.traps.${trapKey}.step3Content`)
-            ? game.i18n.localize(`EMP.traps.${trapKey}.step3Content`)
-            : game.i18n.localize('EMP.traps.setup.step3TargetRegionContent');
+        const targetTitle = localize(
+            `EMP.traps.${trapKey}.step3Title`,
+            format('EMP.traps.setup.step3TargetRegionTitle', { name: trapKey })
+        );
+        const targetContent = localize(
+            `EMP.traps.${trapKey}.step3Content`,
+            localize('EMP.traps.setup.step3TargetRegionContent')
+        );
 
         const targetResult = await adapter.buttonDialog({
             title: targetTitle,
             buttons: [
-                { label: game.i18n.localize('EMP.traps.common.continue'), value: 'continue' },
-                { label: game.i18n.localize('EMP.traps.common.cancel'), value: 'cancel' },
+                { label: localize('EMP.traps.common.continue'), value: 'continue' },
+                { label: localize('EMP.traps.common.cancel'), value: 'cancel' },
             ],
         }, {
             content: targetContent
@@ -360,23 +368,25 @@ export async function setupRegionTrap(animation, config = {}) {
         targetElements = targetTiles.length > 0 ? targetTiles : targetRegions;
 
         if (targetElements.length === 0) {
-            notify.warn(game.i18n.localize('EMP.traps.setup.noTargetTiles'));
+            notify.warn(localize('EMP.traps.setup.noTargetTiles'));
             targetElements = triggerRegions;
         }
     } else {
         // Step 2: Prompt user to select trap animation placeables (Tile or Region)
-        const animTitle = game.i18n.has?.(`EMP.traps.${trapKey}.step2Title`)
-            ? game.i18n.localize(`EMP.traps.${trapKey}.step2Title`)
-            : game.i18n.format('EMP.traps.setup.step2AnimRegionTitle', { name: trapKey });
-        const animContent = game.i18n.has?.(`EMP.traps.${trapKey}.step2Content`)
-            ? game.i18n.localize(`EMP.traps.${trapKey}.step2Content`)
-            : game.i18n.localize('EMP.traps.setup.step2AnimRegionContent');
+        const animTitle = localize(
+            `EMP.traps.${trapKey}.step2Title`,
+            format('EMP.traps.setup.step2AnimRegionTitle', { name: trapKey })
+        );
+        const animContent = localize(
+            `EMP.traps.${trapKey}.step2Content`,
+            localize('EMP.traps.setup.step2AnimRegionContent')
+        );
 
         const animResult = await adapter.buttonDialog({
             title: animTitle,
             buttons: [
-                { label: game.i18n.localize('EMP.traps.common.continue'), value: 'continue' },
-                { label: game.i18n.localize('EMP.traps.common.cancel'), value: 'cancel' },
+                { label: localize('EMP.traps.common.continue'), value: 'continue' },
+                { label: localize('EMP.traps.common.cancel'), value: 'cancel' },
             ],
         }, {
             content: animContent
@@ -390,9 +400,10 @@ export async function setupRegionTrap(animation, config = {}) {
         // Enforce Tile requirement when mandatory (e.g. Flooding Room)
         const requiresTile = Boolean(config.requiresTile || trapKey === 'floodingRoom');
         if (requiresTile && controlledTiles.length === 0) {
-            const warningMsg = game.i18n.has?.(`EMP.traps.${trapKey}.noTile`)
-                ? game.i18n.localize(`EMP.traps.${trapKey}.noTile`)
-                : `${trapKey} requires a Tile placeable on the canvas. Trap setup cancelled.`;
+            const warningMsg = localize(
+                `EMP.traps.${trapKey}.noTile`,
+                `${trapKey} requires a Tile placeable on the canvas. Trap setup cancelled.`
+            );
             return notify.warn(warningMsg);
         }
 
@@ -403,10 +414,10 @@ export async function setupRegionTrap(animation, config = {}) {
     if (config.extraTiles) {
         for (const extra of config.extraTiles) {
             const extraResult = await adapter.buttonDialog({
-                title: game.i18n.format('EMP.traps.setup.extraTitle', { name: extra.label }),
+                title: format('EMP.traps.setup.extraTitle', { name: extra.label }),
                 buttons: [
-                    { label: game.i18n.localize('EMP.traps.common.continue'), value: 'continue' },
-                    { label: game.i18n.localize('EMP.traps.common.cancel'), value: 'cancel' },
+                    { label: localize('EMP.traps.common.continue'), value: 'continue' },
+                    { label: localize('EMP.traps.common.cancel'), value: 'cancel' },
                 ],
             }, {
                 content: `<p>${extra.prompt}</p><p>Click <strong>Continue</strong> once selected.</p>`
@@ -419,7 +430,7 @@ export async function setupRegionTrap(animation, config = {}) {
             const selected = selectedTiles.length > 0 ? selectedTiles : selectedRegions;
 
             if (selected.length === 0) {
-                return notify.warn(game.i18n.format('EMP.traps.setup.noExtraTiles', { name: extra.label }));
+                return notify.warn(format('EMP.traps.setup.noExtraTiles', { name: extra.label }));
             }
             extraResults[extra.key] = selected;
         }
@@ -575,7 +586,7 @@ await Promise.all(animPromises);`
  */
 export async function setupTrap(animation, config = {}) {
     if (!game.user.isGM) {
-        return notify.error(game.i18n.localize('EMP.traps.setup.onlyGm'));
+        return notify.error(localize('EMP.traps.setup.onlyGm'));
     }
 
     let mode = config.mode;
@@ -590,13 +601,13 @@ export async function setupTrap(animation, config = {}) {
                 mode = 'region';
             } else {
                 mode = await adapter.buttonDialog({
-                    title: game.i18n.localize('EMP.traps.setup.modeDialogTitle'),
+                    title: localize('EMP.traps.setup.modeDialogTitle'),
                     buttons: [
-                        { label: game.i18n.localize('EMP.traps.setup.modeRegion'), value: 'region' },
-                        { label: game.i18n.localize('EMP.traps.setup.modeMatt'), value: 'matt' },
+                        { label: localize('EMP.traps.setup.modeRegion'), value: 'region' },
+                        { label: localize('EMP.traps.setup.modeMatt'), value: 'matt' },
                     ],
                 }, {
-                    content: game.i18n.localize('EMP.traps.setup.modeDialogContent'),
+                    content: localize('EMP.traps.setup.modeDialogContent'),
                 });
                 if (!mode) return;
             }

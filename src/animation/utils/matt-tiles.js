@@ -3,6 +3,8 @@ import { dependency } from '../../lib/dependency.js';
 import { socket } from '../../adapters/modules/socketlib/socketlib-module-adapter.js';
 import { SECONDS, MODULE_ID } from '../../lib/constants.js';
 import { adapter } from '../../adapters/index.js';
+import { log, notify } from '../../lib/logger.js';
+import { localize, format } from '../../lib/utils.js';
 
 const DEFAULT_CONFIG = {
     id: 'generic-tile-movement',
@@ -94,7 +96,7 @@ async function configure(token, tile, config = {}) {
 async function setup(animation, config = {}) {
     dependency.required([{ id: 'monks-active-tiles', ref: "Monk's Active Tile Triggers" }]);
 
-    if (!game.user.isGM) return ui.notifications.error(game.i18n.localize('EMP.traps.setup.onlyGm'));
+    if (!game.user.isGM) return notify.error(localize('EMP.traps.setup.onlyGm'));
 
     const pathParts = animation.split('.');
     const trapKey = pathParts[pathParts.length - 1];
@@ -102,19 +104,19 @@ async function setup(animation, config = {}) {
 
     // Step 1: Prompt user to select trigger tiles
     const triggerResult = await adapter.buttonDialog({
-        title: game.i18n.format('EMP.traps.setup.step1Title', { name: trapKey }),
+        title: format('EMP.traps.setup.step1Title', { name: trapKey }),
         buttons: [
-            { label: game.i18n.localize('EMP.traps.common.continue'), value: 'continue' },
-            { label: game.i18n.localize('EMP.traps.common.cancel'), value: 'cancel' },
+            { label: localize('EMP.traps.common.continue'), value: 'continue' },
+            { label: localize('EMP.traps.common.cancel'), value: 'cancel' },
         ],
     }, {
-        content: game.i18n.localize('EMP.traps.setup.step1Content')
+        content: localize('EMP.traps.setup.step1Content')
     });
 
     if (triggerResult !== 'continue') return;
 
     const triggerTiles = canvas.tiles.controlled.map(t => t.document);
-    if (triggerTiles.length === 0) return ui.notifications.warn(game.i18n.localize('EMP.traps.setup.noTriggerTiles'));
+    if (triggerTiles.length === 0) return notify.warn(localize('EMP.traps.setup.noTriggerTiles'));
 
     let originTiles = [];
     let targetTiles = [];
@@ -122,55 +124,55 @@ async function setup(animation, config = {}) {
     if (tileCount === 3) {
         // Step 2: Prompt user to select trap origin/launcher tiles
         const originResult = await adapter.buttonDialog({
-            title: game.i18n.format('EMP.traps.setup.step2OriginTitle', { name: trapKey }),
+            title: format('EMP.traps.setup.step2OriginTitle', { name: trapKey }),
             buttons: [
-                { label: game.i18n.localize('EMP.traps.common.continue'), value: 'continue' },
-                { label: game.i18n.localize('EMP.traps.common.cancel'), value: 'cancel' },
+                { label: localize('EMP.traps.common.continue'), value: 'continue' },
+                { label: localize('EMP.traps.common.cancel'), value: 'cancel' },
             ],
         }, {
-            content: game.i18n.localize('EMP.traps.setup.step2OriginContent')
+            content: localize('EMP.traps.setup.step2OriginContent')
         });
 
         if (originResult !== 'continue') return;
 
         originTiles = canvas.tiles.controlled.map(t => t.document);
-        if (originTiles.length === 0) return ui.notifications.warn(game.i18n.localize('EMP.traps.setup.noOriginTiles'));
+        if (originTiles.length === 0) return notify.warn(localize('EMP.traps.setup.noOriginTiles'));
 
         // Step 3: Prompt user to select trap target/landing tiles
         const targetResult = await adapter.buttonDialog({
-            title: game.i18n.format('EMP.traps.setup.step3TargetTitle', { name: trapKey }),
+            title: format('EMP.traps.setup.step3TargetTitle', { name: trapKey }),
             buttons: [
-                { label: game.i18n.localize('EMP.traps.common.continue'), value: 'continue' },
-                { label: game.i18n.localize('EMP.traps.common.cancel'), value: 'cancel' },
+                { label: localize('EMP.traps.common.continue'), value: 'continue' },
+                { label: localize('EMP.traps.common.cancel'), value: 'cancel' },
             ],
         }, {
-            content: game.i18n.localize('EMP.traps.setup.step3TargetContent')
+            content: localize('EMP.traps.setup.step3TargetContent')
         });
 
         if (targetResult === 'cancel' || targetResult === false) return;
 
         targetTiles = canvas.tiles.controlled.map(t => t.document);
         if (targetTiles.length === 0) {
-            ui.notifications.warn(game.i18n.localize('EMP.traps.setup.noTargetTiles'));
+            notify.warn(localize('EMP.traps.setup.noTargetTiles'));
             targetTiles = triggerTiles;
         }
     } else {
         // Step 2: Prompt user to select trap animation tiles
         const trapResult = await adapter.buttonDialog({
-            title: game.i18n.format('EMP.traps.setup.step2AnimTitle', { name: trapKey }),
+            title: format('EMP.traps.setup.step2AnimTitle', { name: trapKey }),
             buttons: [
-                { label: game.i18n.localize('EMP.traps.common.continue'), value: 'continue' },
-                { label: game.i18n.localize('EMP.traps.common.cancel'), value: 'cancel' },
+                { label: localize('EMP.traps.common.continue'), value: 'continue' },
+                { label: localize('EMP.traps.common.cancel'), value: 'cancel' },
             ],
         }, {
-            content: game.i18n.localize('EMP.traps.setup.step2AnimContent')
+            content: localize('EMP.traps.setup.step2AnimContent')
         });
 
         if (trapResult !== 'continue') return;
 
         originTiles = canvas.tiles.controlled.map(t => t.document);
         if (originTiles.length === 0) {
-            ui.notifications.warn(game.i18n.localize('EMP.traps.setup.noAnimTiles'));
+            notify.warn(localize('EMP.traps.setup.noAnimTiles'));
             originTiles = triggerTiles;
         }
     }
@@ -179,10 +181,10 @@ async function setup(animation, config = {}) {
     if (config.extraTiles) {
         for (const extra of config.extraTiles) {
             const extraResult = await adapter.buttonDialog({
-                title: game.i18n.format('EMP.traps.setup.extraTitle', { name: extra.label }),
+                title: format('EMP.traps.setup.extraTitle', { name: extra.label }),
                 buttons: [
-                    { label: game.i18n.localize('EMP.traps.common.continue'), value: 'continue' },
-                    { label: game.i18n.localize('EMP.traps.common.cancel'), value: 'cancel' },
+                    { label: localize('EMP.traps.common.continue'), value: 'continue' },
+                    { label: localize('EMP.traps.common.cancel'), value: 'cancel' },
                 ],
             }, {
                 content: `<p>${extra.prompt}</p><p>Click <strong>Continue</strong> once selected.</p>`
@@ -191,7 +193,7 @@ async function setup(animation, config = {}) {
             if (extraResult !== 'continue') return;
 
             const selected = canvas.tiles.controlled.map(t => t.document);
-            if (selected.length === 0) return ui.notifications.warn(game.i18n.format('EMP.traps.setup.noExtraTiles', { name: extra.label }));
+            if (selected.length === 0) return notify.warn(format('EMP.traps.setup.noExtraTiles', { name: extra.label }));
             extraTileResults[extra.key] = selected.map(t => t.id);
         }
     }
@@ -313,7 +315,7 @@ await Promise.all(promises);
         await socket.tile.edit(tileId, updateData);
     }
 
-    ui.notifications.info(`Successfully setup ${trapKey} trap links for ${triggerTiles.length} trigger tile(s) and ${originTiles.length} trap tile(s).`);
+    notify.info(`Successfully setup ${trapKey} trap links for ${triggerTiles.length} trigger tile(s) and ${originTiles.length} trap tile(s).`);
     return { triggerTiles, originTiles, targetTiles };
 }
 

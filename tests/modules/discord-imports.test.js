@@ -155,12 +155,12 @@ test('standalone macros exist, have valid syntax, and are registered in KNOWN_ST
 });
 
 test('banishingArrow and enfeeblingArrow do not restore visibility or end effects inside create()', () => {
-    const banishingModule = fs.readFileSync(path.join(rootDir, 'src/animation/effects/arcane-shot/banishing-arrow.js'), 'utf8');
+    const banishingModule = fs.readFileSync(path.join(rootDir, 'src/animation/effects/arcane-shot/banishing-arrow.ts'), 'utf8');
     const banishingMacro = fs.readFileSync(path.join(rootDir, 'src/standalone-macros/banishing-arrow.js'), 'utf8');
     assert.doesNotMatch(banishingModule, /\.thenDo\s*\(\s*function\s*\(\s*\)\s*\{[\s\S]*?\.show\(\)/, 'banishingArrow module create() must not unhide target in thenDo');
     assert.doesNotMatch(banishingMacro, /\.thenDo\s*\(\s*function\s*\(\s*\)\s*\{[\s\S]*?\.show\(\)/, 'banishing-arrow macro must not unhide target in thenDo');
 
-    const enfeeblingModule = fs.readFileSync(path.join(rootDir, 'src/animation/effects/arcane-shot/enfeebling-arrow.js'), 'utf8');
+    const enfeeblingModule = fs.readFileSync(path.join(rootDir, 'src/animation/effects/arcane-shot/enfeebling-arrow.ts'), 'utf8');
     const enfeeblingMacro = fs.readFileSync(path.join(rootDir, 'src/standalone-macros/enfeebling-arrow.js'), 'utf8');
     assert.doesNotMatch(enfeeblingModule, /\.thenDo\s*\(\s*function\s*\(\s*\)\s*\{[\s\S]*?endEffects/, 'enfeeblingArrow module create() must not prematurely end effects in thenDo');
     assert.doesNotMatch(enfeeblingMacro, /\.thenDo\s*\(\s*function\s*\(\s*\)\s*\{[\s\S]*?endEffects/, 'enfeebling-arrow macro must not prematurely end effects in thenDo');
@@ -189,7 +189,7 @@ test('no animation effect module or standalone macro embeds Sequencer crosshairs
             const res = path.resolve(dir, entry.name);
             if (entry.isDirectory()) {
                 files.push(...getJsFiles(res));
-            } else if (entry.name.endsWith('.js')) {
+            } else if (entry.name.endsWith('.js') || entry.name.endsWith('.ts')) {
                 files.push(res);
             }
         }
@@ -224,7 +224,7 @@ test('no animation effect module or standalone macro animates position on sprite
             const res = path.resolve(dir, entry.name);
             if (entry.isDirectory()) {
                 files.push(...getJsFiles(res));
-            } else if (entry.name.endsWith('.js')) {
+            } else if (entry.name.endsWith('.js') || entry.name.endsWith('.ts')) {
                 files.push(res);
             }
         }
@@ -254,7 +254,7 @@ test('no animation effect module or standalone macro uses globalThis', () => {
             const res = path.resolve(dir, entry.name);
             if (entry.isDirectory()) {
                 files.push(...getJsFiles(res));
-            } else if (entry.name.endsWith('.js')) {
+            } else if (entry.name.endsWith('.js') || entry.name.endsWith('.ts')) {
                 files.push(res);
             }
         }

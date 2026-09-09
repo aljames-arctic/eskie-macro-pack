@@ -195,7 +195,7 @@ const AA_MACRO_ICON_MAP = {
  * @returns {string} The formatted Title Case name ("Speak With Dead").
  */
 export function formatMacroTitle(filename) {
-    const baseName = filename.replace(/\.js$/i, '');
+    const baseName = filename.replace(/\.(js|ts)$/i, '');
     return baseName
         .split(/[-_]+/)
         .filter(Boolean)

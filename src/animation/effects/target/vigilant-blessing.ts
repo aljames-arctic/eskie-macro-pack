@@ -134,8 +134,8 @@ async function playEffect(token: any, config: any = {}) {
 }
 
 async function stopTarget(token: any, target: any, config: any = {}) {
-    const recipient = target ?? token;
-    if (!recipient) return;
+    if (!target) return;
+    const recipient = target;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `${id} - ${recipient.id}`, object: recipient });
@@ -149,8 +149,8 @@ async function stopEffect(token: any, config: any = {}) {
 }
 
 async function stop(token: any, target: any, config: any = {}) {
-    const recipient = target ?? token;
-    if (!recipient) return;
+    if (!target) return;
+    const recipient = target;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `${id} - ${recipient.id}`, object: recipient });

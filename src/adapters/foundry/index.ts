@@ -12,7 +12,7 @@ export { BaseFoundryAdapter };
  * @param {object|null} [parentAdapter=null] Parent Unified Adapter reference
  * @returns {FoundryV14Adapter|FoundryV13Adapter|FoundryV12Adapter}
  */
-export function initializeFoundryAdapter(parentAdapter = null) {
+export function initializeFoundryAdapter(parentAdapter: any = null): BaseFoundryAdapter {
     let generation = 12;
     if (typeof game !== 'undefined') {
         if (game.release?.generation !== undefined) {

@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(targets, config = {}) {
+async function create(targets: any[], config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const sequence = new Sequence();
     applySound(sequence, mConfig.sound);
@@ -20,14 +20,14 @@ async function create(targets, config = {}) {
         .file(closest("jb2a.sleep.cloud.01.dark_orangepurple"))
         .scaleIn(0, 500, { ease: "easeOutQuint" })
         .fadeOut(1000)
-        .atLocation(config.position)
+        .atLocation(mConfig.position)
         .duration(1000)
         .size(5, { gridUnits: true })
         .zIndex(3);
 
     sequence.effect()
         .file(closest("jb2a.extras.tmfx.border.circle.outpulse.02.normal"))
-        .atLocation(config.position)
+        .atLocation(mConfig.position)
         .size(5, { gridUnits: true })
         .duration(1000)
         .fadeOut(1000)
@@ -38,7 +38,7 @@ async function create(targets, config = {}) {
         .file(closest("jb2a.particles.outward.orange.02.03"))
         .scaleIn(0, 500, { ease: "easeOutQuint" })
         .fadeOut(2000)
-        .atLocation(config.position)
+        .atLocation(mConfig.position)
         .duration(3000)
         .size(5.5, { gridUnits: true })
         .animateProperty('spriteContainer', 'position.y', { from: 0, to: 100, duration: 3000 })
@@ -65,12 +65,12 @@ async function create(targets, config = {}) {
     return sequence;
 }
 
-async function play(targets, config = {}) {
+async function play(targets: any[], config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { position } = mConfig;
+    let position = mConfig.position;
     const crosshairConfig = {
         size: 5,
-        icon: 'icons/magic/control/hypnosis-mesmerism-pendulum.webp',
+        icon: 'icons/magic/control/sleep-bubble-purple.webp',
         label: 'Sleep',
         tag: 'sleep',
         t: 'circle',
@@ -88,7 +88,7 @@ async function play(targets, config = {}) {
     if (sequence) { return sequence.play(); }
 }
 
-function stop(targets, config = {}) {
+function stop(targets: any[], config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     targets.forEach(t => {
         Sequencer.EffectManager.endEffects({ name: `Sleep-${t.id}` });

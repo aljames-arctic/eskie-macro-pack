@@ -9,7 +9,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(token, target, config = {}) {
+async function create(token: any, target: any, config: any = {}) {
     config = adapter.mergeObject(DEFAULT_CONFIG, config);
     const sequence = new Sequence();
     applySound(sequence, config.sound);
@@ -24,7 +24,7 @@ async function create(token, target, config = {}) {
 
     sequence.effect()
         .copySprite(target)
-        .spriteRotation(-target.document.rotation)
+        .spriteRotation(-adapter.getTokenRotation(target))
         .attachTo(target)
         .scaleToObject(1, { considerTokenScale: true })
         .fadeIn(500)
@@ -51,7 +51,7 @@ async function create(token, target, config = {}) {
     return sequence;
 }
 
-async function play(token, target, config = {}) {
+async function play(token: any, target: any, config: any = {}) {
     const sequence = await create(token, target, config);
     if (sequence) {
         return sequence.play();

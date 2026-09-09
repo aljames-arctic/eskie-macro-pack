@@ -123,7 +123,7 @@ async function setup(config: Record<string, unknown> = {}): Promise<any> {
 
             // Programmatically update each door wall to trigger our tile when opened
             for (const door of doors) {
-                await door.document.update({
+                await (door.document as any).update({
                     "flags.monks-active-tiles": {
                         checklock: false,
                         close: false,

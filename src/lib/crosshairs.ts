@@ -30,7 +30,7 @@ function getBbcApi() {
  * @param {object} [config={}] Configuration options
  * @returns {{placeable: object|null, config: object}} Normalized placeable and options
  */
-function normalizeCrosshairInvocation(targetOrPlaceable, config = {}) {
+function normalizeCrosshairInvocation(targetOrPlaceable: any, config: any = {}): { placeable: any; config: any } {
     const docName = targetOrPlaceable?.documentName ?? targetOrPlaceable?.document?.documentName;
     const isTokenOrTile = docName === 'Token' || docName === 'Tile';
 
@@ -61,7 +61,7 @@ function normalizeCrosshairInvocation(targetOrPlaceable, config = {}) {
  * @param {object} [rawConfig={}] Shape configuration options
  * @returns {Promise<unknown>} The BBC play sequence result
  */
-async function playShape(shape, targetOrPlaceable, rawConfig = {}) {
+async function playShape(shape: string, targetOrPlaceable: any, rawConfig: any = {}) {
     const api = getBbcApi();
     const { placeable, config } = normalizeCrosshairInvocation(targetOrPlaceable, rawConfig);
     log.debug(`Delegating crosshair "${shape}" play to BBC API for target:`, placeable?.id ?? config.token?.name);
@@ -74,38 +74,38 @@ async function playShape(shape, targetOrPlaceable, rawConfig = {}) {
 
 export const crosshair = {
     cone: {
-        play: (targetOrPlaceable, config = {}) => playShape('cone', targetOrPlaceable, config),
-        create: (targetOrPlaceable, config = {}) => {
+        play: (targetOrPlaceable: any, config: any = {}) => playShape('cone', targetOrPlaceable, config),
+        create: (targetOrPlaceable: any, config: any = {}) => {
             const { placeable, config: normConfig } = normalizeCrosshairInvocation(targetOrPlaceable, config);
             return getBbcApi().crosshair?.cone?.create?.(placeable, normConfig);
         },
-        stop: (token, config = {}) => getBbcApi().crosshair?.cone?.stop?.(token, config)
+        stop: (token: any, config: any = {}) => getBbcApi().crosshair?.cone?.stop?.(token, config)
     },
     circle: {
-        play: (targetOrPlaceable, config = {}) => playShape('circle', targetOrPlaceable, config),
-        create: (targetOrPlaceable, config = {}) => {
+        play: (targetOrPlaceable: any, config: any = {}) => playShape('circle', targetOrPlaceable, config),
+        create: (targetOrPlaceable: any, config: any = {}) => {
             const { placeable, config: normConfig } = normalizeCrosshairInvocation(targetOrPlaceable, config);
             return getBbcApi().crosshair?.circle?.create?.(placeable, normConfig);
         },
-        stop: (token, config = {}) => getBbcApi().crosshair?.circle?.stop?.(token, config)
+        stop: (token: any, config: any = {}) => getBbcApi().crosshair?.circle?.stop?.(token, config)
     },
     ray: {
-        play: (targetOrPlaceable, config = {}) => playShape('ray', targetOrPlaceable, config),
-        create: (targetOrPlaceable, config = {}) => {
+        play: (targetOrPlaceable: any, config: any = {}) => playShape('ray', targetOrPlaceable, config),
+        create: (targetOrPlaceable: any, config: any = {}) => {
             const { placeable, config: normConfig } = normalizeCrosshairInvocation(targetOrPlaceable, config);
             return getBbcApi().crosshair?.ray?.create?.(placeable, normConfig);
         },
-        stop: (token, config = {}) => getBbcApi().crosshair?.ray?.stop?.(token, config)
+        stop: (token: any, config: any = {}) => getBbcApi().crosshair?.ray?.stop?.(token, config)
     },
     square: {
-        play: (targetOrPlaceable, config = {}) => playShape('square', targetOrPlaceable, config),
-        create: (targetOrPlaceable, config = {}) => {
+        play: (targetOrPlaceable: any, config: any = {}) => playShape('square', targetOrPlaceable, config),
+        create: (targetOrPlaceable: any, config: any = {}) => {
             const { placeable, config: normConfig } = normalizeCrosshairInvocation(targetOrPlaceable, config);
             return getBbcApi().crosshair?.square?.create?.(placeable, normConfig);
         },
-        stop: (token, config = {}) => getBbcApi().crosshair?.square?.stop?.(token, config)
+        stop: (token: any, config: any = {}) => getBbcApi().crosshair?.square?.stop?.(token, config)
     },
-    play: (typeOrPlaceable, placeableOrConfig, config) => {
+    play: (typeOrPlaceable: any, placeableOrConfig?: any, config?: any) => {
         const api = getBbcApi();
         if (typeof typeOrPlaceable === 'string') {
             const { placeable, config: normConfig } = normalizeCrosshairInvocation(placeableOrConfig, config);

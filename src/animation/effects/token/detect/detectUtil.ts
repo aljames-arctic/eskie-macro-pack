@@ -21,12 +21,12 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function _createDetectionEffects(target, config = {}) {
+async function _createDetectionEffects(target: any, config: any = {}) {
     const tags = Object.keys(config.detection);
     let sequence = new Sequence();
     applySound(sequence, config.sound);
 
-    let filteredTags = [];
+    let filteredTags: string[] = [];
     for (const tag of tags) {
         let validated = await config.validator(target, [tag]);
         if (validated) { filteredTags.push(tag); }
@@ -91,7 +91,7 @@ async function _createDetectionEffects(target, config = {}) {
  * @param {object} [config.detectionConfig=defaultDetectionConfig] The detection configuration.
  * @returns {Promise<Sequence>} A promise that resolves with the sequence.
  */
-async function create(token, config = {}) {
+async function create(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const gridDistance = adapter.getSceneDimensions(canvas?.scene).distance;
     const targets = canvas.tokens.placeables.filter((t) => {
@@ -122,7 +122,7 @@ async function create(token, config = {}) {
     return sequence;
 }
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const seq = await create(token, config);
     if (seq) { return seq.play(); }
 }

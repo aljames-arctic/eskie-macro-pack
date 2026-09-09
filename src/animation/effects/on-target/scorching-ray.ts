@@ -12,14 +12,14 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token, targets, config = {}) {
+async function create(token: any, targets?: any, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { rayCount, sound, rayCounts: explicitCounts } = mConfig;
 
     if (!token) return;
 
-    let targetList = [];
+    let targetList: any[] = [];
     if (Array.isArray(targets)) {
         targetList = targets;
     } else if (targets) {

@@ -3,6 +3,8 @@
 
 import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
+import { closest } from '../../../lib/filemanager.js';
+import { settingsOverride } from '../../../lib/settings.js';
 
 const DEFAULT_CONFIG = {
     id: 'wailsFromTheGrave',
@@ -11,13 +13,13 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-function generateOffsets(target, count = 3) {
-    const randomOffset = [];
+function generateOffsets(target: any, count = 3): Array<{ x: number; y: number }> {
+    const randomOffset: Array<{ x: number; y: number }> = [];
     const targetWidth = adapter.getTokenDimensions(target).widthUnits;
     const minDistance = 0.1 * targetWidth;
     for (let i = 0; i < count; i++) {
         let valid = false;
-        let offset;
+        let offset: { x: number; y: number } | undefined;
         let attempts = 0;
         while (!valid && attempts < 20) {
             attempts++;
@@ -26,8 +28,8 @@ function generateOffsets(target, count = 3) {
                 y: (Math.random() * 0.5 - 0.25) * targetWidth
             };
             valid = randomOffset.every(existing => {
-                const dx = offset.x - existing.x;
-                const dy = offset.y - existing.y;
+                const dx = offset!.x - existing.x;
+                const dy = offset!.y - existing.y;
                 return Math.hypot(dx, dy) >= minDistance;
             });
         }
@@ -36,7 +38,7 @@ function generateOffsets(target, count = 3) {
     return randomOffset;
 }
 
-async function createDamageOnly(target, config = {}) {
+async function createDamageOnly(target: any, config: any = {}) {
     let mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     mConfig = settingsOverride(mConfig);
     const { id, sound } = mConfig;
@@ -86,12 +88,12 @@ async function createDamageOnly(target, config = {}) {
     return seq;
 }
 
-async function playDamageOnly(target, config = {}) {
+async function playDamageOnly(target: any, config: any = {}) {
     const seq = await createDamageOnly(target, config);
     if (seq) return seq.play();
 }
 
-async function createAttack(token, target1, target2, config = {}) {
+async function createAttack(token: any, target1: any, target2?: any, config: any = {}) {
     let mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     mConfig = settingsOverride(mConfig);
     const { id, type, weight, sound } = mConfig;
@@ -230,12 +232,12 @@ async function createAttack(token, target1, target2, config = {}) {
     return seq;
 }
 
-async function playAttack(token, target1, target2, config = {}) {
+async function playAttack(token: any, target1: any, target2?: any, config: any = {}) {
     const seq = await createAttack(token, target1, target2, config);
     if (seq) return seq.play();
 }
 
-async function stop(token, target, config = {}) {
+async function stop(token?: any, target?: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     if (token) Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}` });

@@ -12,7 +12,7 @@ const DEFAULT_CONFIG = {
     }
 };
 
-function create(token, targets = [], config = {}) {
+function create(token: any, targets: any[] = [], config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     const gridSize = adapter.getSceneDimensions(canvas?.scene).size;
@@ -75,12 +75,12 @@ function create(token, targets = [], config = {}) {
     return sequence;
 }
 
-async function play(token, targets = [], config = {}) {
+async function play(token: any, targets: any[] = [], config: any = {}) {
     const sequence = create(token, targets, config);
     if (sequence) { return sequence.play(); }
 }
 
-function stop(token, { id = DEFAULT_CONFIG.id } = {}) {
+function stop(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
     // Instantaneous effect
 }
 

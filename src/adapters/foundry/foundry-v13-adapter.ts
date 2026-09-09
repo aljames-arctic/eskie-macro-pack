@@ -9,42 +9,42 @@ export class FoundryV13Adapter extends FoundryV12Adapter {
     /**
      * The active ContextMenu constructor in v13+.
      */
-    get ContextMenu() {
+    get ContextMenu(): any {
         return foundry.applications.ux.ContextMenu.implementation;
     }
 
     /**
      * The active KeyboardManager constructor in v13+.
      */
-    get KeyboardManager() {
-        return foundry.helpers.interaction.KeyboardManager.implementation;
+    get KeyboardManager(): any {
+        return (foundry.helpers as any)?.interaction?.KeyboardManager?.implementation ?? KeyboardManager;
     }
 
     /**
      * The active Token placeable constructor in v13+.
      */
-    get Token() {
+    get Token(): any {
         return foundry.canvas.placeables.Token.implementation;
     }
 
     /**
      * The active Tile placeable constructor in v13+.
      */
-    get Tile() {
+    get Tile(): any {
         return foundry.canvas.placeables.Tile.implementation;
     }
 
     /**
      * The active FilePicker constructor / implementation in v13+.
      */
-    get FilePicker() {
+    get FilePicker(): any {
         return foundry.applications.apps.FilePicker.implementation;
     }
 
     /**
      * The active TextEditor constructor / implementation in v13+.
      */
-    get TextEditor() {
+    get TextEditor(): any {
         return foundry.applications.ux.TextEditor.implementation;
     }
 
@@ -54,7 +54,7 @@ export class FoundryV13Adapter extends FoundryV12Adapter {
      * @param {Object} [options={}] Resolution options
      * @returns {Document|null}
      */
-    fromUuidSync(uuid, options = {}) {
+    fromUuidSync(uuid: string, options: any = {}): any {
         return foundry.utils.fromUuidSync(uuid, options);
     }
 
@@ -64,7 +64,7 @@ export class FoundryV13Adapter extends FoundryV12Adapter {
      * @param {Object} [options={}] Resolution options
      * @returns {Promise<Document|null>}
      */
-    async fromUuid(uuid, options = {}) {
+    async fromUuid(uuid: string, options: any = {}): Promise<any> {
         return foundry.utils.fromUuid(uuid, options);
     }
 
@@ -74,9 +74,9 @@ export class FoundryV13Adapter extends FoundryV12Adapter {
      * @param {Token} token Target Token placeable
      * @returns {Combatant[]}
      */
-    getCombatantsByToken(combat, token) {
+    getCombatantsByToken(combat: any, token: any): any[] {
         if (!combat || !token) return [];
-        return combat.getCombatantsByToken(token);
+        return (combat as any).getCombatantsByToken(token);
     }
 
     /**
@@ -85,7 +85,7 @@ export class FoundryV13Adapter extends FoundryV12Adapter {
      * @param {string[]} paths Array of template paths
      * @returns {Promise<Function[]>}
      */
-    async loadTemplates(paths) {
+    async loadTemplates(paths: string[]): Promise<any> {
         return foundry.applications.handlebars.loadTemplates(paths);
     }
 }

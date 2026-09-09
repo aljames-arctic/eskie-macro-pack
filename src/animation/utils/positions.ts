@@ -22,7 +22,7 @@ const DEFAULT_POSITION_CONFIG = {
     }
 };
 
-async function selectMultiple(config = {}) {
+async function selectMultiple(config: any = {}) {
     const mergedConfig = adapter.mergeObject(DEFAULT_POSITION_CONFIG, config);
 
     const {
@@ -35,7 +35,7 @@ async function selectMultiple(config = {}) {
         crosshair
     } = mergedConfig;
 
-    const positions = [];
+    const positions: any[] = [];
     ui.notifications.info('Click to select positions. Right-click or press Escape to finish.');
 
     let index = 0;

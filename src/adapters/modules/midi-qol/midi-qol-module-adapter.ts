@@ -15,8 +15,8 @@ export class MidiQolModuleAdapter extends BaseModuleAdapter {
      * @param {ChatMessage} message The chat message document to inspect
      * @returns {{ rolls: Array<{ source: string, rawAbility: string|null, outcome: string, tokenId: string|null }>, outcome: string }}
      */
-    extractRolls(message) {
-        const rolls = [];
+    extractRolls(message: any): { rolls: Array<{ source: string, rawAbility: string | null, outcome: string, tokenId: string | null }>, outcome: string } {
+        const rolls: Array<{ source: string, rawAbility: string | null, outcome: string, tokenId: string | null }> = [];
         const contentText = message?.content ?? "";
         const midiFlags = message?.flags?.["midi-qol"];
 
@@ -52,13 +52,13 @@ export class MidiQolModuleAdapter extends BaseModuleAdapter {
                 const targetLis = saveDisplay.querySelectorAll("li.midi-qol-target-select");
 
                 // Parse the short ability code from the save display block text
-                let saveAbility = null;
+                let saveAbility: string | null = null;
                 const textContext = (saveDisplay.textContent ?? "").toLowerCase();
                 const abilityRegex = /(strength|dexterity|constitution|intelligence|wisdom|charisma|str|dex|con|int|wis|cha|acr|ath|per|ste)/;
                 const match = textContext.match(abilityRegex);
-                if (match) saveAbility = match[1];
+                if (match) saveAbility = match[1] ?? null;
 
-                targetLis.forEach(el => {
+                targetLis.forEach((el: any) => {
                     const tokenId = el.dataset?.id ?? el.getAttribute?.('data-id');
                     let targetOutcome = "indeterminant";
                     let isResolved = false;

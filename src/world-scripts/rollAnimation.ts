@@ -12,7 +12,7 @@ import { log } from '../lib/logger.js';
 // SEQUENCER ANIMATION TRIGGER
 // ============================================================================
 
-async function playRollAnimation(token, config = {}) {
+async function playRollAnimation(token: any, config: any = {}) {
     if (!token) return;
 
     const rollType = config.rollType ?? "default";
@@ -56,6 +56,9 @@ async function playRollAnimation(token, config = {}) {
 // ============================================================================
 
 export class RollTracker {
+    hookIds: Array<{ name: string; id: number }>;
+    localAnimatedTokens: Map<string, Set<string>>;
+
     constructor() {
         this.hookIds = [];
         this.localAnimatedTokens = new Map();
@@ -73,11 +76,11 @@ export class RollTracker {
 
         log.debug(`Enabling Eskie Roll Animations. Active System: "${this.activeAdapter.id}"`);
 
-        const createId = Hooks.on("createChatMessage", (message, options, userId) => {
+        const createId = Hooks.on("createChatMessage" as any, (message: any, options: any, userId: any) => {
             this.processMessageAndPlay(message, userId);
         });
 
-        const updateId = Hooks.on("updateChatMessage", (message, updateData, options, userId) => {
+        const updateId = Hooks.on("updateChatMessage" as any, (message: any, updateData: any, options: any, userId: any) => {
             if (!updateData.content) return;
             this.processMessageAndPlay(message, userId);
         });
@@ -96,7 +99,7 @@ export class RollTracker {
         log.debug("Disabling Eskie Roll Animations");
 
         for (const hook of this.hookIds) {
-            Hooks.off(hook.name, hook.id);
+            Hooks.off(hook.name as any, hook.id);
         }
         this.hookIds = [];
     }
@@ -105,9 +108,9 @@ export class RollTracker {
      * Parses raw chat text, flavor, and flags using the system adapter
      * to determine if this card contains actionable rolls.
      */
-    getRollDetails(message) {
+    getRollDetails(message: any): any[] {
         // Extract raw rolls from the system adapter
-        const rolls = this.activeAdapter.extractRolls(message);
+        const rolls: any[] = this.activeAdapter.extractRolls(message);
         if (rolls.length === 0) return [];
 
         const flavorText = (message?.flavor ?? "").toLowerCase();
@@ -138,7 +141,7 @@ export class RollTracker {
     /**
      * Pinpoints the exact rolling token document via the unified adapter.
      */
-    getSpeakerToken(message, extractedTokenId) {
+    getSpeakerToken(message: any, extractedTokenId: any) {
         return adapter.getSpeakerToken(message, extractedTokenId);
     }
 
@@ -146,14 +149,14 @@ export class RollTracker {
      * Semantically classifies a chat message to determine its purpose.
      * @returns {string} The message classification.
      */
-    qualifyMessage(message) {
+    qualifyMessage(message: any) {
         return this.activeAdapter.qualifyMessage(message);
     }
 
     /**
      * Evaluates the message and triggers animations for unplayed rolls.
      */
-    async processMessageAndPlay(message, userId) {
+    async processMessageAndPlay(message: any, userId: any) {
         // Only run validation calculations once on the user machine modifying the doc
         if (game.user?.id !== userId) return;
 
@@ -169,7 +172,7 @@ export class RollTracker {
             // Prune map if it grows too large to prevent memory leaks (keep cache under 100 messages)
             if (this.localAnimatedTokens.size > 100) {
                 const oldestKey = this.localAnimatedTokens.keys().next().value;
-                this.localAnimatedTokens.delete(oldestKey);
+                if (oldestKey) this.localAnimatedTokens.delete(oldestKey);
             }
             this.localAnimatedTokens.set(messageId, new Set());
         }
@@ -185,10 +188,10 @@ export class RollTracker {
 
         for (const roll of rolls) {
             const token = this.getSpeakerToken(message, roll.tokenId);
-            if (!token) continue;
+            if (!token || !token.id) continue;
 
             // Check if we've already animated this specific token
-            if (newFiredTokens.includes(token.id) || localFired.has(token.id)) continue;
+            if (newFiredTokens.includes(token.id) || localFired?.has(token.id)) continue;
 
             // Trigger the sequence
             playRollAnimation(token, {
@@ -197,7 +200,7 @@ export class RollTracker {
             });
 
             newFiredTokens.push(token.id);
-            localFired.add(token.id);
+            localFired?.add(token.id);
             updatedFlags = true;
         }
 

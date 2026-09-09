@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token, config = {}, options = {}) {
+async function create(token: any, config: any = {}, options: any = {}) {
     if (options?.type == "aefx") return;
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
@@ -150,13 +150,13 @@ async function create(token, config = {}, options = {}) {
     return sequence;
 }
 
-async function play(token, config = {}, options = {}) {
+async function play(token: any, config: any = {}, options: any = {}) {
     if (options?.type == "aefx") return;
     const sequence = await create(token, config, options);
     if (sequence) return sequence.play();
 }
 
-function stop(token, { id = DEFAULT_CONFIG.id } = {}) {
+function stop(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
     if (token) {
         const tokenName = token.name;
         Sequencer.EffectManager.endEffects({ name: `${tokenName} Wall of Fire` });

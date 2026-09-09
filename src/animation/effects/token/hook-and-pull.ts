@@ -22,16 +22,17 @@ const DEFAULT_CONFIG = {
  * @param {object} config - Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function create(token, target, config = {}) {
+async function create(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { hitTargets, timingAdjust, effect } = mConfig;
     const isHit = mConfig.isHit ?? hitTargets?.includes(target.document.id);
 
     // Determine pull location (best adjacent square to the token along the line to the target)
     const location = adapter.getBestAdjacentLocation(token, target);
+    const targetCenter = adapter.getCenter(target);
+    if (!location || !targetCenter) return new Sequence();
 
     // Determine travel distance
-    const targetCenter = adapter.getCenter(target);
     const gridSize = adapter.getGridSize();
     const offsetX = (location.x - targetCenter.x) / gridSize;
     const offsetY = (location.y - targetCenter.y) / gridSize;
@@ -83,15 +84,15 @@ async function create(token, target, config = {}) {
  * @param {Token} target - The target token.
  * @param {object} config - Configuration options for the animation.
  */
-async function play(token, target, config = {}) {
+async function play(token: any, target: any, config: any = {}) {
     const sequence = await create(token, target, config);
-    sequence.play();
+    if (sequence) sequence.play();
 }
 
 /**
  * Stops the Hook and Pull animation (transient effect).
  */
-function stop(token, config = {}) {
+function stop(token: any, config: any = {}) {
     // No persistent effects to stop
 }
 

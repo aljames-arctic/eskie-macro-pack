@@ -12,14 +12,14 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token, targetOrConfig, config = {}) {
+async function create(token: any, targetOrConfig?: any, config: any = {}) {
     const isTarget = Boolean(targetOrConfig?.document || targetOrConfig?.center || targetOrConfig?.x);
     const target = isTarget ? targetOrConfig : null;
     const rawConfig = settingsOverride(isTarget ? config : (targetOrConfig ?? config));
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, rawConfig);
     const { sound, template } = mConfig;
 
-    let position = null;
+    let position: any = null;
     if (template) {
         const [primary, secondary, center] = await templatelib.getPosition(template);
         position = center ?? primary;
@@ -108,7 +108,7 @@ async function create(token, targetOrConfig, config = {}) {
     return sequence;
 }
 
-async function play(token, targetOrConfig, config = {}) {
+async function play(token: any, targetOrConfig?: any, config: any = {}) {
     const sequence = await create(token, targetOrConfig, config);
     if (sequence) return sequence.play();
 }

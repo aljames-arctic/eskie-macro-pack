@@ -49,7 +49,7 @@ async function _getDestination(destinations) {
             </select>
         </div>`;
 
-    const dialogCls = adapter.foundry.DialogV2 ?? foundry.applications?.api?.DialogV2;
+    const dialogCls: any = adapter.foundry.DialogV2 ?? (foundry as any).applications?.api?.DialogV2;
     if (dialogCls?.prompt) {
         return dialogCls.prompt({
             window: { title: 'Select a Destination' },
@@ -57,7 +57,7 @@ async function _getDestination(destinations) {
             ok: {
                 label: 'OK',
                 icon: 'fa-solid fa-check',
-                callback: (event, button, dialog) => {
+                callback: (event: any, button: any, dialog: any) => {
                     return button.form?.elements?.['destination-select']?.value
                         ?? button.form?.querySelector?.('#destination-select')?.value
                         ?? destinations[0]?.value;
@@ -68,14 +68,14 @@ async function _getDestination(destinations) {
     }
 
     return new Promise((resolve) => {
-        new Dialog({
+        new (Dialog as any)({
             title: 'Select a Destination',
             content: content,
             buttons: {
                 ok: {
                     icon: '<i class="fas fa-check"></i>',
                     label: 'OK',
-                    callback: (html) => {
+                    callback: (html: any) => {
                         const selected = html.find('#destination-select').val();
                         resolve(selected);
                     },
@@ -115,7 +115,7 @@ function _getPlaneConfig(destination) {
 }
 
 
-async function create(token, config = {}) {
+async function create(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const tokenId = token.id;
     mConfig.id = `${tokenId} - ${mConfig.id}`;
@@ -236,7 +236,7 @@ async function create(token, config = {}) {
     return seq;
 }
 
-async function play(token, config = {}, options = {}) {
+async function play(token: any, config: any = {}, options: any = {}) {
     /*       Don't parse for active effects        *
      * We only care about removing when it expires */
     if (options?.type == "aefx") return;
@@ -244,7 +244,7 @@ async function play(token, config = {}, options = {}) {
     if (seq) { await seq.play(); }
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     if (!token) return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const id = `${token.id} - ${mConfig.id}`;

@@ -40,7 +40,7 @@ async function validate(red, blue) {
     }
 }
 
-async function play(token1, token2, config = {}) {
+async function play(token1: any, token2: any, config: any = {}) {
     const red = token1;
     const blue = token2;
     // move them into appropriate positions
@@ -53,7 +53,7 @@ async function play(token1, token2, config = {}) {
     if (seq) return seq.play({preload:true});
 }
 
-function create(red, blue, config = {}) {
+function create(red: any, blue: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     let seq = new Sequence();
@@ -96,7 +96,7 @@ function midpoint(a, b) {
     return {x: (a.x + b.x)/2, y: (a.y + b.y)/2 };
 }
 
-function movement1create(red, blue, config = {}) {
+function movement1create(red: any, blue: any, config: any = {}) {
     const {b1, b2, b3, b4, r1, r2, r3, r4} = config.positions;
 
     let seq = new Sequence();
@@ -299,7 +299,7 @@ function movement1create(red, blue, config = {}) {
     return seq;
 }
 
-function movement2create(red, blue, config = {}) {
+function movement2create(red: any, blue: any, config: any = {}) {
     const {b1, b2, b3, b4, r1, r2, r3, r4} = config.positions;
 
     let seq = new Sequence()
@@ -566,7 +566,7 @@ function movement2create(red, blue, config = {}) {
     return seq;
 }
 
-function movement3create(red, blue, config = {}) {
+function movement3create(red: any, blue: any, config: any = {}) {
     const {b1, b2, b3, b4, r1, r2, r3, r4} = config.positions;
 
     let seq = new Sequence()    

@@ -12,7 +12,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(token, config = {}, options = {}) {
+async function create(token: any, config: any = {}, options: any = {}) {
     if (options?.type == 'aefx') return;
     const { id, template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -88,12 +88,12 @@ async function create(token, config = {}, options = {}) {
     return seq;
 }
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const seq = await create(token, config);
     if (seq) return seq.play();
 }
 
-function destroy(token, config = {}) {
+function destroy(token: any, config: any = {}) {
     const tokenRotation = adapter.getTokenRotation(token);
     let seq = new Sequence()
         .animation()
@@ -102,7 +102,7 @@ function destroy(token, config = {}) {
     return seq;
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     const seq = destroy(token, config);
     if (seq) return seq.play();
 }

@@ -1,7 +1,7 @@
 import { MODULE_ID } from "../lib/constants.js";
 import { adapter } from "../adapters/index.js";
 
-export function settingsOverride(config = {}) {
+export function settingsOverride(config: Record<string, any> = {}): Record<string, any> {
     if (!game.settings.get(MODULE_ID, 'enableSounds')) {
         config = adapter.mergeObject(config, { sound: { enable: false } });
         if (config.sound && typeof config.sound === 'object') {

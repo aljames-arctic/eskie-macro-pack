@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {    sound: { ...DEFAULT_SOUND_CONFIG },
  * @param {object} config - Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function create(token, config = {}) {
+async function create(token: any, config: any = {}) {
     config = adapter.mergeObject(DEFAULT_CONFIG, config);
     const sequence = new Sequence();
     applySound(sequence, config.sound);
@@ -81,7 +81,7 @@ async function create(token, config = {}) {
  * @param {Token} token - The token from which the moan originates.
  * @param {object} options - Options for playing the animation, including config.
  */
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const sequence = await create(token, config);
     if (sequence) return sequence.play();
 }

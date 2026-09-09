@@ -35,7 +35,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config - Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-function create(token, targetTokens, config = {}) {
+function create(token: any, targetTokens: any[], config: any = {}) {
     config = settingsOverride(config);
     config = adapter.mergeObject(DEFAULT_CONFIG, config);
     if (!targetTokens || targetTokens.length === 0) {
@@ -54,22 +54,22 @@ function create(token, targetTokens, config = {}) {
     //   [ { parent: target0, children: [target1, target2] } ], // Level 1
     //   ... 
     // ]
-    const propagationLevels = [];
+    const propagationLevels: any[] = [];
 
     // Level 0: from caster to target 0
     propagationLevels.push([
         { parent: token, children: [targetTokens[0]] }
     ]);
 
-    let currentLevelNodes = [0];
+    let currentLevelNodes: number[] = [0];
     const visited = new Set([0]);
 
     while (true) {
-        const nextLevelGroups = [];
-        const nextLevelNodes = [];
+        const nextLevelGroups: any[] = [];
+        const nextLevelNodes: number[] = [];
 
         for (const u of currentLevelNodes) {
-            const children = [];
+            const children: any[] = [];
             for (let v = 0; v < N; v++) {
                 if (A[u][v] === 0 && !visited.has(v)) {
                     visited.add(v);
@@ -199,9 +199,9 @@ function create(token, targetTokens, config = {}) {
  * @param {Array<Token>} targetTokens - An array of target tokens.
  * @param {object} config - Configuration options for the animation.
  */
-function play(token, targetTokens, config = {}) {
+function play(token: any, targetTokens: any[], config: any = {}) {
     const sequence = create(token, targetTokens, config);
-    sequence.play();
+    if (sequence) sequence.play();
 }
 
 export const chainLightningPrims = {

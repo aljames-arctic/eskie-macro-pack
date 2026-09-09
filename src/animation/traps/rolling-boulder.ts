@@ -62,9 +62,9 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: Rollin
 
     // Dynamically calculate duration from distance between source and destination tile and speed
     const distancePx = Math.hypot(endLoc.x - startLoc.x, endLoc.y - startLoc.y);
-    const speed = boulder.speed > 0 ? boulder.speed : DEFAULT_CONFIG.boulder.speed;
+    const speed = boulder.speed > 0 ? boulder.speed : (DEFAULT_CONFIG.boulder?.speed ?? 200);
     const duration = Math.max(100, Math.round((distancePx / speed) * 1000));
-    const playbackRate = boulder.playbackRate > 0 ? boulder.playbackRate : DEFAULT_CONFIG.boulder.playbackRate;
+    const playbackRate = boulder.playbackRate > 0 ? boulder.playbackRate : (DEFAULT_CONFIG.boulder?.playbackRate ?? 1.0);
 
     let seq = new Sequence();
     applySound(seq, sound);

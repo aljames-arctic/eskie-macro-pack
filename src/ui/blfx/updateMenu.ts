@@ -15,13 +15,13 @@ const BLFX_SETTING_KEYS = ['blfxCustomAutoRecognition', 'customAutoRecognition']
  * Safely retrieves existing Custom Auto-Recognition data from any registered BLFX module settings.
  * @returns {object} Existing BLFX customAutoRecognition object
  */
-export function readExistingBlfxData() {
+export function readExistingBlfxData(): any {
     for (const mod of BLFX_MODULES) {
         for (const key of BLFX_SETTING_KEYS) {
             const settingKey = `${mod}.${key}`;
             try {
-                if (game.settings?.settings?.has?.(settingKey)) {
-                    let val = game.settings.get(mod, key);
+                if ((game.settings as any)?.settings?.has?.(settingKey)) {
+                    let val = (game.settings as any).get(mod, key);
                     if (typeof val === 'string') {
                         try { val = JSON.parse(val); } catch {}
                     }
@@ -42,7 +42,7 @@ export function readExistingBlfxData() {
  * @param {string} note The note text
  * @returns {string} The version string or "0.0.0"
  */
-function extractVersionFromNote(note) {
+function extractVersionFromNote(note: any): string {
     const match = (note ?? '').match(/Eskie Macro Pack \(([^)]+)\)/);
     return match ? match[1] : "0.0.0";
 }
@@ -52,7 +52,7 @@ function extractVersionFromNote(note) {
  * @param {Array<object>} entries Formatted entries list
  * @returns {Array<{triggerName: string, triggerMode: string, entries: Array<object>}>}
  */
-export function groupBlfxEntriesByTrigger(entries = []) {
+export function groupBlfxEntriesByTrigger(entries: any[] = []) {
     const preferredSectionOrder = [
         "After Activity Use (Default)",
         "After Attack Roll",
@@ -68,7 +68,7 @@ export function groupBlfxEntriesByTrigger(entries = []) {
         "On Token"
     ];
 
-    const sections = {};
+    const sections: Record<string, any> = {};
 
     for (const item of entries) {
         const triggerMode = item.triggerMode ?? item.entry?.animationData?.eventType ?? '';
@@ -126,11 +126,11 @@ export function groupBlfxEntriesByTrigger(entries = []) {
         sections[mainSection].subsectionsMap[subSection].push(item);
     }
 
-    const result = [];
+    const result: any[] = [];
     for (const [secName, secData] of Object.entries(sections)) {
-        const sortedSubsections = [];
-        for (const [subName, subEntries] of Object.entries(secData.subsectionsMap)) {
-            subEntries.sort((a, b) => (a.itemName ?? a.label ?? "").localeCompare(b.itemName ?? b.label ?? ""));
+        const sortedSubsections: any[] = [];
+        for (const [subName, subEntries] of Object.entries(secData.subsectionsMap as Record<string, any[]>)) {
+            subEntries.sort((a: any, b: any) => (a.itemName ?? a.label ?? "").localeCompare(b.itemName ?? b.label ?? ""));
             sortedSubsections.push({
                 subTriggerName: subName,
                 hasSubTriggerName: Boolean(subName),
@@ -138,7 +138,7 @@ export function groupBlfxEntriesByTrigger(entries = []) {
             });
         }
 
-        sortedSubsections.sort((a, b) => {
+        sortedSubsections.sort((a: any, b: any) => {
             const idxA = preferredSubOrder.indexOf(a.subTriggerName);
             const idxB = preferredSubOrder.indexOf(b.subTriggerName);
             if (idxA !== -1 && idxB !== -1) return idxA - idxB;
@@ -147,18 +147,18 @@ export function groupBlfxEntriesByTrigger(entries = []) {
             return (a.subTriggerName ?? "").localeCompare(b.subTriggerName ?? "");
         });
 
-        const flatEntries = sortedSubsections.flatMap(s => s.entries);
+        const flatEntries = sortedSubsections.flatMap((s: any) => s.entries);
 
         result.push({
             triggerName: secName,
             triggerMode: secData.triggerMode,
-            hasSubsections: sortedSubsections.some(s => Boolean(s.subTriggerName)),
+            hasSubsections: sortedSubsections.some((s: any) => Boolean(s.subTriggerName)),
             subsections: sortedSubsections,
             entries: flatEntries
         });
     }
 
-    return result.sort((a, b) => {
+    return result.sort((a: any, b: any) => {
         const idxA = preferredSectionOrder.indexOf(a.triggerName);
         const idxB = preferredSectionOrder.indexOf(b.triggerName);
         if (idxA !== -1 && idxB !== -1) return idxA - idxB;
@@ -174,12 +174,12 @@ export function groupBlfxEntriesByTrigger(entries = []) {
  * @param {Set<string>} [excludedKeys=new Set()] Set of entry keys to exclude from addition
  * @returns {Promise<object>} Comparison results and formatted resource payload
  */
-export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry, excludedKeys = new Set()) {
+export async function generateBlfxAutorecUpdate(empRegistry: any = EMP_BLFX_Registry, excludedKeys: any = new Set()) {
     log.group("Boss Loot FX Autorec Check", 'debug');
 
-    const existingData = readExistingBlfxData();
+    const existingData: any = readExistingBlfxData();
 
-    let existingTree = {};
+    let existingTree: Record<string, any> = {};
     if (existingData?.customAutoRecognition && typeof existingData.customAutoRecognition === 'object' && !Array.isArray(existingData.customAutoRecognition)) {
         existingTree = foundryPlatform.duplicate(existingData.customAutoRecognition);
     } else if (existingData?.flags?.['boss-loot-assets-premium']?.customAutoRecognition && typeof existingData.flags['boss-loot-assets-premium'].customAutoRecognition === 'object') {
@@ -191,19 +191,19 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
         existingTree = {};
     }
 
-    const missingEntries = [];
-    const updatedEntries = [];
-    const customEntries = [];
-    const sameEntries = [];
+    const missingEntries: any[] = [];
+    const updatedEntries: any[] = [];
+    const customEntries: any[] = [];
+    const sameEntries: any[] = [];
 
     // 1st Pass: Compare incoming EMP entries against existing BLFX settings
-    for (const [systemId, items] of Object.entries(empRegistry ?? {})) {
+    for (const [systemId, items] of Object.entries((empRegistry as Record<string, any>) ?? {})) {
         if (!items || typeof items !== 'object') continue;
-        for (const [itemSlug, activities] of Object.entries(items)) {
+        for (const [itemSlug, activities] of Object.entries(items as Record<string, any>)) {
             if (!activities || typeof activities !== 'object') continue;
-            for (const [activitySlug, triggers] of Object.entries(activities)) {
+            for (const [activitySlug, triggers] of Object.entries(activities as Record<string, any>)) {
                 if (!triggers || typeof triggers !== 'object') continue;
-                for (const [triggerMode, newEntry] of Object.entries(triggers)) {
+                for (const [triggerMode, newEntry] of Object.entries(triggers as Record<string, any>)) {
                     if (!newEntry || typeof newEntry !== 'object') continue;
 
                     const entryKey = `${systemId}___${itemSlug}___${activitySlug}___${triggerMode}`;
@@ -259,7 +259,7 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
     log.groupEnd();
 
     // 2nd Pass: Build the merged tree, filtering out excluded missing entries
-    const mergedTree = foundryPlatform.duplicate(existingTree);
+    const mergedTree: Record<string, any> = foundryPlatform.duplicate(existingTree);
 
     // Add selected missing entries
     for (const item of missingEntries) {
@@ -306,8 +306,10 @@ export async function generateBlfxAutorecUpdate(empRegistry = EMP_BLFX_Registry,
 /**
  * Interactive ApplicationV2 for reviewing and synchronizing Boss Loot FX custom auto-recognition presets.
  */
-export class BlfxAutorecUpdateApp extends foundryPlatform.HandlebarsApplicationMixin(foundryPlatform.ApplicationV2) {
-    constructor(registry = EMP_BLFX_Registry, options = {}) {
+export class BlfxAutorecUpdateApp extends (foundryPlatform.HandlebarsApplicationMixin(foundryPlatform.ApplicationV2) as any) {
+    registry: any;
+
+    constructor(registry: any = EMP_BLFX_Registry, options: any = {}) {
         super(options);
         this.registry = registry;
     }
@@ -337,11 +339,11 @@ export class BlfxAutorecUpdateApp extends foundryPlatform.HandlebarsApplicationM
         };
     }
 
-    async settings(excludedKeys = new Set()) {
+    async settings(excludedKeys: any = new Set()) {
         return await generateBlfxAutorecUpdate(this.registry, excludedKeys);
     }
 
-    async _prepareContext(options) {
+    async _prepareContext(options: any): Promise<any> {
         const {
             missingEntries,
             updatedEntries,
@@ -365,10 +367,10 @@ export class BlfxAutorecUpdateApp extends foundryPlatform.HandlebarsApplicationM
         };
     }
 
-    _onRender(context, options) {
-        super._onRender?.(context, options);
+    _onRender(context: any, options: any): void | Promise<void> {
+        (super._onRender as any)?.(context, options);
         const cancelBtn = this.element?.querySelector('button[name="cancel"]');
-        cancelBtn?.addEventListener('click', async (event) => {
+        cancelBtn?.addEventListener('click', async (event: any) => {
             event.preventDefault();
             const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
             if (rawVersion !== "#{VERSION}#" && game.settings) {
@@ -378,7 +380,7 @@ export class BlfxAutorecUpdateApp extends foundryPlatform.HandlebarsApplicationM
         });
     }
 
-    static async _formHandler(event, form, formData) {
+    static async _formHandler(this: any, event: any, form: any, formData: any) {
         const isCancel = event.submitter && event.submitter.name === "cancel";
         if (isCancel) {
             const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
@@ -429,8 +431,8 @@ export class BlfxAutorecUpdateApp extends foundryPlatform.HandlebarsApplicationM
             for (const key of BLFX_SETTING_KEYS) {
                 const settingKey = `${mod}.${key}`;
                 try {
-                    if (game.settings?.settings?.has?.(settingKey)) {
-                        await game.settings.set(mod, key, newPayload);
+                    if ((game.settings as any)?.settings?.has?.(settingKey)) {
+                        await (game.settings as any).set(mod, key, newPayload);
                         log.info(`Directly saved custom auto-recognition payload to ${settingKey}`);
                     }
                 } catch (err) {
@@ -446,7 +448,7 @@ export class BlfxAutorecUpdateApp extends foundryPlatform.HandlebarsApplicationM
             : `${rawVersion}.${Date.now()}`;
 
         // 3. Dispatch the official BLFX registration Hook
-        Hooks.callAll('blfx.register.CustomAutoRec', newPayload, MODULE_ID, effectiveVersion);
+        Hooks.callAll('blfx.register.CustomAutoRec' as any, newPayload, MODULE_ID, effectiveVersion);
 
         // 4. Update EMP's internal tracking version
         if (game.settings?.settings?.has?.(`${MODULE_ID}.blfxAutorecVersion`)) {

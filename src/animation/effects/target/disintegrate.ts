@@ -286,7 +286,7 @@ function reformCreate(target, config = {}) {
     // Set target to be invisible at the start
     reformSequence.animation().on(target).opacity(0);
 
-    const allSteps = [];
+    const allSteps: any[] = [];
     dissolveSections.forEach(section => {
         section.steps.forEach(step => {
             allSteps.push({ ...step, offset: section.offset });

@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(target, config = {}) {
+async function create(target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     let sequence = new Sequence();
     applySound(sequence, mConfig.sound);
@@ -31,7 +31,7 @@ async function create(target, config = {}) {
 
     sequence = sequence.effect()
         .copySprite(target)
-        .spriteRotation(-target.document.rotation)
+        .spriteRotation(-adapter.getTokenRotation(target))
         .scaleToObject(1, { considerTokenScale: true })
         .duration(500)
         .scaleOut(0, 500, { ease: "easeInOutElastic" })
@@ -42,13 +42,13 @@ async function create(target, config = {}) {
 
     sequence = sequence.animation()
         .on(target)
-        .teleportTo(config.position, { offset: { x: -1, y: -1 } })
+        .teleportTo(mConfig.position, { offset: { x: -1, y: -1 } })
         .snapToGrid();
 
     // Vortex in
     sequence = sequence.effect()
         .file(closest("jb2a.portals.horizontal.vortex.purple"))
-        .atLocation(config.position)
+        .atLocation(mConfig.position)
         .scaleToObject(2.5)
         .rotateIn(-360, 500, { ease: "easeOutCubic" })
         .rotateOut(360, 500, { ease: "easeOutCubic" })
@@ -60,7 +60,7 @@ async function create(target, config = {}) {
     
     sequence = sequence.effect()
         .copySprite(target)
-        .spriteRotation(-target.document.rotation)
+        .spriteRotation(-adapter.getTokenRotation(target))
         .scaleToObject(1, { considerTokenScale: true })
         .scaleIn(0, 500, { ease: "easeInOutElastic" })
         .rotateIn(180, 300, { ease: "easeOutCubic" })
@@ -74,7 +74,7 @@ async function create(target, config = {}) {
     return sequence;
 }
 
-async function play(target, config = {}) {
+async function play(target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { position } = mConfig;
     const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);

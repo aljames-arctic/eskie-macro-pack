@@ -17,7 +17,7 @@ const DEFAULT_CONFIG = {
     }
 };
 
-async function createStarwardSword(token, config = {}, options = {}) {
+async function createStarwardSword(token: any, config: any = {}, options: any = {}) {
     if (options?.type == "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { size, darkMap, cameraZoom, sound } = mConfig;
@@ -45,11 +45,11 @@ async function createStarwardSword(token, config = {}, options = {}) {
     let radius = (size / 2) * gridSize;
 
     // Declare an array to hold the points
-    let initialPoints = [];
-    let points = [];
+    let initialPoints: Array<{ x: number, y: number }> = [];
+    let points: Array<{ x: number, y: number, angle: number }> = [];
 
     // Declare an array to keep track of used angles
-    let usedAngles = [];
+    let usedAngles: number[] = [];
 
     // Define an array of angles in radians
     let angles = [Math.PI / 6, Math.PI * (7 / 6), Math.PI * (11 / 6), Math.PI * (3 / 4), Math.PI * (6 / 4)];
@@ -557,13 +557,13 @@ async function createStarwardSword(token, config = {}, options = {}) {
 }
 
 
-async function playStarwardSword(token, config = {}, options = {}) {
+async function playStarwardSword(token: any, config: any = {}, options: any = {}) {
     if (options?.type == "aefx") return;
     let seq = await createStarwardSword(token, config, options);
     if (seq) { return seq.play(); }
 }
 
-function stopStarwardSword(token, { id = DEFAULT_CONFIG.id } = {}) {
+function stopStarwardSword(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
     Sequencer.EffectManager.endEffects({ name: "Starward Sword" });
     if (token) {
         Sequencer.EffectManager.endEffects({ name: `Starward Sword ${token.name} ${id}` });

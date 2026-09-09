@@ -35,19 +35,19 @@ export function isBlfxAutorecAvailable() {
  * Setting: boss-loot-assets-premium.blfxCustomAutoRecUpdates
  * @returns {boolean}
  */
-export function isBlfxCustomAutoRecUpdatesEnabled() {
+export function isBlfxCustomAutoRecUpdatesEnabled(): boolean {
     for (const modId of ['boss-loot-assets-premium', 'blfx-animation-editor-premium', 'blfx']) {
         const fullKey = `${modId}.blfxCustomAutoRecUpdates`;
-        if (game?.settings?.settings?.has?.(fullKey)) {
+        if ((game?.settings?.settings as any)?.has?.(fullKey)) {
             try {
-                return Boolean(game.settings.get(modId, 'blfxCustomAutoRecUpdates'));
+                return Boolean((game?.settings as any)?.get(modId, 'blfxCustomAutoRecUpdates'));
             } catch {
                 // Continue checking fallback namespaces
             }
         }
     }
     try {
-        const directVal = game?.settings?.get?.('boss-loot-assets-premium', 'blfxCustomAutoRecUpdates');
+        const directVal = (game?.settings as any)?.get?.('boss-loot-assets-premium', 'blfxCustomAutoRecUpdates');
         if (typeof directVal === 'boolean') return directVal;
     } catch {}
     return false;
@@ -56,7 +56,7 @@ export function isBlfxCustomAutoRecUpdatesEnabled() {
 /**
  * Modern ApplicationV2 dialog instructing the user to enable custom auto-recognition updates in BLFX settings.
  */
-export class BlfxEnableUpdatesDialog extends foundryPlatform.HandlebarsApplicationMixin(foundryPlatform.ApplicationV2) {
+export class BlfxEnableUpdatesDialog extends (foundryPlatform.HandlebarsApplicationMixin(foundryPlatform.ApplicationV2) as any) {
     static DEFAULT_OPTIONS = {
         id: "empBlfxEnableUpdatesDialog",
         classes: ["eskie-world-scripts-form", "eskie-dialog-v2", "eskie-blfx-prompt"],
@@ -79,10 +79,10 @@ export class BlfxEnableUpdatesDialog extends foundryPlatform.HandlebarsApplicati
         };
     }
 
-    _onRender(context, options) {
+    _onRender(context: any, options: any): void {
         super._onRender?.(context, options);
 
-        this.element?.querySelector('button[name="openSettings"]')?.addEventListener("click", (event) => {
+        this.element?.querySelector('button[name="openSettings"]')?.addEventListener("click", (event: any) => {
             event.preventDefault();
             if (game.settings?.sheet) {
                 game.settings.sheet.render(true);
@@ -90,7 +90,7 @@ export class BlfxEnableUpdatesDialog extends foundryPlatform.HandlebarsApplicati
             this.close();
         });
 
-        this.element?.querySelector('button[name="dismiss"]')?.addEventListener("click", (event) => {
+        this.element?.querySelector('button[name="dismiss"]')?.addEventListener("click", (event: any) => {
             event.preventDefault();
             this.close();
         });
@@ -159,7 +159,7 @@ export const BLFX_TRIGGER_NAMES = {
  * @param {string} [customTrigger] Optional explicit BLFX trigger override
  * @returns {string} Standardized BLFX trigger name
  */
-export function standardizeBlfxTrigger(trigger, customTrigger) {
+export function standardizeBlfxTrigger(trigger: string, customTrigger?: string): string {
     if (customTrigger) return customTrigger;
     const cleanTrigger = (trigger ?? '').toLowerCase();
     return BLFX_TRIGGER_MAP[cleanTrigger] ?? "afterItemUse";
@@ -192,7 +192,7 @@ export const VALID_BLFX_MACRO_TYPES = Object.freeze([
  * @param {object} [options={}] Additional configuration overrides
  * @returns {string} One of the VALID_BLFX_MACRO_TYPES
  */
-export function resolveBlfxMacroType(triggerMode, trigger, key = "", options = {}) {
+export function resolveBlfxMacroType(triggerMode: string, trigger: string, key: string = "", options: any = {}): string {
     if (options.macroType && VALID_BLFX_MACRO_TYPES.includes(options.macroType)) {
         return options.macroType;
     }
@@ -428,7 +428,9 @@ export function mergeBlfxCustomAutoRec(existingData, empRegistry = EMP_BLFX_Regi
  * internal registry storage, and hook submission.
  */
 export class BlfxModuleAdapter extends BaseModuleAdapter {
-    constructor(registry = null) {
+    registry: any;
+
+    constructor(registry: any = null) {
         super("blfx");
         this.registry = registry ?? EMP_BLFX_Registry;
     }
@@ -439,28 +441,28 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
      * @param {string} [customTrigger] Optional explicit override
      * @returns {string}
      */
-    standardizeTrigger(trigger, customTrigger) {
+    standardizeTrigger(trigger: any, customTrigger?: any): string {
         return standardizeBlfxTrigger(trigger, customTrigger);
     }
 
     /**
      * Builds macro command string for BLFX.
      */
-    buildMacroCommand(animation, trigger, config) {
+    buildMacroCommand(animation: any, trigger: any, config: any): string {
         return buildBlfxMacroCommand(animation, trigger, config);
     }
 
     /**
      * Builds resources payload matching BLFX format.
      */
-    buildPayload() {
+    buildPayload(): any {
         return buildBlfxPayload(this.registry);
     }
 
     /**
      * Merges internal registry into existing BLFX settings data.
      */
-    mergeCustomAutoRec(existingData) {
+    mergeCustomAutoRec(existingData: any): any {
         return mergeBlfxCustomAutoRec(existingData, this.registry);
     }
 
@@ -472,7 +474,7 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
      * @param {object} [options={}] Additional configuration overrides
      * @returns {string} One of the VALID_BLFX_MACRO_TYPES
      */
-    resolveMacroType(triggerMode, trigger, key = "", options = {}) {
+    resolveMacroType(triggerMode: any, trigger: any, key: any = "", options: any = {}): string {
         return resolveBlfxMacroType(triggerMode, trigger, key, options);
     }
 
@@ -486,7 +488,7 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
      * @param {string} [fallback=key] Fallback label
      * @param {object} [options={}] Additional BLFX-specific overrides
      */
-    register(key, trigger, animation, config, version = "0.0.0", fallback = key, options = {}) {
+    register(key: any, trigger: any, animation: any, config: any, version: string = "0.0.0", fallback: any = key, options: any = {}): void {
         const systemId = options.systemId ?? game?.system?.id ?? 'dnd5e';
         const localizedLabel = (typeof key === 'string' && (key.includes(":") || key.includes(" "))) ? key : localize(`EMP.effects.${key}`, fallback);
         const itemName = options.itemName ?? localizedLabel ?? String(key ?? 'default');
@@ -552,7 +554,7 @@ export class BlfxModuleAdapter extends BaseModuleAdapter {
      * @param {boolean} [force=false] Force update regardless of version check
      * @returns {Promise<void>}
      */
-    async submit(force = false) {
+    async submit(force: boolean = false): Promise<void> {
         if (!game?.user?.isGM) return;
 
         const rawVersion = game?.modules?.get(MODULE_ID)?.version ?? "1.0.0";

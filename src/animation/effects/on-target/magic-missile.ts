@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
     }
 };
 
-async function create(token, target, config = {}) {
+async function create(token: any, target: any, config: any = {}) {
     const { id, missileCount, info, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     let mCount = missileCount;
     const spellLevel = adapter.getSpellLevel({aaHandler: info});
@@ -39,7 +39,7 @@ async function create(token, target, config = {}) {
     const stepAngle = orbitSpread / steps;
 
     // Precompute per-missile data
-    const missiles = [];
+    const missiles: any[] = [];
     const colors = ["blue", "purple", "grey"];
 
     for (let m = 0; m < mCount; m++) {
@@ -106,7 +106,7 @@ async function create(token, target, config = {}) {
     return seq;
 }
 
-async function play(token, target, config = {}) {
+async function play(token: any, target: any, config: any = {}) {
     const seq = await create(token, target, config);
     if (seq) { return seq.play(); }
 }

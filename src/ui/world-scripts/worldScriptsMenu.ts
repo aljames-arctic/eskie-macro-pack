@@ -12,7 +12,7 @@ export const WORLD_SCRIPTS_REGISTRY = [
     }
 ];
 
-export class WorldScriptsApp extends adapter.foundry.HandlebarsApplicationMixin(adapter.foundry.ApplicationV2) {
+export class WorldScriptsApp extends (adapter.foundry.HandlebarsApplicationMixin(adapter.foundry.ApplicationV2) as any) {
     static DEFAULT_OPTIONS = {
         id: "eskie-world-scripts-menu",
         classes: ["eskie-world-scripts-form"],
@@ -38,12 +38,12 @@ export class WorldScriptsApp extends adapter.foundry.HandlebarsApplicationMixin(
         };
     }
 
-    async _prepareContext(options) {
+    async _prepareContext(options: any): Promise<any> {
         const currentConfig = game.settings?.get(MODULE_ID, "worldScriptsConfig") ?? {};
         const activeSystem = game.system?.title ?? "";
 
         const scripts = WORLD_SCRIPTS_REGISTRY.map(script => {
-            const data = {
+            const data: Record<string, any> = {
                 ...script,
                 name: game.i18n?.localize?.(script.name) ?? script.name,
                 description: game.i18n?.localize?.(script.description) ?? script.description,
@@ -62,24 +62,24 @@ export class WorldScriptsApp extends adapter.foundry.HandlebarsApplicationMixin(
         };
     }
 
-    _onRender(context, options) {
-        super._onRender?.(context, options);
+    _onRender(context: any, options: any) {
+        (super._onRender as any)?.(context, options);
 
         // Instantly toggle the .active class on the card when the checkbox changes for real-time visual feedback
-        this.element?.querySelectorAll?.(".eskie-switch input").forEach(input => {
-            input.addEventListener("change", (event) => {
-                const checkbox = event.currentTarget;
-                const card = checkbox.closest(".eskie-script-card");
-                if (card) {
+        this.element?.querySelectorAll?.(".eskie-switch input").forEach((input: any) => {
+            input.addEventListener("change", (event: any) => {
+                const checkbox = event.currentTarget as HTMLInputElement | null;
+                const card = checkbox?.closest(".eskie-script-card");
+                if (card && checkbox) {
                     card.classList.toggle("active", checkbox.checked);
                 }
             });
         });
     }
 
-    static async _formHandler(event, form, formData) {
+    static async _formHandler(this: any, event: any, form: any, formData: any) {
         const rawData = formData.object ?? formData;
-        const config = {};
+        const config: Record<string, any> = {};
         for (const script of WORLD_SCRIPTS_REGISTRY) {
             const input = form?.querySelector ? form.querySelector(`input[name="${script.id}"]`) : null;
             config[script.id] = input ? input.checked : Boolean(rawData?.[script.id]);

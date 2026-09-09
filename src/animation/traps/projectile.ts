@@ -182,7 +182,7 @@ async function stop(trapObject: Tile, config: ProjectileTrapConfig = {}): Promis
 }
 
 async function setup(config: Record<string, unknown> = {}): Promise<any> {
-    let projectileType = config.projectileType as string | undefined;
+    let projectileType: any = config.projectileType;
     if (!projectileType) {
         projectileType = await adapter.buttonDialog({
             title: game.i18n.localize('EMP.traps.projectile.chooseTypeTitle'),

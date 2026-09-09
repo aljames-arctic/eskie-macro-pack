@@ -12,15 +12,15 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(token, targetOrTargets, config = {}) {
+async function create(token: any, targetOrTargets?: any, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { color, sound } = mConfig;
 
     if (!token) return;
 
-    let target1 = null;
-    let target2 = null;
+    let target1: any = null;
+    let target2: any = null;
 
     if (Array.isArray(targetOrTargets)) {
         target1 = targetOrTargets[0];
@@ -93,7 +93,7 @@ async function create(token, targetOrTargets, config = {}) {
     return sequence;
 }
 
-async function play(token, targetOrTargets, config = {}) {
+async function play(token: any, targetOrTargets?: any, config: any = {}) {
     const sequence = await create(token, targetOrTargets, config);
     if (sequence) return sequence.play();
 }

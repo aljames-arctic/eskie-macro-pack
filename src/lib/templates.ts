@@ -10,7 +10,7 @@ import { log } from './logger.js';
  * @param {Document|object|null} [template=null] Original template or region document
  * @returns {Array} Resolved coordinates array or error array
  */
-function resolveDistinctPositions(positions, config = {}, template = null) {
+function resolveDistinctPositions(positions: any[], config: any = {}, template: any = null) {
     return adapter.resolveDistinctPositions(positions, config, template);
 }
 
@@ -22,7 +22,7 @@ function resolveDistinctPositions(positions, config = {}, template = null) {
  * @param {object} [config={}] Configuration options
  * @returns {Promise<Array>} Coordinates array [primary, secondary, center]
  */
-async function getPosition(template, config = {}) {
+async function getPosition(template: any, config: any = {}) {
     let positions;
     const isTemplateObject = Boolean(template && typeof template === 'object' && (template.x !== undefined || template.document !== undefined || template.shapes !== undefined || template.direction !== undefined));
 

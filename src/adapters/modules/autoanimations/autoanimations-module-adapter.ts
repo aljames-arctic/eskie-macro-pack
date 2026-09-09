@@ -74,7 +74,7 @@ function JSONformatObject(obj, depth = 1) {
     const keys = Object.keys(obj);
     if (keys.length === 0) return '{}';
 
-    const ret = [];
+    const ret: string[] = [];
     for (const prop of keys) {
         ret.push(`\n` + ' '.repeat(depth * 2) + `${prop}: ${JSONformatObject(obj[prop], depth + 1)}`);
     }
@@ -88,7 +88,7 @@ function JSONformatObject(obj, depth = 1) {
  * @param {string} [fallback=key] Human-readable fallback label
  * @returns {string} Formatted concentrating name
  */
-export function CONCENTRATING(key, fallback = key) {
+export function CONCENTRATING(key: any, fallback = key): string {
     const localizedName = (typeof key === 'string' && (key.includes(":") || key.includes(" "))) ? key : localize(`EMP.effects.${key}`, fallback);
     return format("EMP.effects.concentratingPrefix", { name: localizedName }, `Concentrating: ${localizedName}`);
 }
@@ -99,7 +99,9 @@ export function CONCENTRATING(key, fallback = key) {
  * and dialog synchronization.
  */
 export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
-    constructor(menu = null) {
+    menu: any;
+
+    constructor(menu: any = null) {
         super("autoanimations");
         this.menu = menu ?? EMP_AA_Menu;
     }
@@ -109,7 +111,7 @@ export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
      * @param {string} trigger Input trigger name
      * @returns {string} Standardized trigger key
      */
-    standardizeTrigger(trigger) {
+    standardizeTrigger(trigger: any): any {
         return standardizeTrigger(trigger);
     }
 
@@ -147,7 +149,7 @@ export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
             case "templatefx":
                 name = `${compendium}.AA | Template`;
                 break;
-            case "preset":
+            case "preset" as any:
                 break;
             default:
                 throw new Error(`EMP + AA | Unknown trigger type "${stdTrigger}" for effect "${name}".`);
@@ -184,11 +186,11 @@ export class AutoanimationsModuleAdapter extends BaseModuleAdapter {
      * @param {string} [fallback=key] Fallback label
      * @param {object} [options={}] Additional options
      */
-    async register(key, trigger, animation, config, version = "0.0.0", fallback = key, options = {}) {
+    async register(key: any, trigger: any, animation: any, config: any, version: string = "0.0.0", fallback: any = key, options: any = {}): Promise<void> {
         const stdTrigger = this.standardizeTrigger(trigger);
         const entry = this.createAutorecEntry(key, stdTrigger, animation, config, version, fallback);
         if (entry) {
-            const existingIdx = this.menu[stdTrigger].findIndex(e => e.label === entry.label);
+            const existingIdx = this.menu[stdTrigger].findIndex((e: any) => e.label === entry.label);
             if (existingIdx >= 0) {
                 this.menu[stdTrigger][existingIdx] = entry;
             } else {

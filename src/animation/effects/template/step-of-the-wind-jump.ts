@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(token, config = {}, options = {}) {
+async function create(token: any, config: any = {}, options: any = {}) {
     if (options?.type == "aefx") return;
     let { id, template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const tokenName = token.name;
@@ -196,14 +196,14 @@ async function create(token, config = {}, options = {}) {
     return seq;
 }
 
-async function play(token, config = {}, options = {}) {
+async function play(token: any, config: any = {}, options: any = {}) {
     if (options?.type == "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const sequence = await create(token, mConfig, options);
     if (sequence) { return sequence.play(); }
 }
 
-function stop(token, { id = DEFAULT_CONFIG.id } = {}) {
+function stop(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
     if (token) {
         Sequencer.EffectManager.endEffects({ name: `${token.name} Step of the Wind (Jump)` });
         Sequencer.EffectManager.endEffects({ name: `${token.name} Step of the Wind (Jump) ${id}` });

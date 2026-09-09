@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
     durationY: 11000,
 };
 
-function createUserBlur(user, bg, config = {}) {
+function createUserBlur(user: any, bg: any, config: any = {}) {
     const { id, opacity, blur, sway, durationX, durationY } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const sceneCenter = adapter.getSceneCenter(canvas?.scene);
@@ -40,7 +40,7 @@ function createUserBlur(user, bg, config = {}) {
     return seq;
 }
 
-function create(users = [], config = {}) {
+function create(users: any[] = [], config: any = {}) {
     const seq = new Sequence();
     const bg = adapter.getSceneBackground(canvas?.scene);
     if (!bg?.src) {
@@ -54,12 +54,12 @@ function create(users = [], config = {}) {
     return seq;
 }
 
-async function play(users = [], config = {}) {
+async function play(users: any[] = [], config: any = {}) {
     const seq = create(users, config);
     if (seq) { seq.play(); }
 }
 
-function createDrunkBlur(users = []) {
+function createDrunkBlur(users: any[] = []) {
     const seq = new Sequence();
     seq.addSequence(create(users, { opacity: 1.00, sway: 1.0, durationX: 6500, durationY: 11000 }));
     seq.addSequence(create(users, { opacity: 0.57, sway: -0.9, durationX: 16500, durationY: 7000 }));
@@ -67,12 +67,12 @@ function createDrunkBlur(users = []) {
     return seq;
 }
 
-async function playDrunkBlur(users = []) {
+async function playDrunkBlur(users: any[] = []) {
     const seq = createDrunkBlur(users);
     if (seq) { seq.play(); }
 }
 
-async function stop(users = [], config = {}) {
+async function stop(users: any[] = [], config: any = {}) {
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     return Promise.all(users.map(user => Sequencer.EffectManager.endEffects({ name: `${id} - ${user.name}` })));
 }

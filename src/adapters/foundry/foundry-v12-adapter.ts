@@ -9,42 +9,42 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
     /**
      * The active ContextMenu constructor in v12.
      */
-    get ContextMenu() {
+    get ContextMenu(): any {
         return ContextMenu;
     }
 
     /**
      * The active KeyboardManager constructor in v12.
      */
-    get KeyboardManager() {
+    get KeyboardManager(): any {
         return KeyboardManager;
     }
 
     /**
      * The active Token placeable constructor in v12.
      */
-    get Token() {
+    get Token(): any {
         return Token;
     }
 
     /**
      * The active Tile placeable constructor in v12.
      */
-    get Tile() {
+    get Tile(): any {
         return Tile;
     }
 
     /**
      * The active FilePicker constructor / implementation in v12.
      */
-    get FilePicker() {
+    get FilePicker(): any {
         return FilePicker;
     }
 
     /**
      * The active TextEditor constructor / implementation in v12.
      */
-    get TextEditor() {
+    get TextEditor(): any {
         return TextEditor;
     }
 
@@ -54,7 +54,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {Object} [options={}] Resolution options
      * @returns {Document|null}
      */
-    fromUuidSync(uuid, options = {}) {
+    fromUuidSync(uuid: string, options: any = {}): any {
         return fromUuidSync(uuid, options);
     }
 
@@ -64,7 +64,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {Object} [options={}] Resolution options
      * @returns {Promise<Document|null>}
      */
-    async fromUuid(uuid, options = {}) {
+    async fromUuid(uuid: string, options: any = {}): Promise<any> {
         return fromUuid(uuid, options);
     }
 
@@ -74,7 +74,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {Token} token Target Token placeable
      * @returns {Combatant[]}
      */
-    getCombatantsByToken(combat, token) {
+    getCombatantsByToken(combat: any, token: any): any[] {
         if (!combat || !token?.id) return [];
         const single = combat.getCombatantByToken(token.id);
         return single ? [single] : [];
@@ -135,7 +135,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {Object} [config={}] Configuration options
      * @returns {[ {x: number, y: number}, {x: number, y: number}, {x: number, y: number} ]} Array of [primary, secondary, center] coordinates
      */
-    getTemplatePosition(template, config = {}) {
+    getTemplatePosition(template: any, config: any = {}): any {
         if (!template || typeof template !== 'object') return [];
 
         const doc = template.document ?? template;
@@ -193,7 +193,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {Level|null} [_level=null] Unused in V12
      * @returns {{ src: string|null, offsetX: number, offsetY: number }}
      */
-    getSceneBackground(scene = canvas?.scene, _level = null) {
+    getSceneBackground(scene: any = canvas?.scene, _level: any = null): any {
         if (!scene) return { src: null, offsetX: 0, offsetY: 0 };
         const bg = scene.background;
         const src = typeof bg?.src === 'string' ? bg.src : (typeof bg === 'string' ? bg : null);
@@ -216,7 +216,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {string} keyId The property key to delete
      * @returns {Record<string, *>} Update dictionary
      */
-    formatDeletionUpdate(path, keyId) {
+    formatDeletionUpdate(path: string, keyId: string): Record<string, any> {
         const fullKey = path ? `${path}.-=${keyId}` : `-=${keyId}`;
         return { [fullKey]: null };
     }
@@ -227,7 +227,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {string[]} paths Array of template paths
      * @returns {Promise<Function[]>}
      */
-    async loadTemplates(paths) {
+    async loadTemplates(paths: string[]): Promise<any> {
         return loadTemplates(paths);
     }
 }

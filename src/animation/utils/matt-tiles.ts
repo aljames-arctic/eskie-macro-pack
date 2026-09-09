@@ -62,7 +62,7 @@ async function start(token: Token, code: string, config: Record<string, unknown>
     await tile.setFlag(MODULE_ID, 'config', nonInfoConfig);
 }
 
-async function configure(token: Token, tile: Tile, config: Record<string, unknown> = {}): Promise<any> {
+async function configure(token: any, tile: any, config: Record<string, any> = {}): Promise<any> {
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = getLabel(id, token);
 
@@ -70,22 +70,26 @@ async function configure(token: Token, tile: Tile, config: Record<string, unknow
 
     // Initial token position is where the tile was when the movement started
     // We wait until the tile has moved and calculate latency required for the animation
-    const savedData = await tile.getFlag(MODULE_ID, id);
-        const tileOrigin = {x: savedData.tileData.x, y: savedData.tileData.y};
-        function tileMoved() {
-            const currentCenter = getCenter(tile);
-            const savedCenter = savedData.tileData;
-            return (currentCenter.x !== savedCenter.x) || (currentCenter.y !== savedCenter.y);
-        }
-        let latency = await time.waitUntil(tileMoved, {timeout: 5000});
-    await tile.setFlag(MODULE_ID, id, { tileData: getCenter(tile) });
+    const savedData: any = await (tile.document as any)?.getFlag?.(MODULE_ID, id) ?? await (tile as any).getFlag?.(MODULE_ID, id);
+    const tileOrigin = { x: savedData?.tileData?.x ?? 0, y: savedData?.tileData?.y ?? 0 };
+    function tileMoved() {
+        const currentCenter = getCenter(tile);
+        const savedCenter = savedData?.tileData ?? { x: 0, y: 0 };
+        return (currentCenter.x !== savedCenter.x) || (currentCenter.y !== savedCenter.y);
+    }
+    let latency = Number(await time.waitUntil(tileMoved, { timeout: 5000 })) || 0;
+    if ((tile.document as any)?.setFlag) {
+        await (tile.document as any).setFlag(MODULE_ID, id, { tileData: getCenter(tile) });
+    } else if ((tile as any).setFlag) {
+        await (tile as any).setFlag(MODULE_ID, id, { tileData: getCenter(tile) });
+    }
 
     const tilePosition = getCenter(tile);
     const dx = tileOrigin.x - tilePosition.x;
     const dy = tileOrigin.y - tilePosition.y;
     const angleRadians = Math.atan2(dy, dx);
     const distance = Math.hypot(tileOrigin.x - tilePosition.x, tileOrigin.y - tilePosition.y);
-    const tokenSpeed = (token as any)._getAnimationMovementSpeed();
+    const tokenSpeed = (token as any)._getAnimationMovementSpeed?.() ?? 0;
     const speed = (tokenSpeed * adapter.getSceneDimensions().size) / (1 * SECONDS);
     const rotation = angleRadians * (180 / Math.PI);
     const travelTime = (distance / speed) - latency;
@@ -118,8 +122,8 @@ async function setup(animation: string, config: Record<string, unknown> = {}): P
     const triggerTiles = canvas.tiles.controlled.map(t => t.document);
     if (triggerTiles.length === 0) return notify.warn(localize('EMP.traps.setup.noTriggerTiles'));
 
-    let originTiles = [];
-    let targetTiles = [];
+    let originTiles: any[] = [];
+    let targetTiles: any[] = [];
 
     if (tileCount === 3) {
         // Step 2: Prompt user to select trap origin/launcher tiles
@@ -177,9 +181,9 @@ async function setup(animation: string, config: Record<string, unknown> = {}): P
         }
     }
 
-    const extraTileResults = {};
-    if (config.extraTiles) {
-        for (const extra of config.extraTiles) {
+    const extraTileResults: Record<string, any> = {};
+    if (config.extraTiles && Array.isArray(config.extraTiles as any)) {
+        for (const extra of (config.extraTiles as any[])) {
             const extraResult = await adapter.buttonDialog({
                 title: format('EMP.traps.setup.extraTitle', { name: extra.label }),
                 buttons: [

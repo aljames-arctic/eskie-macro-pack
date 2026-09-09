@@ -209,13 +209,13 @@ export function formatMacroTitle(filename) {
  * @param {string} modulePath - The relative module root directory.
  * @returns {Promise<string[]>} List of JS filenames.
  */
-async function discoverMacroFiles(modulePath) {
+async function discoverMacroFiles(modulePath: string): Promise<string[]> {
     const dirPath = `${modulePath}/src/standalone-macros`;
     try {
-        const browseResult = await FilePicker.browse('data', dirPath);
+        const browseResult = await (FilePicker as any).browse('data', dirPath);
         const files = browseResult.files
-            .filter((filePath) => filePath.endsWith('.js'))
-            .map((filePath) => filePath.split('/').pop());
+            .filter((filePath: string) => filePath.endsWith('.js'))
+            .map((filePath: string) => filePath.split('/').pop());
         if (files.length > 0) {
             return Array.from(new Set([...KNOWN_STANDALONE_MACROS, ...files]));
         }
@@ -225,20 +225,14 @@ async function discoverMacroFiles(modulePath) {
     return KNOWN_STANDALONE_MACROS;
 }
 
-/**
- * Discovers `.js` files in `compendium-macros/` using Foundry's FilePicker if possible,
- * falling back to the canonical known AA bootstrap list.
- * @param {string} modulePath - The relative module root directory.
- * @returns {Promise<string[]>} List of JS filenames.
- */
-async function discoverAaMacroFiles(modulePath) {
+async function discoverAaMacroFiles(modulePath: string): Promise<string[]> {
     const dirPath = `${modulePath}/compendium-macros`;
     const knownFiles = KNOWN_AA_BOOTSTRAP_MACROS.map((m) => m.file);
     try {
-        const browseResult = await FilePicker.browse('data', dirPath);
+        const browseResult = await (FilePicker as any).browse('data', dirPath);
         const files = browseResult.files
-            .filter((filePath) => filePath.endsWith('.js'))
-            .map((filePath) => filePath.split('/').pop());
+            .filter((filePath: string) => filePath.endsWith('.js'))
+            .map((filePath: string) => filePath.split('/').pop());
         if (files.length > 0) {
             return Array.from(new Set([...knownFiles, ...files]));
         }
@@ -248,16 +242,9 @@ async function discoverAaMacroFiles(modulePath) {
     return knownFiles;
 }
 
-/**
- * Synchronizes `.js` files in `src/standalone-macros/` into the module's standalone macro compendium.
- * For each script, reads its content and creates or updates a corresponding Macro document.
- * @param {object} [options] - Optional sync parameters.
- * @param {string} [options.packName] - Full collection name of the target pack.
- * @returns {Promise<void>}
- */
-export async function updateStandaloneMacroCompendium(options = {}) {
+export async function updateStandaloneMacroCompendium(options: any = {}) {
     const packName = options.packName ?? `${MODULE_ID}.eskie-standalone-macros`;
-    const pack = game.packs?.get(packName);
+    const pack = (game.packs as any)?.get(packName);
 
     if (!pack) {
         log.error(`Standalone macro compendium '${packName}' not found`);
@@ -289,7 +276,7 @@ export async function updateStandaloneMacroCompendium(options = {}) {
 
             const commandContent = await response.text();
             const macroTitle = formatMacroTitle(filename);
-            const existingEntry = existingIndex.find((entry) => entry.name === macroTitle);
+            const existingEntry = existingIndex.find((entry: any) => entry.name === macroTitle);
 
             const macroPayload = {
                 name: macroTitle,
@@ -314,7 +301,7 @@ export async function updateStandaloneMacroCompendium(options = {}) {
                     log.debug(`Updated standalone macro '${macroTitle}' in compendium '${packName}'`);
                 }
             } else {
-                await Macro.create(macroPayload, { pack: pack.collection });
+                await (Macro as any).create(macroPayload, { pack: pack.collection });
                 log.debug(`Created standalone macro '${macroTitle}' in compendium '${packName}'`);
             }
         }
@@ -336,9 +323,9 @@ export async function updateStandaloneMacroCompendium(options = {}) {
  * @param {string} [options.packName] - Full collection name of the target pack.
  * @returns {Promise<void>}
  */
-export async function updateAaIntegrationCompendium(options = {}) {
+export async function updateAaIntegrationCompendium(options: any = {}) {
     const packName = options.packName ?? `${MODULE_ID}.eskie-aa-integration`;
-    const pack = game.packs?.get(packName);
+    const pack = (game.packs as any)?.get(packName);
 
     if (!pack) {
         log.error(`AA integration macro compendium '${packName}' not found`);
@@ -371,7 +358,7 @@ export async function updateAaIntegrationCompendium(options = {}) {
             const commandContent = await response.text();
             const macroTitle = AA_MACRO_NAME_MAP[filename] ?? formatMacroTitle(filename);
             const macroIcon = AA_MACRO_ICON_MAP[filename] ?? 'icons/svg/lightning.svg';
-            const existingEntry = existingIndex.find((entry) => entry.name === macroTitle);
+            const existingEntry = existingIndex.find((entry: any) => entry.name === macroTitle);
 
             const macroPayload = {
                 name: macroTitle,
@@ -397,7 +384,7 @@ export async function updateAaIntegrationCompendium(options = {}) {
                     log.debug(`Updated AA bootstrap macro '${macroTitle}' in compendium '${packName}'`);
                 }
             } else {
-                await Macro.create(macroPayload, { pack: pack.collection });
+                await (Macro as any).create(macroPayload, { pack: pack.collection });
                 log.debug(`Created AA bootstrap macro '${macroTitle}' in compendium '${packName}'`);
             }
         }

@@ -31,7 +31,7 @@ export const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-function create(token, config = {}) {
+function create(token: any, config: any = {}) {
     const { id, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
 
@@ -82,7 +82,7 @@ function create(token, config = {}) {
     return sequence;
 }
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const effectFunction = `eskie.effect.sandevistan.macro.movement`;
     const code = `${effectFunction}(token.object, tile)`;
@@ -91,7 +91,7 @@ async function play(token, config = {}) {
     if (sequence) return sequence.play();
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     const { id, imageDuration } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
 
@@ -114,7 +114,7 @@ async function stop(token, config = {}) {
     await endSequence.play();
 }
 
-async function travelSequence(token, tile, config = {}, options = {}) {
+async function travelSequence(token: any, tile: any, config: any = {}, options: any = {}) {
     const { travelTime, label } = options;
     const { msPerImage, imageDuration, hueIteration } = config;
     const priorIterations = hueIteration ?? 0;
@@ -133,7 +133,7 @@ async function travelSequence(token, tile, config = {}, options = {}) {
         else seq = seq.persist();
         seq = seq.delay(msPerImage * i)
             .copySprite(token)
-            .spriteRotation(-token.document.rotation)
+            .spriteRotation(-adapter.getTokenRotation(token))
             .scaleToObject(1, { considerTokenScale: true })
             .belowTokens()
             .opacity(1)
@@ -148,7 +148,7 @@ async function travelSequence(token, tile, config = {}, options = {}) {
     return seq;
 }
 
-async function movement(token, tile) {
+async function movement(token: any, tile: any) {
     const config = tile.getFlag(MODULE_ID, 'config') ?? {};
     const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { travelTime, label } = await matt.movement.configure(token, tile, mergedConfig);

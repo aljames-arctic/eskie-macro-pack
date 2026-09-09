@@ -9,7 +9,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(position, config = {}) {
+async function create(position: any, config: any = {}) {
     config = adapter.mergeObject(DEFAULT_CONFIG, config);
     let seq = new Sequence();
     applySound(seq, config.sound);
@@ -40,7 +40,7 @@ async function create(position, config = {}) {
     return seq;
 }
 
-async function play(position, config = {}) {
+async function play(position?: any, config: any = {}) {
     if (!position) {
         const crosshairConfig = {
             size: 5,

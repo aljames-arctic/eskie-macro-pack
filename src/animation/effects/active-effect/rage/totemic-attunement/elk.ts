@@ -12,12 +12,12 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function pronePlay(token, target, config = {}) {
+async function pronePlay(token: any, target: any, config: any = {}) {
     const seq = await proneCreate(token, target, config);
     if (seq) { await seq.play(); }
 }
 
-function proneCreate(token, target, config = {}) {
+function proneCreate(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, sound } = mConfig;
     const label = `${id} - ${token.id}`;
@@ -32,7 +32,7 @@ function proneCreate(token, target, config = {}) {
 
         .effect()
             .copySprite(target)
-            .spriteRotation(-target.document.rotation)
+            .spriteRotation(-adapter.getTokenRotation(target))
             .attachTo(target, {bindAlpha:false, bindRotation:false,local:false})
             .scaleToObject(0.9, { considerTokenScale: true })
             .zIndex(0.1)
@@ -55,7 +55,7 @@ function proneCreate(token, target, config = {}) {
         
         .effect()
             .copySprite(target)
-            .spriteRotation(-target.document.rotation)
+            .spriteRotation(-adapter.getTokenRotation(target))
             .attachTo(target, {bindAlpha:false, bindRotation:false,local:false})
             .scaleToObject(1, { considerTokenScale: true })
             .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", delay:100, gridUnits: true })
@@ -75,11 +75,11 @@ function proneCreate(token, target, config = {}) {
             .delay(300)
             .on(target)
             .opacity(1)
-            .rotate(target.document.rotation+90);
+            .rotate(adapter.getTokenRotation(target)+90);
     return seq;
 }
 
-function chargeCreate(token, config = {}) {
+function chargeCreate(token: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, sound } = mConfig;
     const label = matt.getLabel(id, token);
@@ -108,7 +108,7 @@ function chargeCreate(token, config = {}) {
     return sequenceOn;
 }
 
-async function chargePlay(token, config = {}) {
+async function chargePlay(token: any, config: any = {}) {
     const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const effectFunction = `eskie.effect.totemicAttunement.elk.charge.macro.movement`;
     const code = `${effectFunction}(token.object, tile)`;
@@ -117,15 +117,15 @@ async function chargePlay(token, config = {}) {
     if (sequence) return sequence.play();
 }
 
-async function chargeStop(token, config = {}) {
+async function chargeStop(token: any, config: any = {}) {
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
     await matt.movement.stop(token, label);
     Sequencer.EffectManager.endEffects({ name: label, object: token });
 }
 
-async function chargeMovement(token, tile, config = {}) {
-    function travelSequence(config = {}) {
+async function chargeMovement(token: any, tile: any, config: any = {}) {
+    function travelSequence(config: any = {}) {
         const { rotation, travelTime, label } = config;
         const particleRepeats = travelTime / 100;
         

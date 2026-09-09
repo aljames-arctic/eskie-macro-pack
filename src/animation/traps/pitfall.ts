@@ -60,6 +60,7 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: Pitfal
     if (finalTargets.length > 0) {
         finalTargets.forEach(target => {
             const targetWidth = target.document.width;
+            const targetRotation = adapter.getTokenRotation(target);
             const fallenEffectName = `pitfall-fallen-${target.id}`;
 
             seq = seq
@@ -67,7 +68,7 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: Pitfal
                 .effect()
                 .name(fallenEffectName)
                 .copySprite(target)
-                .spriteRotation(-adapter.getTokenRotation(target))
+                .spriteRotation(-targetRotation)
                 .attachTo(target, { bindAlpha: false })
                 .scaleToObject(1, { considerTokenScale: true })
                 .fadeOut(750, { ease: 'easeOutCubic' })

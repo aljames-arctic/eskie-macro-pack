@@ -172,10 +172,6 @@ class Adapter {
         return this.foundry.isEmpty(obj);
     }
 
-    isNewerVersion(a, b) {
-        return this.foundry.isNewerVersion(a, b);
-    }
-
     hasProperty(obj, path) {
         return this.foundry.hasProperty(obj, path);
     }

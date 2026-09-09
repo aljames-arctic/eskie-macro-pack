@@ -60,7 +60,7 @@ function findLockedDoor(position, radius) {
  * @param {object} [config={}] Configuration for the effect.
  * @returns {Promise<Sequence|null>} A promise that resolves with the Sequence object, or null if the creation fails.
  */
-async function create(token, config = {}, options = {}) {
+async function create(token: any, config: any = {}, options: any = {}) {
     if (options?.type == "aefx") return null;
     config = settingsOverride(config);
     const { id, template, crosshair, radius, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
@@ -79,7 +79,7 @@ async function create(token, config = {}, options = {}) {
     }
 
     const gridSize = adapter.getGridSize();
-    const width = lockedDoor?.hitArea ? lockedDoor.hitArea.width : gridSize;
+    const width = (lockedDoor?.hitArea as any)?.width ?? gridSize;
     const effectSize = width / gridSize;
 
     // 4. Animation Sequence (Only runs after damage confirmation)
@@ -166,7 +166,7 @@ async function create(token, config = {}, options = {}) {
  * @param {object} [config={}] Configuration for the effect.
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
-async function play(token, config = {}, options = {}) {
+async function play(token: any, config: any = {}, options: any = {}) {
     if (options?.type == "aefx") return;
     const sequence = await create(token, config, options);
     if (sequence) {

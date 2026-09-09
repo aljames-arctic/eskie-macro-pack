@@ -20,12 +20,32 @@ export const NOTIFICATION_LABELS = Object.freeze({
     info: ""
 });
 
+interface GroupEntry {
+    message: string;
+    level: string;
+    groupArgs: any[];
+    forceCollapse: boolean | null;
+    started: boolean;
+    enabled: boolean;
+}
+
 /**
  * Unified Logger and UI notification dispatcher for Eskie Macro Pack.
  * Encapsulates console output (error, warn, info, debug, grouping) and debounced,
  * coalesced UI toast notifications.
  */
 export class Logger {
+    private _cachedVerbosity: number | null;
+    private _groupStack: GroupEntry[];
+    private _queues: Record<string, string[]>;
+    private _flushTimeout: any;
+    private _batchWindowMs: number;
+    notify: {
+        info: (message: string) => void;
+        warn: (message: string) => void;
+        error: (message: string) => void;
+    };
+
     constructor() {
         this._cachedVerbosity = null;
         this._groupStack = [];
@@ -38,9 +58,9 @@ export class Logger {
         this._batchWindowMs = 50;
 
         this.notify = Object.freeze({
-            info: (message) => this._enqueueNotification("info", message),
-            warn: (message) => this._enqueueNotification("warn", message),
-            error: (message) => this._enqueueNotification("error", message)
+            info: (message: string) => this._enqueueNotification("info", message),
+            warn: (message: string) => this._enqueueNotification("warn", message),
+            error: (message: string) => this._enqueueNotification("error", message)
         });
 
         this.error = this.error.bind(this);
@@ -65,7 +85,7 @@ export class Logger {
 
         try {
             if (game?.settings) {
-                const setting = game.settings.get(MODULE_ID, "logVerbosity");
+                const setting = game.settings.get(MODULE_ID, "logVerbosity") as keyof typeof VERBOSITY_LEVELS;
                 this._cachedVerbosity = VERBOSITY_LEVELS[setting] ?? VERBOSITY_LEVELS.debug;
                 return this._cachedVerbosity;
             }
@@ -78,11 +98,11 @@ export class Logger {
     /**
      * Dynamically update the cached verbosity level.
      * Called by the settings onChange callback.
-     * @param {'error'|'warn'|'info'|'debug'} level - The new verbosity level key.
+     * @param {'error'|'warn'|'info'|'debug'} level - The new verbosity level name.
      * @returns {void}
      */
-    setVerbosity(level) {
-        this._cachedVerbosity = VERBOSITY_LEVELS[level] ?? VERBOSITY_LEVELS.debug;
+    setVerbosity(level: any) {
+        this._cachedVerbosity = (VERBOSITY_LEVELS as any)[level] ?? VERBOSITY_LEVELS.debug;
     }
 
     /**
@@ -265,10 +285,10 @@ export class Logger {
 
             const text = messages.length === 1
                 ? messages[0]
-                : `${MODULE_NAME}${NOTIFICATION_LABELS[level] ?? ""} (${messages.length}):\n` +
+                : `${MODULE_NAME}${(NOTIFICATION_LABELS as any)[level] ?? ""} (${messages.length}):\n` +
                   messages.map((m) => `• ${m}`).join("\n");
 
-            ui.notifications[level](text);
+            (ui.notifications as any)[level](text);
         }
     }
 
@@ -279,7 +299,7 @@ export class Logger {
      * @private
      * @returns {void}
      */
-    _enqueueNotification(level, message) {
+    _enqueueNotification(level: string, message: string) {
         const trimmed = String(message ?? "").trim();
         if (!trimmed) return;
         const queue = this._queues[level];

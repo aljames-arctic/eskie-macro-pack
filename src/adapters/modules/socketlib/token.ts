@@ -18,11 +18,12 @@ async function editToken(id, updates = {}) {
  * @param {object} [updates={}] - An object containing the data for the new token.
  * @returns {Promise<TokenDocument[]>} An array containing the new token document.
  */
-async function createToken(position, updates = {}) {
+async function createToken(position: any, _updates: any = {}) {
     const actorName = "EMP Blank Actor"; // Change this to your Actor's name
     const actor = game.actors.getName(actorName);
-    const tokenData = await actor.getTokenDocument(position);
-    return canvas.scene.createEmbeddedDocuments("Token", [tokenData]);
+    if (!actor) return [];
+    const tokenData = await (actor as any).getTokenDocument(position);
+    return (canvas as any).scene?.createEmbeddedDocuments("Token", [tokenData]) ?? [];
 }
 
 /**
@@ -30,8 +31,8 @@ async function createToken(position, updates = {}) {
  * @param {string} id - The ID of the token to delete.
  * @returns {Promise<TokenDocument[]>} An array containing the deleted token document.
  */
-async function destroyToken(id) {
-    return canvas.scene.deleteEmbeddedDocuments("Token", [id]);
+async function destroyToken(id: string) {
+    return (canvas as any).scene?.deleteEmbeddedDocuments("Token", [id]) ?? [];
 }
 
 export const tokenSockets = {

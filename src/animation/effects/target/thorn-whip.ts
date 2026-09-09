@@ -13,7 +13,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(token, target, config = {}) {
+async function create(token: any, target: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, timingAdjust, pull, sound } = mConfig;
 
@@ -36,7 +36,7 @@ async function create(token, target, config = {}) {
         y: targetCenter.y + (distance > 0 ? (dy / distance) * moveDistance : 0)
     };
 
-    const location = canvas.grid.getCenterPoint ? canvas.grid.getCenterPoint(rawLocation) : rawLocation;
+    const location = (canvas as any)?.grid?.getCenterPoint ? (canvas as any).grid.getCenterPoint(rawLocation) : rawLocation;
     const offsetX = (location.x - targetCenter.x) / gridSize;
     const offsetY = (location.y - targetCenter.y) / gridSize;
     const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);
@@ -108,12 +108,12 @@ async function create(token, target, config = {}) {
     return seq;
 }
 
-async function play(token, target, config = {}) {
+async function play(token: any, target: any, config: any = {}) {
     const seq = await create(token, target, config);
     if (seq) return seq.play();
 }
 
-async function stop(token, target, config = {}) {
+async function stop(token: any, target?: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id } = mConfig;
     Sequencer.EffectManager.endEffects({ name: `${id} - ${token.id}` });

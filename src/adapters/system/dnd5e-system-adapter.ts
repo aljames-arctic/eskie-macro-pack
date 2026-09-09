@@ -1,4 +1,5 @@
 import { BaseSystemAdapter } from './base-system-adapter.js';
+import { BaseFoundryAdapter } from '../foundry/base-foundry-adapter.js';
 import { midiQolAdapter } from '../modules/midi-qol/midi-qol-module-adapter.js';
 import { log } from '../../lib/logger.js';
 
@@ -10,7 +11,7 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
     /**
      * @param {BaseFoundryAdapter} [foundry=null]
      */
-    constructor(foundry = null) {
+    constructor(foundry: BaseFoundryAdapter | null = null) {
         super("dnd5e", true, foundry);
     }
 
@@ -19,7 +20,7 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
      * @param {ChatMessage} message
      * @returns {string}
      */
-    qualifyMessage(message) {
+    qualifyMessage(message: any): string {
         log.debug(`Dnd5eSystemAdapter.qualifyMessage: message="${message?.id}"`, {
             rollType: message?.flags?.dnd5e?.roll?.type,
             messageType: message?.flags?.dnd5e?.messageType,
@@ -70,8 +71,8 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
      * @param {ChatMessage} message
      * @returns {Array<{ source: string, rawAbility: string|null, outcome: string, tokenId: string|null }>}
      */
-    extractRolls(message) {
-        const rolls = [];
+    extractRolls(message: any): any[] {
+        const rolls: any[] = [];
 
         // 1. Core System Flag Checks (rolls from character sheets)
         const rollFlags = message?.flags?.dnd5e?.roll;
@@ -95,7 +96,7 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
         }
 
         // Distribute module-level outcome to core/fallback rolls if they are still indeterminant
-        rolls.forEach(roll => {
+        rolls.forEach((roll: any) => {
             if (roll.outcome === "indeterminant" && moduleOutcome !== "indeterminant") {
                 roll.outcome = moduleOutcome;
             }
@@ -110,7 +111,7 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
      * @param {string} [combinedText=""]
      * @returns {string|null}
      */
-    normalizeAbility(rawAbility, combinedText = "") {
+    normalizeAbility(rawAbility: any, combinedText: string = ""): string | null {
         const dnd5eMap = {
             ath: "strength",
             acr: "dexterity", ste: "dexterity", sle: "dexterity",
@@ -126,7 +127,7 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
      * @param {Object} config Configuration containing aaHandler or item
      * @returns {number|undefined}
      */
-    getSpellLevel(config = {}) {
+    getSpellLevel(config: any = {}): number | undefined {
         return config?.aaHandler?.systemData?.spellLevel ?? config?.item?.system?.level ?? undefined;
     }
 
@@ -135,7 +136,7 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
      * @param {Actor} actor Concrete Actor document
      * @returns {string|null}
      */
-    getCreatureType(actor) {
+    getCreatureType(actor: any): string | null {
         if (!actor) return null;
         const rawType = actor.system?.details?.type?.value ?? actor.system?.details?.type ?? null;
         return typeof rawType === 'string' ? rawType.toLowerCase() : null;

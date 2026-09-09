@@ -14,6 +14,16 @@ export let socketlibInstance;
  * and multi-client sequence coordinator functions.
  */
 export class SocketlibModuleAdapter extends BaseModuleAdapter {
+    door: any;
+    tile: any;
+    token: any;
+    object: any;
+    doorSockets: any;
+    tileSockets: any;
+    tokenSockets: any;
+    tokenMaskSockets: any;
+    _socket: any;
+
     constructor() {
         super("socketlib");
         this.door = door;
@@ -56,7 +66,7 @@ export class SocketlibModuleAdapter extends BaseModuleAdapter {
 
         const mod = game?.modules?.get(MODULE_ID);
         if (mod) {
-            mod.socketlib = socket;
+            (mod as any).socketlib = socket;
         }
         this._socket = socket;
         socketlibInstance = socket;

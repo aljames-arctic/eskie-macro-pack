@@ -9,7 +9,7 @@ export const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-function create(token, config = {}) {
+function create(token: any, config: any = {}) {
     const { id, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
 
@@ -48,7 +48,7 @@ function create(token, config = {}) {
     return sequenceOn;
 }
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const mergedConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const effectFunction = `eskie.effect.dash.macro.movement`;
     const code = `${effectFunction}(token.object, tile)`;
@@ -57,15 +57,15 @@ async function play(token, config = {}) {
     if (sequence) return sequence.play();
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     const { id, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = matt.getLabel(id, token);
     matt.movement.stop(token, label);
     Sequencer.EffectManager.endEffects({ name: label, object: token });
 }
 
-async function movement(token, tile, config = {}) {
-    function travelSequence(config = {}) {
+async function movement(token: any, tile: any, config: any = {}) {
+    function travelSequence(config: any = {}) {
         const { rotation, travelTime, label } = config;
         const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
         

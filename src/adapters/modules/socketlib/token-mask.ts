@@ -8,7 +8,7 @@ import { adapter } from "../../index.js";
 /**
  * Socketlib handler to execute local sequence rendering on a client.
  */
-async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}) {
+async function playTokenMaskLocal(tokenId: string, tileIds: any, initiatorUserId: string, config: any = {}) {
     log.debug(`playTokenMaskLocal | Received socket call:`, {
         tokenId,
         tileIds,
@@ -46,7 +46,7 @@ async function playTokenMaskLocal(tokenId, tileIds, initiatorUserId, config = {}
 /**
  * Socketlib handler to report local animation completion back to the initiator.
  */
-async function tokenMaskClientDone(tokenId, userId, animationId) {
+async function tokenMaskClientDone(tokenId: any, userId: any, animationId: any) {
     const tracker = tokenMaskTracker.get(animationId);
     if (tracker) {
         tracker.received.add(userId);
@@ -69,7 +69,7 @@ async function tokenMaskClientDone(tokenId, userId, animationId) {
 /**
  * Clean up the session tiles and token flags as GM.
  */
-async function cleanUpTokenMask(tokenId, animationId, tileIds, deleteObject) {
+async function cleanUpTokenMask(tokenId: any, animationId: any, tileIds: any, deleteObject: any): Promise<any> {
     if (!game.user.isGM) {
         return socketlib.executeAsGM("cleanUpTokenMask", tokenId, animationId, tileIds, deleteObject);
     }
@@ -79,7 +79,7 @@ async function cleanUpTokenMask(tokenId, animationId, tileIds, deleteObject) {
     const object = adapter.getPlaceable(tokenId);
     if (object) {
         // Resolve tiles and detach them in the database
-        const tiles = tileIds ? tileIds.map(id => canvas.scene.tiles.get(id)).filter(t => t) : [];
+        const tiles = tileIds ? tileIds.map((id: string) => (canvas as any).scene?.tiles?.get(id)).filter(Boolean) : [];
         if (tiles.length > 0) {
             await adapter.detachPlaceableElements(tiles, object);
         }

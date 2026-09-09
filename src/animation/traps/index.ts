@@ -38,7 +38,7 @@ async function setup (config: Record<string, unknown> = {}): Promise<any> {
         return;
     }
 
-    const trap = traps[chosenTrapKey];
+    const trap = (traps as Record<string, any>)[chosenTrapKey as string];
     if (trap?.setup) {
         return trap.setup(config);
     } else {

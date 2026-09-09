@@ -230,7 +230,7 @@ function processModule(mod) {
     };
 }
 
-export class RecommendedModulesApp extends adapter.foundry.HandlebarsApplicationMixin(adapter.foundry.ApplicationV2) {
+export class RecommendedModulesApp extends (adapter.foundry.HandlebarsApplicationMixin(adapter.foundry.ApplicationV2) as any) {
     static DEFAULT_OPTIONS = {
         id: "eskie-recommended-modules-menu",
         classes: ["eskie-world-scripts-form", "eskie-recommended-modules-form"],
@@ -259,27 +259,27 @@ export class RecommendedModulesApp extends adapter.foundry.HandlebarsApplication
         };
     }
 
-    _onRender(context, options) {
-        super._onRender?.(context, options);
+    _onRender(context: any, options: any) {
+        (super._onRender as any)?.(context, options);
 
         const closeBtn = this.element?.querySelector?.('button[data-action="close"], button[name="submit"], .eskie-world-scripts-footer button');
-        closeBtn?.addEventListener?.("click", (event) => {
+        closeBtn?.addEventListener?.("click", (event: any) => {
             event?.preventDefault?.();
             this.close?.();
         });
     }
 
-    static async _onClose(event, target) {
+    static async _onClose(this: any, event: any, target: any) {
         return this.close?.();
     }
 
-    static async _formHandler(event, form, formData) {
+    static async _formHandler(this: any, event: any, form: any, formData: any) {
         return this.close?.();
     }
 
-    async _prepareContext(options) {
+    async _prepareContext(options: any): Promise<any> {
         const categories = RECOMMENDED_CATEGORIES.map(cat => {
-            const catData = {
+            const catData: Record<string, any> = {
                 id: cat.id,
                 name: game.i18n?.localize(cat.name) ?? cat.name,
                 icon: cat.icon
@@ -288,7 +288,7 @@ export class RecommendedModulesApp extends adapter.foundry.HandlebarsApplication
             if (cat.subcategories) {
                 catData.subcategories = cat.subcategories.map(sub => {
                     const processedModules = sub.modules.map(processModule);
-                    let subStatus = null;
+                    let subStatus: Record<string, any> | null = null;
 
                     if (sub.isNative) {
                         const isSupported = Boolean(adapter.supportsRegionBehaviors);

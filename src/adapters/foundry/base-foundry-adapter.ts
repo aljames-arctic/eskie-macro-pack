@@ -20,10 +20,12 @@ export const USER_PERMISSION_TIERS = Object.freeze({
  * permission, placeable lookup, and utility operations.
  */
 export class BaseFoundryAdapter {
+    _adapter: any;
+
     /**
      * @param {object|null} [adapter=null] Unified Adapter singleton reference
      */
-    constructor(adapter = null) {
+    constructor(adapter: any = null) {
         this._adapter = adapter;
     }
 
@@ -41,18 +43,20 @@ export class BaseFoundryAdapter {
     /**
      * Access the Mass Edit module adapter via parent adapter navigation or ambient API.
      */
-    get massEdit() {
+    get massEdit(): any {
         if (this.adapter?.massEdit) return this.adapter.massEdit;
-        if (typeof MassEdit !== 'undefined' && MassEdit?.linker) return MassEdit.linker;
+        const globalMassEdit = (globalThis as any).MassEdit;
+        if (globalMassEdit?.linker) return globalMassEdit.linker;
         return null;
     }
 
     /**
      * Access the Token Attacher module adapter via parent adapter navigation or ambient API.
      */
-    get tokenAttacher() {
+    get tokenAttacher(): any {
         if (this.adapter?.tokenAttacher) return this.adapter.tokenAttacher;
-        if (typeof tokenAttacher !== 'undefined') return tokenAttacher;
+        const globalTA = (globalThis as any).tokenAttacher;
+        if (globalTA) return globalTA;
         return null;
     }
 
@@ -68,28 +72,28 @@ export class BaseFoundryAdapter {
     /**
      * The active ContextMenu constructor.
      */
-    get ContextMenu() {
+    get ContextMenu(): any {
         throw new Error('BaseFoundryAdapter.ContextMenu must be implemented by version subclass');
     }
 
     /**
      * The active KeyboardManager constructor.
      */
-    get KeyboardManager() {
+    get KeyboardManager(): any {
         throw new Error('BaseFoundryAdapter.KeyboardManager must be implemented by version subclass');
     }
 
     /**
      * The active Token placeable constructor.
      */
-    get Token() {
+    get Token(): any {
         throw new Error('BaseFoundryAdapter.Token must be implemented by version subclass');
     }
 
     /**
      * The active Tile placeable constructor.
      */
-    get Tile() {
+    get Tile(): any {
         throw new Error('BaseFoundryAdapter.Tile must be implemented by version subclass');
     }
 
@@ -146,14 +150,14 @@ export class BaseFoundryAdapter {
     /**
      * The active FilePicker constructor / implementation.
      */
-    get FilePicker() {
+    get FilePicker(): any {
         throw new Error('BaseFoundryAdapter.FilePicker must be implemented by version subclass');
     }
 
     /**
      * The active TextEditor constructor / implementation.
      */
-    get TextEditor() {
+    get TextEditor(): any {
         throw new Error('BaseFoundryAdapter.TextEditor must be implemented by version subclass');
     }
 
@@ -174,7 +178,7 @@ export class BaseFoundryAdapter {
      * @param {string[]} paths Array of template paths
      * @returns {Promise<Function[]>}
      */
-    async loadTemplates(paths) {
+    async loadTemplates(paths: string[]): Promise<any> {
         throw new Error('BaseFoundryAdapter.loadTemplates must be implemented by version subclass');
     }
 
@@ -184,7 +188,7 @@ export class BaseFoundryAdapter {
      * @param {Object} [options={}] Resolution options
      * @returns {Document|null}
      */
-    fromUuidSync(uuid, options = {}) {
+    fromUuidSync(uuid: string, options: any = {}): any {
         throw new Error('BaseFoundryAdapter.fromUuidSync must be implemented by version subclass');
     }
 
@@ -194,7 +198,7 @@ export class BaseFoundryAdapter {
      * @param {Object} [options={}] Resolution options
      * @returns {Promise<Document|null>}
      */
-    async fromUuid(uuid, options = {}) {
+    async fromUuid(uuid: string, options: any = {}): Promise<any> {
         throw new Error('BaseFoundryAdapter.fromUuid must be implemented by version subclass');
     }
 
@@ -288,15 +292,15 @@ export class BaseFoundryAdapter {
     }
 
     /**
-     * Slugify a string according to Foundry VTT standards.
-     * @param {string} text Target text to slugify
+     * Convert a string to a URL-friendly slug.
+     * @param {string} text Text to slugify
      * @param {Object} [options={}] Slugify options
      * @returns {string} Slugified string
      */
-    slugify(text, options = {}) {
+    slugify(text: any, options: any = {}): string {
         const str = String(text ?? '');
-        if (typeof str.slugify === 'function') {
-            return str.slugify(options);
+        if (typeof (str as any).slugify === 'function') {
+            return (str as any).slugify(options);
         }
         const replacement = options.replacement ?? '-';
         return str
@@ -315,7 +319,7 @@ export class BaseFoundryAdapter {
      * @param {Object} [options={}] Comparison options
      * @returns {Object} Difference object
      */
-    diffObject(original, other, options = {}) {
+    diffObject(original: any, other: any, options: any = {}): any {
         return foundry.utils.diffObject(original, other, options);
     }
 
@@ -325,18 +329,18 @@ export class BaseFoundryAdapter {
      * @param {number} [d=0] Current recursion depth
      * @returns {Object} Flattened object
      */
-    flattenObject(obj, d = 0) {
+    flattenObject(obj: any, d: number = 0): any {
         return foundry.utils.flattenObject(obj, d);
     }
 
     /**
      * Expand a flattened object with dot-separated keys into a deeply nested structure.
      * @param {Object} obj Flattened object
-     * @param {number} [d=0] Current recursion depth
+     * @param {number} [_d=0] Current recursion depth
      * @returns {Object} Expanded nested object
      */
-    expandObject(obj, d = 0) {
-        return foundry.utils.expandObject(obj, d);
+    expandObject(obj: any, _d: number = 0): any {
+        return (foundry.utils as any).expandObject(obj);
     }
 
     /**
@@ -345,7 +349,7 @@ export class BaseFoundryAdapter {
      * @param {number} delay Delay in milliseconds
      * @returns {Function} Debounced function
      */
-    debounce(fn, delay) {
+    debounce(fn: any, delay: number): any {
         return foundry.utils.debounce(fn, delay);
     }
 
@@ -373,7 +377,7 @@ export class BaseFoundryAdapter {
      * @param {Token} token Target Token placeable
      * @returns {Combatant[]}
      */
-    getCombatantsByToken(combat, token) {
+    getCombatantsByToken(combat: any, token: any): any[] {
         throw new Error('BaseFoundryAdapter.getCombatantsByToken must be implemented by version subclass');
     }
 
@@ -383,8 +387,9 @@ export class BaseFoundryAdapter {
      * @param {Token} token Target Token placeable
      * @returns {Combatant|null}
      */
-    getCombatantByToken(combat, token) {
-        return this.getCombatantsByToken(combat, token)[0] ?? null;
+    getCombatantByToken(combat: any, token: any): any {
+        const combatants = this.getCombatantsByToken(combat, token);
+        return combatants?.[0] ?? null;
     }
 
     /* -------------------------------------------- */
@@ -525,7 +530,7 @@ export class BaseFoundryAdapter {
      * @param {number} [scale=1] Additional scale multiplier
      * @returns {{x: number, y: number}} Offset coordinates
      */
-    getRevealOffset(object, scale = 1) {
+    getRevealOffset(object: any, scale: number = 1): any {
         throw new Error('BaseFoundryAdapter.getRevealOffset must be implemented by version subclass');
     }
 
@@ -534,7 +539,7 @@ export class BaseFoundryAdapter {
      * @param {PlaceableObject} object Token or Tile placeable
      * @returns {{x: number, y: number}} Offset coordinates
      */
-    getShapeOffset(object) {
+    getShapeOffset(object: any): any {
         throw new Error('BaseFoundryAdapter.getShapeOffset must be implemented by version subclass');
     }
 
@@ -545,7 +550,7 @@ export class BaseFoundryAdapter {
      * @param {number} [scale=1] Scale multiplier
      * @returns {{x: number, y: number}} Resolved coordinates
      */
-    getTileOffset(object, type, scale = 1) {
+    getTileOffset(object: any, type: string, scale: number = 1): any {
         if (type === 'reveal') return this.getRevealOffset(object, scale);
         if (type === 'shape') return this.getShapeOffset(object);
         throw new Error(`Invalid offset type: ${type}`);
@@ -561,7 +566,7 @@ export class BaseFoundryAdapter {
      * @param {Object} [config={}] Configuration options
      * @returns {[ {x: number, y: number}, {x: number, y: number}, {x: number, y: number} ]} Array of [primary, secondary, center] coordinates
      */
-    getTemplatePosition(template, config = {}) {
+    getTemplatePosition(template: any, config: any = {}): any {
         throw new Error('BaseFoundryAdapter.getTemplatePosition must be implemented by version subclass');
     }
 
@@ -571,7 +576,7 @@ export class BaseFoundryAdapter {
      * @param {object} [config={}] Configuration options
      * @returns {[ {x: number, y: number}, {x: number, y: number}, {x: number, y: number} ]} Array of [primary, secondary, center]
      */
-    getCrosshairPosition(position, config = {}) {
+    getCrosshairPosition(position: any, config: any = {}): any[] {
         if (!position) return [];
 
         let primary = { x: position.x ?? 0, y: position.y ?? 0 };
@@ -609,7 +614,7 @@ export class BaseFoundryAdapter {
      * @param {Document|object|null} [template=null] Original template or region document
      * @returns {Array} Validated positions or error array
      */
-    resolveDistinctPositions(positions, config = {}, template = null) {
+    resolveDistinctPositions(positions: any, config: any = {}, template: any = null): any[] {
         if (!positions || positions.length === 0 || positions.error || positions[0]?.error) {
             return positions;
         }
@@ -621,7 +626,7 @@ export class BaseFoundryAdapter {
             log.error('BaseFoundryAdapter | Unable to resolve distinct non-zero positions for animation.', { template, config, primary, secondary });
             ui?.notifications?.error?.('Eskie Macro Pack | Unable to resolve coordinates for animation.');
             const err = new Error('Unable to resolve distinct coordinates for template animation');
-            const errResult = [{ error: err, cancelled: true }, undefined, undefined];
+            const errResult: any = [{ error: err, cancelled: true }, undefined, undefined];
             errResult.error = err;
             return errResult;
         }
@@ -639,7 +644,7 @@ export class BaseFoundryAdapter {
      * @param {Level|null} [level=null] Target level document or placeable
      * @returns {{ src: string|null, offsetX: number, offsetY: number }}
      */
-    getSceneBackground(scene = canvas?.scene, level = null) {
+    getSceneBackground(scene: any = canvas?.scene, level: any = null): any {
         throw new Error('BaseFoundryAdapter.getSceneBackground must be implemented by version subclass');
     }
 
@@ -648,10 +653,10 @@ export class BaseFoundryAdapter {
      * @param {Scene|null} [scene=canvas?.scene] Target scene
      * @returns {{ width: number, height: number, size: number, distance: number, maxRayDistance: number, sceneRect: { x: number, y: number, width: number, height: number } }}
      */
-    getSceneDimensions(scene = canvas?.scene) {
+    getSceneDimensions(scene: any = canvas?.scene): any {
         const isCurrentScene = !scene || scene === canvas?.scene;
-        const dims = isCurrentScene ? canvas?.dimensions : null;
-        const sceneDoc = scene?.document ?? scene;
+        const dims: any = isCurrentScene ? canvas?.dimensions : null;
+        const sceneDoc = (scene as any)?.document ?? scene;
         const width = dims?.width ?? sceneDoc?.width ?? 4000;
         const height = dims?.height ?? sceneDoc?.height ?? 4000;
         const size = sceneDoc?.grid?.size ?? sceneDoc?.gridSize ?? dims?.size ?? canvas?.grid?.size ?? 100;
@@ -674,12 +679,45 @@ export class BaseFoundryAdapter {
     }
 
     /**
-     * Retrieves the grid pixel size of the scene.
+     * Retrieve the grid size in pixels for the current scene.
      * @param {Scene|null} [scene=canvas?.scene] Target scene
-     * @returns {number} Grid size in pixels
+     * @returns {number} Grid size in pixels (default 100)
      */
-    getGridSize(scene = canvas?.scene) {
+    getGridSize(scene: any = canvas?.scene): number {
         return this.getSceneDimensions(scene).size;
+    }
+
+    /**
+     * Retrieve the grid distance unit value for the current scene.
+     * @param {Scene|null} [scene=canvas?.scene] Target scene
+     * @returns {number} Grid distance in scene units (default 5)
+     */
+    getGridDistance(scene: any = canvas?.scene): number {
+        return this.getSceneDimensions(scene).distance;
+    }
+
+    /**
+     * Converts a distance in grid units (e.g., feet, meters) into canvas pixels.
+     * @param {number} units Distance in grid units
+     * @param {Scene|null} [scene=canvas?.scene] Target scene
+     * @returns {number} Distance in canvas pixels
+     */
+    unitsToPixels(units: number, scene: any = canvas?.scene): number {
+        if (!units) return 0;
+        const { size, distance } = this.getSceneDimensions(scene);
+        return (units / distance) * size;
+    }
+
+    /**
+     * Converts a distance in canvas pixels into grid units (e.g., feet, meters).
+     * @param {number} pixels Distance in canvas pixels
+     * @param {Scene|null} [scene=canvas?.scene] Target scene
+     * @returns {number} Distance in grid units
+     */
+    pixelsToUnits(pixels: number, scene: any = canvas?.scene): number {
+        if (!pixels) return 0;
+        const { size, distance } = this.getSceneDimensions(scene);
+        return (pixels / size) * distance;
     }
 
     /**
@@ -687,7 +725,7 @@ export class BaseFoundryAdapter {
      * @param {Scene|null} [scene=canvas?.scene] Target scene
      * @returns {{ x: number, y: number }} Center coordinates
      */
-    getSceneCenter(scene = canvas?.scene) {
+    getSceneCenter(scene: any = canvas?.scene): { x: number, y: number } {
         const dims = this.getSceneDimensions(scene);
         return {
             x: dims.width / 2,
@@ -696,26 +734,37 @@ export class BaseFoundryAdapter {
     }
 
     /* -------------------------------------------- */
-    /*  Document Inspection & Placeable Lookup      */
+    /*  Geometry, Coordinates & Center Extraction   */
     /* -------------------------------------------- */
 
     /**
-     * Gets the native Foundry VTT document name of a placeable object or document.
-     * @param {PlaceableObject|Document|null} target Target document or placeable
-     * @returns {string|undefined} Document name (e.g. 'Token', 'Tile')
+     * Retrieve the documentName for a placeable or document across Foundry versions.
+     * @param {PlaceableObject|Document|null} target Target placeable or document
+     * @returns {string|undefined} Canonical document name (e.g., "Token", "Tile", "Region")
      */
-    getDocumentName(target) {
+    getDocumentName(target: any): string | undefined {
         if (!target) return undefined;
-        return target.documentName ?? target.document?.documentName ?? undefined;
+        return target.document?.documentName ?? target.documentName ?? undefined;
     }
 
     /**
-     * Test whether a target document or placeable matches a specific document type.
-     * @param {PlaceableObject|Document|null} target Target document or placeable
+     * Tests whether a placeable or document matches a specific Document type name.
+     * @param {PlaceableObject|Document|null} target Target placeable or document
+     * @param {string} type Expected document type name (e.g. "Token", "Tile", "Region")
      * @returns {boolean}
      */
-    isDocumentOfType(target, type) {
+    isDocumentType(target: any, type: string): boolean {
         return this.getDocumentName(target) === type;
+    }
+
+    /**
+     * Backward-compatible alias for isDocumentType.
+     * @param {PlaceableObject|Document|null} target Target placeable or document
+     * @param {string} type Expected document type name
+     * @returns {boolean}
+     */
+    isDocumentOfType(target: any, type: string): boolean {
+        return this.isDocumentType(target, type);
     }
 
     /**
@@ -723,11 +772,11 @@ export class BaseFoundryAdapter {
      * @param {string} id Target placeable ID
      * @returns {PlaceableObject|null}
      */
-    getPlaceable(id) {
+    getPlaceable(id: string): any {
         if (!id) return null;
-        return canvas?.tokens?.get(id)
-            ?? canvas?.tiles?.get(id)
-            ?? canvas?.walls?.get(id)
+        return (canvas as any)?.tokens?.get(id)
+            ?? (canvas as any)?.tiles?.get(id)
+            ?? (canvas as any)?.walls?.get(id)
             ?? null;
     }
 
@@ -837,9 +886,9 @@ export class BaseFoundryAdapter {
      * @param {Token} token Target token placeable
      * @returns {number} Rotation angle in degrees (0 to 360)
      */
-    getTokenRotation(token) {
+    getTokenRotation(token: any): number {
         if (!token) return 0;
-        return token.document.rotation ?? 0;
+        return token.document?.rotation ?? token.rotation ?? 0;
     }
 
     /**
@@ -848,17 +897,18 @@ export class BaseFoundryAdapter {
      * @param {Token} t2 The target token placeable
      * @returns {number} Distance in scene units, rounded up
      */
-    getDistance(t1, t2) {
+    getDistance(t1: any, t2: any): number {
         if (!t1 || !t2) return 0;
         const p1 = this.getCenter(t1);
         const p2 = this.getCenter(t2);
+        if (!p1 || !p2) return 0;
         const dist2DPx = Math.hypot(p1.x - p2.x, p1.y - p2.y);
 
         const { size: gridSize, distance: gridDistance } = this.getSceneDimensions();
         const dist2DUnits = (dist2DPx / gridSize) * gridDistance;
 
-        const el1 = t1.document.elevation ?? 0;
-        const el2 = t2.document.elevation ?? 0;
+        const el1 = t1.document?.elevation ?? t1.elevation ?? 0;
+        const el2 = t2.document?.elevation ?? t2.elevation ?? 0;
         const elDiff = el1 - el2;
 
         const dist3DUnits = Math.hypot(dist2DUnits, elDiff);
@@ -872,7 +922,7 @@ export class BaseFoundryAdapter {
      * @param {number} [stepDistancePx=100] Distance in pixels between each interpolated point
      * @returns {Array<{ x: number, y: number }>} Array of interpolated points including start and end
      */
-    getInterpolatedPoints(point1, point2, stepDistancePx = 100) {
+    getInterpolatedPoints(point1: any, point2: any, stepDistancePx: number = 100): Array<{ x: number, y: number }> {
         const p1 = this.getCenter(point1);
         const p2 = this.getCenter(point2);
         if (!p1 || !p2) return p1 ? [p1] : (p2 ? [p2] : []);
@@ -880,7 +930,7 @@ export class BaseFoundryAdapter {
         if (totalDistance === 0 || stepDistancePx <= 0) return [p1];
 
         const steps = Math.max(1, Math.round(totalDistance / stepDistancePx));
-        const points = [];
+        const points: Array<{ x: number, y: number }> = [];
         for (let i = 0; i <= steps; i++) {
             const t = i / steps;
             points.push({
@@ -897,16 +947,16 @@ export class BaseFoundryAdapter {
      * @param {Token} target The target token placeable
      * @returns {{x: number, y: number}|null} Coordinate of nearest square center
      */
-    getNearestSquareCenter(token, target) {
+    getNearestSquareCenter(token: any, target: any): { x: number, y: number } | null {
         if (!token || !target) return null;
         const gs = this.getGridSize();
         const srcCenter = this.getCenter(token);
         if (!srcCenter) return null;
 
-        const w = target.document.width ?? 1;
-        const h = target.document.height ?? 1;
+        const w = target.document?.width ?? target.width ?? 1;
+        const h = target.document?.height ?? target.height ?? 1;
 
-        let bestPoint = null;
+        let bestPoint: { x: number, y: number } | null = null;
         let bestDist2 = Infinity;
 
         for (let gx = 0; gx < w; gx++) {
@@ -933,9 +983,9 @@ export class BaseFoundryAdapter {
      * to the line between two tokens.
      * @param {Token} token The reference token placeable
      * @param {Token} target The target token placeable
-     * @returns {{ x: number, y: number }} The center point { x, y } of the best adjacent grid cell
+     * @returns {{ x: number, y: number }|null} The center point { x, y } of the best adjacent grid cell
      */
-    getBestAdjacentLocation(token, target) {
+    getBestAdjacentLocation(token: any, target: any): { x: number, y: number } | null {
         const p1 = this.getCenter(token);
         const p2 = this.getCenter(target);
         if (!p1 || !p2) return null;
@@ -946,24 +996,24 @@ export class BaseFoundryAdapter {
         const c = p1.x * p2.y - p2.x * p1.y;
         const denominator = Math.hypot(a, b);
 
-        const getDistance = (p) => {
+        const getDistance = (p: { x: number, y: number }) => {
             if (denominator === 0) return 0;
             return Math.abs(a * p.x + b * p.y + c) / denominator;
         };
 
         const gridSize = this.getGridSize();
-        const tDoc = token.document;
+        const tDoc = token.document ?? token;
         const tWidth = tDoc.width ?? 1;
         const tHeight = tDoc.height ?? 1;
         const tX = tDoc.x;
         const tY = tDoc.y;
 
-        const getCenterPoint = (pt) => {
-            if (canvas?.grid?.getCenterPoint) return canvas.grid.getCenterPoint(pt);
+        const getCenterPoint = (pt: { x: number, y: number }) => {
+            if ((canvas as any)?.grid?.getCenterPoint) return (canvas as any).grid.getCenterPoint(pt);
             return { x: pt.x + gridSize / 2, y: pt.y + gridSize / 2 };
         };
 
-        const candidates = [];
+        const candidates: Array<{ x: number, y: number }> = [];
         // Iterate around the token's footprint to find all adjacent grid centers
         for (let i = -1; i <= tWidth; i++) {
             for (let j = -1; j <= tHeight; j++) {
@@ -1008,7 +1058,7 @@ export class BaseFoundryAdapter {
      * @param {boolean} [config.applyGM=true] Whether to include Game Masters
      * @returns {User[]} Array of User objects
      */
-    getTokenOwners(token, config = {}) {
+    getTokenOwners(token: any, config: any = {}): any[] {
         if (!token) return [];
         const applyPC = config.applyPC !== false;
         const applyGM = config.applyGM !== false;
@@ -1173,7 +1223,7 @@ export class BaseFoundryAdapter {
      * @param {string} keyId The property key to delete
      * @returns {Record<string, *>} Update dictionary
      */
-    formatDeletionUpdate(path, keyId) {
+    formatDeletionUpdate(path: string, keyId: string): Record<string, any> {
         throw new Error('BaseFoundryAdapter.formatDeletionUpdate must be implemented by version subclass');
     }
 
@@ -1185,7 +1235,7 @@ export class BaseFoundryAdapter {
      * Whether the active Foundry platform version supports native RegionBehaviors (V14+).
      * @type {boolean}
      */
-    get supportsRegionBehaviors() {
+    get supportsRegionBehaviors(): boolean {
         return false;
     }
 
@@ -1194,7 +1244,7 @@ export class BaseFoundryAdapter {
      * Legacy baseline returns an empty array.
      * @returns {RegionDocument[]}
      */
-    getControlledRegions() {
+    getControlledRegions(): any[] {
         return [];
     }
 
@@ -1204,7 +1254,7 @@ export class BaseFoundryAdapter {
      * @param {Region|RegionDocument} region Target Region
      * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number, anchor: {x: number, y: number} }}
      */
-    getRegionBounds(region) {
+    getRegionBounds(region: any): any {
         if (!region) {
             return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
         }
@@ -1232,7 +1282,7 @@ export class BaseFoundryAdapter {
      * @param {Region|RegionDocument} _region Target Region
      * @returns {Token[]}
      */
-    getTokensInRegion(_region) {
+    getTokensInRegion(_region: any): any[] {
         return [];
     }
 

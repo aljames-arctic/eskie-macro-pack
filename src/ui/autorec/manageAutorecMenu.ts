@@ -12,8 +12,10 @@ const foundryPlatform = new BaseFoundryAdapter();
  * configuring target destinations via dropdown, and triggering preset sync submenus across
  * Automated Animations (AA) and Boss Loot FX (BLFX).
  */
-export class ConfigureAutorecApp extends foundryPlatform.HandlebarsApplicationMixin(foundryPlatform.ApplicationV2) {
-    constructor(options = {}) {
+export class ConfigureAutorecApp extends (foundryPlatform.HandlebarsApplicationMixin(foundryPlatform.ApplicationV2) as any) {
+    onSelectedCallback?: ((target: string) => Promise<void> | void) | null;
+
+    constructor(options: any = {}) {
         super(options);
         this.onSelectedCallback = options.onSelectedCallback ?? null;
     }
@@ -43,7 +45,7 @@ export class ConfigureAutorecApp extends foundryPlatform.HandlebarsApplicationMi
         };
     }
 
-    async _prepareContext(options) {
+    async _prepareContext(options: any): Promise<any> {
         const isAaActive = Boolean(game.modules?.get('autoanimations')?.active);
         const isBlfxActive = isBlfxAutorecAvailable();
 
@@ -67,21 +69,21 @@ export class ConfigureAutorecApp extends foundryPlatform.HandlebarsApplicationMi
         };
     }
 
-    _onRender(context, options) {
-        super._onRender?.(context, options);
+    _onRender(context: any, options: any): void | Promise<void> {
+        (super._onRender as any)?.(context, options);
 
         // Sync AA submenu button handler
         const syncAaBtn = this.element?.querySelector('button[name="syncAa"]');
-        syncAaBtn?.addEventListener('click', (event) => {
+        syncAaBtn?.addEventListener('click', (event: any) => {
             event.preventDefault();
             new autorecUpdateFormApplication().render(true);
         });
 
         // Sync BLFX submenu button handler
         const syncBlfxBtn = this.element?.querySelector('button[name="syncBlfx"]');
-        syncBlfxBtn?.addEventListener('click', async (event) => {
+        syncBlfxBtn?.addEventListener('click', async (event: any) => {
             event.preventDefault();
-            const { missingEntries, updatedEntries, customEntries } = await generateBlfxAutorecUpdate(blfxAdapter.registry);
+            const { missingEntries, updatedEntries, customEntries } = await generateBlfxAutorecUpdate((blfxAdapter as any).registry);
             const hasChanges = Boolean(missingEntries.length || updatedEntries.length || customEntries.length);
             if (hasChanges && !isBlfxCustomAutoRecUpdatesEnabled()) {
                 await promptEnableBlfxUpdates();
@@ -92,13 +94,13 @@ export class ConfigureAutorecApp extends foundryPlatform.HandlebarsApplicationMi
 
         // Cancel/Close button handler
         const cancelBtn = this.element?.querySelector('button[name="cancel"]');
-        cancelBtn?.addEventListener('click', (event) => {
+        cancelBtn?.addEventListener('click', (event: any) => {
             event.preventDefault();
             this.close();
         });
     }
 
-    static async _formHandler(event, form, formData) {
+    static async _formHandler(this: any, event: any, form: any, formData: any) {
         const isCancel = event.submitter && event.submitter.name === "cancel";
         if (isCancel) return;
 

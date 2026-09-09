@@ -12,12 +12,12 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function play(token, targets, config = {}) {
+async function play(token: any, targets?: any, config: any = {}) {
     const seq = await create(token, targets, config);
     if (seq) { await seq.play(); }
 }
 
-function targetSequence(target, config = {}) {
+function targetSequence(target: any, config: any = {}) {
     const { color, sound } = config;
     let seq = new Sequence();
     applySound(seq, sound);
@@ -25,7 +25,7 @@ function targetSequence(target, config = {}) {
         .copySprite(target)
         .attachTo(target)
         .scaleToObject(1, { considerTokenScale: true })
-        .spriteRotation(-target.document.rotation)
+        .spriteRotation(-adapter.getTokenRotation(target))
         .duration(2500) 
         .fadeOut(1000)
         .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 25, gridUnits:true, pingPong:true})
@@ -54,7 +54,7 @@ function targetSequence(target, config = {}) {
     return seq;
 }
 
-function create(token, targets, config = {}) {
+function create(token: any, targets?: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
     const label = `${id} - ${token.id}`;

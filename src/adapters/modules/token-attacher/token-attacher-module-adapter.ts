@@ -16,12 +16,10 @@ export class TokenAttacherModuleAdapter extends BaseModuleAdapter {
     /**
      * Access the active external tokenAttacher library API instance.
      */
-    get api() {
-        if (typeof window !== 'undefined' && window.tokenAttacher && window.tokenAttacher !== tokenAttacher) {
-            return window.tokenAttacher;
-        }
-        if (typeof global !== 'undefined' && global.tokenAttacher && global.tokenAttacher !== tokenAttacher) {
-            return global.tokenAttacher;
+    get api(): any {
+        const globalTA = (globalThis as any).tokenAttacher;
+        if (globalTA && globalTA !== tokenAttacher) {
+            return globalTA;
         }
         return null;
     }
@@ -33,7 +31,7 @@ export class TokenAttacherModuleAdapter extends BaseModuleAdapter {
      * @param {boolean} [suppressNotification=true] Whether to suppress UI notification
      * @returns {Promise<unknown>}
      */
-    async attachElementsToToken(elements, targetToken, suppressNotification = true) {
+    async attachElementsToToken(elements: any, targetToken: any, suppressNotification: boolean = true): Promise<any> {
         const items = [elements].flat().filter(Boolean);
         if (items.length === 0 || !targetToken) return;
         const api = this.api;
@@ -51,7 +49,7 @@ export class TokenAttacherModuleAdapter extends BaseModuleAdapter {
      * @param {boolean} [suppressNotification=true] Whether to suppress UI notification
      * @returns {Promise<unknown>}
      */
-    async detachElementsFromToken(elements, targetToken, suppressNotification = true) {
+    async detachElementsFromToken(elements: any, targetToken: any, suppressNotification: boolean = true): Promise<any> {
         const items = [elements].flat().filter(Boolean);
         if (items.length === 0 || !targetToken) return;
         const api = this.api;
@@ -65,14 +63,14 @@ export class TokenAttacherModuleAdapter extends BaseModuleAdapter {
     /**
      * Alias for attachElementsToToken.
      */
-    async attach(elements, targetToken, suppressNotification = true) {
+    async attach(elements: any, targetToken: any, suppressNotification: boolean = true): Promise<any> {
         return this.attachElementsToToken(elements, targetToken, suppressNotification);
     }
 
     /**
      * Alias for detachElementsFromToken.
      */
-    async detach(elements, targetToken, suppressNotification = true) {
+    async detach(elements: any, targetToken: any, suppressNotification: boolean = true): Promise<any> {
         return this.detachElementsFromToken(elements, targetToken, suppressNotification);
     }
 }

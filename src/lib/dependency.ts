@@ -22,9 +22,8 @@ function _isAscending(min?: string, version?: string, max?: string): boolean {
     if ((Boolean(min) || Boolean(max)) && !version) return false;
     let isValidVersion = true;
     const isNewer = foundry?.utils?.isNewerVersion;
-    if (!isNewer) return false;
-    if (min) isValidVersion = isValidVersion && !isNewer(min, version);
-    if (max) isValidVersion = isValidVersion && !isNewer(version, max);
+    if (min && version) isValidVersion = isValidVersion && !isNewer(min, version);
+    if (max && version) isValidVersion = isValidVersion && !isNewer(version, max);
     return Boolean(isValidVersion);
 }
 

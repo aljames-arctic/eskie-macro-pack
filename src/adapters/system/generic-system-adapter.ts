@@ -1,4 +1,5 @@
 import { BaseSystemAdapter } from './base-system-adapter.js';
+import { BaseFoundryAdapter } from '../foundry/base-foundry-adapter.js';
 
 /**
  * Generic Fallback System Adapter Class
@@ -8,7 +9,7 @@ export class GenericSystemAdapter extends BaseSystemAdapter {
     /**
      * @param {BaseFoundryAdapter} [foundry=null]
      */
-    constructor(foundry = null) {
+    constructor(foundry: BaseFoundryAdapter | null = null) {
         super("generic", false, foundry);
     }
 
@@ -17,7 +18,7 @@ export class GenericSystemAdapter extends BaseSystemAdapter {
      * @param {ChatMessage} message
      * @returns {string}
      */
-    qualifyMessage(message) {
+    qualifyMessage(message: any): string {
         const flavorText = (message?.flavor ?? "").toLowerCase();
         const contentText = message?.content ?? "";
         const contentLower = contentText.toLowerCase();
@@ -40,7 +41,7 @@ export class GenericSystemAdapter extends BaseSystemAdapter {
      * @param {ChatMessage} _message
      * @returns {Array<{ source: string, rawAbility: string|null, outcome: string, tokenId: string|null }>}
      */
-    extractRolls(_message) {
+    extractRolls(_message: any): any[] {
         return [{
             source: "generic-keywords",
             rawAbility: null,

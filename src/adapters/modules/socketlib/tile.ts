@@ -105,7 +105,7 @@ async function createTile(updates = {}) {
         height: 1
     };
     updates = adapter.mergeObject(DEFAULT_TILE_UPDATES, updates);
-    return canvas.scene.createEmbeddedDocuments("Tile", [updates]);
+    return (canvas as any).scene?.createEmbeddedDocuments("Tile", [updates as any]) ?? [];
 }
 
 /**

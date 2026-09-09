@@ -24,7 +24,7 @@ const DEFAULT_CONFIG = {
  * @param {boolean} persist - Whether the effect should persist.
  * @returns {Effect} A configured Sequencer Effect.
  */
-function _createCloudEffect(position, file, { size, opacity, rotate, zIndex, rotationDuration }, persist) {
+function _createCloudEffect(position: any, file: any, { size, opacity, rotate, zIndex, rotationDuration }: any, persist?: boolean) {
     return new Sequence()
         .effect()
         .name("Cloud of Sand")
@@ -54,7 +54,7 @@ function _createCloudEffect(position, file, { size, opacity, rotate, zIndex, rot
  * @param {boolean} config.persist - Whether the effect should persist.
  * @returns {Sequence} The animation sequence.
  */
-async function create(position, config = {}) {
+async function create(position: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { persist, color, sound } = mConfig;
 
@@ -134,14 +134,14 @@ async function create(position, config = {}) {
         .tint("#faff1e")
         .belowTokens()
         .opacity(0.45)
-        .persist(config.persist)
+        .persist(persist)
 
     // Simplified cloud effects
-    sequence.addSequence(_createCloudEffect(position, `jb2a.sleep.cloud.01.${color}`, { size: 12, opacity: 1, rotate: 0, zIndex: 1, rotationDuration: 1500 }, config.persist));
-    sequence.addSequence(_createCloudEffect(position, `jb2a.sleep.cloud.01.${color}`, { size: 10, opacity: 0.65, rotate: 90, zIndex: 2, rotationDuration: 1400 }, config.persist));
-    sequence.addSequence(_createCloudEffect(position, `jb2a.sleep.cloud.01.${color}`, { size: 6, opacity: 0.4, rotate: 180, zIndex: 3, rotationDuration: 1300 }, config.persist));
-    sequence.addSequence(_createCloudEffect(position, `jb2a.sleep.cloud.01.${color}`, { size: 2, opacity: 0.25, rotate: 180, zIndex: 4, rotationDuration: 1200 }, config.persist));
-    sequence.addSequence(_createCloudEffect(position, `jb2a.sleep.cloud.01.${color}`, { size: 1, opacity: 0.15, rotate: 180, zIndex: 5, rotationDuration: 1100 }, config.persist));
+    sequence.addSequence(_createCloudEffect(position, `jb2a.sleep.cloud.01.${color}`, { size: 12, opacity: 1, rotate: 0, zIndex: 1, rotationDuration: 1500 }, persist));
+    sequence.addSequence(_createCloudEffect(position, `jb2a.sleep.cloud.01.${color}`, { size: 10, opacity: 0.65, rotate: 90, zIndex: 2, rotationDuration: 1400 }, persist));
+    sequence.addSequence(_createCloudEffect(position, `jb2a.sleep.cloud.01.${color}`, { size: 6, opacity: 0.4, rotate: 180, zIndex: 3, rotationDuration: 1300 }, persist));
+    sequence.addSequence(_createCloudEffect(position, `jb2a.sleep.cloud.01.${color}`, { size: 2, opacity: 0.25, rotate: 180, zIndex: 4, rotationDuration: 1200 }, persist));
+    sequence.addSequence(_createCloudEffect(position, `jb2a.sleep.cloud.01.${color}`, { size: 1, opacity: 0.15, rotate: 180, zIndex: 5, rotationDuration: 1100 }, persist));
 
     return sequence;
 }
@@ -153,7 +153,7 @@ async function create(position, config = {}) {
  * @param {object} config - Configuration options.
  * @param {boolean} config.persist - Whether the effect should persist.
  */
-async function play(position, config = {}) {
+async function play(position: any, config: any = {}) {
     const sequence = await create(position, config);
     if (sequence) return sequence.play();
 }

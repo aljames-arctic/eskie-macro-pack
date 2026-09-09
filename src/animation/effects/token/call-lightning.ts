@@ -16,7 +16,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config - Configuration options for the animation.
  * @returns {Sequence} The created Sequence object.
  */
-async function create(position, config = {}) {
+async function create(position: any, config: any = {}) {
     config = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const sequence = new Sequence();
@@ -52,7 +52,7 @@ async function create(position, config = {}) {
  * @param {Token} token - The casting token.
  * @param {object} options - Options for playing the animation, including config.
  */
-async function play(token, position, config = {}) {
+async function play(token: any, position?: any, config: any = {}) {
     if (!position) {
         const crosshairConfig = {
             size: token.document.width,

@@ -5,25 +5,25 @@ import { BaseFoundryAdapter } from '../../adapters/foundry/index.js';
 
 const foundryPlatform = new BaseFoundryAdapter();
 
-export async function generateAutorecUpdate(autorec, excludedIds = new Set()) {
+export async function generateAutorecUpdate(autorec: any, excludedIds: any = new Set()) {
     log.group("Autorecognition Menu Check", 'debug');
-    let settings = {};
+    let settings: Record<string, any[]> = {};
     const menuKeys = ["melee", "range", "ontoken", "templatefx", "preset", "aura", "aefx"];
     for (const key of menuKeys) {
-        settings[key] = [...new Map(await game.settings.get("autoanimations", `aaAutorec-${key}`).map((v) => [v.id, v])).values()];
+        settings[key] = [...new Map((await (game.settings as any).get("autoanimations", `aaAutorec-${key}`)).map((v: any) => [v.id, v])).values()];
     }
 
-    let updatedEntries = { melee: [], range: [], ontoken: [], templatefx: [], aura: [], preset: [], aefx: [] };
-    let missingEntries = { melee: [], range: [], ontoken: [], templatefx: [], aura: [], preset: [], aefx: [] };
-    let custom = { melee: [], range: [], ontoken: [], templatefx: [], aura: [], preset: [], aefx: [] };
-    let same = { melee: [], range: [], ontoken: [], templatefx: [], aura: [], preset: [], aefx: [] };
-    let customNew = { melee: [], range: [], ontoken: [], templatefx: [], aura: [], preset: [], aefx: [] };
+    let updatedEntries: Record<string, any[]> = { melee: [], range: [], ontoken: [], templatefx: [], aura: [], preset: [], aefx: [] };
+    let missingEntries: Record<string, any[]> = { melee: [], range: [], ontoken: [], templatefx: [], aura: [], preset: [], aefx: [] };
+    let custom: Record<string, any[]> = { melee: [], range: [], ontoken: [], templatefx: [], aura: [], preset: [], aefx: [] };
+    let same: Record<string, any[]> = { melee: [], range: [], ontoken: [], templatefx: [], aura: [], preset: [], aefx: [] };
+    let customNew: Record<string, any[]> = { melee: [], range: [], ontoken: [], templatefx: [], aura: [], preset: [], aefx: [] };
 
     // 1st Loop - Check incoming animations against existing settings
     for (const key of menuKeys) {
         if (!autorec[key] || !Array.isArray(autorec[key])) continue;
-        autorec[key].forEach(newEntry => {
-            const existingEntry = settings[key]?.find(e => e.label === newEntry.label);
+        autorec[key].forEach((newEntry: any) => {
+            const existingEntry = settings[key]?.find((e: any) => e.label === newEntry.label);
             if (existingEntry) {
                 if (existingEntry.metaData?.name === "Eskie Macro Pack") {
                     if (foundryPlatform.isNewerVersion(newEntry.metaData.version, existingEntry.metaData.version ?? "0.0.0")) {
@@ -43,14 +43,14 @@ export async function generateAutorecUpdate(autorec, excludedIds = new Set()) {
     // 2nd Loop - Check existing settings for custom animations to preserve
     for (const key of menuKeys) {
         if (!settings[key] || !Array.isArray(settings[key])) continue;
-        settings[key].forEach(existingEntry => {
-            const isConflict = custom[key].some(e => e.id === existingEntry.id);
+        settings[key].forEach((existingEntry: any) => {
+            const isConflict = custom[key].some((e: any) => e.id === existingEntry.id);
             if (isConflict) return;
 
-            const isSame = same[key].some(e => e.id === existingEntry.id);
+            const isSame = same[key].some((e: any) => e.id === existingEntry.id);
             if (isSame) return;
 
-            const isInNew = autorec[key]?.some(e => e.label === existingEntry.label);
+            const isInNew = autorec[key]?.some((e: any) => e.label === existingEntry.label);
             if (isInNew) return; 
 
             if (existingEntry.metaData?.name !== "Eskie Macro Pack") {
@@ -67,19 +67,19 @@ export async function generateAutorecUpdate(autorec, excludedIds = new Set()) {
     log.groupEnd();
     
     // Create structured lists for the dialog
-    const formatEntry = (e) => ({ id: e.id, label: e.label, menu: e.menu || "preset" });
-    const missingEntriesList = Object.values(missingEntries).flat().map(formatEntry).sort((a, b) => a.label.localeCompare(b.label));
-    const updatedEntriesList = Object.values(updatedEntries).flat().map(formatEntry).sort((a, b) => a.label.localeCompare(b.label));
-    const customEntriesList = Object.values(custom).flat().map(formatEntry).sort((a, b) => a.label.localeCompare(b.label));
+    const formatEntry = (e: any) => ({ id: e.id, label: e.label, menu: e.menu || "preset" });
+    const missingEntriesList = Object.values(missingEntries).flat().map(formatEntry).sort((a: any, b: any) => a.label.localeCompare(b.label));
+    const updatedEntriesList = Object.values(updatedEntries).flat().map(formatEntry).sort((a: any, b: any) => a.label.localeCompare(b.label));
+    const customEntriesList = Object.values(custom).flat().map(formatEntry).sort((a: any, b: any) => a.label.localeCompare(b.label));
 
     const missingSections = groupAAEntriesBySection(missingEntries);
     const updatedSections = groupAAEntriesBySection(updatedEntries);
     const customSections = groupAAEntriesBySection(custom);
 
     // Construct the new settings that will be saved (filtering out excluded missing entries)
-    let newSettings = {};
+    let newSettings: Record<string, any> = {};
     for (const key of menuKeys) {
-        const missingForCategory = (missingEntries[key] ?? []).filter(e => !excludedIds.has(e.id));
+        const missingForCategory = (missingEntries[key] ?? []).filter((e: any) => !excludedIds.has(e.id));
         const newEntriesForKey = [
             ...missingForCategory,
             ...(updatedEntries[key] ?? []),
@@ -89,7 +89,7 @@ export async function generateAutorecUpdate(autorec, excludedIds = new Set()) {
         ];
         // Deduplicate EMP entries by label to eliminate any legacy duplicates
         const seenEmpLabels = new Set();
-        const deduplicatedEntries = [];
+        const deduplicatedEntries: any[] = [];
         for (const entry of newEntriesForKey) {
             if (entry.metaData?.name === "Eskie Macro Pack") {
                 if (seenEmpLabels.has(entry.label)) continue;
@@ -97,9 +97,9 @@ export async function generateAutorecUpdate(autorec, excludedIds = new Set()) {
             }
             deduplicatedEntries.push(entry);
         }
-        newSettings[key] = [...new Map(deduplicatedEntries.map((v) => [v.id, v])).values()].sort((a, b) => (a.label || "").localeCompare(b.label || ""));
+        newSettings[key] = [...new Map(deduplicatedEntries.map((v: any) => [v.id, v])).values()].sort((a: any, b: any) => (a.label ?? "").localeCompare(b.label ?? ""));
     }
-    newSettings.version = (await game.settings.get("autoanimations", "aaAutorec"))?.version ?? "0.0.0";
+    newSettings.version = (await (game.settings as any).get("autoanimations", "aaAutorec"))?.version ?? "0.0.0";
 
     return {
         newSettings,
@@ -130,18 +130,18 @@ export const AA_SECTION_CONFIG = [
  * @param {object} entriesByCategory Dictionary of arrays keyed by AA category
  * @returns {Array<{sectionId: string, sectionName: string, icon: string, entries: Array<object>}>}
  */
-export function groupAAEntriesBySection(entriesByCategory = {}) {
-    const sections = [];
+export function groupAAEntriesBySection(entriesByCategory: any = {}) {
+    const sections: any[] = [];
     for (const conf of AA_SECTION_CONFIG) {
-        const rawList = entriesByCategory[conf.id];
-        if (!rawList || !rawList.length) continue;
+        const rawEntries = entriesByCategory[conf.id] ?? [];
+        if (!rawEntries.length) continue;
 
-        const entries = rawList.map(e => ({
+        const entries = rawEntries.map((e: any) => ({
             id: e.id,
             label: e.label,
             menu: conf.id,
             version: e.metaData?.version ?? "0.0.0"
-        })).sort((a, b) => a.label.localeCompare(b.label));
+        })).sort((a: any, b: any) => a.label.localeCompare(b.label));
 
         sections.push({
             sectionId: conf.id,
@@ -156,8 +156,10 @@ export function groupAAEntriesBySection(entriesByCategory = {}) {
 /**
  * Interactive ApplicationV2 for reviewing and synchronizing Automated Animations custom auto-recognition presets.
  */
-export class AutorecUpdateApp extends foundryPlatform.HandlebarsApplicationMixin(foundryPlatform.ApplicationV2) {
-    constructor(autorec = EMP_AA_Menu, options = {}) {
+export class AutorecUpdateApp extends (foundryPlatform.HandlebarsApplicationMixin(foundryPlatform.ApplicationV2) as any) {
+    autorec: any;
+
+    constructor(autorec = EMP_AA_Menu, options: any = {}) {
         super(options);
         this.autorec = autorec ?? EMP_AA_Menu;
     }
@@ -191,7 +193,7 @@ export class AutorecUpdateApp extends foundryPlatform.HandlebarsApplicationMixin
         return await generateAutorecUpdate(this.autorec, excludedIds);
     }
 
-    async _prepareContext(options) {
+    async _prepareContext(options: any): Promise<any> {
         const {
             missingEntriesList,
             updatedEntriesList,
@@ -214,10 +216,10 @@ export class AutorecUpdateApp extends foundryPlatform.HandlebarsApplicationMixin
         };
     }
 
-    _onRender(context, options) {
-        super._onRender?.(context, options);
+    _onRender(context: any, options: any): void | Promise<void> {
+        (super._onRender as any)?.(context, options);
         const cancelBtn = this.element?.querySelector('button[name="cancel"]');
-        cancelBtn?.addEventListener('click', async (event) => {
+        cancelBtn?.addEventListener('click', async (event: any) => {
             event.preventDefault();
             const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
             if (rawVersion !== "#{VERSION}#" && game.settings) {
@@ -227,7 +229,7 @@ export class AutorecUpdateApp extends foundryPlatform.HandlebarsApplicationMixin
         });
     }
 
-    static async _formHandler(event, form, formData) {
+    static async _formHandler(this: any, event: any, form: any, formData: any) {
         const isCancel = event.submitter && event.submitter.name === "cancel";
         if (isCancel) {
             const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";
@@ -272,8 +274,9 @@ export class AutorecUpdateApp extends foundryPlatform.HandlebarsApplicationMixin
             return;
         }
 
-        if (AutomatedAnimations?.AutorecManager?.overwriteMenus) {
-            await AutomatedAnimations.AutorecManager.overwriteMenus(JSON.stringify(newSettings), { submitAll: true });
+        const aaManager = (globalThis as any).AutomatedAnimations?.AutorecManager;
+        if (aaManager?.overwriteMenus) {
+            await aaManager.overwriteMenus(JSON.stringify(newSettings), { submitAll: true });
         }
 
         const rawVersion = game.modules?.get(MODULE_ID)?.version ?? "1.0.0";

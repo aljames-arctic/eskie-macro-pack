@@ -9,7 +9,7 @@ const DEFAULT_CONFIG = {
     config_v2,
 };
 
-function getVersion(config = {}) {
+function getVersion(config: any = {}) {
     const { version } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     // Merge the DEFAULT_CONFIG with our possibly modified input config
@@ -22,19 +22,19 @@ function getVersion(config = {}) {
     return map[version - 1];
 }
 
-function create(token, config = {}) {
+function create(token: any, config: any = {}) {
     const version = getVersion(config);
     if (!version) return;
     return version.fn.create(token, version.cfg);
 }
 
-async function play(token, config = {}) {
+async function play(token: any, config: any = {}) {
     const version = getVersion(config);
     if (!version) return;
     return version.fn.play(token, version.cfg);
 }
 
-async function stop(token, config = {}) {
+async function stop(token: any, config: any = {}) {
     // If a specific version is targeted, stop it; otherwise stop across both versions
     const version = getVersion(config);
     if (version) {

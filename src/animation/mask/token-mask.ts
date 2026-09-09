@@ -87,7 +87,7 @@ async function createMaskTiles(object, config = {}) {
  * Internal helper to build the local animation sequence using pre-created tiles.
  * Guaranteed to be called only locally on the client.
  */
-async function createLocal(object, tileIds, animationId, config = {}) {
+async function createLocal(object: any, tileIds: string[], animationId: string, config: any = {}) {
     if (!object) {
         ui.notifications.warn("Eskie Macros | No token or tile provided or selected.");
         return log.warn("tokenMaskEffect.createLocal: No object provided. Effect aborted.");
@@ -124,12 +124,12 @@ async function createLocal(object, tileIds, animationId, config = {}) {
     // Wait for tiles to replicate to this client's scene
     try {
         await time.waitUntil(() => {
-            return tileIds.every(tileId => canvas.scene.tiles.has(tileId));
+            return tileIds.every(tileId => Boolean((canvas.scene as any)?.tiles?.has(tileId)));
         }, { timeout: 5000, interval: 100 });
     } catch (err) {
         log.warn("tokenMaskEffect.createLocal | Timeout waiting for tiles to replicate.");
     }
-    const tiles = tileIds.map(tileId => canvas.scene.tiles.get(tileId));
+    const tiles = tileIds.map(tileId => (canvas.scene as any)?.tiles?.get(tileId));
 
     const [objectRevealMask, sceneRevealMask, objectShapeMask] = tiles;
     if (!objectRevealMask || !sceneRevealMask || !objectShapeMask) {
@@ -256,7 +256,7 @@ async function createLocal(object, tileIds, animationId, config = {}) {
 /**
  * Public coordinated create. Returns a Sequence wrapper that triggers host-level playSocketed.
  */
-async function create(object, config = {}) {
+async function create(object: any, config: any = {}) {
     if (!object) {
         ui.notifications.warn("Eskie Macros | No token or tile provided or selected.");
         return log.warn("tokenMaskEffect: No object provided. Effect aborted.");
@@ -392,7 +392,7 @@ async function stopLocal(object, config = {}) {
 /**
  * Public entry point to stop all active token mask sessions.
  */
-async function stop(object, config = {}) {
+async function stop(object: any, config: any = {}) {
     // Stop all active token mask sessions currently registered on this object
     const masks = object.document.getFlag('eskie-macros', 'token-masks') ?? {};
     const activeAnimationIds = Object.keys(masks);

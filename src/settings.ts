@@ -20,7 +20,7 @@ Hooks.once('init', function() {
             label: 'EMP.settings.generateCompendiums.label',
             hint: 'EMP.settings.generateCompendiums.hint',
             icon: 'fa-solid fa-arrows-rotate',
-            type: class extends (adapter.foundry.ApplicationV2 ?? class {}) {
+            type: (class extends ((adapter.foundry as any).ApplicationV2 ?? class {}) {
                 constructor(options = {}) {
                     super(options);
                     updateMacroCompendiums().then(() => {
@@ -30,7 +30,7 @@ Hooks.once('init', function() {
                     });
                 }
                 render() { return this; }
-            },
+            }) as any,
             restricted: true
         });
     }
@@ -39,8 +39,9 @@ Hooks.once('init', function() {
     game.settings.registerMenu(MODULE_ID, 'recommendedModules', {
         name: 'EMP.settings.recommendedModules.name',
         label: 'EMP.settings.recommendedModules.label',
+        hint: '',
         icon: 'fa-solid fa-puzzle-piece',
-        type: RecommendedModulesFormApplication,
+        type: RecommendedModulesFormApplication as any,
         restricted: true
     });
 
@@ -50,7 +51,7 @@ Hooks.once('init', function() {
         label: 'EMP.settings.configureAutorec.label',
         hint: 'EMP.settings.configureAutorec.hint',
         icon: 'fa-solid fa-wand-magic-sparkles',
-        type: ConfigureAutorecFormApplication,
+        type: ConfigureAutorecFormApplication as any,
         restricted: true
     });
 
@@ -58,8 +59,9 @@ Hooks.once('init', function() {
     game.settings.registerMenu(MODULE_ID, 'worldScripts', {
         name: 'EMP.settings.worldScripts.name',
         label: 'EMP.settings.worldScripts.label',
+        hint: '',
         icon: 'fa-solid fa-code',
-        type: WorldScriptsFormApplication,
+        type: WorldScriptsFormApplication as any,
         restricted: true
     });
 
@@ -137,7 +139,7 @@ Hooks.once('init', function() {
  * @param {HTMLElement|jQuery} html - The settings config DOM element
  * @param {object} [_app=null] - The settings application instance
  */
-export function injectSettingsHeaders(html, _app = null) {
+export function injectSettingsHeaders(html: any, _app: any = null) {
     const root = html?.querySelector ? html : html?.[0];
     if (!root?.querySelector) return;
 
@@ -176,7 +178,7 @@ export function injectSettingsHeaders(html, _app = null) {
             icon: 'fas fa-globe'
         },
         {
-            keys: [],
+            keys: [] as string[],
             scope: 'user',
             title: game.i18n?.localize?.('EMP.settingsSections.user') ?? 'User Settings',
             icon: 'fas fa-user'
@@ -190,7 +192,7 @@ export function injectSettingsHeaders(html, _app = null) {
     ];
 
     for (const section of sections) {
-        let targetEl = null;
+        let targetEl: any = null;
         for (const key of section.keys) {
             const selector = [
                 `[data-setting-id="${MODULE_ID}.${key}"]`,
@@ -232,8 +234,8 @@ export function injectSettingsHeaders(html, _app = null) {
 }
 
 // Dynamic visibility of Manage Autorec menu button and settings headers injection
-Hooks.on('renderSettingsConfig', function(app, html, data) {
-    const root = html?.querySelector ? html : html?.[0];
+Hooks.on('renderSettingsConfig', function(app: any, html: any, data: any) {
+    const root = typeof html?.querySelector === 'function' ? html : html?.[0];
     if (!root) return;
 
     const isAaActive = Boolean(game.modules?.get("autoanimations")?.active);

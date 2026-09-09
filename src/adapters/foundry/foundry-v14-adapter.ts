@@ -82,7 +82,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {Object} [config={}] Configuration options
      * @returns {[ {x: number, y: number}, {x: number, y: number}, {x: number, y: number} ]} Array of [primary, secondary, center] coordinates
      */
-    getTemplatePosition(template, config = {}) {
+    getTemplatePosition(template: any, config: any = {}): any {
         if (!template) return [];
 
         const doc = template.document ?? template;
@@ -104,19 +104,19 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
             const { size: gridSize, distance: gridDistance } = this.getSceneDimensions(canvas?.scene);
 
             // Grid distance (feet) converted to canvas pixels when provided
-            const gridUnits = config.distance ?? doc.distance ?? shape?.distance;
+            const gridUnits = (config as any).distance ?? doc.distance ?? shape?.distance;
             const distancePx = gridUnits !== undefined && gridUnits > 0
                 ? (gridUnits / gridDistance) * gridSize
                 : (shape?.radius ?? shape?.height ?? shape?.width ?? 0);
 
-            const rotation = shape?.rotation ?? doc.rotation ?? config.direction ?? 0;
+            const rotation = shape?.rotation ?? doc.rotation ?? (config as any).direction ?? 0;
             const rad = (rotation * Math.PI) / 180;
 
             let secondary;
             if (distancePx > 0) {
                 secondary = { x: primary.x + Math.cos(rad) * distancePx, y: primary.y + Math.sin(rad) * distancePx };
             } else {
-                const token = config.token ?? config.sourceToken;
+                const token = (config as any).token ?? (config as any).sourceToken;
                 const tokenCenter = token?.center ?? (token?.x !== undefined ? { x: token.x, y: token.y } : null);
                 if (tokenCenter && Math.hypot(primary.x - tokenCenter.x, primary.y - tokenCenter.y) >= 1) {
                     secondary = primary;
@@ -142,7 +142,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @returns {string|null}
      * @private
      */
-    _extractTextureSource(target) {
+    _extractTextureSource(target: any): string | null {
         if (!target) return null;
         if (typeof target === 'string') return target;
         if (typeof target.src === 'string') return target.src;
@@ -162,11 +162,11 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {Level|null} [level=null] Target level document or placeable (defaults to active level)
      * @returns {{ src: string|null, offsetX: number, offsetY: number }}
      */
-    getSceneBackground(scene = canvas?.scene, level = null) {
+    getSceneBackground(scene: any = canvas?.scene, level: any = null): any {
         if (!scene) return { src: null, offsetX: 0, offsetY: 0 };
 
-        const activeLevel = level
-            ?? canvas?.level
+        const activeLevel: any = level
+            ?? (canvas as any)?.level
             ?? scene.levels?.get?.(scene.activeLevel)
             ?? scene.levels?.contents?.[0]
             ?? scene.levels?.[0]
@@ -182,7 +182,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
             }
         }
 
-        const envBg = scene.environment?.background ?? null;
+        const envBg = (scene as any).environment?.background ?? null;
         if (envBg) {
             const src = this._extractTextureSource(envBg);
             return {
@@ -210,9 +210,9 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {string} keyId The property key to delete
      * @returns {Record<string, *>} Update dictionary
      */
-    formatDeletionUpdate(path, keyId) {
+    formatDeletionUpdate(path: string, keyId: string): Record<string, any> {
         const fullKey = path ? `${path}.${keyId}` : keyId;
-        const operator = foundry.data?.operators?.ForcedDeletion;
+        const operator = (foundry.data as any)?.operators?.ForcedDeletion;
         return { [fullKey]: operator };
     }
 
@@ -234,9 +234,9 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @override
      * @returns {RegionDocument[]}
      */
-    getControlledRegions() {
-        const controlled = canvas?.regions?.controlled ?? [];
-        return controlled.map(r => r.document);
+    getControlledRegions(): any[] {
+        const controlled = (canvas as any)?.regions?.controlled ?? [];
+        return controlled.map((r: any) => r.document);
     }
 
     /**
@@ -246,7 +246,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {Region|RegionDocument} region Target Region placeable or document
      * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number, anchor: {x: number, y: number} }}
      */
-    getRegionBounds(region) {
+    getRegionBounds(region: any): any {
         if (!region) {
             return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
         }
@@ -377,11 +377,11 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {Region|RegionDocument} region Target Region placeable or document
      * @returns {Token[]}
      */
-    getTokensInRegion(region) {
+    getTokensInRegion(region: any): any[] {
         if (!region) return [];
         const doc = region.document ?? region;
         const tokens = doc.tokens ?? region.tokens ?? [];
-        return Array.from(tokens, t => (t.object ? t.object : t)).filter(Boolean);
+        return Array.from(tokens, (t: any) => (t.object ? t.object : t)).filter(Boolean);
     }
 
     /**
@@ -391,7 +391,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {object} behaviorData Formatted behavior configuration data
      * @returns {Promise<RegionBehavior|null>}
      */
-    async createRegionBehavior(region, behaviorData) {
+    async createRegionBehavior(region: any, behaviorData: any): Promise<any> {
         if (!region) return null;
         const doc = region.document ?? region;
         if (!doc.createEmbeddedDocuments) return null;
@@ -411,7 +411,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {object} [config.flags={}] Custom flags
      * @returns {object} Formatted RegionBehavior creation payload
      */
-    formatRegionBehaviorData({ name, events = ['tokenEnter'], source, disabled = false, flags = {} }) {
+    formatRegionBehaviorData({ name, events = ['tokenEnter'], source, disabled = false, flags = {} }: any): any {
         return {
             name,
             type: 'executeScript',
@@ -430,12 +430,12 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {string} id Target placeable ID
      * @returns {PlaceableObject|null}
      */
-    getPlaceable(id) {
+    getPlaceable(id: string): any {
         if (!id) return null;
         return super.getPlaceable(id)
-            ?? canvas?.regions?.get?.(id)
-            ?? canvas?.scene?.regions?.get?.(id)?.object
-            ?? canvas?.scene?.regions?.get?.(id)
+            ?? (canvas as any)?.regions?.get?.(id)
+            ?? (canvas as any)?.scene?.regions?.get?.(id)?.object
+            ?? (canvas as any)?.scene?.regions?.get?.(id)
             ?? null;
     }
 
@@ -446,7 +446,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {PlaceableObject|Document|null} placeable Target placeable or document
      * @returns {string|null}
      */
-    getPlaceableTexture(placeable) {
+    getPlaceableTexture(placeable: any): string | null {
         if (!placeable) return null;
         const directTexture = super.getPlaceableTexture(placeable);
         if (directTexture) return directTexture;
@@ -474,13 +474,13 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {{ x: number, y: number }} point Point coordinates
      * @returns {boolean}
      */
-    containsPoint(object, point) {
+    containsPoint(object: any, point: any): boolean {
         if (!object || !point) return false;
         const doc = object.document ?? object;
         const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(object.shapes);
         if (isRegion) {
             const placeable = object.object ?? doc.object ?? object;
-            const testResult = placeable.testPoint?.(point);
+            const testResult = placeable?.testPoint?.(point);
             if (testResult !== undefined) return Boolean(testResult);
         }
         return super.containsPoint(object, point);

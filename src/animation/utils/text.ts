@@ -47,7 +47,7 @@ const DEFAULT_TYPING_CONFIG = {
  * @param {object} [config] Configuration for styling and timing.
  * @returns {Promise<Sequence>}
  */
-async function create(token, text, config = {}) {
+async function create(token: any, text: string, config: any = {}): Promise<any> {
     const mConfig = adapter.mergeObject(DEFAULT_FLOATING_CONFIG, config);
     let { id, duration, delay, style, kerning, verticalOffset } = mConfig;
     
@@ -81,9 +81,9 @@ async function create(token, text, config = {}) {
  * @param {number} maxCharsPerLine 
  * @returns {string[]}
  */
-function _wrapText(text, maxCharsPerLine) {
+function _wrapText(text: string, maxCharsPerLine: number): string[] {
     const words = text.split(' ');
-    const lines = [];
+    const lines: string[] = [];
     let currentLine = "";
 
     for (const word of words) {
@@ -105,7 +105,7 @@ function _wrapText(text, maxCharsPerLine) {
  * @param {string} text The text to type.
  * @param {object} [config] Configuration for positioning, styling, and wrapping.
  */
-function createTyping(sequence, text, config = {}) {
+function createTyping(sequence: any, text: string, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_TYPING_CONFIG, config);
     const {
         duration,
@@ -185,7 +185,7 @@ function createTyping(sequence, text, config = {}) {
  * @param {string} text 
  * @param {object} [config] 
  */
-async function play(token, text, config = {}) {
+async function play(token: any, text: string, config: any = {}) {
     const seq = await create(token, text, config);
     if (seq) return seq.play();
 }
@@ -196,7 +196,7 @@ async function play(token, text, config = {}) {
  * @param {Token} token 
  * @param {object} [options] 
  */
-async function stop(token, { id = 'text' } = {}) {
+async function stop(token: any, { id = 'text' }: { id?: string } = {}) {
     return Sequencer.EffectManager.endEffects({ name: id, object: token });
 }
 

@@ -11,7 +11,10 @@ import { ManageAutorecApp } from "../../../ui/autorec/manageAutorecMenu.js";
  * and Boss Loot FX (BLFX), enforcing user destination preferences.
  */
 export class AutorecManager {
-    constructor(aa = autoanimationsAdapter, blfx = blfxAdapter) {
+    aa: any;
+    blfx: any;
+
+    constructor(aa: any = autoanimationsAdapter, blfx: any = blfxAdapter) {
         this.aa = aa;
         this.blfx = blfx;
     }
@@ -26,7 +29,7 @@ export class AutorecManager {
      * @param {string} [fallback=key] Human-readable fallback name
      * @param {object} [options={}] Additional integration-specific configuration
      */
-    register(key, trigger, animation, config, version = "0.0.0", fallback = key, options = {}) {
+    register(key: any, trigger: any, animation: any, config: any, version: string = "0.0.0", fallback: any = key, options: any = {}): void {
         this.aa.register(key, trigger, animation, config, version, fallback);
         this.blfx.register(key, trigger, animation, config, version, fallback, options);
     }
@@ -37,7 +40,7 @@ export class AutorecManager {
      * @param {string} [fallback=key] Human-readable fallback label
      * @returns {string} Formatted concentrating name
      */
-    CONCENTRATING(key, fallback = key) {
+    CONCENTRATING(key: any, fallback: any = key): string {
         const localizedName = (typeof key === 'string' && (key.includes(":") || key.includes(" "))) ? key : localize(`EMP.effects.${key}`, fallback);
         return format("EMP.effects.concentratingPrefix", { name: localizedName }, `Concentrating: ${localizedName}`);
     }
@@ -48,7 +51,7 @@ export class AutorecManager {
      * @param {string} [fallback=key] Human-readable fallback label
      * @returns {string} Formatted label with (Melee) prefix
      */
-    MELEE(key, fallback = key) {
+    MELEE(key: any, fallback: any = key): string {
         const localizedName = (typeof key === 'string' && (key.includes(":") || key.includes(" "))) ? key : localize(`EMP.effects.${key}`, fallback);
         return format("EMP.effects.meleePrefix", { name: localizedName }, `(Melee) ${localizedName}`);
     }
@@ -59,7 +62,7 @@ export class AutorecManager {
      * @param {string} [fallback=key] Human-readable fallback label
      * @returns {string} Formatted label with (Ranged) prefix
      */
-    RANGED(key, fallback = key) {
+    RANGED(key: any, fallback: any = key): string {
         const localizedName = (typeof key === 'string' && (key.includes(":") || key.includes(" "))) ? key : localize(`EMP.effects.${key}`, fallback);
         return format("EMP.effects.rangedPrefix", { name: localizedName }, `(Ranged) ${localizedName}`);
     }
@@ -71,7 +74,7 @@ export class AutorecManager {
      * @param {boolean} [options.force=false] Force submission regardless of version
      * @returns {Promise<void>}
      */
-    async submit(options = {}) {
+    async submit(options: any = {}): Promise<void> {
         if (!game?.user?.isGM) return;
 
         const target = game.settings?.get(MODULE_ID, 'autorecTarget') ?? 'ask';

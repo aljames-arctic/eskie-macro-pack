@@ -23,7 +23,7 @@ const DEFAULT_CONFIG = {
  * @param {object} config Configuration options for the animation.
  * @returns {Sequence} The created Sequence object for the initial cast.
  */
-async function createInitialSpikeGrowth(position, config = {}) {
+async function createInitialSpikeGrowth(position: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { size, sound } = mConfig;
 
@@ -67,7 +67,7 @@ async function createInitialSpikeGrowth(position, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Array<Sequence>} An array of Sequence objects for the persistent spikes.
  */
-async function createPersistentSpikes(token, centralPosition, config = {}) {
+async function createPersistentSpikes(token: any, centralPosition: any, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, tint } = mConfig;
 
@@ -85,7 +85,7 @@ async function createPersistentSpikes(token, centralPosition, config = {}) {
     ];
 
     const tokenName = token.name;
-    const persistentSpikeSequences = [];
+    const persistentSpikeSequences: any[] = [];
 
     for (let i = 0; i < locations.length; i++) {
         const sequence = new Sequence();
@@ -135,7 +135,7 @@ async function createPersistentSpikes(token, centralPosition, config = {}) {
  * @param {object} config Configuration options for the animation.
  * @returns {Promise<void>} A promise that resolves when the effect is played or stopped.
  */
-async function createSpikeGrowth(token, config = {}, options = {}) {
+async function createSpikeGrowth(token: any, config: any = {}, options: any = {}) {
     if (options?.type == "aefx") return;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, size, template } = mConfig;
@@ -160,7 +160,7 @@ async function createSpikeGrowth(token, config = {}, options = {}) {
     return seq;
 }
 
-async function playSpikeGrowth(token, config = {}, options = {}) {
+async function playSpikeGrowth(token: any, config: any = {}, options: any = {}) {
     /*       Don't parse for active effects        *
      * We only care about removing when it expires */
     if (options?.type == "aefx") return;
@@ -174,7 +174,7 @@ async function playSpikeGrowth(token, config = {}, options = {}) {
  * @param {Token} token The token that cast the spell (used to identify the effect).
  * @param {object} options Options for stopping effects.
  */
-function stopSpikeGrowth(token, { id = DEFAULT_CONFIG.id } = {}) {
+function stopSpikeGrowth(token: any, { id = DEFAULT_CONFIG.id }: any = {}) {
     if (token) {
         Sequencer.EffectManager.endEffects({ name: `Spike Growth ${token.name} ${id}` });
     }

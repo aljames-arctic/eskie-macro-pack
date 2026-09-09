@@ -16,8 +16,8 @@ export class MassEditModuleAdapter extends BaseModuleAdapter {
     /**
      * Access the active MassEdit Linker API instance.
      */
-    get linker() {
-        return MassEdit?.linker;
+    get linker(): any {
+        return (globalThis as any).MassEdit?.linker;
     }
 
     /**
@@ -26,7 +26,7 @@ export class MassEditModuleAdapter extends BaseModuleAdapter {
      * @param {PlaceableObject} target Target parent placeable
      * @returns {Promise<unknown>}
      */
-    async link(elements, target) {
+    async link(elements: any, target: any): Promise<any> {
         const items = [elements].flat().filter(Boolean);
         if (items.length === 0 || !target) return;
         const linker = this.linker;
@@ -34,7 +34,7 @@ export class MassEditModuleAdapter extends BaseModuleAdapter {
             log.warn("MassEditModuleAdapter.link | MassEdit linker API is unavailable.");
             return;
         }
-        return Promise.all(items.map(element => linker.link([element, target])));
+        return Promise.all(items.map((element: any) => linker.link([element, target])));
     }
 
     /**
@@ -43,7 +43,7 @@ export class MassEditModuleAdapter extends BaseModuleAdapter {
      * @param {PlaceableObject} target Target parent placeable
      * @returns {Promise<unknown>}
      */
-    async removeLinks(elements, target) {
+    async removeLinks(elements: any, target: any): Promise<any> {
         const items = [elements].flat().filter(Boolean);
         if (items.length === 0 || !target) return;
         const linker = this.linker;
@@ -51,20 +51,20 @@ export class MassEditModuleAdapter extends BaseModuleAdapter {
             log.warn("MassEditModuleAdapter.removeLinks | MassEdit linker API is unavailable.");
             return;
         }
-        return Promise.all(items.map(element => linker.removeLinks([element, target])));
+        return Promise.all(items.map((element: any) => linker.removeLinks([element, target])));
     }
 
     /**
      * Alias for link.
      */
-    async attach(elements, target) {
+    async attach(elements: any, target: any): Promise<any> {
         return this.link(elements, target);
     }
 
     /**
      * Alias for removeLinks.
      */
-    async detach(elements, target) {
+    async detach(elements: any, target: any): Promise<any> {
         return this.removeLinks(elements, target);
     }
 }

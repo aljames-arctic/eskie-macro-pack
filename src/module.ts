@@ -81,4 +81,4 @@ Hooks.once('aa.ready', async () => {
     }
 });
 
-Hooks.once('socketlib.ready', async () => { await adapter.socketlib.register(); });
+Hooks.once('socketlib.ready', async () => { await (adapter.socketlib as any).register(); });

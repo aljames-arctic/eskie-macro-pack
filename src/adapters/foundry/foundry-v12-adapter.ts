@@ -227,7 +227,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {string[]} paths Array of template paths
      * @returns {Promise<Function[]>}
      */
-    async loadTemplates(paths: string[]): Promise<any> {
+    async loadTemplates(paths: string[]): Promise<Function[]> {
         return loadTemplates(paths);
     }
 }

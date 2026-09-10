@@ -178,7 +178,7 @@ export class BaseFoundryAdapter {
      * @param {string[]} paths Array of template paths
      * @returns {Promise<Function[]>}
      */
-    async loadTemplates(paths: string[]): Promise<any> {
+    async loadTemplates(paths: string[]): Promise<Function[]> {
         throw new Error('BaseFoundryAdapter.loadTemplates must be implemented by version subclass');
     }
 

@@ -304,7 +304,7 @@ class Adapter {
         return this.foundry.getPlaceable(id);
     }
 
-    async loadTemplates(paths: any) {
+    async loadTemplates(paths: string[]): Promise<Function[]> {
         return this.foundry.loadTemplates(paths);
     }
 

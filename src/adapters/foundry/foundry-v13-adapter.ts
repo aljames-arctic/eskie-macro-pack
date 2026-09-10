@@ -85,7 +85,7 @@ export class FoundryV13Adapter extends FoundryV12Adapter {
      * @param {string[]} paths Array of template paths
      * @returns {Promise<Function[]>}
      */
-    async loadTemplates(paths: string[]): Promise<any> {
+    async loadTemplates(paths: string[]): Promise<Function[]> {
         return foundry.applications.handlebars.loadTemplates(paths);
     }
 }

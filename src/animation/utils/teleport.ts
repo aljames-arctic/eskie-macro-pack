@@ -1,11 +1,11 @@
-async function create(token: any, position: any) {
+async function create(token: Token, position: { x: number; y: number }) {
     return new Sequence()
         .animation()
         .on(token)
         .teleportTo(position)
 }
 
-async function play(token: any, position: any) {
+async function play(token: Token, position?: { x: number; y: number } | any) {
     if (!token) return;
     if (!position) {
         position = await Sequencer.Crosshair.show();

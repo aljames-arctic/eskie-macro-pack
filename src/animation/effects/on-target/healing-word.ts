@@ -26,10 +26,9 @@ function getColor(color: any) {
     }
 }
 
-async function create(token: Token, targets: Token | Token[], config: any = {}) {
+async function create(token: Token, targets: Token[], config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, color, word, sound } = mConfig;
-    const targetList = [targets].flat().filter(Boolean);
 
     const colorVal = getColor(color);
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
@@ -45,7 +44,7 @@ async function create(token: Token, targets: Token | Token[], config: any = {}) 
         fontWeight: "bold",
     };
 
-    for (const target of targetList) {
+    for (const target of targets) {
         const targetWidth = adapter.getTokenDimensions(target).widthUnits;
         const target_seq = new Sequence()
             .effect()
@@ -107,7 +106,7 @@ async function create(token: Token, targets: Token | Token[], config: any = {}) 
         .scaleIn(0, 500, { ease: "easeOutBack" })
         .waitUntilFinished(-750);
 
-    for (let target of targetList) {
+    for (const target of targets) {
         const target_seq = new Sequence()
             .effect()
             .atLocation(target)
@@ -135,7 +134,7 @@ async function create(token: Token, targets: Token | Token[], config: any = {}) 
     return seq;
 }
 
-async function play(token: Token, targets: Token | Token[], config: any = {}) {
+async function play(token: Token, targets: Token[], config: any = {}) {
     let seq = await create(token, targets, config);
     if (seq) { await seq.play(); }
 }

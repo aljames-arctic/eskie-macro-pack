@@ -150,16 +150,15 @@ async function stopTarget(target: Token, config: any = {}) {
     return Sequencer.EffectManager.endEffects({ name: `${id} - ${target.name}`, object: target });
 }
 
-function create(token: Token, targets: Token | Token[], config: any = {}) {
-    const targetList = [targets].flat().filter(Boolean);
+function create(token: Token, targets: Token[], config: any = {}) {
     const sequence = createCaster(token, config);
-    targetList.forEach(target => {
+    targets.forEach(target => {
         sequence.addSequence(createTarget(target, config));
     });
     return sequence;
 }
 
-async function play(token: Token, targets: Token | Token[], config: any = {}) {
+async function play(token: Token, targets: Token[], config: any = {}) {
     const sequence = create(token, targets, config);
     if (sequence) { return sequence.play(); }
 }

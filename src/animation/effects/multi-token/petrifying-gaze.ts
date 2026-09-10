@@ -22,8 +22,7 @@ const DEFAULT_CONFIG = {
  * @param {string} [config.id='PetrifyingGaze'] The id of the effect.
  * @returns {Promise<Sequence>} A promise that resolves with the complete effect sequence.
  */
-async function create(token: Token, targetTokens: Token | Token[], config: any = {}) {
-    const targets = [targetTokens].flat().filter(Boolean);
+async function create(token: Token, targets: Token[], config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, sound } = mConfig;
     const eyeAnimation = "jb2a.eyes.01.single.orangeyellow";
@@ -133,8 +132,8 @@ async function create(token: Token, targetTokens: Token | Token[], config: any =
  * @param {object} [config={}] Configuration for the effect.
  * @returns {Promise<void>} A promise that resolves when the effect is finished.
  */
-async function play(token: Token, targetTokens: Token | Token[], config: any = {}) {
-    let seq = await create(token, targetTokens, config);
+async function play(token: Token, targets: Token[], config: any = {}) {
+    let seq = await create(token, targets, config);
     if (seq) { await seq.play(); }
 }
 

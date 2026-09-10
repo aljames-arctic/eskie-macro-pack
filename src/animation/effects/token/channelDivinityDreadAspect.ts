@@ -11,8 +11,7 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-async function create(token: Token, targets: Token | Token[], config: any = {}) {
-    const targetList = [targets].flat().filter(Boolean);
+async function create(token: Token, targets: Token[], config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { darkMap, sound } = mConfig;
 
@@ -140,7 +139,7 @@ async function create(token: Token, targets: Token | Token[], config: any = {}) 
         .filter("ColorMatrix", { brightness: 0 })
         .tint("#e51e19");
 
-    targetList.forEach(target => {
+    targets.forEach(target => {
         sequence.effect()
             .file(closest("jb2a.toll_the_dead.red.skull_smoke"))
             .attachTo(target)
@@ -178,7 +177,7 @@ async function create(token: Token, targets: Token | Token[], config: any = {}) 
     return sequence;
 }
 
-async function play(token: Token, targets: Token | Token[], config: any = {}) {
+async function play(token: Token, targets: Token[], config: any = {}) {
     const sequence = await create(token, targets, config);
     if (sequence) { return sequence.play(); }
 }

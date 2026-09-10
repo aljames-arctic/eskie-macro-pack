@@ -14,26 +14,25 @@ const DEFAULT_CONFIG = {
     sound: { ...DEFAULT_SOUND_CONFIG }
 };
 
-function create(targets: Token | Token[], config: any = {}) {
-    const targetList = [targets].flat().filter(Boolean);
+function create(targets: Token[], config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    mConfig.destinationPoints = targetList.map(t => adapter.getCenter(t));
+    mConfig.destinationPoints = targets.map(t => adapter.getCenter(t));
     const { sendToCenter, destinationPoints, sound } = mConfig;
 
-    if (targetList.length !== destinationPoints.length)
-        throw new Error(`User provided ${targetList.length} targets but ${destinationPoints.length} destination points. Can not shuffle.`);
+    if (targets.length !== destinationPoints.length)
+        throw new Error(`User provided ${targets.length} targets but ${destinationPoints.length} destination points. Can not shuffle.`);
 
     const shuffle = destinationPoints.sort(() => Math.random() - 0.5);
     const shuffleSeq = new Sequence();
     applySound(shuffleSeq, sound);
 
-    if (targetList.length === 0) return shuffleSeq;
+    if (targets.length === 0) return shuffleSeq;
 
     if (sendToCenter) {
         let centerPoint = destinationPoints.reduce((acc: any, { x, y }: any) => ({ x: acc.x + x, y: acc.y + y }), { x: 0, y: 0 });
         centerPoint.x /= destinationPoints.length;
         centerPoint.y /= destinationPoints.length;
-        for (const t of targetList) {
+        for (const t of targets) {
             shuffleSeq.animation()
                 .on(t)
                 .moveTowards(centerPoint)
@@ -41,9 +40,9 @@ function create(targets: Token | Token[], config: any = {}) {
         }
     }
 
-    for (let i = 0; i < targetList.length; i++) {
+    for (let i = 0; i < targets.length; i++) {
         shuffleSeq.animation()
-            .on(targetList[i])
+            .on(targets[i])
             .moveTowards(shuffle[i])
             .delay(200)
             .duration(1000);
@@ -51,14 +50,13 @@ function create(targets: Token | Token[], config: any = {}) {
     return shuffleSeq;
 }
 
-async function play(targets: Token | Token[], config: any = {}) {
-    const targetList = [targets].flat().filter(Boolean);
+async function play(targets: Token[], config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    mConfig.destinationPoints = targetList.map(t => adapter.getCenter(t));
+    mConfig.destinationPoints = targets.map(t => adapter.getCenter(t));
     const { repeat, delay, sendToCenter, destinationPoints } = mConfig;
 
     for (let i = 0; i <= repeat; i++) {
-        let seq = create(targetList, { sendToCenter, destinationPoints });
+        let seq = create(targets, { sendToCenter, destinationPoints });
         if (delay > 0) seq = seq.wait(delay);
         if (seq) { await seq.play(); }
     }

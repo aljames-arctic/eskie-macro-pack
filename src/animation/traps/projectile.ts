@@ -10,7 +10,6 @@ import { setupTrap } from './trap-manager.js';
 import { log, notify } from '../../lib/logger.js';
 import { adapter } from '../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../utils/sound.js';
-import type { SoundConfig, TrapConfig, TrapModule } from '../../types/animation.js';
 
 export interface ProjectileTrapConfig extends TrapConfig {
     targetLocation?: { x: number; y: number } | string | null;

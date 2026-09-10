@@ -11,7 +11,6 @@ import { setupTrap } from './trap-manager.js';
 import { log } from '../../lib/logger.js';
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
-import type { SoundConfig, TrapConfig, TrapModule } from '../../types/animation.js';
 
 export interface BoulderConfig {
     src?: string;

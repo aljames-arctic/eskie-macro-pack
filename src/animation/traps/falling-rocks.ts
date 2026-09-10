@@ -10,7 +10,6 @@ import { MODULE_ID } from '../../lib/constants.js';
 
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
-import type { SoundConfig, TrapConfig, TrapModule } from '../../types/animation.js';
 
 export interface FallingRocksTrapConfig extends TrapConfig {
     label?: string;

@@ -9,7 +9,6 @@ import { setupTrap } from './trap-manager.js';
 
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
-import type { SoundConfig, TrapConfig, TrapModule } from '../../types/animation.js';
 
 export interface PitfallTrapConfig extends TrapConfig {
     reveal?: boolean;

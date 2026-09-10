@@ -139,8 +139,8 @@ Hooks.once('init', function() {
  * @param {HTMLElement|jQuery} html - The settings config DOM element
  * @param {object} [_app=null] - The settings application instance
  */
-export function injectSettingsHeaders(html: any, _app: any = null) {
-    const root = html?.querySelector ? html : html?.[0];
+export function injectSettingsHeaders(html: HTMLElement | JQuery, _app: unknown = null) {
+    const root = ((html as any)?.querySelector ? (html as HTMLElement) : (html as any)?.[0]) as HTMLElement | undefined;
     if (!root?.querySelector) return;
 
     // 1. Ensure generateCompendiums (Dev Menu) is at the very top of World Settings if present
@@ -157,7 +157,7 @@ export function injectSettingsHeaders(html: any, _app: any = null) {
     if (genCompEl) {
         const genCompFg = genCompEl.closest('.form-group') ?? genCompEl;
         const parent = genCompFg?.parentNode;
-        const firstEl = parent?.firstElementChild ?? parent?.children?.[0];
+        const firstEl = (parent?.firstElementChild ?? parent?.children?.[0]) as HTMLElement | null | undefined;
         if (parent && firstEl && firstEl !== genCompFg) {
             if (firstEl.classList?.contains('emp-settings-section-header') && firstEl.dataset?.scope === 'world') {
                 if (firstEl.nextElementSibling !== genCompFg) {
@@ -234,8 +234,8 @@ export function injectSettingsHeaders(html: any, _app: any = null) {
 }
 
 // Dynamic visibility of Manage Autorec menu button and settings headers injection
-Hooks.on('renderSettingsConfig', function(app: any, html: any, data: any) {
-    const root = typeof html?.querySelector === 'function' ? html : html?.[0];
+Hooks.on('renderSettingsConfig', function(app: unknown, html: HTMLElement | JQuery, data: unknown) {
+    const root = ((html as any)?.querySelector ? (html as HTMLElement) : (html as any)?.[0]) as HTMLElement | undefined;
     if (!root) return;
 
     const isAaActive = Boolean(game.modules?.get("autoanimations")?.active);

@@ -27,12 +27,11 @@ const DEFAULT_CONFIG: BullRushStatueConfig = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(tile: Tile, targets?: Token[] | null, config: BullRushStatueConfig = {}): Promise<any> {
+async function create(tile: Tile, targets: Token[] = [], config: BullRushStatueConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { targetLocation, pushDistance, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
-    const targetList = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(tile);
-    const target = targetList.length ? targetList[0] : null;
+    const target = targets.length ? targets[0] : null;
 
     const tileDoc = tile.document;
     const tileBounds = adapter.getBounds(tile);
@@ -143,7 +142,7 @@ async function create(tile: Tile, targets?: Token[] | null, config: BullRushStat
     return seq;
 }
 
-async function play(tile: Tile, targets?: Token[] | null, config: BullRushStatueConfig = {}): Promise<any> {
+async function play(tile: Tile, targets: Token[] = [], config: BullRushStatueConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(tile, targets, config);
     return seq.play();

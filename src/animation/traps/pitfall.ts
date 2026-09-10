@@ -25,7 +25,7 @@ const DEFAULT_CONFIG: PitfallTrapConfig = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(trapObject: Tile, targets?: Token[] | null, config: PitfallTrapConfig = {}): Promise<any> {
+async function create(trapObject: Tile, targets: Token[] = [], config: PitfallTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { reveal, smokeSize, fallenScale, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -35,8 +35,6 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: Pitfal
     const trapCenter = trapBounds.center;
     const trapWidth = trapBounds.width;
     const trapHeight = trapBounds.height;
-
-    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(trapObject);
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -57,8 +55,8 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: Pitfal
             .opacity(1);
     }
 
-    if (finalTargets.length > 0) {
-        finalTargets.forEach(target => {
+    if (targets.length > 0) {
+        targets.forEach(target => {
             const targetWidth = target.document.width;
             const targetRotation = adapter.getTokenRotation(target);
             const fallenEffectName = `pitfall-fallen-${target.id}`;
@@ -115,7 +113,7 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: Pitfal
     return seq;
 }
 
-async function play(trapObject: Tile, targets?: Token[] | null, config: PitfallTrapConfig = {}): Promise<any> {
+async function play(trapObject: Tile, targets: Token[] = [], config: PitfallTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(trapObject, targets, config);
     return seq.play();

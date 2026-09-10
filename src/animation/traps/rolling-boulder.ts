@@ -37,7 +37,7 @@ const DEFAULT_CONFIG: RollingBoulderTrapConfig = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(trapObject: Tile, targets?: Token[] | null, config: RollingBoulderTrapConfig = {}): Promise<any> {
+async function create(trapObject: Tile, targets: Token[] = [], config: RollingBoulderTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { targetLocation, boulder, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -137,7 +137,7 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: Rollin
         .zIndex(4);
 }
 
-async function play(trapObject: Tile, targets?: Token[] | null, config: RollingBoulderTrapConfig = {}): Promise<any> {
+async function play(trapObject: Tile, targets: Token[] = [], config: RollingBoulderTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(trapObject, targets, config);
     return seq.play();

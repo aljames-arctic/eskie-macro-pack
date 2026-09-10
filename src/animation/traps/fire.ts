@@ -25,10 +25,9 @@ const DEFAULT_CONFIG: FireTrapConfig = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(trapObject: Tile, targets?: Token[] | null, config: FireTrapConfig = {}): Promise<any> {
+async function create(trapObject: Tile, targets: Token[] = [], config: FireTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { targetLocation, size, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInPlaceable(trapObject);
 
     const targetLoc = targetLocation ? adapter.getTargetLocation(targetLocation) : null;
 
@@ -60,8 +59,8 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: FireTr
         .stretchTo(targetLoc)
         .zIndex(1);
 
-    if (targetList.length > 0) {
-        targetList.forEach(target => {
+    if (targets.length > 0) {
+        targets.forEach(target => {
             seq = seq
                 // Burning token shake effect
                 .effect()
@@ -81,7 +80,7 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: FireTr
     return seq;
 }
 
-async function play(trapObject: Tile, targets?: Token[] | null, config: FireTrapConfig = {}): Promise<any> {
+async function play(trapObject: Tile, targets: Token[] = [], config: FireTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(trapObject, targets, config);
     return seq.play();

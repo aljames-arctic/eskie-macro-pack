@@ -30,10 +30,9 @@ const DEFAULT_CONFIG: ProjectileTrapConfig = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(trapObject: Tile, targets?: Token[] | null, config: ProjectileTrapConfig = {}): Promise<any> {
+async function create(trapObject: Tile, targets: Token[] = [], config: ProjectileTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { targetLocation, projectileType, sound, repeats, repeatDelay, splashScale } = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const targetList = (targets && targets.length > 0) ? [targets].flat().filter(Boolean) : adapter.getTokensInPlaceable(trapObject);
 
     const trapBounds = adapter.getBounds(trapObject);
     const trapCenter = trapBounds.center;
@@ -89,8 +88,8 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: Projec
             .repeats(repeats, repeatDelay, repeatDelay);
     }
 
-    if (targetList.length > 0) {
-        targetList.forEach(target => {
+    if (targets.length > 0) {
+        targets.forEach(target => {
             const targetDoc = target.document;
             const targetWidth = targetDoc.width;
             const targetScaleX = targetDoc.texture.scaleX;
@@ -171,7 +170,7 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: Projec
     return seq;
 }
 
-async function play(trapObject: Tile, targets?: Token[] | null, config: ProjectileTrapConfig = {}): Promise<any> {
+async function play(trapObject: Tile, targets: Token[] = [], config: ProjectileTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(trapObject, targets, config);
     return seq.play();

@@ -24,7 +24,7 @@ const DEFAULT_CONFIG: ElectricDoorConfig = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(trapObject: Tile, targets?: Token[] | null, config: ElectricDoorConfig = {}): Promise<any> {
+async function create(trapObject: Tile, targets: Token[] = [], config: ElectricDoorConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { repeats, repeatDelay, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -33,12 +33,10 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: Electr
     const trapBounds = adapter.getBounds(trapObject);
     const trapCenter = trapBounds.center;
 
-    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(trapObject);
-
     let seq = new Sequence();
     applySound(seq, sound);
 
-    if (finalTargets.length > 0) {
+    if (targets.length > 0) {
         seq = seq
             // Electricity burst at the trap location
             .effect()
@@ -49,7 +47,7 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: Electr
 
             .wait(250);
 
-        finalTargets.forEach(t => {
+        targets.forEach(t => {
             const targetRotation = adapter.getTokenRotation(t);
 
             seq = seq
@@ -81,7 +79,7 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: Electr
     return seq;
 }
 
-async function play(trapObject: Tile, targets?: Token[] | null, config: ElectricDoorConfig = {}): Promise<any> {
+async function play(trapObject: Tile, targets: Token[] = [], config: ElectricDoorConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(trapObject, targets, config);
     return seq.play();

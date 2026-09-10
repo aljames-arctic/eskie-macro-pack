@@ -32,15 +32,9 @@ const DEFAULT_CONFIG: FallingSkyTrapConfig = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(trapObject: Tile, targets?: Token[] | null, config: FallingSkyTrapConfig = {}): Promise<any> {
+async function create(trapObject: Tile, targets: Token[] = [], config: FallingSkyTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { reveal, smokeSize, startScale, fallenScale, randomDelay, color, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
-
-    // Target selection:
-    // 1. Tokens passed explicitly
-    // 2. Tokens on the trap placeable itself
-    let finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(trapObject);
-    finalTargets = Array.from(new Set(finalTargets));
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -53,9 +47,9 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: Fallin
             .opacity(1);
     }
 
-    if (finalTargets.length > 0) {
+    if (targets.length > 0) {
         const targetSeqs: any[] = [];
-        finalTargets.forEach(target => {
+        targets.forEach(target => {
             const { widthUnits: targetWidth, widthPx, heightPx } = adapter.getTokenDimensions(target);
             const targetRotation = adapter.getTokenRotation(target);
             const staggerDelay = Math.random() * (randomDelay);
@@ -144,7 +138,7 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: Fallin
     return seq;
 }
 
-async function play(trapObject: Tile, targets?: Token[] | null, config: FallingSkyTrapConfig = {}): Promise<any> {
+async function play(trapObject: Tile, targets: Token[] = [], config: FallingSkyTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(trapObject, targets, config);
     return seq.play();

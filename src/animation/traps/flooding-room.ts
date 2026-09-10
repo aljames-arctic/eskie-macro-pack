@@ -22,7 +22,7 @@ const DEFAULT_CONFIG: FloodingRoomTrapConfig = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(tile: Tile, targets?: Token[] | null, config: FloodingRoomTrapConfig = {}): Promise<any> {
+async function create(tile: Tile, targets: Token[] = [], config: FloodingRoomTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { fadeTime, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -77,7 +77,7 @@ async function create(tile: Tile, targets?: Token[] | null, config: FloodingRoom
     return seq;
 }
 
-async function play(tile: Tile, targets?: Token[] | null, config: FloodingRoomTrapConfig = {}): Promise<any> {
+async function play(tile: Tile, targets: Token[] = [], config: FloodingRoomTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(tile, targets, config);
     return seq.play();

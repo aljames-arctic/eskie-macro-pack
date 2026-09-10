@@ -41,8 +41,8 @@ export interface AnimationEffectModule<TConfig = Record<string, unknown>> {
 }
 
 export interface TrapModule<TConfig extends TrapConfig = TrapConfig> {
-    create: (tile: Tile, targets?: Token[] | null, config?: TConfig) => Promise<any>;
-    play: (tile: Tile, targets?: Token[] | null, config?: TConfig) => Promise<any>;
+    create: (tile: Tile, targets?: Token[], config?: TConfig) => Promise<any>;
+    play: (tile: Tile, targets?: Token[], config?: TConfig) => Promise<any>;
     stop?: (tile: Tile, config?: TConfig) => Promise<void>;
     setup?: (config?: Record<string, unknown>) => Promise<any>;
     default_config: TConfig;

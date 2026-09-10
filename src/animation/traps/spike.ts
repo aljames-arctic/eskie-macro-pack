@@ -31,7 +31,7 @@ const DEFAULT_CONFIG: SpikeTrapConfig = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(trapObject: Tile, targets?: Token[] | null, config: SpikeTrapConfig = {}): Promise<any> {
+async function create(trapObject: Tile, targets: Token[] = [], config: SpikeTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { delay, spike: spikeConfig, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
@@ -42,8 +42,6 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: SpikeT
     const { xScale, yScale } = spikeConfig;
     const effectWidth = trapBounds.width * xScale;
     const effectHeight = trapBounds.height * yScale;
-
-    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(trapObject);
 
     let seq = new Sequence();
     applySound(seq, sound);
@@ -67,8 +65,8 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: SpikeT
 
         .wait(delay);
 
-    if (finalTargets.length > 0) {
-        finalTargets.forEach(target => {
+    if (targets.length > 0) {
+        targets.forEach(target => {
             seq = seq
                 // Blood splash effect on target
                 .effect()
@@ -95,7 +93,7 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: SpikeT
     return seq;
 }
 
-async function play(trapObject: Tile, targets?: Token[] | null, config: SpikeTrapConfig = {}): Promise<any> {
+async function play(trapObject: Tile, targets: Token[] = [], config: SpikeTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(trapObject, targets, config);
     return seq.play();

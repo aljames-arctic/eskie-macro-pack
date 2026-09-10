@@ -24,13 +24,11 @@ const DEFAULT_CONFIG: FallingRocksTrapConfig = {
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
-async function create(trapObject: Tile, targets?: Token[] | null, config: FallingRocksTrapConfig = {}): Promise<any> {
+async function create(trapObject: Tile, targets: Token[] = [], config: FallingRocksTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const { label, dustBrightness, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     if (!trapObject) return new Sequence();
-
-    const finalTargets = (targets && targets.length > 0) ? targets : adapter.getTokensInPlaceable(trapObject);
 
     const trapDoc = trapObject.document;
     const trapBounds = adapter.getBounds(trapObject);
@@ -98,12 +96,12 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: Fallin
         .delay(200)
         .shake({ duration: 500, strength: 2, rotation: false });
 
-    if (finalTargets.length > 0) {
+    if (targets.length > 0) {
         const currentPinnedIds = trapDoc.getFlag(MODULE_ID, `${label} - pinned`) ?? [];
-        const finalTargetIds = finalTargets.map(token => token.id);
+        const finalTargetIds = targets.map(token => token.id);
         await trapDoc.setFlag(MODULE_ID, `${label} - pinned`, [...currentPinnedIds, ...finalTargetIds]);
         
-        finalTargets.forEach(target => {
+        targets.forEach(target => {
             const buryEffectName = `${label}-${target.name}-${target.id}`;
 
             seq = seq
@@ -127,7 +125,7 @@ async function create(trapObject: Tile, targets?: Token[] | null, config: Fallin
     return seq;
 }
 
-async function play(trapObject: Tile, targets?: Token[] | null, config: FallingRocksTrapConfig = {}): Promise<any> {
+async function play(trapObject: Tile, targets: Token[] = [], config: FallingRocksTrapConfig = {}): Promise<any> {
     config = settingsOverride(config);
     const seq = await create(trapObject, targets, config);
     return seq.play();

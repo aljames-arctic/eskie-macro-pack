@@ -47,7 +47,7 @@ const DEFAULT_TYPING_CONFIG = {
  * @param {object} [config] Configuration for styling and timing.
  * @returns {Promise<Sequence>}
  */
-async function create(token: any, text: string, config: any = {}): Promise<any> {
+async function create(token: Token, text: string, config: Record<string, any> = {}): Promise<any> {
     const mConfig = adapter.mergeObject(DEFAULT_FLOATING_CONFIG, config);
     let { id, duration, delay, style, kerning, verticalOffset } = mConfig;
     
@@ -185,7 +185,7 @@ function createTyping(sequence: any, text: string, config: any = {}) {
  * @param {string} text 
  * @param {object} [config] 
  */
-async function play(token: any, text: string, config: any = {}) {
+async function play(token: Token, text: string, config: Record<string, any> = {}) {
     const seq = await create(token, text, config);
     if (seq) return seq.play();
 }
@@ -196,7 +196,7 @@ async function play(token: any, text: string, config: any = {}) {
  * @param {Token} token 
  * @param {object} [options] 
  */
-async function stop(token: any, { id = 'text' }: { id?: string } = {}) {
+async function stop(token: Token, { id = 'text' }: { id?: string } = {}) {
     return Sequencer.EffectManager.endEffects({ name: id, object: token });
 }
 

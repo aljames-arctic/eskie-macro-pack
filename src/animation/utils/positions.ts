@@ -22,7 +22,7 @@ const DEFAULT_POSITION_CONFIG = {
     }
 };
 
-async function selectMultiple(config: any = {}) {
+async function selectMultiple(config: Record<string, any> = {}): Promise<{ x: number; y: number }[] | null> {
     const mergedConfig = adapter.mergeObject(DEFAULT_POSITION_CONFIG, config);
 
     const {
@@ -35,7 +35,7 @@ async function selectMultiple(config: any = {}) {
         crosshair
     } = mergedConfig;
 
-    const positions: any[] = [];
+    const positions: { x: number; y: number }[] = [];
     ui.notifications.info('Click to select positions. Right-click or press Escape to finish.');
 
     let index = 0;
@@ -77,7 +77,7 @@ async function selectMultiple(config: any = {}) {
  * 
  * @param {string} [prefix='Marker'] The prefix used when creating the markers.
  */
-async function clearMarkers(prefix = 'Marker') {
+async function clearMarkers(prefix: string = 'Marker') {
     const effects = Sequencer.EffectManager.getEffects().filter((e: any) => e.data.name?.startsWith(prefix));
     return Sequencer.EffectManager.endEffects({ effects });
 }
@@ -87,7 +87,7 @@ async function clearMarkers(prefix = 'Marker') {
  * 
  * @param {string} name The exact name of the marker effect.
  */
-async function clearMarker(name: any) {
+async function clearMarker(name: string) {
     return Sequencer.EffectManager.endEffects({ name });
 }
 

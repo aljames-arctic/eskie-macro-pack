@@ -132,8 +132,8 @@ class Adapter {
         return this.foundry.generation;
     }
 
-    isNewerVersion(a: any, b: any) {
-        return this.foundry.isNewerVersion(a, b);
+    isNewerVersion(v1: string | number, v0: string | number, options?: { majorOnly?: boolean }): boolean {
+        return this.foundry.isNewerVersion(v1, v0, options);
     }
 
     fromUuidSync(uuid: any, options = {}) {

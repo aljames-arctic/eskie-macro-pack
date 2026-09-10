@@ -2,7 +2,6 @@ import { BaseSystemAdapter } from './base-system-adapter.js';
 import { BaseFoundryAdapter } from '../foundry/base-foundry-adapter.js';
 import { midiQolAdapter } from '../modules/midi-qol/midi-qol-module-adapter.js';
 import { log } from '../../lib/logger.js';
-import type { Actor5e } from '../../types/systems.js';
 
 /**
  * D&D 5e System Adapter Class

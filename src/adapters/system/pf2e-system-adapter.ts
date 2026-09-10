@@ -1,6 +1,5 @@
 import { BaseSystemAdapter } from './base-system-adapter.js';
 import { BaseFoundryAdapter } from '../foundry/base-foundry-adapter.js';
-import type { ActorPF2e } from '../../types/systems.js';
 
 /**
  * Pathfinder 2e (PF2e) System Adapter Class

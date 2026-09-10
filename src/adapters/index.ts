@@ -65,7 +65,7 @@ class Adapter {
      * @param {string} moduleId Unique module identifier
      * @returns {BaseModuleAdapter|undefined}
      */
-    getModule(moduleId: any) {
+    getModule(moduleId: string) {
         return this.modules.get(moduleId);
     }
 
@@ -74,7 +74,7 @@ class Adapter {
      * @param {string} moduleId Unique module identifier
      * @returns {boolean}
      */
-    hasModule(moduleId: any) {
+    hasModule(moduleId: string): boolean {
         return this.modules.has(moduleId);
     }
 
@@ -136,11 +136,11 @@ class Adapter {
         return this.foundry.isNewerVersion(v1, v0, options);
     }
 
-    fromUuidSync(uuid: any, options = {}) {
+    fromUuidSync(uuid: string, options = {}) {
         return this.foundry.fromUuidSync(uuid, options);
     }
 
-    async fromUuid(uuid: any, options = {}) {
+    async fromUuid(uuid: string, options = {}) {
         return this.foundry.fromUuid(uuid, options);
     }
 
@@ -296,11 +296,11 @@ class Adapter {
         return this.foundry.getDocumentName(target);
     }
 
-    isDocumentOfType(target: any, type: any) {
+    isDocumentOfType(target: any, type: string): boolean {
         return this.foundry.isDocumentOfType(target, type);
     }
 
-    getPlaceable(id: any) {
+    getPlaceable(id: string) {
         return this.foundry.getPlaceable(id);
     }
 

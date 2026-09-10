@@ -378,7 +378,7 @@ export class BaseFoundryAdapter {
      * @param {Token} token Target Token placeable
      * @returns {Combatant[]}
      */
-    getCombatantsByToken(combat: any, token: any): any[] {
+    getCombatantsByToken(combat: Combat, token: Token): Combatant[] {
         throw new Error('BaseFoundryAdapter.getCombatantsByToken must be implemented by version subclass');
     }
 
@@ -388,7 +388,7 @@ export class BaseFoundryAdapter {
      * @param {Token} token Target Token placeable
      * @returns {Combatant|null}
      */
-    getCombatantByToken(combat: any, token: any): any {
+    getCombatantByToken(combat: Combat, token: Token): Combatant | null {
         const combatants = this.getCombatantsByToken(combat, token);
         return combatants?.[0] ?? null;
     }
@@ -410,7 +410,7 @@ export class BaseFoundryAdapter {
      * @param {User} user Concrete User document
      * @returns {number|null} 1 for Player, 2 for Trusted, 3 for GM, or null if invalid/none
      */
-    getUserPermissionTier(user: any) {
+    getUserPermissionTier(user: User): number | null {
         if (!user) return null;
         if (user.isGM) return USER_PERMISSION_TIERS.GM;
 
@@ -424,10 +424,10 @@ export class BaseFoundryAdapter {
         if (userRole != null && userRole >= assistantRole) {
             return USER_PERMISSION_TIERS.GM;
         }
-        if (userRole === trustedRole || Boolean(user.isTrusted)) {
+        if (userRole === trustedRole || Boolean((user as any).isTrusted)) {
             return USER_PERMISSION_TIERS.TRUSTED;
         }
-        if (userRole === playerRole || !user.isTrusted) {
+        if (userRole === playerRole || !(user as any).isTrusted) {
             return USER_PERMISSION_TIERS.PLAYER;
         }
         return null;
@@ -439,7 +439,7 @@ export class BaseFoundryAdapter {
      * @param {Document|null} doc Concrete Document (Actor or TokenDocument)
      * @returns {boolean} True if the user has an ownership role
      */
-    isUserDocumentOwner(user: any, doc: any) {
+    isUserDocumentOwner(user: User, doc: any): boolean {
         if (!user || !doc) return false;
 
         // GM / Co-GM always has ownership over all documents in Foundry
@@ -455,7 +455,7 @@ export class BaseFoundryAdapter {
             return doc.getUserLevel(user) >= ownerLevel;
         }
         if (doc.ownership) {
-            const level = doc.ownership[user.id] ?? doc.ownership.default ?? 0;
+            const level = (user.id ? doc.ownership[user.id] : undefined) ?? doc.ownership.default ?? 0;
             return level >= ownerLevel;
         }
         return (user.id === game.user?.id || user === game.user) && Boolean(doc.isOwner);
@@ -471,7 +471,7 @@ export class BaseFoundryAdapter {
      * @param {User} [user=game.user] Target user to evaluate (defaults to active client user)
      * @returns {boolean} True if the user is in-charge of the token
      */
-    isUserInCharge(token: any, user = game.user) {
+    isUserInCharge(token: Token, user: User = game.user): boolean {
         if (!token || !user) return false;
 
         const isOwner = (u: any) => this.isUserDocumentOwner(u, token.actor) || this.isUserDocumentOwner(u, token.document);
@@ -625,7 +625,7 @@ export class BaseFoundryAdapter {
         const distancePx = secondary ? Math.hypot(secondary.x - primary.x, secondary.y - primary.y) : 0;
         if (secondary && distancePx < 1) {
             log.error('BaseFoundryAdapter | Unable to resolve distinct non-zero positions for animation.', { template, config, primary, secondary });
-            ui?.notifications?.error?.('Eskie Macro Pack | Unable to resolve coordinates for animation.');
+            ui.notifications.error('Eskie Macro Pack | Unable to resolve coordinates for animation.');
             const err = new Error('Unable to resolve distinct coordinates for template animation');
             const errResult: any = [{ error: err, cancelled: true }, undefined, undefined];
             errResult.error = err;
@@ -792,7 +792,7 @@ export class BaseFoundryAdapter {
      * @param {string|null} [extractedTokenId=null] Optional pre-extracted token ID
      * @returns {Token|null}
      */
-    getSpeakerToken(message: any, extractedTokenId = null) {
+    getSpeakerToken(message: ChatMessage | null | undefined, extractedTokenId: string | null = null): Token | null {
         const canvasObj = canvas;
         if (!canvasObj?.ready || !canvasObj.tokens) return null;
 
@@ -817,10 +817,10 @@ export class BaseFoundryAdapter {
      * @param {ChatMessage|object|null} message Chat message or speaker context
      * @returns {Actor|null}
      */
-    getSpeakerActor(message: any) {
-        const speaker = message?.speaker ?? message;
-        if (speaker && ChatMessage?.getSpeakerActor) {
-            const actor = ChatMessage.getSpeakerActor(speaker);
+    getSpeakerActor(message: ChatMessage | null | undefined): Actor | null {
+        const speaker = (message as any)?.speaker ?? message;
+        if (speaker && (ChatMessage as any)?.getSpeakerActor) {
+            const actor = (ChatMessage as any).getSpeakerActor(speaker);
             if (actor) return actor;
         }
         const speakerToken = this.getSpeakerToken(message);
@@ -866,7 +866,7 @@ export class BaseFoundryAdapter {
      * @param {Token} token Target token placeable
      * @returns {{ widthPx: number, heightPx: number, widthUnits: number, heightUnits: number, radiusPx: number }}
      */
-    getTokenDimensions(token: any) {
+    getTokenDimensions(token: Token) {
         if (!token) return { widthPx: 0, heightPx: 0, widthUnits: 1, heightUnits: 1, radiusPx: 0 };
         const gridSize = this.getGridSize();
         const widthUnits = token.document.width ?? 1;
@@ -885,12 +885,22 @@ export class BaseFoundryAdapter {
 
     /**
      * Extracts the authoritative rotation in degrees for a token placeable.
-     * @param {Token} token Target token placeable
+     * @param {Token|null|undefined} token Target token placeable
      * @returns {number} Rotation angle in degrees (0 to 360)
      */
-    getTokenRotation(token: any): number {
+    getTokenRotation(token: Token | null | undefined): number {
         if (!token) return 0;
         return token.document.rotation ?? 0;
+    }
+
+    /**
+     * Extracts the authoritative rotation in degrees for a tile placeable.
+     * @param {Tile|null|undefined} tile Target tile placeable
+     * @returns {number} Rotation angle in degrees (0 to 360)
+     */
+    getTileRotation(tile: Tile | null | undefined): number {
+        if (!tile) return 0;
+        return tile.document.rotation ?? 0;
     }
 
     /**
@@ -899,7 +909,7 @@ export class BaseFoundryAdapter {
      * @param {Token} t2 The target token placeable
      * @returns {number} Distance in scene units, rounded up
      */
-    getDistance(t1: any, t2: any): number {
+    getDistance(t1: Token, t2: Token): number {
         if (!t1 || !t2) return 0;
         const p1 = this.getCenter(t1);
         const p2 = this.getCenter(t2);
@@ -949,7 +959,7 @@ export class BaseFoundryAdapter {
      * @param {Token} target The target token placeable
      * @returns {{x: number, y: number}|null} Coordinate of nearest square center
      */
-    getNearestSquareCenter(token: any, target: any): { x: number, y: number } | null {
+    getNearestSquareCenter(token: Token, target: Token): { x: number, y: number } | null {
         if (!token || !target) return null;
         const gs = this.getGridSize();
         const srcCenter = this.getCenter(token);
@@ -987,7 +997,7 @@ export class BaseFoundryAdapter {
      * @param {Token} target The target token placeable
      * @returns {{ x: number, y: number }|null} The center point { x, y } of the best adjacent grid cell
      */
-    getBestAdjacentLocation(token: any, target: any): { x: number, y: number } | null {
+    getBestAdjacentLocation(token: Token, target: Token): { x: number, y: number } | null {
         const p1 = this.getCenter(token);
         const p2 = this.getCenter(target);
         if (!p1 || !p2) return null;
@@ -1059,7 +1069,7 @@ export class BaseFoundryAdapter {
      * @param {boolean} [config.applyGM=true] Whether to include Game Masters
      * @returns {User[]} Array of User objects
      */
-    getTokenOwners(token: any, config: any = {}): any[] {
+    getTokenOwners(token: Token, config: any = {}): any[] {
         if (!token) return [];
         const applyPC = config.applyPC !== false;
         const applyGM = config.applyGM !== false;
@@ -1087,7 +1097,7 @@ export class BaseFoundryAdapter {
      * @param {Tile} tile Target tile placeable
      * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number, anchor: {x: number, y: number} }}
      */
-    getTileBounds(tile: any) {
+    getTileBounds(tile: Tile) {
         if (!tile) return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0, y: 0 } };
         const doc = tile.document;
         const x = doc.x;
@@ -1112,7 +1122,7 @@ export class BaseFoundryAdapter {
      * @param {Tile} tile Target Tile placeable
      * @returns {Token[]} Array of matching Token placeables
      */
-    getTokensInTile(tile: any) {
+    getTokensInTile(tile: Tile): Token[] {
         if (!tile) return [];
         const { minX: tileMinX, maxX: tileMaxX, minY: tileMinY, maxY: tileMaxY } = this.getTileBounds(tile);
 

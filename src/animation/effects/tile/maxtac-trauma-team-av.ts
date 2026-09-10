@@ -17,7 +17,7 @@ async function create(tile: Tile, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { effectNameFly, effectNameLanding, sound } = mConfig;
 
-    const tileRotation = adapter.getTokenRotation(tile);
+    const tileRotation = adapter.getTileRotation(tile);
     const { width: w, height: h } = adapter.getTileBounds(tile);
 
     const cautionstyle = {
@@ -265,7 +265,7 @@ async function stop(tile: Tile, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { flyingTag, effectNameFly, effectNameLanding } = mConfig;
 
-    const tileRotation = adapter.getTokenRotation(tile);
+    const tileRotation = adapter.getTileRotation(tile);
     const { width: w, height: h } = adapter.getTileBounds(tile);
 
     // End landing indicators immediately

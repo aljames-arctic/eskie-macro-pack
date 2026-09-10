@@ -200,23 +200,23 @@ class Adapter {
         return this.foundry.enrichHTML(content, options);
     }
 
-    getCombatantsByToken(combat: any, token: any) {
+    getCombatantsByToken(combat: Combat, token: Token): Combatant[] {
         return this.foundry.getCombatantsByToken(combat, token);
     }
 
-    getCombatantByToken(combat: any, token: any) {
+    getCombatantByToken(combat: Combat, token: Token): Combatant | null {
         return this.foundry.getCombatantByToken(combat, token);
     }
 
-    getUserPermissionTier(user: any) {
+    getUserPermissionTier(user: User): number | null {
         return this.foundry.getUserPermissionTier(user);
     }
 
-    isUserDocumentOwner(user: any, doc: any) {
+    isUserDocumentOwner(user: User, doc: any): boolean {
         return this.foundry.isUserDocumentOwner(user, doc);
     }
 
-    isUserInCharge(token: any, user = game?.user) {
+    isUserInCharge(token: Token, user: User = game.user): boolean {
         return this.foundry.isUserInCharge(token, user);
     }
 
@@ -268,19 +268,23 @@ class Adapter {
         return this.foundry.getCenter(target);
     }
 
-    getTokenDimensions(token: any) {
+    getTokenDimensions(token: Token) {
         return this.foundry.getTokenDimensions(token);
     }
 
-    getTokenRotation(token: any) {
+    getTokenRotation(token: Token | null | undefined): number {
         return this.foundry.getTokenRotation(token);
+    }
+
+    getTileRotation(tile: Tile | null | undefined): number {
+        return this.foundry.getTileRotation(tile);
     }
 
     getInterpolatedPoints(point1: any, point2: any, stepDistancePx = 100) {
         return this.foundry.getInterpolatedPoints(point1, point2, stepDistancePx);
     }
 
-    getBestAdjacentLocation(token: any, target: any) {
+    getBestAdjacentLocation(token: Token, target: Token): { x: number, y: number } | null {
         return this.foundry.getBestAdjacentLocation(token, target);
     }
 
@@ -304,31 +308,31 @@ class Adapter {
         return this.foundry.loadTemplates(paths);
     }
 
-    getSpeakerToken(message: any, extractedTokenId = null) {
+    getSpeakerToken(message: ChatMessage | null | undefined, extractedTokenId: string | null = null): Token | null {
         return this.foundry.getSpeakerToken(message, extractedTokenId);
     }
 
-    getSpeakerActor(message: any) {
+    getSpeakerActor(message: ChatMessage | null | undefined): Actor | null {
         return this.foundry.getSpeakerActor(message);
     }
 
-    getDistance(t1: any, t2: any) {
+    getDistance(t1: Token, t2: Token): number {
         return this.foundry.getDistance(t1, t2);
     }
 
-    getNearestSquareCenter(token: any, target: any) {
+    getNearestSquareCenter(token: Token, target: Token): { x: number, y: number } | null {
         return this.foundry.getNearestSquareCenter(token, target);
     }
 
-    getTokenOwners(token: any, config = {}) {
+    getTokenOwners(token: Token, config: Record<string, unknown> = {}): User[] {
         return this.foundry.getTokenOwners(token, config);
     }
 
-    getTileBounds(tile: any) {
+    getTileBounds(tile: Tile) {
         return this.foundry.getTileBounds(tile);
     }
 
-    getTokensInTile(tile: any) {
+    getTokensInTile(tile: Tile): Token[] {
         return this.foundry.getTokensInTile(tile);
     }
 
@@ -340,7 +344,7 @@ class Adapter {
         return this.foundry.detachPlaceableElements(elements, target);
     }
 
-    formatDeletionUpdate(path: any, keyId: any) {
+    formatDeletionUpdate(path: string, keyId: string): Record<string, any> {
         return this.foundry.formatDeletionUpdate(path, keyId);
     }
 

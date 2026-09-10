@@ -9,7 +9,7 @@ import { localize } from './utils.js';
  * @param {...string} categories - The categories to traverse.
  * @returns {string} The best-fit path in the Sequencer database.
  */
-function bestFit(modulePrefix: any, ...categories: any[]) {
+function bestFit(modulePrefix: string, ...categories: string[]): string {
     let diverged = false;
     let currentPath = modulePrefix;
     const originalPath = `${modulePrefix}.${categories.join('.')}`;
@@ -21,7 +21,7 @@ function bestFit(modulePrefix: any, ...categories: any[]) {
      * @param {string} component - The path component to inspect.
      * @returns {boolean} True if the component is enclosed in mustache braces, false otherwise.
      */
-    function isMustache(component: any) {
+    function isMustache(component: string): boolean {
         return Boolean(component?.startsWith?.('{{') && component?.endsWith?.('}}'));
     }
 
@@ -60,7 +60,7 @@ function bestFit(modulePrefix: any, ...categories: any[]) {
  * @param {string} path - The path to the file, using dot notation (e.g., 'jb2a.fireball.blue').
  * @returns {string|undefined} The resolved file path, or undefined if no path categories exist.
  */
-export function closest(path: any) {
+export function closest(path: string | null | undefined): string | undefined {
     if (typeof path !== 'string' || !path.trim()) return undefined;
 
     // Support http:// and https:// addresses
@@ -72,7 +72,7 @@ export function closest(path: any) {
     if (categories.length === 0) return undefined;
     let isPatreonUser = false;
     let isFreeUser = false;
-    let modulePrefix = categories.shift();
+    let modulePrefix = categories.shift() ?? '';
 
     switch (modulePrefix) {
         // Sounds
@@ -126,7 +126,7 @@ export function closest(path: any) {
  * @param {string} configPath - The configuration path to resolve.
  * @returns {string|undefined} The absolute file path, or undefined if empty.
  */
-export function absolutePath(configPath: any) {
+export function absolutePath(configPath: string | null | undefined): string | undefined {
     if (typeof configPath !== 'string' || !configPath.trim()) return undefined;
     const resolvedConfig = closest(configPath);
     if (!resolvedConfig) return resolvedConfig;

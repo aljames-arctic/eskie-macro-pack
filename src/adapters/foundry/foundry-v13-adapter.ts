@@ -74,7 +74,7 @@ export class FoundryV13Adapter extends FoundryV12Adapter {
      * @param {Token} token Target Token placeable
      * @returns {Combatant[]}
      */
-    getCombatantsByToken(combat: any, token: any): any[] {
+    getCombatantsByToken(combat: Combat, token: Token): Combatant[] {
         if (!combat || !token) return [];
         return (combat as any).getCombatantsByToken(token);
     }

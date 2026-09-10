@@ -12,7 +12,13 @@ import { log } from '../lib/logger.js';
 // SEQUENCER ANIMATION TRIGGER
 // ============================================================================
 
-async function playRollAnimation(token: any, config: any = {}) {
+export interface RollAnimationConfig {
+    rollType?: string;
+    outcome?: string;
+    [key: string]: unknown;
+}
+
+async function playRollAnimation(token: Token, config: RollAnimationConfig = {}) {
     if (!token) return;
 
     const rollType = config.rollType ?? "default";
@@ -76,11 +82,11 @@ export class RollTracker {
 
         log.debug(`Enabling Eskie Roll Animations. Active System: "${this.activeAdapter.id}"`);
 
-        const createId = Hooks.on("createChatMessage" as any, (message: any, options: any, userId: any) => {
+        const createId = Hooks.on("createChatMessage" as any, (message: ChatMessage, _options: unknown, userId: string) => {
             this.processMessageAndPlay(message, userId);
         });
 
-        const updateId = Hooks.on("updateChatMessage" as any, (message: any, updateData: any, options: any, userId: any) => {
+        const updateId = Hooks.on("updateChatMessage" as any, (message: ChatMessage, updateData: { content?: string; [key: string]: unknown }, _options: unknown, userId: string) => {
             if (!updateData.content) return;
             this.processMessageAndPlay(message, userId);
         });
@@ -108,7 +114,7 @@ export class RollTracker {
      * Parses raw chat text, flavor, and flags using the system adapter
      * to determine if this card contains actionable rolls.
      */
-    getRollDetails(message: any): any[] {
+    getRollDetails(message: ChatMessage): any[] {
         // Extract raw rolls from the system adapter
         const rolls: any[] = this.activeAdapter.extractRolls(message);
         if (rolls.length === 0) return [];
@@ -141,7 +147,7 @@ export class RollTracker {
     /**
      * Pinpoints the exact rolling token document via the unified adapter.
      */
-    getSpeakerToken(message: any, extractedTokenId: any) {
+    getSpeakerToken(message: ChatMessage, extractedTokenId: string | null = null): Token | null {
         return adapter.getSpeakerToken(message, extractedTokenId);
     }
 
@@ -149,14 +155,14 @@ export class RollTracker {
      * Semantically classifies a chat message to determine its purpose.
      * @returns {string} The message classification.
      */
-    qualifyMessage(message: any) {
+    qualifyMessage(message: ChatMessage): string {
         return this.activeAdapter.qualifyMessage(message);
     }
 
     /**
      * Evaluates the message and triggers animations for unplayed rolls.
      */
-    async processMessageAndPlay(message: any, userId: any) {
+    async processMessageAndPlay(message: ChatMessage, userId: string) {
         // Only run validation calculations once on the user machine modifying the doc
         if (game.user?.id !== userId) return;
 
@@ -168,6 +174,7 @@ export class RollTracker {
         if (rolls.length === 0) return;
 
         const messageId = message.id;
+        if (!messageId) return;
         if (!this.localAnimatedTokens.has(messageId)) {
             // Prune map if it grows too large to prevent memory leaks (keep cache under 100 messages)
             if (this.localAnimatedTokens.size > 100) {

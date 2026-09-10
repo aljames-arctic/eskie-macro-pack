@@ -90,7 +90,7 @@ async function create(tile: Tile, targets: Token[] = [], config: BullRushStatueC
             .file(textureSrc)
             .atLocation(tileCenter)
             .size({ width: tileWidth * scaleX, height: tileHeight * scaleY })
-            .spriteRotation(-adapter.getTokenRotation(tile))
+            .spriteRotation(-adapter.getTileRotation(tile))
             .animateProperty('spriteContainer', 'position.x', { from: 0, to: slideDistance.x, duration: 500, ease: 'easeOutQuint', delay: 200 })
             .animateProperty('spriteContainer', 'position.y', { from: 0, to: slideDistance.y, duration: 500, ease: 'easeOutQuint', delay: 200 })
             .animateProperty('spriteContainer', 'position.x', { from: 0, to: -slideDistance.x, duration: 3000, ease: 'easeInOutQuad', delay: 700 })

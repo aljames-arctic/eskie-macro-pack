@@ -20,7 +20,7 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
      * @param {ChatMessage} message
      * @returns {string}
      */
-    qualifyMessage(message: any): string {
+    override qualifyMessage(message: any): string {
         log.debug(`Dnd5eSystemAdapter.qualifyMessage: message="${message?.id}"`, {
             rollType: message?.flags?.dnd5e?.roll?.type,
             messageType: message?.flags?.dnd5e?.messageType,
@@ -71,7 +71,7 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
      * @param {ChatMessage} message
      * @returns {Array<{ source: string, rawAbility: string|null, outcome: string, tokenId: string|null }>}
      */
-    extractRolls(message: any): any[] {
+    override extractRolls(message: any): any[] {
         const rolls: any[] = [];
 
         // 1. Core System Flag Checks (rolls from character sheets)
@@ -111,7 +111,7 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
      * @param {string} [combinedText=""]
      * @returns {string|null}
      */
-    normalizeAbility(rawAbility: any, combinedText: string = ""): string | null {
+    override normalizeAbility(rawAbility: any, combinedText: string = ""): string | null {
         const dnd5eMap = {
             ath: "strength",
             acr: "dexterity", ste: "dexterity", sle: "dexterity",
@@ -127,7 +127,7 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
      * @param {Object} config Configuration containing aaHandler or item
      * @returns {number|undefined}
      */
-    getSpellLevel(config: any = {}): number | undefined {
+    override getSpellLevel(config: any = {}): number | undefined {
         return config?.aaHandler?.systemData?.spellLevel ?? config?.item?.system?.level ?? undefined;
     }
 
@@ -136,7 +136,7 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
      * @param {Actor} actor Concrete Actor document
      * @returns {string|null}
      */
-    getCreatureType(actor: any): string | null {
+    override getCreatureType(actor: any): string | null {
         if (!actor) return null;
         const rawType = actor.system?.details?.type?.value ?? actor.system?.details?.type ?? null;
         return typeof rawType === 'string' ? rawType.toLowerCase() : null;

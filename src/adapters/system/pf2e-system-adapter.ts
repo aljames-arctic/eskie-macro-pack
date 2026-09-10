@@ -18,7 +18,7 @@ export class Pf2eSystemAdapter extends BaseSystemAdapter {
      * @param {ChatMessage} message
      * @returns {string}
      */
-    qualifyMessage(message: any): string {
+    override qualifyMessage(message: any): string {
         const pf2eContext = message?.flags?.pf2e?.context;
         if (pf2eContext) {
             const type = pf2eContext.type;
@@ -34,7 +34,7 @@ export class Pf2eSystemAdapter extends BaseSystemAdapter {
      * @param {ChatMessage} message
      * @returns {Array<{ source: string, rawAbility: string|null, outcome: string, tokenId: string|null }>}
      */
-    extractRolls(message: any): any[] {
+    override extractRolls(message: any): any[] {
         const rolls: any[] = [];
         const pf2eContext = message?.flags?.pf2e?.context;
         const pf2eFlags = message?.flags?.pf2e;
@@ -76,7 +76,7 @@ export class Pf2eSystemAdapter extends BaseSystemAdapter {
      * @param {string} [combinedText=""]
      * @returns {string|null}
      */
-    normalizeAbility(rawAbility: any, combinedText: string = ""): string | null {
+    override normalizeAbility(rawAbility: any, combinedText: string = ""): string | null {
         const pf2eMap = {
             perception: "wisdom", prc: "wisdom",
             fortitude: "constitution",
@@ -91,7 +91,7 @@ export class Pf2eSystemAdapter extends BaseSystemAdapter {
      * @param {Object} config
      * @returns {number|undefined}
      */
-    getSpellLevel(config: any = {}): number | undefined {
+    override getSpellLevel(config: any = {}): number | undefined {
         return config?.item?.system?.level?.value ?? undefined;
     }
 
@@ -100,7 +100,7 @@ export class Pf2eSystemAdapter extends BaseSystemAdapter {
      * @param {Actor} actor
      * @returns {string|null}
      */
-    getCreatureType(actor: any): string | null {
+    override getCreatureType(actor: any): string | null {
         if (!actor) return null;
         const rawType = actor.system?.details?.creatureType ?? actor.system?.traits?.value?.[0] ?? null;
         return typeof rawType === 'string' ? rawType.toLowerCase() : null;

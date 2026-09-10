@@ -19,7 +19,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {number} [_scale=1] Additional scale multiplier (unused in V14 centered origin)
      * @returns {{x: number, y: number}} Offset coordinates
      */
-    getRevealOffset(object: any, _scale = 1) {
+    override getRevealOffset(object: any, _scale = 1) {
         if (!object) return { x: 0, y: 0 };
         return object.center ?? { x: object.x, y: object.y };
     }
@@ -30,7 +30,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {PlaceableObject} object Token or Tile placeable
      * @returns {{x: number, y: number}} Offset coordinates
      */
-    getShapeOffset(object: any) {
+    override getShapeOffset(object: any) {
         if (!object) return { x: 0, y: 0 };
         return object.center ?? { x: object.x, y: object.y };
     }
@@ -42,7 +42,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {Tile} tile Target tile placeable
      * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number, anchor: {x: number, y: number} }}
      */
-    getTileBounds(tile: any) {
+    override getTileBounds(tile: any) {
         if (!tile) return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
         const doc = tile.document;
         const x = doc.x ?? 0;
@@ -82,7 +82,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {Object} [config={}] Configuration options
      * @returns {[ {x: number, y: number}, {x: number, y: number}, {x: number, y: number} ]} Array of [primary, secondary, center] coordinates
      */
-    getTemplatePosition(template: any, config: any = {}): any {
+    override getTemplatePosition(template: any, config: any = {}): any {
         if (!template) return [];
 
         const doc = template.document ? template.document : template;
@@ -162,7 +162,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {Level|null} [level=null] Target level document or placeable (defaults to active level)
      * @returns {{ src: string|null, offsetX: number, offsetY: number }}
      */
-    getSceneBackground(scene: any = canvas?.scene, level: any = null): any {
+    override getSceneBackground(scene: any = canvas?.scene, level: any = null): any {
         if (!scene) return { src: null, offsetX: 0, offsetY: 0 };
 
         const activeLevel: any = level
@@ -210,7 +210,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {string} keyId The property key to delete
      * @returns {Record<string, *>} Update dictionary
      */
-    formatDeletionUpdate(path: string, keyId: string): Record<string, any> {
+    override formatDeletionUpdate(path: string, keyId: string): Record<string, any> {
         const fullKey = path ? `${path}.${keyId}` : keyId;
         const operator = (foundry.data as any)?.operators?.ForcedDeletion;
         return { [fullKey]: operator };
@@ -225,7 +225,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @override
      * @type {boolean}
      */
-    get supportsRegionBehaviors() {
+    override get supportsRegionBehaviors() {
         return true;
     }
 
@@ -234,7 +234,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @override
      * @returns {RegionDocument[]}
      */
-    getControlledRegions(): any[] {
+    override getControlledRegions(): any[] {
         const controlled = (canvas as any)?.regions?.controlled ?? [];
         return controlled.map((r: any) => r.document);
     }
@@ -246,7 +246,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {Region|RegionDocument} region Target Region placeable or document
      * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number, anchor: {x: number, y: number} }}
      */
-    getRegionBounds(region: any): any {
+    override getRegionBounds(region: any): any {
         if (!region) {
             return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
         }
@@ -377,7 +377,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {Region|RegionDocument} region Target Region placeable or document
      * @returns {Token[]}
      */
-    getTokensInRegion(region: any): any[] {
+    override getTokensInRegion(region: any): any[] {
         if (!region) return [];
         const doc = region.document ? region.document : region;
         const tokens = doc.tokens ?? region.tokens ?? [];
@@ -391,7 +391,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {object} behaviorData Formatted behavior configuration data
      * @returns {Promise<RegionBehavior|null>}
      */
-    async createRegionBehavior(region: any, behaviorData: any): Promise<any> {
+    override async createRegionBehavior(region: any, behaviorData: any): Promise<any> {
         if (!region) return null;
         const doc = region.document ? region.document : region;
         if (!doc.createEmbeddedDocuments) return null;
@@ -411,7 +411,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {object} [config.flags={}] Custom flags
      * @returns {object} Formatted RegionBehavior creation payload
      */
-    formatRegionBehaviorData({ name, events = ['tokenEnter'], source, disabled = false, flags = {} }: any): any {
+    override formatRegionBehaviorData({ name, events = ['tokenEnter'], source, disabled = false, flags = {} }: any): any {
         return {
             name,
             type: 'executeScript',
@@ -430,7 +430,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {string} id Target placeable ID
      * @returns {PlaceableObject|null}
      */
-    getPlaceable(id: string): any {
+    override getPlaceable(id: string): any {
         if (!id) return null;
         return super.getPlaceable(id)
             ?? (canvas as any)?.regions?.get?.(id)
@@ -446,7 +446,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {PlaceableObject|Document|null} placeable Target placeable or document
      * @returns {string|null}
      */
-    getPlaceableTexture(placeable: any): string | null {
+    override getPlaceableTexture(placeable: any): string | null {
         if (!placeable) return null;
         const directTexture = super.getPlaceableTexture(placeable);
         if (directTexture) return directTexture;
@@ -474,7 +474,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
      * @param {{ x: number, y: number }} point Point coordinates
      * @returns {boolean}
      */
-    containsPoint(object: any, point: any): boolean {
+    override containsPoint(object: any, point: any): boolean {
         if (!object || !point) return false;
         const doc = object.document ? object.document : object;
         const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(object.shapes);

@@ -9,42 +9,42 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
     /**
      * The active ContextMenu constructor in v12.
      */
-    get ContextMenu(): any {
+    override get ContextMenu(): any {
         return ContextMenu;
     }
 
     /**
      * The active KeyboardManager constructor in v12.
      */
-    get KeyboardManager(): any {
+    override get KeyboardManager(): any {
         return KeyboardManager;
     }
 
     /**
      * The active Token placeable constructor in v12.
      */
-    get Token(): any {
+    override get Token(): any {
         return Token;
     }
 
     /**
      * The active Tile placeable constructor in v12.
      */
-    get Tile(): any {
+    override get Tile(): any {
         return Tile;
     }
 
     /**
      * The active FilePicker constructor / implementation in v12.
      */
-    get FilePicker(): any {
+    override get FilePicker(): any {
         return FilePicker;
     }
 
     /**
      * The active TextEditor constructor / implementation in v12.
      */
-    get TextEditor(): any {
+    override get TextEditor(): any {
         return TextEditor;
     }
 
@@ -54,7 +54,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {Object} [options={}] Resolution options
      * @returns {Document|null}
      */
-    fromUuidSync(uuid: string, options: any = {}): any {
+    override fromUuidSync(uuid: string, options: any = {}): any {
         return fromUuidSync(uuid, options);
     }
 
@@ -64,7 +64,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {Object} [options={}] Resolution options
      * @returns {Promise<Document|null>}
      */
-    async fromUuid(uuid: string, options: any = {}): Promise<any> {
+    override async fromUuid(uuid: string, options: any = {}): Promise<any> {
         return fromUuid(uuid, options);
     }
 
@@ -74,7 +74,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {Token} token Target Token placeable
      * @returns {Combatant[]}
      */
-    getCombatantsByToken(combat: Combat, token: Token): Combatant[] {
+    override getCombatantsByToken(combat: Combat, token: Token): Combatant[] {
         if (!combat || !token?.id) return [];
         const single = (combat as any).getCombatantByToken(token.id);
         return single ? [single] : [];
@@ -92,7 +92,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {number} [scale=1] Additional scale multiplier
      * @returns {{x: number, y: number}} Offset coordinates
      */
-    getRevealOffset(object: any, scale = 1) {
+    override getRevealOffset(object: any, scale = 1) {
         if (!object) return { x: 0, y: 0 };
         const doc = object.document;
         const isToken = this.isDocumentOfType(object, 'Token');
@@ -116,7 +116,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {PlaceableObject} object Token or Tile placeable
      * @returns {{x: number, y: number}} Offset coordinates
      */
-    getShapeOffset(object: any) {
+    override getShapeOffset(object: any) {
         if (!object) return { x: 0, y: 0 };
         return {
             x: object.x,
@@ -135,7 +135,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {Object} [config={}] Configuration options
      * @returns {[ {x: number, y: number}, {x: number, y: number}, {x: number, y: number} ]} Array of [primary, secondary, center] coordinates
      */
-    getTemplatePosition(template: any, config: any = {}): any {
+    override getTemplatePosition(template: any, config: any = {}): any {
         if (!template || typeof template !== 'object') return [];
 
         const doc = template.document ? template.document : template;
@@ -193,7 +193,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {Level|null} [_level=null] Unused in V12
      * @returns {{ src: string|null, offsetX: number, offsetY: number }}
      */
-    getSceneBackground(scene: any = canvas?.scene, _level: any = null): any {
+    override getSceneBackground(scene: any = canvas?.scene, _level: any = null): any {
         if (!scene) return { src: null, offsetX: 0, offsetY: 0 };
         const bg = scene.background;
         const src = typeof bg?.src === 'string' ? bg.src : (typeof bg === 'string' ? bg : null);
@@ -216,7 +216,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {string} keyId The property key to delete
      * @returns {Record<string, *>} Update dictionary
      */
-    formatDeletionUpdate(path: string, keyId: string): Record<string, any> {
+    override formatDeletionUpdate(path: string, keyId: string): Record<string, any> {
         const fullKey = path ? `${path}.-=${keyId}` : `-=${keyId}`;
         return { [fullKey]: null };
     }
@@ -227,7 +227,7 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
      * @param {string[]} paths Array of template paths
      * @returns {Promise<Function[]>}
      */
-    async loadTemplates(paths: string[]): Promise<Function[]> {
+    override async loadTemplates(paths: string[]): Promise<Function[]> {
         return loadTemplates(paths);
     }
 }

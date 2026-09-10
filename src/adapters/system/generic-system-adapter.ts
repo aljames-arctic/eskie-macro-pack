@@ -18,7 +18,7 @@ export class GenericSystemAdapter extends BaseSystemAdapter {
      * @param {ChatMessage} message
      * @returns {string}
      */
-    qualifyMessage(message: any): string {
+    override qualifyMessage(message: any): string {
         const flavorText = (message?.flavor ?? "").toLowerCase();
         const contentText = message?.content ?? "";
         const contentLower = contentText.toLowerCase();
@@ -41,7 +41,7 @@ export class GenericSystemAdapter extends BaseSystemAdapter {
      * @param {ChatMessage} _message
      * @returns {Array<{ source: string, rawAbility: string|null, outcome: string, tokenId: string|null }>}
      */
-    extractRolls(_message: any): any[] {
+    override extractRolls(_message: any): any[] {
         return [{
             source: "generic-keywords",
             rawAbility: null,

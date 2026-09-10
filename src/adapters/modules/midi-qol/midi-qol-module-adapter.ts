@@ -15,7 +15,7 @@ export class MidiQolModuleAdapter extends BaseModuleAdapter {
      * @param {ChatMessage} message The chat message document to inspect
      * @returns {{ rolls: Array<{ source: string, rawAbility: string|null, outcome: string, tokenId: string|null }>, outcome: string }}
      */
-    extractRolls(message: any): { rolls: Array<{ source: string, rawAbility: string | null, outcome: string, tokenId: string | null }>, outcome: string } {
+    override extractRolls(message: any): { rolls: Array<{ source: string, rawAbility: string | null, outcome: string, tokenId: string | null }>, outcome: string } {
         const rolls: Array<{ source: string, rawAbility: string | null, outcome: string, tokenId: string | null }> = [];
         const contentText = message?.content ?? "";
         const midiFlags = message?.flags?.["midi-qol"];

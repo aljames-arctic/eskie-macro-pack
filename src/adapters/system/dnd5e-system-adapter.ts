@@ -2,6 +2,7 @@ import { BaseSystemAdapter } from './base-system-adapter.js';
 import { BaseFoundryAdapter } from '../foundry/base-foundry-adapter.js';
 import { midiQolAdapter } from '../modules/midi-qol/midi-qol-module-adapter.js';
 import { log } from '../../lib/logger.js';
+import type { Actor5e } from '../../types/systems.js';
 
 /**
  * D&D 5e System Adapter Class
@@ -133,12 +134,14 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
 
     /**
      * Retrieve normalized creature type string for a target actor in D&D 5e.
-     * @param {Actor} actor Concrete Actor document
+     * @param {Actor5e|Actor} actor Concrete Actor document
      * @returns {string|null}
      */
-    override getCreatureType(actor: any): string | null {
+    override getCreatureType(actor: Actor5e | Actor): string | null {
         if (!actor) return null;
-        const rawType = actor.system?.details?.type?.value ?? actor.system?.details?.type ?? null;
+        const act = actor as Actor5e;
+        const detailType = act.system?.details?.type;
+        const rawType = typeof detailType === 'object' && detailType !== null ? detailType.value : detailType;
         return typeof rawType === 'string' ? rawType.toLowerCase() : null;
     }
 }

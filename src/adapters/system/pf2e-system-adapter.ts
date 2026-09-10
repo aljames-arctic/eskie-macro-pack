@@ -1,5 +1,6 @@
 import { BaseSystemAdapter } from './base-system-adapter.js';
 import { BaseFoundryAdapter } from '../foundry/base-foundry-adapter.js';
+import type { ActorPF2e } from '../../types/systems.js';
 
 /**
  * Pathfinder 2e (PF2e) System Adapter Class
@@ -97,12 +98,13 @@ export class Pf2eSystemAdapter extends BaseSystemAdapter {
 
     /**
      * Retrieve normalized creature type string for a target actor in PF2e.
-     * @param {Actor} actor
+     * @param {ActorPF2e|Actor} actor
      * @returns {string|null}
      */
-    override getCreatureType(actor: any): string | null {
+    override getCreatureType(actor: ActorPF2e | Actor): string | null {
         if (!actor) return null;
-        const rawType = actor.system?.details?.creatureType ?? actor.system?.traits?.value?.[0] ?? null;
+        const act = actor as ActorPF2e;
+        const rawType = act.system?.details?.creatureType ?? act.system?.traits?.value?.[0] ?? null;
         return typeof rawType === 'string' ? rawType.toLowerCase() : null;
     }
 }

@@ -4,6 +4,7 @@ import { BlfxModuleAdapter } from './blfx/blfx-module-adapter.js';
 import { SocketlibModuleAdapter } from './socketlib/socketlib-module-adapter.js';
 import { MassEditModuleAdapter } from './mass-edit/mass-edit-module-adapter.js';
 import { TokenAttacherModuleAdapter } from './token-attacher/token-attacher-module-adapter.js';
+import { FoundrySummonsModuleAdapter } from './foundry-summons/foundry-summons-module-adapter.js';
 
 /**
  * Registry of known module adapters.
@@ -18,5 +19,6 @@ export const MODULE_ADAPTERS = {
     'socketlib': SocketlibModuleAdapter,
     'multi-token-edit': MassEditModuleAdapter,
     'mass-edit': MassEditModuleAdapter,
-    'token-attacher': TokenAttacherModuleAdapter
+    'token-attacher': TokenAttacherModuleAdapter,
+    'foundry-summons': FoundrySummonsModuleAdapter
 };

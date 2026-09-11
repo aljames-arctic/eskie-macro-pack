@@ -168,6 +168,19 @@ export const RECOMMENDED_CATEGORIES: RecommendedCategoryConfig[] = [
                         icon: "fa-solid fa-layer-group"
                     }
                 ]
+            },
+            {
+                id: "summoning",
+                name: "EMP.recommendedModules.subcategories.summoning",
+                icon: "fa-solid fa-hat-wizard",
+                modules: [
+                    {
+                        id: "foundry-summons",
+                        name: "EMP.recommendedModules.modules.foundrySummons.name",
+                        description: "EMP.recommendedModules.modules.foundrySummons.description",
+                        icon: "fa-solid fa-hat-wizard"
+                    }
+                ]
             }
         ]
     },

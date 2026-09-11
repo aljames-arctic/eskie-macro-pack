@@ -8,6 +8,7 @@ declare global {
   var socketlib: any;
   var dnd5e: any;
   var FXMASTER: any;
+  var foundrySummons: any;
 
   interface ModuleConfig {
     [key: string]: any;

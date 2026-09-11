@@ -9,10 +9,13 @@ import { midiQolAdapter } from './modules/midi-qol/midi-qol-module-adapter.js';
 import { autorecManager } from './modules/autorec/autorec-module-adapter.js';
 import { massEditAdapter } from './modules/mass-edit/mass-edit-module-adapter.js';
 import { tokenAttacherAdapter } from './modules/token-attacher/token-attacher-module-adapter.js';
+import { FoundrySummonsModuleAdapter } from './modules/foundry-summons/foundry-summons-module-adapter.js';
 import { crosshair } from '../lib/crosshairs.js';
 import { template } from '../lib/templates.js';
 import { file } from '../lib/filemanager.js';
 import { log } from '../lib/logger.js';
+
+const foundrySummonsAdapter = new FoundrySummonsModuleAdapter();
 
 /**
  * Unified Adapter Singleton for Eskie Macro Pack.
@@ -110,6 +113,14 @@ class Adapter {
 
     get tokenAttacher() {
         return this.modules.get('token-attacher') ?? tokenAttacherAdapter;
+    }
+
+    get summons() {
+        return (this.modules.get('foundry-summons') as FoundrySummonsModuleAdapter) ?? foundrySummonsAdapter;
+    }
+
+    get foundrySummons() {
+        return this.summons;
     }
 
     get crosshair() {

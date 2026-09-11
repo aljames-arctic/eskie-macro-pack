@@ -102,7 +102,8 @@
                 "regionTriggers": "Region Triggering",
                 "tileTriggers": "Tile Triggering",
                 "tagging": "Tagging",
-                "objectAttaching": "Object Attaching & Linking"
+                "objectAttaching": "Object Attaching & Linking",
+                "summoning": "Creature & Token Summoning"
             },
             "modules": {
                 "foundryRegions": {
@@ -144,6 +145,10 @@
                 "massEdit": {
                     "name": "Baileywiki Mass Edit",
                     "description": "Enables linking and attaching elements to canvas tiles and tokens for advanced scene object manipulation."
+                },
+                "foundrySummons": {
+                    "name": "Foundry Summons",
+                    "description": "Enables automated creature, spirit, and token summoning directly onto scene canvases for EMP summoning macros."
                 },
                 "autoanimations": {
                     "name": "Automated Animations",

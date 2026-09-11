@@ -196,6 +196,11 @@ test('RecommendedModulesApp inherits from ApplicationV2 with HandlebarsApplicati
     const taggingSub = funcCategory.subcategories.find(s => s.id === 'tagging');
     assert.ok(taggingSub.modules.some(m => m.id === 'tagger'), 'tagger must be in tagging subcategory');
 
+    // Verify Summoning subcategory under Functionality
+    assert.ok(funcCategory.subcategories.some(s => s.id === 'summoning'), 'summoning subcategory must exist');
+    const summoningSub = funcCategory.subcategories.find(s => s.id === 'summoning');
+    assert.ok(summoningSub.modules.some(m => m.id === 'foundry-summons'), 'foundry-summons must be in summoning subcategory');
+
     const autoCategory = context.categories.find(c => c.id === 'automation');
     assert.ok(autoCategory);
     assert.ok(autoCategory.modules.some(m => m.id === 'boss-loot-assets-premium'));

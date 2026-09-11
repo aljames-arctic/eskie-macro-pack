@@ -2,7 +2,43 @@ import { MODULE_ID } from "../../lib/constants.js";
 
 import { adapter } from '../../adapters/index.js';
 
-export const RECOMMENDED_CATEGORIES = [
+export interface RecommendedModuleConfig {
+    id: string;
+    name: string;
+    description: string;
+    icon?: string;
+    altIds?: string[];
+    isNative?: boolean;
+    note?: string;
+    patreon?: string;
+}
+
+export interface ProcessedRecommendedModule extends RecommendedModuleConfig {
+    statusKey: string;
+    statusLabel: string;
+    statusClass: string;
+    statusIcon: string;
+    isActive: boolean;
+}
+
+export interface RecommendedSubcategoryConfig {
+    id: string;
+    name: string;
+    icon: string;
+    isNative?: boolean;
+    requireOne?: boolean;
+    modules: RecommendedModuleConfig[];
+}
+
+export interface RecommendedCategoryConfig {
+    id: string;
+    name: string;
+    icon: string;
+    subcategories?: RecommendedSubcategoryConfig[];
+    modules?: RecommendedModuleConfig[];
+}
+
+export const RECOMMENDED_CATEGORIES: RecommendedCategoryConfig[] = [
     {
         id: "assets",
         name: "EMP.recommendedModules.categories.assets",
@@ -18,14 +54,16 @@ export const RECOMMENDED_CATEGORIES = [
                         name: "EMP.recommendedModules.modules.eskieEffects.name",
                         altIds: ["eskie-effects-free"],
                         description: "EMP.recommendedModules.modules.eskieEffects.description",
-                        icon: "fa-solid fa-wand-magic-sparkles"
+                        icon: "fa-solid fa-wand-magic-sparkles",
+                        patreon: "https://www.patreon.com/c/EskieEffects"
                     },
                     {
                         id: "jb2a_patreon",
                         name: "EMP.recommendedModules.modules.jb2a.name",
                         altIds: ["JB2A_DnD5e"],
                         description: "EMP.recommendedModules.modules.jb2a.description",
-                        icon: "fa-solid fa-film"
+                        icon: "fa-solid fa-film",
+                        patreon: "https://www.patreon.com/c/JB2A"
                     },
                     {
                         id: "jaamod",
@@ -38,7 +76,8 @@ export const RECOMMENDED_CATEGORIES = [
                         name: "EMP.recommendedModules.modules.bossLoot.name",
                         altIds: ["boss-loot-assets-free", "blfx-assets-pack01"],
                         description: "EMP.recommendedModules.modules.bossLoot.description",
-                        icon: "fa-solid fa-gem"
+                        icon: "fa-solid fa-gem",
+                        patreon: "https://www.patreon.com/cw/BossLoot"
                     }
                 ]
             },
@@ -52,7 +91,8 @@ export const RECOMMENDED_CATEGORIES = [
                         name: "EMP.recommendedModules.modules.psfx.name",
                         altIds: ["psfx"],
                         description: "EMP.recommendedModules.modules.psfx.description",
-                        icon: "fa-solid fa-music"
+                        icon: "fa-solid fa-music",
+                        patreon: "https://www.patreon.com/c/PeriSFX"
                     }
                 ]
             }
@@ -149,20 +189,21 @@ export const RECOMMENDED_CATEGORIES = [
                 name: "EMP.recommendedModules.modules.bossLootFx.name",
                 altIds: ["blfx-animation-editor-premium", "blfx"],
                 description: "EMP.recommendedModules.modules.bossLootFx.description",
-                icon: "fa-solid fa-dragon"
+                icon: "fa-solid fa-dragon",
+                patreon: "https://www.patreon.com/cw/BossLoot"
             }
         ]
     }
 ];
 
-function processModule(mod: any) {
+function processModule(mod: RecommendedModuleConfig): ProcessedRecommendedModule {
     if (mod.isNative) {
         const isSupported = Boolean(adapter.supportsRegionBehaviors);
         return {
             ...mod,
             name: game.i18n?.localize(mod.name) ?? mod.name,
             description: game.i18n?.localize(mod.description) ?? mod.description,
-            note: mod.note ? (game.i18n?.localize(mod.note) ?? mod.note) : null,
+            note: mod.note ? (game.i18n?.localize(mod.note) ?? mod.note) : undefined,
             statusKey: "native",
             statusLabel: isSupported
                 ? (game.i18n?.localize("EMP.recommendedModules.status.nativeSupported") ?? "Native Support")
@@ -174,7 +215,6 @@ function processModule(mod: any) {
     }
 
     const primaryMod = game.modules?.get(mod.id);
-    let activeMod = null;
     let isInstalled = false;
     let isActive = false;
 
@@ -182,7 +222,6 @@ function processModule(mod: any) {
         isInstalled = true;
         if (primaryMod.active) {
             isActive = true;
-            activeMod = primaryMod;
         }
     }
 
@@ -193,7 +232,6 @@ function processModule(mod: any) {
                 isInstalled = true;
                 if (altMod.active) {
                     isActive = true;
-                    activeMod = altMod;
                     break;
                 }
             }
@@ -221,7 +259,7 @@ function processModule(mod: any) {
         ...mod,
         name: game.i18n?.localize(mod.name) ?? mod.name,
         description: game.i18n?.localize(mod.description) ?? mod.description,
-        note: mod.note ? (game.i18n?.localize(mod.note) ?? mod.note) : null,
+        note: mod.note ? (game.i18n?.localize(mod.note) ?? mod.note) : undefined,
         statusKey,
         statusLabel,
         statusClass,
@@ -266,6 +304,13 @@ export class RecommendedModulesApp extends (adapter.foundry.HandlebarsApplicatio
         closeBtn?.addEventListener?.("click", (event: any) => {
             event?.preventDefault?.();
             this.close?.();
+        });
+
+        const patreonPills = this.element?.querySelectorAll?.('.eskie-patreon-pill');
+        patreonPills?.forEach?.((pill: any) => {
+            pill?.addEventListener?.("click", (event: any) => {
+                event?.stopPropagation?.();
+            });
         });
     }
 

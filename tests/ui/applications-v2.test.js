@@ -87,10 +87,12 @@ test('RecommendedModulesApp inherits from ApplicationV2 with HandlebarsApplicati
     await RecommendedModulesApp._formHandler.call(mockApp);
     assert.equal(closeCalled, true);
 
-    // Verify _onRender binds click listener that triggers close
+    // Verify _onRender binds click listener that triggers close and stops pill propagation
     closeCalled = false;
     let clickHandler = null;
     let defaultPrevented = false;
+    let pillClickHandler = null;
+    let pillPropagationStopped = false;
     app.close = async () => { closeCalled = true; };
     app.element = {
         querySelector(selector) {
@@ -102,6 +104,18 @@ test('RecommendedModulesApp inherits from ApplicationV2 with HandlebarsApplicati
                 };
             }
             return null;
+        },
+        querySelectorAll(selector) {
+            if (selector.includes('.eskie-patreon-pill')) {
+                return [
+                    {
+                        addEventListener(event, handler) {
+                            if (event === 'click') pillClickHandler = handler;
+                        }
+                    }
+                ];
+            }
+            return [];
         }
     };
     app._onRender({}, {});
@@ -113,6 +127,14 @@ test('RecommendedModulesApp inherits from ApplicationV2 with HandlebarsApplicati
     });
     assert.equal(defaultPrevented, true);
     assert.equal(closeCalled, true);
+
+    assert.ok(pillClickHandler, 'Patreon pill click listener should be registered');
+    pillClickHandler({
+        stopPropagation() {
+            pillPropagationStopped = true;
+        }
+    });
+    assert.equal(pillPropagationStopped, true, 'Patreon pill click should stop propagation');
 
     // Verify context preparation
     const context = await app._prepareContext();
@@ -142,9 +164,32 @@ test('RecommendedModulesApp inherits from ApplicationV2 with HandlebarsApplicati
     const autoCategory = context.categories.find(c => c.id === 'automation');
     assert.ok(autoCategory);
     assert.ok(autoCategory.modules.some(m => m.id === 'boss-loot-assets-premium'));
+
+    // Verify Patreon URLs on companion modules
+    const assetsCategory = context.categories.find(c => c.id === 'assets');
+    const visualSub = assetsCategory.subcategories.find(s => s.id === 'visual');
+    const soundSub = assetsCategory.subcategories.find(s => s.id === 'sound');
+
+    const eskieEffects = visualSub.modules.find(m => m.id === 'eskie-effects');
+    assert.equal(eskieEffects.patreon, 'https://www.patreon.com/c/EskieEffects');
+
+    const jb2a = visualSub.modules.find(m => m.id === 'jb2a_patreon');
+    assert.equal(jb2a.patreon, 'https://www.patreon.com/c/JB2A');
+
+    const bossLoot = visualSub.modules.find(m => m.id === 'boss-loot-assets-premium');
+    assert.equal(bossLoot.patreon, 'https://www.patreon.com/cw/BossLoot');
+
+    const psfx = soundSub.modules.find(m => m.id === 'psfx-patreon');
+    assert.equal(psfx.patreon, 'https://www.patreon.com/c/PeriSFX');
+
+    const blfx = autoCategory.modules.find(m => m.id === 'boss-loot-assets-premium');
+    assert.equal(blfx.patreon, 'https://www.patreon.com/cw/BossLoot');
+
+    const jaamod = visualSub.modules.find(m => m.id === 'jaamod');
+    assert.equal(jaamod.patreon, undefined);
 });
 
-test('RecommendedModulesApp template includes data-action="close" on close button', async () => {
+test('RecommendedModulesApp template includes data-action="close" on close button and clickable Patreon pills', async () => {
     const fs = await import('node:fs');
     const path = await import('node:path');
     const { fileURLToPath } = await import('node:url');
@@ -154,6 +199,12 @@ test('RecommendedModulesApp template includes data-action="close" on close butto
 
     assert.ok(templateContent.includes('data-action="close"'));
     assert.ok(templateContent.includes('EMP.recommendedModules.closeButton'));
+    assert.ok(templateContent.includes('eskie-patreon-pill'));
+    assert.ok(templateContent.includes('fa-brands fa-patreon'));
+    assert.ok(templateContent.includes('target="_blank"'));
+    assert.ok(templateContent.includes('rel="noopener noreferrer"'));
+    assert.ok(templateContent.includes('EMP.recommendedModules.patreon'));
+    assert.ok(templateContent.includes('EMP.recommendedModules.patreonTooltip'));
 });
 
 test('ConfigureAutorecApp inherits from ApplicationV2 with HandlebarsApplicationMixin and manages module visibility', async () => {

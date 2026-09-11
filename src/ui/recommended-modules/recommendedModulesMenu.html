@@ -42,6 +42,11 @@
                             <div class="eskie-card-details">
                                 <div class="eskie-card-title-row">
                                     <h3 class="eskie-card-title">{{name}}</h3>
+                                    {{#if patreon}}
+                                    <a href="{{patreon}}" target="_blank" rel="noopener noreferrer" class="eskie-patreon-pill" title="{{localize 'EMP.recommendedModules.patreonTooltip'}}">
+                                        <i class="fa-brands fa-patreon"></i> {{localize "EMP.recommendedModules.patreon"}}
+                                    </a>
+                                    {{/if}}
                                 </div>
                                 <p class="eskie-card-description">{{description}}</p>
                             </div>
@@ -65,6 +70,11 @@
                         <div class="eskie-card-details">
                             <div class="eskie-card-title-row">
                                 <h3 class="eskie-card-title">{{name}}</h3>
+                                {{#if patreon}}
+                                <a href="{{patreon}}" target="_blank" rel="noopener noreferrer" class="eskie-patreon-pill" title="{{localize 'EMP.recommendedModules.patreonTooltip'}}">
+                                    <i class="fa-brands fa-patreon"></i> {{localize "EMP.recommendedModules.patreon"}}
+                                </a>
+                                {{/if}}
                             </div>
                             <p class="eskie-card-description">{{description}}</p>
                         </div>

@@ -75,6 +75,8 @@
             "menuTitle": "Eskie Macro Pack - Companion Modules",
             "menuHint": "The following modules enhance Eskie Macro Pack by supplying visual assets, audio effects, animations, or advanced automation.",
             "closeButton": "Close Guide",
+            "patreon": "Patreon",
+            "patreonTooltip": "Visit Patreon page",
             "status": {
                 "active": "Installed",
                 "disabled": "Disabled",

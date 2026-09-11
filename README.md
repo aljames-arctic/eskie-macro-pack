@@ -81,7 +81,7 @@ The following modules are optional but unlock additional features when installed
 | [Eskie Effects (Patreon)](https://www.patreon.com/EskieEffects) | Additional premium effect assets designed specifically for EMP (or the free variant) |
 | [Jinker's Animated Art Pack](https://foundryvtt.com/packages/jaamod) | Animated asset library used by select effects |
 | [JB2A (Patreon)](https://www.patreon.com/JB2A) | Large library of high-quality animated assets used by many EMP effects (or the free variant) |
-| [Boss Loot Assets (Patreon)](https://www.patreon.com/cw/BossLoot) | Premium asset pack used by select effects (or the free variant) |
+| [Boss Loot Assets (Patreon)](https://www.patreon.com/c/BossLoot) | Premium asset pack used by select effects (or the free variant) |
 | [Tagger](https://foundryvtt.com/packages/tagger) | Tag-based tile and token lookup; used by some trap and movement effects |
 | [Token Attacher](https://foundryvtt.com/packages/token-attacher) | Attaches tokens to tiles for movement-based trap and tile effects |
 | [Monk's Active Tile Triggers (MATT)](https://foundryvtt.com/packages/monks-active-tiles) | **Optional on V14+ / Required on V12-V13 for Traps.** Automates tile trap playback when tokens enter tiles (Foundry V14+ supports native Regions) |

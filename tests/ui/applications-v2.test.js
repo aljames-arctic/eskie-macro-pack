@@ -134,6 +134,8 @@ test('RecommendedModulesApp inherits from ApplicationV2 with HandlebarsApplicati
 
     assert.ok(pillClickHandler, 'Patreon pill click listener should be registered');
     let openedUrl = null;
+    let pillPreventDefault = false;
+    let pillStopPropagation = false;
     globalThis.window = {
         electron: {
             shell: {
@@ -144,9 +146,29 @@ test('RecommendedModulesApp inherits from ApplicationV2 with HandlebarsApplicati
         }
     };
     pillClickHandler({
-        preventDefault() {}
+        preventDefault() {
+            pillPreventDefault = true;
+        },
+        stopPropagation() {
+            pillStopPropagation = true;
+        }
     });
+    assert.equal(pillPreventDefault, true, 'preventDefault should be called on click');
+    assert.equal(pillStopPropagation, true, 'stopPropagation should be called on click');
     assert.equal(openedUrl, 'https://www.patreon.com/c/EskieEffects');
+
+    // Test browser window.open fallback when electron is absent
+    let browserOpenedUrl = null;
+    globalThis.window = {
+        open(url) {
+            browserOpenedUrl = url;
+        }
+    };
+    pillClickHandler({
+        preventDefault() {},
+        stopPropagation() {}
+    });
+    assert.equal(browserOpenedUrl, 'https://www.patreon.com/c/EskieEffects');
     delete globalThis.window;
 
     // Verify context preparation
@@ -190,13 +212,13 @@ test('RecommendedModulesApp inherits from ApplicationV2 with HandlebarsApplicati
     assert.equal(jb2a.patreon, 'https://www.patreon.com/c/JB2A');
 
     const bossLoot = visualSub.modules.find(m => m.id === 'boss-loot-assets-premium');
-    assert.equal(bossLoot.patreon, 'https://www.patreon.com/cw/BossLoot');
+    assert.equal(bossLoot.patreon, 'https://www.patreon.com/c/BossLoot');
 
     const psfx = soundSub.modules.find(m => m.id === 'psfx-patreon');
     assert.equal(psfx.patreon, 'https://www.patreon.com/c/PeriSFX');
 
     const blfx = autoCategory.modules.find(m => m.id === 'boss-loot-assets-premium');
-    assert.equal(blfx.patreon, 'https://www.patreon.com/cw/BossLoot');
+    assert.equal(blfx.patreon, 'https://www.patreon.com/c/BossLoot');
 
     const jaamod = visualSub.modules.find(m => m.id === 'jaamod');
     assert.equal(jaamod.patreon, undefined);

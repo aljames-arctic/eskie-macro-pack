@@ -76,7 +76,7 @@ export const RECOMMENDED_CATEGORIES: RecommendedCategoryConfig[] = [
                         altIds: ["boss-loot-assets-free", "blfx-assets-pack01"],
                         description: "EMP.recommendedModules.modules.bossLoot.description",
                         icon: "fa-solid fa-gem",
-                        patreon: "https://www.patreon.com/cw/BossLoot"
+                        patreon: "https://www.patreon.com/c/BossLoot"
                     }
                 ]
             },
@@ -188,7 +188,7 @@ export const RECOMMENDED_CATEGORIES: RecommendedCategoryConfig[] = [
                 altIds: ["blfx-animation-editor-premium", "blfx"],
                 description: "EMP.recommendedModules.modules.bossLootFx.description",
                 icon: "fa-solid fa-dragon",
-                patreon: "https://www.patreon.com/cw/BossLoot"
+                patreon: "https://www.patreon.com/c/BossLoot"
             }
         ]
     }
@@ -307,10 +307,14 @@ export class RecommendedModulesApp extends (adapter.foundry.HandlebarsApplicatio
         const patreonPills = this.element?.querySelectorAll?.('.eskie-patreon-pill');
         patreonPills?.forEach?.((pill: any) => {
             pill?.addEventListener?.("click", (event: any) => {
+                event?.preventDefault?.();
+                event?.stopPropagation?.();
                 const href = pill.getAttribute?.("href");
-                if (href && (window as any)?.electron?.shell?.openExternal) {
-                    event?.preventDefault?.();
+                if (!href) return;
+                if ((window as any)?.electron?.shell?.openExternal) {
                     (window as any).electron.shell.openExternal(href);
+                } else {
+                    window?.open?.(href, "_blank", "noopener,noreferrer");
                 }
             });
         });

@@ -17,11 +17,11 @@ const DEFAULT_CONFIG = {
  * Creates a Sequencer effect for animating a spawned undead.
  * This function assumes the undead token has already been spawned.
  *
- * @param {Token} undeadToken The newly spawned undead token.
+ * @param {Token} token The newly spawned undead token.
  * @param {object} config Configuration options for the animation.
- * @returns {Sequence} The created Sequence object.
+ * @returns {Promise<any>} The created Sequence object.
  */
-async function createAnimateDead(undeadToken: any, config: any = {}) {
+async function createAnimateDead(token: Token, config: any = {}): Promise<any> {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, choice, sound } = mConfig;
 
@@ -37,7 +37,7 @@ async function createAnimateDead(undeadToken: any, config: any = {}) {
         // Magic Circle
         .wait(50)
         .effect()
-        .atLocation(undeadToken)
+        .atLocation(token)
         .file(closest(`jb2a.magic_signs.circle.02.necromancy.complete.green`))
         .size(1.25, { gridUnits: true })
         .belowTokens()
@@ -46,7 +46,7 @@ async function createAnimateDead(undeadToken: any, config: any = {}) {
 
         .effect()
         .delay(2250)
-        .atLocation(undeadToken)
+        .atLocation(token)
         .file(closest(`jb2a.magic_signs.circle.02.necromancy.loop.green`))
         .size(1.25, { gridUnits: true })
         .belowTokens(true)
@@ -62,7 +62,7 @@ async function createAnimateDead(undeadToken: any, config: any = {}) {
         .file(closest("eskie.damage.electricity.01.purple"))
         .delay(2250)
         .fadeOut(1500)
-        .atLocation(undeadToken)
+        .atLocation(token)
         .duration(1500)
         .fadeOut(1000)
         .size(1.75, { gridUnits: true })
@@ -74,7 +74,7 @@ async function createAnimateDead(undeadToken: any, config: any = {}) {
         .effect()
         .delay(2250)
         .file(closest("jb2a.cast_generic.ice.01.blue"))
-        .atLocation(undeadToken)
+        .atLocation(token)
         .size(1.5, { gridUnits: true })
         .opacity(0.8)
         .filter("ColorMatrix", { brightness: 0, hue: -45 })
@@ -87,7 +87,7 @@ async function createAnimateDead(undeadToken: any, config: any = {}) {
         .delay(200)
         .file(closest("eskie.lightning.lightning_bolt.blue"))
         .rotate(-90)
-        .atLocation(undeadToken, { offset: { y: -0.4 }, gridUnits: true })
+        .atLocation(token, { offset: { y: -0.4 }, gridUnits: true })
         .size(1.5, { gridUnits: true })
         .playbackRate(1.5)
         .filter("ColorMatrix", { saturate: -1, brightness: 0 })
@@ -96,7 +96,7 @@ async function createAnimateDead(undeadToken: any, config: any = {}) {
 
         .effect()
         .file(closest("eskie.damage.electricity.01.purple"))
-        .atLocation(undeadToken)
+        .atLocation(token)
         .size(2.25, { gridUnits: true })
         .filter("ColorMatrix", { saturate: -1, brightness: 0 })
         .playbackRate(0.63)
@@ -105,7 +105,7 @@ async function createAnimateDead(undeadToken: any, config: any = {}) {
 
         .effect()
         .file(closest("jb2a.impact.dark.01.red"))
-        .atLocation(undeadToken)
+        .atLocation(token)
         .size(2.5, { gridUnits: true })
         .filter("ColorMatrix", { hue: 90 })
         .randomizeMirrorX()
@@ -113,7 +113,7 @@ async function createAnimateDead(undeadToken: any, config: any = {}) {
 
         .effect()
         .file(closest("jb2a.liquid.splash.red"))
-        .atLocation(undeadToken)
+        .atLocation(token)
         .size(1.65, { gridUnits: true })
         .belowTokens()
         .zIndex(0.1)
@@ -121,7 +121,7 @@ async function createAnimateDead(undeadToken: any, config: any = {}) {
         .effect()
         .delay(250)
         .file(closest("blfx.spell.template.circle.wave2.blood1.splatter.red"))
-        .attachTo(undeadToken)
+        .attachTo(token)
         .size(1.3, { gridUnits: true })
         .belowTokens()
         .fadeOut(1000)
@@ -132,12 +132,12 @@ async function createAnimateDead(undeadToken: any, config: any = {}) {
         .zIndex(0.2)
 
         .animation()
-        .on(undeadToken)
+        .on(token)
         .fadeIn(500)
 
         .effect()
         .file(closest("jb2a.fireflies.many.02.green"))
-        .atLocation(undeadToken)
+        .atLocation(token)
         .size(1.25, { gridUnits: true })
         .duration(3000)
         .fadeIn(500)
@@ -149,7 +149,7 @@ async function createAnimateDead(undeadToken: any, config: any = {}) {
         .effect()
         .delay(250)
         .file(closest("jb2a.static_electricity.03.blue"))
-        .atLocation(undeadToken)
+        .atLocation(token)
         .size(1.25, { gridUnits: true })
         .belowTokens()
         .fadeOut(3000)
@@ -168,12 +168,12 @@ async function createAnimateDead(undeadToken: any, config: any = {}) {
  * Plays the Animate Dead effect for a spawned undead token.
  * This function assumes the undead token has already been spawned.
  *
- * @param {Token} undeadToken The newly spawned undead token.
+ * @param {Token} token The newly spawned undead token.
  * @param {object} config Configuration options for the animation.
- * @returns {Promise<Sequence>} A promise that resolves when the sequence starts playing.
+ * @returns {Promise<any>} A promise that resolves when the sequence starts playing.
  */
-async function playAnimateDead(undeadToken: any, config: any = {}) {
-    const sequence = await createAnimateDead(undeadToken, config);
+async function playAnimateDead(token: Token, config: any = {}): Promise<any> {
+    const sequence = await createAnimateDead(token, config);
     if (sequence) { return sequence.play(); }
 }
 

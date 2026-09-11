@@ -130,12 +130,85 @@ test('tokensOfTheDeparted.spawn delegates to adapter.summons.pick', async () => 
     assert.ok(pickOptionsPassed.tokenData.light);
 });
 
+test('tokensOfTheDeparted.play summons a token when Actor is provided and plays animation', async () => {
+    let pickOptionsPassed = null;
+    const mockSpawnedToken = {
+        id: 'spawned-token-1',
+        name: 'Ghostly Companion',
+        document: { rotation: 0, x: 200, y: 200 },
+        center: { x: 250, y: 250 }
+    };
+
+    adapter.summons.pick = async (options) => {
+        pickOptionsPassed = options;
+        return mockSpawnedToken;
+    };
+
+    const mockCaster = { id: 'caster-1', name: 'Rogue', document: { rotation: 0 }, center: { x: 100, y: 100 } };
+    const mockActor = { id: 'actor-ghost', name: 'Ghostly Companion', uuid: 'Actor.ghost123', documentName: 'Actor' };
+
+    const playResult = await tokensOfTheDeparted.play(mockCaster, mockActor);
+    assert.ok(playResult, 'Play must return sequence play result for Actor');
+    assert.equal(pickOptionsPassed.uuid, 'Actor.ghost123');
+});
+
+test('tokensOfTheDeparted.play uses existing Token directly without invoking summon spawn', async () => {
+    let pickCalled = false;
+    adapter.summons.pick = async () => {
+        pickCalled = true;
+        return null;
+    };
+
+    const mockCaster = { id: 'caster-1', name: 'Rogue', document: { rotation: 0 }, center: { x: 100, y: 100 } };
+    const existingToken = {
+        id: 'token-existing',
+        name: 'Existing Spirit',
+        document: { rotation: 0, x: 300, y: 300 },
+        center: { x: 350, y: 350 }
+    };
+
+    const playResult = await tokensOfTheDeparted.play(mockCaster, existingToken);
+    assert.ok(playResult, 'Play must return sequence play result for existing Token');
+    assert.equal(pickCalled, false, 'spawn should not be called when Token is passed directly');
+});
+
+test('tokensOfTheDeparted.spawn places token directly when location is provided', async () => {
+    let createdTokenData = null;
+    const mockActor = {
+        id: 'actor-1',
+        name: 'Ghost',
+        uuid: 'Actor.ghost1',
+        documentName: 'Actor',
+        getTokenDocument: async (data) => {
+            createdTokenData = data;
+            return { id: 'tok-doc-1', ...data, object: { id: 'tok-doc-1', name: 'Ghost', document: data, center: { x: data.x, y: data.y } } };
+        }
+    };
+
+    game.actors.set('actor-1', mockActor);
+    const mockSceneTokens = [];
+    canvas.scene = {
+        createEmbeddedDocuments: async (_type, docs) => {
+            mockSceneTokens.push(...docs);
+            return docs;
+        }
+    };
+
+    const mockCaster = { id: 'caster-1', name: 'Rogue' };
+    const spawned = await tokensOfTheDeparted.spawn(mockCaster, mockActor, { location: { x: 500, y: 600 } });
+
+    assert.ok(spawned, 'Token placeable must be returned for direct location');
+    assert.equal(createdTokenData.x, 500);
+    assert.equal(createdTokenData.y, 600);
+});
+
 test('tokensOfTheDeparted is registered in autorec', () => {
     const aaMenu = adapter.autorec.aa.menu;
     const ontokenEntries = aaMenu.ontoken;
     const entry = ontokenEntries.find(e => e.label === 'Tokens of the Departed');
 
     assert.ok(entry, 'tokensOfTheDeparted must be registered in AA menu');
-    assert.equal(entry.metaData.version, '0.0.1');
+    assert.equal(entry.metaData.version, '0.0.2');
     assert.ok(entry.macro.args.includes('eskie.summon.tokensOfTheDeparted'), 'Macro args must contain unquoted eskie.summon.tokensOfTheDeparted');
 });
+

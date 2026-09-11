@@ -336,6 +336,14 @@ globalThis.game = {
         ['eskie-macros', { id: 'eskie-macros', active: true, api: {} }]
     ]),
     packs: new Map(),
+    actors: Object.assign(new Map(), {
+        getName(name) {
+            for (const actor of this.values()) {
+                if (actor.name === name) return actor;
+            }
+            return null;
+        }
+    }),
     user: {
         id: 'gm-user-1',
         name: 'Game Master',

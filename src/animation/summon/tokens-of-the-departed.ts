@@ -27,6 +27,7 @@ export interface TokensOfTheDepartedConfig {
     id?: string;
     actor?: Actor | string | null;
     uuid?: string | null;
+    location?: { x: number; y: number } | null;
     tint?: string;
     changeLight?: boolean;
     light?: TokensOfTheDepartedLightConfig;
@@ -40,6 +41,7 @@ export const DEFAULT_CONFIG: TokensOfTheDepartedConfig = {
     id: 'tokensOfTheDeparted',
     actor: null,
     uuid: null,
+    location: null,
     tint: '#58feb0',
     changeLight: true,
     light: {
@@ -63,15 +65,49 @@ export const DEFAULT_CONFIG: TokensOfTheDepartedConfig = {
 };
 
 /**
- * Spawns a summoned token on the canvas via Foundry Summons.
+ * Checks whether a target is a Token placeable or Token document.
+ * @param {unknown} target
+ * @returns {boolean}
+ */
+function isToken(target: unknown): target is Token {
+    if (!target || typeof target !== 'object') return false;
+    return ('center' in target && 'document' in target) || ('documentName' in target && (target as any).documentName === 'Token');
+}
+
+/**
+ * Checks whether a target is an Actor document.
+ * @param {unknown} target
+ * @returns {boolean}
+ */
+function isActor(target: unknown): target is Actor {
+    if (!target || typeof target !== 'object') return false;
+    return ('documentName' in target && (target as any).documentName === 'Actor') || ('items' in target && !('document' in target) && 'uuid' in target);
+}
+
+/**
+ * Spawns a summoned token on the canvas via Foundry Summons (or directly at a configured location).
  * @param {Token} token Caster token
- * @param {TokensOfTheDepartedConfig} [config={}] Configuration options
+ * @param {Actor | string | TokensOfTheDepartedConfig} [actorOrConfig={}] Actor document, name, UUID, or configuration options
+ * @param {TokensOfTheDepartedConfig} [config={}] Additional configuration options if actor was passed first
  * @returns {Promise<Token | null>} The summoned Token placeable or null
  */
-async function spawn(token: Token, config: TokensOfTheDepartedConfig = {}): Promise<Token | null> {
-    config = settingsOverride(config);
-    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { changeLight, light, tint, crosshairParameters } = mConfig;
+async function spawn(
+    token: Token,
+    actorOrConfig: Actor | string | TokensOfTheDepartedConfig = {},
+    config: TokensOfTheDepartedConfig = {}
+): Promise<Token | null> {
+    let baseConfig: TokensOfTheDepartedConfig;
+    if (typeof actorOrConfig === 'string') {
+        baseConfig = { ...config, actor: actorOrConfig };
+    } else if (isActor(actorOrConfig)) {
+        baseConfig = { ...config, actor: actorOrConfig, uuid: actorOrConfig.uuid };
+    } else {
+        baseConfig = (actorOrConfig as TokensOfTheDepartedConfig) ?? config;
+    }
+
+    const mergedConfig = settingsOverride(baseConfig);
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, mergedConfig);
+    const { changeLight, light, tint, crosshairParameters, location } = mConfig;
 
     let targetActor = mConfig.actor;
     let targetUuid = mConfig.uuid;
@@ -81,6 +117,8 @@ async function spawn(token: Token, config: TokensOfTheDepartedConfig = {}): Prom
         if (defaultActor) {
             targetUuid = defaultActor.uuid;
         }
+    } else if (targetActor && typeof targetActor === 'object' && 'uuid' in targetActor) {
+        targetUuid = (targetActor as Actor).uuid;
     }
 
     const tokenLight = changeLight ? (light ?? {
@@ -101,6 +139,31 @@ async function spawn(token: Token, config: TokensOfTheDepartedConfig = {}): Prom
     };
     if (tokenLight) {
         tokenData.light = tokenLight;
+    }
+
+    // Direct location placement if explicit coordinates are provided
+    if (location && typeof location === 'object' && typeof location.x === 'number' && typeof location.y === 'number') {
+        let actorDoc: Actor | null = null;
+        if (targetActor && typeof targetActor === 'object' && 'getTokenDocument' in targetActor) {
+            actorDoc = targetActor as Actor;
+        } else if (targetUuid) {
+            actorDoc = (await fromUuid(targetUuid)) as Actor | null;
+        } else if (typeof targetActor === 'string') {
+            actorDoc = game.actors.getName(targetActor) ?? null;
+        }
+
+        if (actorDoc?.getTokenDocument && canvas.scene) {
+            const tokenDocData = await actorDoc.getTokenDocument({
+                x: location.x,
+                y: location.y,
+                ...tokenData
+            });
+            const tokenDataObj = 'toObject' in tokenDocData && typeof tokenDocData.toObject === 'function' ? tokenDocData.toObject() : tokenDocData;
+            const created = await (canvas.scene as any).createEmbeddedDocuments('Token', [tokenDataObj]);
+            const firstCreated = Array.isArray(created) ? created[0] : created;
+            const placeable = (firstCreated?.object ?? adapter.getPlaceable(firstCreated?.id)) as Token;
+            return placeable ?? null;
+        }
     }
 
     const pickOptions: Record<string, unknown> = {
@@ -209,21 +272,34 @@ async function create(token: Token, summonToken: Token, config: TokensOfTheDepar
 
 /**
  * Plays the Tokens of the Departed sequence.
- * If summonToken is not provided, summons a new token via Foundry Summons first.
+ * If summonTarget is a Token placeable, plays the animation directly with that token.
+ * If summonTarget is an Actor document, summons a new token of that actor at a location first, then plays the animation.
+ * If omitted or a configuration is provided, summons using the configured default actor.
+ *
  * @param {Token} token Caster token
- * @param {Token | TokensOfTheDepartedConfig} [summonTokenOrConfig] Summoned token or configuration
+ * @param {Token | Actor | string | TokensOfTheDepartedConfig} [summonTargetOrConfig] Summoned token, actor to summon, or configuration
  * @param {TokensOfTheDepartedConfig} [config={}] Configuration options
  * @returns {Promise<any>}
  */
-async function play(token: Token, summonTokenOrConfig?: Token | TokensOfTheDepartedConfig, config?: TokensOfTheDepartedConfig): Promise<any> {
+async function play(
+    token: Token,
+    summonTargetOrConfig?: Token | Actor | string | TokensOfTheDepartedConfig,
+    config: TokensOfTheDepartedConfig = {}
+): Promise<any> {
     let summonToken: Token | null = null;
     let cfg: TokensOfTheDepartedConfig;
 
-    if (summonTokenOrConfig && 'document' in summonTokenOrConfig) {
-        summonToken = summonTokenOrConfig as Token;
-        cfg = config ?? {};
+    if (isToken(summonTargetOrConfig)) {
+        summonToken = ('object' in summonTargetOrConfig && summonTargetOrConfig.object ? summonTargetOrConfig.object : summonTargetOrConfig) as Token;
+        cfg = config;
+    } else if (isActor(summonTargetOrConfig)) {
+        cfg = { ...config, actor: summonTargetOrConfig, uuid: summonTargetOrConfig.uuid };
+        summonToken = await spawn(token, cfg);
+    } else if (typeof summonTargetOrConfig === 'string') {
+        cfg = { ...config, actor: summonTargetOrConfig };
+        summonToken = await spawn(token, cfg);
     } else {
-        cfg = (summonTokenOrConfig as TokensOfTheDepartedConfig) ?? config ?? {};
+        cfg = (summonTargetOrConfig as TokensOfTheDepartedConfig) ?? config;
         summonToken = await spawn(token, cfg);
     }
 
@@ -236,12 +312,12 @@ async function play(token: Token, summonTokenOrConfig?: Token | TokensOfTheDepar
 /**
  * Stops persistent Tokens of the Departed visual effects on the summoned token.
  * @param {Token} token Caster token
- * @param {Token} [summonToken] Summoned token
+ * @param {Token | Actor} [summonTarget] Summoned token or actor
  * @param {TokensOfTheDepartedConfig} [config={}] Configuration options
  * @returns {Promise<void>}
  */
-async function stop(token: Token, summonToken?: Token, config: TokensOfTheDepartedConfig = {}): Promise<void> {
-    const target = summonToken ?? token;
+async function stop(token: Token, summonTarget?: Token | Actor, config: TokensOfTheDepartedConfig = {}): Promise<void> {
+    const target = summonTarget ?? token;
     if (target) {
         Sequencer.EffectManager.endEffects({
             name: `${target.name} Tokens of the Departed`,
@@ -258,4 +334,5 @@ export const tokensOfTheDeparted = {
     default_config: DEFAULT_CONFIG
 };
 
-adapter.autorec.register('tokensOfTheDeparted', 'token', 'eskie.summon.tokensOfTheDeparted', DEFAULT_CONFIG, '0.0.1', 'Tokens of the Departed');
+adapter.autorec.register('tokensOfTheDeparted', 'token', 'eskie.summon.tokensOfTheDeparted', DEFAULT_CONFIG, '0.0.2', 'Tokens of the Departed');
+

@@ -162,7 +162,7 @@ test('RecommendedModulesApp inherits from ApplicationV2 with HandlebarsApplicati
 
     const regionSub = eventCategory.subcategories.find(s => s.id === 'regionTriggers');
     assert.ok(regionSub.modules.some(m => m.id === 'foundry-regions'), 'foundry-regions module must exist');
-    assert.ok(regionSub.subStatus, 'regionTriggers must define subStatus');
+    assert.equal(regionSub.subStatus, null, 'regionTriggers subcategory header should not have a subStatus pill');
 
     const tileSub = eventCategory.subcategories.find(s => s.id === 'tileTriggers');
     assert.ok(tileSub.modules.some(m => m.id === 'monks-active-tiles'), 'monks-active-tiles must be in tileTriggers');

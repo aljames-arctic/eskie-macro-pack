@@ -25,7 +25,6 @@ export interface RecommendedSubcategoryConfig {
     id: string;
     name: string;
     icon: string;
-    isNative?: boolean;
     requireOne?: boolean;
     modules: RecommendedModuleConfig[];
 }
@@ -107,7 +106,6 @@ export const RECOMMENDED_CATEGORIES: RecommendedCategoryConfig[] = [
                 id: "regionTriggers",
                 name: "EMP.recommendedModules.subcategories.regionTriggers",
                 icon: "fa-solid fa-draw-polygon",
-                isNative: true,
                 modules: [
                     {
                         id: "foundry-regions",
@@ -339,17 +337,7 @@ export class RecommendedModulesApp extends (adapter.foundry.HandlebarsApplicatio
                     const processedModules = sub.modules.map(processModule);
                     let subStatus: Record<string, any> | null = null;
 
-                    if ((sub as any).isNative) {
-                        const isSupported = Boolean(adapter.supportsRegionBehaviors);
-                        subStatus = {
-                            isSupported,
-                            statusClass: isSupported ? "native" : "warning",
-                            statusIcon: isSupported ? "fa-solid fa-check-circle" : "fa-solid fa-circle-info",
-                            statusLabel: isSupported
-                                ? (game.i18n?.localize("EMP.recommendedModules.status.nativeSupported") ?? "Native Support")
-                                : (game.i18n?.localize("EMP.recommendedModules.status.nativeV14") ?? "Requires Foundry v14+")
-                        };
-                    } else if ((sub as any).requireOne) {
+                    if (sub.requireOne) {
                         const hasActive = processedModules.some(m => m.isActive);
                         subStatus = {
                             isSupported: hasActive,

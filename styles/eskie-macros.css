@@ -437,7 +437,6 @@ input:checked + .eskie-slider:before {
     display: flex;
     align-items: center;
     gap: 8px;
-    flex-wrap: wrap;
 }
 
 .eskie-module-card .eskie-card-title {
@@ -460,6 +459,7 @@ input:checked + .eskie-slider:before {
     cursor: pointer;
     line-height: normal;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
 }
 
 .eskie-patreon-pill:hover {
@@ -510,7 +510,10 @@ input:checked + .eskie-slider:before {
 .eskie-card-status-wrapper {
     flex-shrink: 0;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 4px;
 }
 
 .eskie-status-badge {

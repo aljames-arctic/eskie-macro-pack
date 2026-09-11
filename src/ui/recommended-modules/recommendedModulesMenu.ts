@@ -309,7 +309,11 @@ export class RecommendedModulesApp extends (adapter.foundry.HandlebarsApplicatio
         const patreonPills = this.element?.querySelectorAll?.('.eskie-patreon-pill');
         patreonPills?.forEach?.((pill: any) => {
             pill?.addEventListener?.("click", (event: any) => {
-                event?.stopPropagation?.();
+                const href = pill.getAttribute?.("href");
+                if (href && (window as any)?.electron?.shell?.openExternal) {
+                    event?.preventDefault?.();
+                    (window as any).electron.shell.openExternal(href);
+                }
             });
         });
     }

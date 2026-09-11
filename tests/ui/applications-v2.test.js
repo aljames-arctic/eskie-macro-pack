@@ -109,6 +109,10 @@ test('RecommendedModulesApp inherits from ApplicationV2 with HandlebarsApplicati
             if (selector.includes('.eskie-patreon-pill')) {
                 return [
                     {
+                        getAttribute(attr) {
+                            if (attr === 'href') return 'https://www.patreon.com/c/EskieEffects';
+                            return null;
+                        },
                         addEventListener(event, handler) {
                             if (event === 'click') pillClickHandler = handler;
                         }
@@ -129,12 +133,21 @@ test('RecommendedModulesApp inherits from ApplicationV2 with HandlebarsApplicati
     assert.equal(closeCalled, true);
 
     assert.ok(pillClickHandler, 'Patreon pill click listener should be registered');
-    pillClickHandler({
-        stopPropagation() {
-            pillPropagationStopped = true;
+    let openedUrl = null;
+    globalThis.window = {
+        electron: {
+            shell: {
+                openExternal(url) {
+                    openedUrl = url;
+                }
+            }
         }
+    };
+    pillClickHandler({
+        preventDefault() {}
     });
-    assert.equal(pillPropagationStopped, true, 'Patreon pill click should stop propagation');
+    assert.equal(openedUrl, 'https://www.patreon.com/c/EskieEffects');
+    delete globalThis.window;
 
     // Verify context preparation
     const context = await app._prepareContext();
@@ -204,7 +217,8 @@ test('RecommendedModulesApp template includes data-action="close" on close butto
     assert.ok(templateContent.includes('target="_blank"'));
     assert.ok(templateContent.includes('rel="noopener noreferrer"'));
     assert.ok(templateContent.includes('EMP.recommendedModules.patreon'));
-    assert.ok(templateContent.includes('EMP.recommendedModules.patreonTooltip'));
+    assert.equal(templateContent.includes('patreonTooltip'), false, 'Tooltips should be removed from Patreon pills');
+    assert.equal(templateContent.includes('title='), false, 'No title tooltip attributes on Patreon pills');
 });
 
 test('ConfigureAutorecApp inherits from ApplicationV2 with HandlebarsApplicationMixin and manages module visibility', async () => {

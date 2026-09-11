@@ -21,7 +21,7 @@ export function setupApiCalls(exportedFunctions: Record<string, unknown>): void 
 }
 
 export function setupModule(): void {
-    const { effect, mask, overlay, showcase, traps } = animation;
+    const { effect, mask, overlay, showcase, traps, summon } = animation;
 
     // Expose only active sequencer play/animation namespaces on globalThis.eskie
     setupApiCalls({
@@ -29,7 +29,8 @@ export function setupModule(): void {
         traps,
         mask,
         overlay,
-        showcase
+        showcase,
+        summon
     });
 
     // Attach module public API to game.modules.get('eskie-macros').api

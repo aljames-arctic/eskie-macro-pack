@@ -5,15 +5,62 @@ const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.
 const token = canvas.tokens.controlled[0];
 if (!token) return ui.notifications.warn('Please select a token!');
 
-const target = Array.from(game.user.targets)[0];
-if (!target) return ui.notifications.warn('Please target a token or location!');
+let target = Array.from(game.user.targets)[0];
 
-const label = `${target.document.name} Tokens of the Departed`;
+if (!target) {
+    if (!game.modules.get('foundry-summons')?.active) {
+        return ui.notifications.warn('Please target a token, or install and activate Foundry Summons to summon one!');
+    }
+
+    const fsApi = game.modules.get('foundry-summons')?.api ?? (typeof foundrySummons !== 'undefined' ? foundrySummons : null);
+    if (!fsApi?.pick) {
+        return ui.notifications.error('Foundry Summons API is not available.');
+    }
+
+    const defaultActor = game.actors.getName('Token of the Departed') ?? game.actors.getName('Tokens of the Departed');
+
+    const light = {
+        dim: 0,
+        bright: 1,
+        alpha: 0.25,
+        luminosity: 0.55,
+        color: '#58feb0',
+        animation: { type: 'torch', speed: 4, intensity: 5 },
+        attenuation: 0.85,
+        contrast: 0,
+        shadows: 0
+    };
+
+    const crosshairParameters = {
+        t: 'circle',
+        distance: 2.5,
+        gridHighlight: false,
+        borderAlpha: 0
+    };
+
+    const pickOptions = {
+        crosshairParameters,
+        tokenData: { alpha: 0, light },
+        drawPing: false
+    };
+    if (defaultActor?.uuid) {
+        pickOptions.uuid = defaultActor.uuid;
+    }
+
+    const spawned = await fsApi.pick(pickOptions);
+    if (!spawned) return;
+    const rawToken = Array.isArray(spawned) ? spawned[0] : spawned;
+    target = rawToken?.object ?? rawToken;
+    if (!target) return;
+}
+
+const targetName = target.document?.name ?? target.name ?? 'Target';
+const label = `${targetName} Tokens of the Departed`;
 const isPlaying = Sequencer.EffectManager.getEffects({ name: label, object: target }).length > 0;
 
 if (isPlaying) {
     Sequencer.EffectManager.endEffects({ name: label, object: target });
-    return ui.notifications.info(`Ended Tokens of the Departed on ${target.document.name}.`);
+    return ui.notifications.info(`Ended Tokens of the Departed on ${targetName}.`);
 }
 
 new Sequence()
@@ -61,7 +108,7 @@ new Sequence()
     .effect()
     .name(label)
     .copySprite(target)
-    .spriteRotation(-target.document.rotation)
+    .spriteRotation(-(target.document?.rotation ?? 0))
     .attachTo(target, { bindAlpha: false })
     .scaleToObject(1, { considerTokenScale: true })
     .opacity(0.65)

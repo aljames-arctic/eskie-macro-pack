@@ -63,8 +63,8 @@ function JSONformatObject(obj: any, depth = 1) {
     if (obj === null) return 'null';
     if (obj === undefined) return 'undefined';
     const type = typeof obj;
-    /* Special case for eskie.effect and eskie.mask functions */
-    if (type === 'string' && (obj.startsWith("eskie.effect.") || obj.startsWith("eskie.mask."))) return obj;
+    /* Special case for eskie.effect, eskie.mask, and eskie.summon functions */
+    if (type === 'string' && (obj.startsWith("eskie.effect.") || obj.startsWith("eskie.mask.") || obj.startsWith("eskie.summon."))) return obj;
     /* Better looking JSON stringify */
     if (type === 'string') return '\'' + obj + '\'';
     if (type === 'boolean' || type === 'number') return obj;

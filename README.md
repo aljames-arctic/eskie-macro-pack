@@ -84,13 +84,14 @@ The following modules are optional but unlock additional features when installed
 | [Boss Loot Assets (Patreon)](https://www.patreon.com/c/BossLoot) | Premium asset pack used by select effects (or the free variant) |
 | [Tagger](https://foundryvtt.com/packages/tagger) | Tag-based tile and token lookup; used by some trap and movement effects |
 | [Token Attacher](https://foundryvtt.com/packages/token-attacher) | Attaches tokens to tiles for movement-based trap and tile effects |
+| [Foundry Summons](https://foundryvtt.com/packages/foundry-summons) | Enables automated creature and token summoning used by EMP summon macros |
 | [Monk's Active Tile Triggers (MATT)](https://foundryvtt.com/packages/monks-active-tiles) | **Optional on V14+ / Required on V12-V13 for Traps.** Automates tile trap playback when tokens enter tiles (Foundry V14+ supports native Regions) |
 
 ---
 
 ## Macro API — `eskie.*`
 
-All API methods are available from any Foundry VTT macro or the browser console (F12). There are four top-level namespaces:
+All API methods are available from any Foundry VTT macro or the browser console (F12). There are five top-level namespaces:
 
 | Namespace | Description |
 |-----------|-------------|
@@ -98,6 +99,7 @@ All API methods are available from any Foundry VTT macro or the browser console 
 | `eskie.overlay` | Canvas-wide scene overlays |
 | `eskie.showcase` | Long-form cinematic sequences |
 | `eskie.traps` | Automated tile-based trap system |
+| `eskie.summon` | Creature, spirit, and token summoning animations |
 
 > **Quick exploration:** Run `console.log(eskie)` in the browser console to browse everything available.
 

@@ -77,7 +77,7 @@ async function spawn(token: Token, config: TokensOfTheDepartedConfig = {}): Prom
     let targetUuid = mConfig.uuid;
 
     if (!targetUuid && !targetActor) {
-        const defaultActor = game?.actors?.getName?.('Token of the Departed') ?? game?.actors?.getName?.('Tokens of the Departed');
+        const defaultActor = game.actors.getName('Token of the Departed') ?? game.actors.getName('Tokens of the Departed');
         if (defaultActor) {
             targetUuid = defaultActor.uuid;
         }
@@ -141,6 +141,7 @@ async function create(token: Token, summonToken: Token, config: TokensOfTheDepar
     applySound(sequence, sound);
 
     const effectTint = tint ?? '#58feb0';
+    const summonRotation = adapter.getTokenRotation(summonToken);
 
     sequence
         .effect()
@@ -191,6 +192,7 @@ async function create(token: Token, summonToken: Token, config: TokensOfTheDepar
         .effect()
             .name(`${summonToken.name} Tokens of the Departed`)
             .copySprite(summonToken)
+            .spriteRotation(-summonRotation)
             .attachTo(summonToken, { bindAlpha: false })
             .scaleToObject(1, { considerTokenScale: true })
             .opacity(0.65)

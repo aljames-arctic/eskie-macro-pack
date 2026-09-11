@@ -55,6 +55,41 @@ test('tokensOfTheDeparted.create builds sequence with effects and animations', a
     assert.ok(playResult, 'Play must return sequence play result');
 });
 
+test('tokensOfTheDeparted.create applies spriteRotation matching counter token rotation', async () => {
+    let capturedSpriteRotation = null;
+    const originalSequence = globalThis.Sequence;
+
+    globalThis.Sequence = class MockSequence {
+        constructor() {
+            const handler = {
+                get(_t, prop) {
+                    if (prop === 'spriteRotation') {
+                        return (angle) => {
+                            capturedSpriteRotation = angle;
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'play') return async () => proxy;
+                    if (prop === 'then') return undefined;
+                    return (..._args) => proxy;
+                }
+            };
+            const proxy = new Proxy(this, handler);
+            return proxy;
+        }
+    };
+
+    try {
+        const mockCaster = { id: 'c1', name: 'Rogue', document: { rotation: 0 } };
+        const mockSummon = { id: 's1', name: 'Spirit', document: { rotation: 90 } };
+        await tokensOfTheDeparted.create(mockCaster, mockSummon);
+        assert.equal(capturedSpriteRotation, -90, 'spriteRotation must be -90 for a 90 degree rotated summon token');
+    } finally {
+        globalThis.Sequence = originalSequence;
+    }
+});
+
+
 test('tokensOfTheDeparted.stop terminates persistent effects on summoned token', async () => {
     let endedEffectName = null;
     let endedObject = null;

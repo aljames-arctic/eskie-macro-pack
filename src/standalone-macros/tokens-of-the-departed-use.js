@@ -55,6 +55,7 @@ if (!target) {
 }
 
 const targetName = target.document?.name ?? target.name ?? 'Target';
+const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
 const label = `${targetName} Tokens of the Departed`;
 const isPlaying = Sequencer.EffectManager.getEffects({ name: label, object: target }).length > 0;
 
@@ -108,7 +109,7 @@ new Sequence()
     .effect()
     .name(label)
     .copySprite(target)
-    .spriteRotation(-(target.document?.rotation ?? 0))
+    .spriteRotation(-targetRotation)
     .attachTo(target, { bindAlpha: false })
     .scaleToObject(1, { considerTokenScale: true })
     .opacity(0.65)

@@ -6,6 +6,9 @@ import { summon, tokensOfTheDeparted } from '../../src/animation/summon/index.js
 import { animation } from '../../src/animation/index.js';
 import { adapter } from '../../src/adapters/index.js';
 
+game.modules.set('jb2a_patreon', { id: 'jb2a_patreon', active: true, version: '1.0.0' });
+game.modules.set('eskie-effects', { id: 'eskie-effects', active: true, version: '1.0.0' });
+
 test('summon namespace is exported correctly on animation object', () => {
     assert.ok(animation.summon, 'animation.summon must exist');
     assert.equal(animation.summon, summon);
@@ -16,7 +19,7 @@ test('tokensOfTheDeparted has required API methods and valid default_config', ()
     assert.equal(typeof tokensOfTheDeparted.create, 'function', 'tokensOfTheDeparted.create must be a function');
     assert.equal(typeof tokensOfTheDeparted.play, 'function', 'tokensOfTheDeparted.play must be a function');
     assert.equal(typeof tokensOfTheDeparted.stop, 'function', 'tokensOfTheDeparted.stop must be a function');
-    assert.equal(typeof tokensOfTheDeparted.spawn, 'function', 'tokensOfTheDeparted.spawn must be a function');
+    assert.equal(typeof tokensOfTheDeparted.summon, 'function', 'tokensOfTheDeparted.summon must be a function');
 
     const config = tokensOfTheDeparted.default_config;
     assert.ok(config, 'default_config must exist');
@@ -29,6 +32,54 @@ test('tokensOfTheDeparted has required API methods and valid default_config', ()
     assert.equal(typeof config.sound.enable, 'boolean', 'sound.enable must be boolean');
     assert.ok(config.crosshairParameters, 'crosshairParameters must exist');
     assert.equal(config.crosshairParameters.t, 'circle');
+});
+
+test('tokensOfTheDeparted.create with single token adjusts copysprite on that token without summoning', async () => {
+    let capturedSpriteRotation = null;
+    let attachedObject = null;
+    const originalSequence = globalThis.Sequence;
+
+    globalThis.Sequence = class MockSequence {
+        constructor() {
+            const handler = {
+                get(_t, prop) {
+                    if (prop === 'spriteRotation') {
+                        return (angle) => {
+                            capturedSpriteRotation = angle;
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'attachTo') {
+                        return (obj) => {
+                            attachedObject = obj;
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'play') return async () => proxy;
+                    if (prop === 'then') return undefined;
+                    return (..._args) => proxy;
+                }
+            };
+            const proxy = new Proxy(this, handler);
+            return proxy;
+        }
+    };
+
+    try {
+        const mockTargetToken = {
+            id: 'target-token-1',
+            name: 'Spirit Token',
+            document: { rotation: 180, x: 200, y: 200 },
+            center: { x: 250, y: 250 }
+        };
+
+        const seq = await tokensOfTheDeparted.create(mockTargetToken);
+        assert.ok(seq, 'Sequence must be created for single token');
+        assert.equal(capturedSpriteRotation, -180, 'spriteRotation must counteract token rotation (-180)');
+        assert.equal(attachedObject, mockTargetToken, 'Effects must attach directly to provided token');
+    } finally {
+        globalThis.Sequence = originalSequence;
+    }
 });
 
 test('tokensOfTheDeparted.create builds sequence with effects and animations', async () => {
@@ -113,7 +164,7 @@ test('tokensOfTheDeparted.stop terminates persistent effects on summoned token',
     assert.equal(endedObject, mockSummon);
 });
 
-test('tokensOfTheDeparted.spawn delegates to adapter.summons.pick', async () => {
+test('tokensOfTheDeparted.summon delegates to adapter.summons.pick with actor, summonConfig, and config', async () => {
     let pickOptionsPassed = null;
     const mockToken = { id: 'summon-token', name: 'Departed Spirit' };
 
@@ -122,11 +173,12 @@ test('tokensOfTheDeparted.spawn delegates to adapter.summons.pick', async () => 
         return mockToken;
     };
 
-    const mockCaster = { id: 'caster-1', name: 'Rogue' };
-    const spawned = await tokensOfTheDeparted.spawn(mockCaster, { uuid: 'Actor.spirit123' });
+    const mockActor = { id: 'actor-1', name: 'Spirit', uuid: 'Actor.spirit123', documentName: 'Actor' };
+    const summoned = await tokensOfTheDeparted.summon(mockActor, { drawPing: true }, { tint: '#58feb0' });
 
-    assert.equal(spawned, mockToken);
+    assert.equal(summoned, mockToken);
     assert.equal(pickOptionsPassed.uuid, 'Actor.spirit123');
+    assert.equal(pickOptionsPassed.drawPing, true);
     assert.ok(pickOptionsPassed.tokenData.light);
 });
 
@@ -172,7 +224,7 @@ test('tokensOfTheDeparted.play uses existing Token directly without invoking sum
     assert.equal(pickCalled, false, 'spawn should not be called when Token is passed directly');
 });
 
-test('tokensOfTheDeparted.spawn places token directly when location is provided', async () => {
+test('tokensOfTheDeparted.summon places token directly when location is provided', async () => {
     let createdTokenData = null;
     const mockActor = {
         id: 'actor-1',
@@ -194,10 +246,9 @@ test('tokensOfTheDeparted.spawn places token directly when location is provided'
         }
     };
 
-    const mockCaster = { id: 'caster-1', name: 'Rogue' };
-    const spawned = await tokensOfTheDeparted.spawn(mockCaster, mockActor, { location: { x: 500, y: 600 } });
+    const summoned = await tokensOfTheDeparted.summon(mockActor, { location: { x: 500, y: 600 } });
 
-    assert.ok(spawned, 'Token placeable must be returned for direct location');
+    assert.ok(summoned, 'Token placeable must be returned for direct location');
     assert.equal(createdTokenData.x, 500);
     assert.equal(createdTokenData.y, 600);
 });
@@ -208,7 +259,7 @@ test('tokensOfTheDeparted is registered in autorec', () => {
     const entry = ontokenEntries.find(e => e.label === 'Tokens of the Departed');
 
     assert.ok(entry, 'tokensOfTheDeparted must be registered in AA menu');
-    assert.equal(entry.metaData.version, '0.0.2');
+    assert.equal(entry.metaData.version, '0.0.3');
     assert.ok(entry.macro.args.includes('eskie.summon.tokensOfTheDeparted'), 'Macro args must contain unquoted eskie.summon.tokensOfTheDeparted');
 });
 

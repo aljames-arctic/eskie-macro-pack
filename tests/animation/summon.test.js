@@ -305,3 +305,213 @@ test('tokensOfTheDeparted is registered in autorec', () => {
     assert.ok(entry.macro.args.includes('eskie.summon.tokensOfTheDeparted'), 'Macro args must contain unquoted eskie.summon.tokensOfTheDeparted');
 });
 
+
+test('all new summon modules are exported on summon namespace and animation.summon', () => {
+    const expectedModules = [
+        'air', 'celestial', 'defaultSummon', 'earth', 'fiend',
+        'fire', 'futuristic', 'nature', 'shadow', 'water', 'ritualSummonHell'
+    ];
+
+    for (const modName of expectedModules) {
+        assert.ok(summon[modName], `summon.${modName} must exist`);
+        assert.ok(animation.summon[modName], `animation.summon.${modName} must exist`);
+    }
+
+    assert.ok(summon.default, 'summon.default alias must exist for defaultSummon');
+});
+
+test('all new summon modules have required API methods and valid default_config', () => {
+    const modules = [
+        { mod: summon.air, id: 'air' },
+        { mod: summon.celestial, id: 'celestial' },
+        { mod: summon.defaultSummon, id: 'default' },
+        { mod: summon.earth, id: 'earth' },
+        { mod: summon.fiend, id: 'fiend' },
+        { mod: summon.fire, id: 'fire' },
+        { mod: summon.futuristic, id: 'futuristic' },
+        { mod: summon.nature, id: 'nature' },
+        { mod: summon.shadow, id: 'shadow' },
+        { mod: summon.water, id: 'water' },
+        { mod: summon.ritualSummonHell, id: 'ritualSummonHell' }
+    ];
+
+    for (const { mod, id } of modules) {
+        assert.equal(typeof mod.create, 'function', `${id}.create must be a function`);
+        assert.equal(typeof mod.play, 'function', `${id}.play must be a function`);
+        assert.equal(typeof mod.stop, 'function', `${id}.stop must be a function`);
+        assert.equal(mod.summon, undefined, `${id}.summon must not be exposed on module`);
+
+        const config = mod.default_config;
+        assert.ok(config, `${id}.default_config must exist`);
+        assert.equal(config.id, id);
+        assert.ok(config.sound, `${id}.sound config must exist`);
+        assert.equal(typeof config.sound.enable, 'boolean', `${id}.sound.enable must be boolean`);
+        assert.ok(config.crosshairParameters, `${id}.crosshairParameters must exist`);
+    }
+});
+
+test('all new summon modules create sequence with single token without summoning', async () => {
+    const modules = [
+        summon.air, summon.celestial, summon.defaultSummon, summon.earth, summon.fiend,
+        summon.fire, summon.futuristic, summon.nature, summon.shadow, summon.water, summon.ritualSummonHell
+    ];
+
+    let pickCalled = false;
+    adapter.summons.pick = async () => {
+        pickCalled = true;
+        return null;
+    };
+
+    const mockToken = {
+        id: 'tok-single-1',
+        name: 'Single Token',
+        document: { rotation: 0, x: 100, y: 100, texture: { src: 'icons/test.png', scaleX: 1 } },
+        center: { x: 150, y: 150 }
+    };
+
+    for (const mod of modules) {
+        pickCalled = false;
+        const seq = await mod.create(mockToken);
+        assert.ok(seq, 'Sequence must be created for single token');
+        assert.equal(pickCalled, false, 'adapter.summons.pick must not be called for single token invocation');
+    }
+});
+
+test('all new summon modules summon token and build sequence when Actor is provided', async () => {
+    const modules = [
+        summon.air, summon.celestial, summon.defaultSummon, summon.earth, summon.fiend,
+        summon.fire, summon.futuristic, summon.nature, summon.shadow, summon.water
+    ];
+
+    const mockSpawnedToken = {
+        id: 'spawned-elem-1',
+        name: 'Elemental Spirit',
+        document: { rotation: 0, x: 200, y: 200, texture: { src: 'icons/elem.png', scaleX: 1 } },
+        center: { x: 250, y: 250 }
+    };
+
+    let pickedActorUuid = null;
+    adapter.summons.pick = async (options) => {
+        pickedActorUuid = options.uuid;
+        return mockSpawnedToken;
+    };
+
+    const mockCaster = { id: 'caster-1', name: 'Mage', document: { rotation: 0 }, center: { x: 100, y: 100 } };
+    const mockActor = { id: 'actor-elem-1', name: 'Elemental', uuid: 'Actor.elem123', documentName: 'Actor' };
+
+    for (const mod of modules) {
+        pickedActorUuid = null;
+        const result = await mod.play(mockCaster, mockActor);
+        assert.ok(result, 'play should return sequence result');
+        assert.equal(pickedActorUuid, 'Actor.elem123', 'Actor UUID must be passed to adapter.summons.pick');
+    }
+});
+
+test('ritualSummonHell builds non-interactive sequence and creates lights', async () => {
+    const createdLights = [];
+    canvas.scene = {
+        createEmbeddedDocuments: async (type, docs) => {
+            if (type === 'AmbientLight') createdLights.push(...docs);
+            return docs;
+        },
+        deleteEmbeddedDocuments: async () => []
+    };
+
+    const mockToken = {
+        id: 'tok-hell-1',
+        name: 'Fiend Token',
+        document: { width: 2, height: 2, rotation: 0, texture: { src: 'icons/demon.png', scaleX: 1 } },
+        center: { x: 500, y: 500 }
+    };
+
+    const seq = await summon.ritualSummonHell.create(mockToken, undefined, { interactive: false });
+    assert.ok(seq, 'ritualSummonHell.create must return a Sequence');
+});
+
+test('ritualSummonHell.stop cleans up lights, tags, and effects', async () => {
+    let deletedLightIds = [];
+    canvas.scene = {
+        lights: [
+            { id: 'light-1', flags: { 'eskie-macro-pack': { ritualSummonHell: true } } },
+            { id: 'light-2', flags: {} }
+        ],
+        deleteEmbeddedDocuments: async (type, ids) => {
+            if (type === 'AmbientLight') deletedLightIds = ids;
+            return ids;
+        }
+    };
+
+    let removedTag = null;
+    globalThis.Tagger = {
+        hasTags: () => false,
+        removeTags: async (_target, tag) => {
+            removedTag = tag;
+        }
+    };
+    game.modules.set('tagger', { id: 'tagger', active: true });
+
+    let endedEffects = [];
+    const origEndEffects = Sequencer.EffectManager.endEffects;
+    Sequencer.EffectManager.endEffects = (opts) => {
+        endedEffects.push(opts.name);
+    };
+
+    try {
+        const mockTarget = { id: 'target-1', name: 'Fiend' };
+        await summon.ritualSummonHell.stop(mockTarget);
+
+        assert.ok(endedEffects.includes('Summoning Core'));
+        assert.ok(endedEffects.includes('Summoning Circle'));
+        assert.deepEqual(deletedLightIds, ['light-1']);
+        assert.equal(removedTag, 'Pre Summon');
+    } finally {
+        Sequencer.EffectManager.endEffects = origEndEffects;
+    }
+});
+
+test('ritualSummonHell.play interactive prompts button dialog and runs climax on confirmation', async () => {
+    let buttonDialogCalled = false;
+    adapter.buttonDialog = async (data) => {
+        buttonDialogCalled = true;
+        assert.equal(data.title, 'Ritual Summon Hell');
+        return '1';
+    };
+
+    const mockCaster = { id: 'caster-1', name: 'Warlock', document: { rotation: 0 }, center: { x: 100, y: 100 } };
+    const mockSummon = {
+        id: 'summon-demon-1',
+        name: 'Pit Fiend',
+        document: { width: 2, height: 2, rotation: 0, texture: { src: 'icons/pitfiend.png', scaleX: 1 } },
+        center: { x: 300, y: 300 }
+    };
+
+    const playResult = await summon.ritualSummonHell.play(mockCaster, mockSummon, { interactive: true });
+    assert.ok(playResult, 'Interactive play must succeed when user confirms');
+    assert.equal(buttonDialogCalled, true, 'adapter.buttonDialog must be called');
+});
+
+test('all new summon modules are registered in autorec with token type', () => {
+    const aaMenu = adapter.autorec.aa.menu;
+    const ontokenEntries = aaMenu.ontoken;
+
+    const expectedRegistrations = [
+        { label: 'Summon Air', macro: 'eskie.summon.air' },
+        { label: 'Summon Celestial', macro: 'eskie.summon.celestial' },
+        { label: 'Summon Default', macro: 'eskie.summon.defaultSummon' },
+        { label: 'Summon Earth', macro: 'eskie.summon.earth' },
+        { label: 'Summon Fiend', macro: 'eskie.summon.fiend' },
+        { label: 'Summon Fire', macro: 'eskie.summon.fire' },
+        { label: 'Summon Futuristic', macro: 'eskie.summon.futuristic' },
+        { label: 'Summon Nature', macro: 'eskie.summon.nature' },
+        { label: 'Summon Shadow', macro: 'eskie.summon.shadow' },
+        { label: 'Summon Water', macro: 'eskie.summon.water' },
+        { label: 'Ritual Summon Hell', macro: 'eskie.summon.ritualSummonHell' }
+    ];
+
+    for (const { label, macro } of expectedRegistrations) {
+        const entry = ontokenEntries.find(e => e.label === label);
+        assert.ok(entry, `${label} must be registered in AA menu`);
+        assert.equal(entry.metaData.version, '0.0.1');
+        assert.ok(entry.macro.args.includes(macro), `Macro args must contain unquoted ${macro}`);
+    }
+});

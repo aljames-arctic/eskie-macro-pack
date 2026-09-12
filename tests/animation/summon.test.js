@@ -182,6 +182,24 @@ test('tokensOfTheDeparted.summon delegates to adapter.summons.pick with actor, s
     assert.ok(pickOptionsPassed.tokenData.light);
 });
 
+test('tokensOfTheDeparted.summon delegates with only actor and summonConfig', async () => {
+    let pickOptionsPassed = null;
+    const mockToken = { id: 'summon-token-2', name: 'Departed Spirit 2' };
+
+    adapter.summons.pick = async (options) => {
+        pickOptionsPassed = options;
+        return mockToken;
+    };
+
+    const mockActor = { id: 'actor-2', name: 'Spirit 2', uuid: 'Actor.spirit456', documentName: 'Actor' };
+    const summoned = await tokensOfTheDeparted.summon(mockActor, { drawPing: false, tint: '#ff0000' });
+
+    assert.equal(summoned, mockToken);
+    assert.equal(pickOptionsPassed.uuid, 'Actor.spirit456');
+    assert.equal(pickOptionsPassed.drawPing, false);
+    assert.equal(pickOptionsPassed.tokenData.light.color, '#ff0000');
+});
+
 test('tokensOfTheDeparted.play summons a token when Actor is provided and plays animation', async () => {
     let pickOptionsPassed = null;
     const mockSpawnedToken = {
@@ -202,6 +220,32 @@ test('tokensOfTheDeparted.play summons a token when Actor is provided and plays 
     const playResult = await tokensOfTheDeparted.play(mockCaster, mockActor);
     assert.ok(playResult, 'Play must return sequence play result for Actor');
     assert.equal(pickOptionsPassed.uuid, 'Actor.ghost123');
+});
+
+test('tokensOfTheDeparted.play summons a token when config object with actor and summonConfig is provided', async () => {
+    let pickOptionsPassed = null;
+    const mockSpawnedToken = {
+        id: 'spawned-token-2',
+        name: 'Ghostly Companion 2',
+        document: { rotation: 0, x: 200, y: 200 },
+        center: { x: 250, y: 250 }
+    };
+
+    adapter.summons.pick = async (options) => {
+        pickOptionsPassed = options;
+        return mockSpawnedToken;
+    };
+
+    const mockCaster = { id: 'caster-1', name: 'Rogue', document: { rotation: 0 }, center: { x: 100, y: 100 } };
+    const mockActor = { id: 'actor-ghost-2', name: 'Ghost 2', uuid: 'Actor.ghost456', documentName: 'Actor' };
+
+    const playResult = await tokensOfTheDeparted.play(mockCaster, {
+        actor: mockActor,
+        summonConfig: { drawPing: true }
+    });
+    assert.ok(playResult, 'Play must return sequence play result when config is provided');
+    assert.equal(pickOptionsPassed.uuid, 'Actor.ghost456');
+    assert.equal(pickOptionsPassed.drawPing, true);
 });
 
 test('tokensOfTheDeparted.play uses existing Token directly without invoking summon spawn', async () => {

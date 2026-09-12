@@ -24,11 +24,16 @@ export interface TokensOfTheDepartedLightConfig {
 }
 
 export interface SummonOptions {
+    actor?: Actor | string | null;
+    uuid?: string | null;
     crosshairParameters?: Record<string, unknown>;
     crosshairCallbacks?: Record<string, unknown>;
     tokenData?: Record<string, unknown>;
     location?: { x: number; y: number } | null;
     drawPing?: boolean;
+    changeLight?: boolean;
+    light?: TokensOfTheDepartedLightConfig;
+    tint?: string;
     [key: string]: unknown;
 }
 
@@ -110,9 +115,11 @@ async function summon(
 ): Promise<Token | null> {
     const mergedConfig = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, mergedConfig);
-    const { changeLight, light, tint } = mConfig;
+    const changeLight = summonConfig.changeLight ?? mConfig.changeLight;
+    const light = summonConfig.light ?? mConfig.light;
+    const tint = summonConfig.tint ?? mConfig.tint;
 
-    let targetActor = actor ?? mConfig.actor;
+    let targetActor = actor ?? summonConfig.actor ?? mConfig.actor;
     let targetUuid: string | null = null;
 
     if (isActor(targetActor)) {
@@ -134,22 +141,24 @@ async function summon(
         if (defaultActor) {
             targetActor = defaultActor;
             targetUuid = defaultActor.uuid;
-        } else if (mConfig.uuid) {
-            targetUuid = mConfig.uuid;
+        } else if (summonConfig.uuid ?? mConfig.uuid) {
+            targetUuid = summonConfig.uuid ?? mConfig.uuid;
         }
     }
 
-    const tokenLight = changeLight ? (light ?? {
-        dim: 0,
-        bright: 1,
-        alpha: 0.25,
-        luminosity: 0.55,
-        color: tint ?? '#58feb0',
-        animation: { type: 'torch', speed: 4, intensity: 5 },
-        attenuation: 0.85,
-        contrast: 0,
-        shadows: 0
-    }) : undefined;
+    const tokenLight = changeLight ? {
+        ...(light ?? {
+            dim: 0,
+            bright: 1,
+            alpha: 0.25,
+            luminosity: 0.55,
+            animation: { type: 'torch', speed: 4, intensity: 5 },
+            attenuation: 0.85,
+            contrast: 0,
+            shadows: 0
+        }),
+        color: summonConfig.light?.color ?? tint ?? light?.color ?? '#58feb0'
+    } : undefined;
 
     const tokenData: Record<string, unknown> = {
         alpha: 0,
@@ -334,15 +343,11 @@ async function play(
     if (isToken(summonTargetOrConfig)) {
         summonToken = ('object' in summonTargetOrConfig && summonTargetOrConfig.object ? summonTargetOrConfig.object : summonTargetOrConfig) as Token;
         cfg = config;
-    } else if (isActor(summonTargetOrConfig)) {
-        cfg = config;
-        summonToken = await summon(summonTargetOrConfig, (cfg.summonConfig as SummonOptions) ?? {}, cfg);
-    } else if (typeof summonTargetOrConfig === 'string') {
-        cfg = config;
-        summonToken = await summon(summonTargetOrConfig, (cfg.summonConfig as SummonOptions) ?? {}, cfg);
     } else {
-        cfg = (summonTargetOrConfig as TokensOfTheDepartedConfig) ?? config;
-        summonToken = await summon(cfg.actor ?? cfg.uuid, (cfg.summonConfig as SummonOptions) ?? {}, cfg);
+        const isActorOrString = isActor(summonTargetOrConfig) || typeof summonTargetOrConfig === 'string';
+        cfg = isActorOrString ? config : ((summonTargetOrConfig as TokensOfTheDepartedConfig) ?? config);
+        const targetActor = isActorOrString ? summonTargetOrConfig : (cfg.actor ?? cfg.uuid);
+        summonToken = await summon(targetActor, cfg.summonConfig);
     }
 
     if (!summonToken) return null;

@@ -164,7 +164,7 @@ test('tokensOfTheDeparted.stop terminates persistent effects on summoned token',
     assert.equal(endedObject, mockSummon);
 });
 
-test('tokensOfTheDeparted.summon delegates to adapter.summons.pick with actor, summonConfig, and config', async () => {
+test('tokensOfTheDeparted.summon delegates to adapter.summons.pick with actor and summonConfig', async () => {
     let pickOptionsPassed = null;
     const mockToken = { id: 'summon-token', name: 'Departed Spirit' };
 
@@ -174,12 +174,18 @@ test('tokensOfTheDeparted.summon delegates to adapter.summons.pick with actor, s
     };
 
     const mockActor = { id: 'actor-1', name: 'Spirit', uuid: 'Actor.spirit123', documentName: 'Actor' };
-    const summoned = await tokensOfTheDeparted.summon(mockActor, { drawPing: true }, { tint: '#58feb0' });
+    const summoned = await tokensOfTheDeparted.summon(mockActor, { drawPing: true, tint: '#58feb0' });
 
     assert.equal(summoned, mockToken);
     assert.equal(pickOptionsPassed.uuid, 'Actor.spirit123');
     assert.equal(pickOptionsPassed.drawPing, true);
     assert.ok(pickOptionsPassed.tokenData.light);
+});
+
+test('tokensOfTheDeparted.summon and play fail cleanly when inputs are missing', async () => {
+    assert.equal(await tokensOfTheDeparted.summon(undefined), null, 'summon must return null when actor is undefined');
+    assert.equal(await tokensOfTheDeparted.play(undefined), null, 'play must return null when token is undefined');
+    assert.equal(await tokensOfTheDeparted.play({ id: 'tok' }, undefined, {}), null, 'play must return null when actor is unconfigured');
 });
 
 test('tokensOfTheDeparted.summon delegates with only actor and summonConfig', async () => {

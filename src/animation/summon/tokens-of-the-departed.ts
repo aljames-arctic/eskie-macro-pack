@@ -103,116 +103,71 @@ function isActor(target: unknown): target is Actor {
 
 /**
  * Summons a token onto the canvas for an actor.
- * @param {Actor | string | null} [actor] Actor document, name, or UUID
+ * @param {Actor | string} actor Actor document, name, or UUID
  * @param {SummonOptions} [summonConfig={}] Summoning placement options (crosshairs, location, tokenData)
- * @param {TokensOfTheDepartedConfig} [config={}] Animation and lighting configuration options
  * @returns {Promise<Token | null>} The summoned Token placeable or null
  */
 async function summon(
-    actor?: Actor | string | null,
-    summonConfig: SummonOptions = {},
-    config: TokensOfTheDepartedConfig = {}
+    actor: Actor | string,
+    summonConfig: SummonOptions = {}
 ): Promise<Token | null> {
-    const mergedConfig = settingsOverride(config);
-    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, mergedConfig);
-    const changeLight = summonConfig.changeLight ?? mConfig.changeLight;
-    const light = summonConfig.light ?? mConfig.light;
-    const tint = summonConfig.tint ?? mConfig.tint;
+    if (!actor) return null;
 
-    let targetActor = actor ?? summonConfig.actor ?? mConfig.actor;
     let targetUuid: string | null = null;
+    let actorDoc: Actor | null = null;
 
-    if (isActor(targetActor)) {
-        targetUuid = targetActor.uuid;
-    } else if (typeof targetActor === 'string') {
-        if (targetActor.includes('.')) {
-            targetUuid = targetActor;
-        } else {
-            const actorDoc = game.actors.getName(targetActor);
-            if (actorDoc) {
-                targetActor = actorDoc;
-                targetUuid = actorDoc.uuid;
-            } else {
-                targetUuid = targetActor;
-            }
-        }
-    } else if (!targetActor) {
-        const defaultActor = game.actors.getName('Token of the Departed') ?? game.actors.getName('Tokens of the Departed');
-        if (defaultActor) {
-            targetActor = defaultActor;
-            targetUuid = defaultActor.uuid;
-        } else if (summonConfig.uuid ?? mConfig.uuid) {
-            targetUuid = summonConfig.uuid ?? mConfig.uuid;
-        }
+    if (isActor(actor)) {
+        actorDoc = actor;
+        targetUuid = actor.uuid;
+    } else if (actor.includes('.')) {
+        targetUuid = actor;
+    } else {
+        actorDoc = game.actors.getName(actor) ?? null;
+        if (!actorDoc) return null;
+        targetUuid = actorDoc.uuid;
     }
 
-    const tokenLight = changeLight ? {
-        ...(light ?? {
-            dim: 0,
-            bright: 1,
-            alpha: 0.25,
-            luminosity: 0.55,
-            animation: { type: 'torch', speed: 4, intensity: 5 },
-            attenuation: 0.85,
-            contrast: 0,
-            shadows: 0
-        }),
-        color: summonConfig.light?.color ?? tint ?? light?.color ?? '#58feb0'
-    } : undefined;
+    if (!targetUuid) return null;
 
     const tokenData: Record<string, unknown> = {
         alpha: 0,
-        ...(mConfig.tokenData ?? {}),
-        ...((summonConfig.tokenData as Record<string, unknown>) ?? {})
+        ...summonConfig.tokenData
     };
-    if (tokenLight) {
-        tokenData.light = tokenLight;
+
+    if (summonConfig.changeLight !== false) {
+        tokenData.light = summonConfig.light ?? {
+            ...DEFAULT_CONFIG.light,
+            ...(summonConfig.tint ? { color: summonConfig.tint } : {})
+        };
     }
 
-    const targetLocation = (summonConfig.location ?? mConfig.location) as { x: number; y: number } | null | undefined;
-
-    // Direct location placement if coordinates are provided
-    if (targetLocation && typeof targetLocation.x === 'number' && typeof targetLocation.y === 'number') {
-        let actorDoc: Actor | null = null;
-        if (isActor(targetActor) && 'getTokenDocument' in targetActor) {
-            actorDoc = targetActor as Actor;
-        } else if (targetUuid) {
+    const location = summonConfig.location;
+    if (location) {
+        if (!actorDoc && targetUuid) {
             actorDoc = (await fromUuid(targetUuid)) as Actor | null;
-        } else if (typeof targetActor === 'string') {
-            actorDoc = game.actors.getName(targetActor) ?? null;
         }
+        if (!actorDoc || !canvas.scene) return null;
 
-        if (actorDoc?.getTokenDocument && canvas.scene) {
-            const tokenDocData = await actorDoc.getTokenDocument({
-                x: targetLocation.x,
-                y: targetLocation.y,
-                ...tokenData
-            });
-            const tokenDataObj = 'toObject' in tokenDocData && typeof tokenDocData.toObject === 'function' ? tokenDocData.toObject() : tokenDocData;
-            const created = await (canvas.scene as any).createEmbeddedDocuments('Token', [tokenDataObj]);
-            const firstCreated = Array.isArray(created) ? created[0] : created;
-            const placeable = (firstCreated?.object ?? adapter.getPlaceable(firstCreated?.id)) as Token;
-            return placeable ?? null;
-        }
+        const tokenDocData = await actorDoc.getTokenDocument({
+            x: location.x,
+            y: location.y,
+            ...tokenData
+        });
+        const tokenDataObj = 'toObject' in tokenDocData && typeof tokenDocData.toObject === 'function'
+            ? tokenDocData.toObject()
+            : tokenDocData;
+        const created = await (canvas.scene as any).createEmbeddedDocuments('Token', [tokenDataObj]);
+        const firstCreated = Array.isArray(created) ? created[0] : created;
+        return (firstCreated?.object ?? adapter.getPlaceable(firstCreated?.id)) as Token;
     }
 
     const pickOptions: Record<string, unknown> = {
-        crosshairParameters: summonConfig.crosshairParameters ?? mConfig.crosshairParameters ?? {
-            t: 'circle',
-            distance: 2.5,
-            gridHighlight: false,
-            borderAlpha: 0
-        },
+        crosshairParameters: summonConfig.crosshairParameters ?? DEFAULT_CONFIG.crosshairParameters,
         ...summonConfig,
         tokenData,
+        uuid: targetUuid,
         drawPing: summonConfig.drawPing ?? false
     };
-
-    if (targetUuid) {
-        pickOptions.uuid = targetUuid;
-    } else if (targetActor) {
-        pickOptions.actor = targetActor;
-    }
 
     return adapter.summons.pick(pickOptions);
 }
@@ -240,11 +195,11 @@ async function create(
 
     if (isToken(summonTokenOrConfig)) {
         casterToken = token;
-        targetToken = ('object' in summonTokenOrConfig && summonTokenOrConfig.object ? summonTokenOrConfig.object : summonTokenOrConfig) as Token;
+        targetToken = summonTokenOrConfig;
         mConfig = adapter.mergeObject(DEFAULT_CONFIG, settingsOverride(config));
     } else {
         targetToken = token;
-        mConfig = adapter.mergeObject(DEFAULT_CONFIG, settingsOverride((summonTokenOrConfig as TokensOfTheDepartedConfig) ?? config));
+        mConfig = adapter.mergeObject(DEFAULT_CONFIG, settingsOverride(summonTokenOrConfig));
     }
 
     const { sound, tint } = mConfig;
@@ -337,18 +292,21 @@ async function play(
     summonTarget?: Token | Actor,
     config: TokensOfTheDepartedConfig = {}
 ): Promise<any> {
-    let summonToken: Token | null = null;
+    if (!token) return null;
 
+    let summonToken: Token | null = null;
     if (isToken(summonTarget)) {
-        summonToken = ('object' in summonTarget && summonTarget.object ? summonTarget.object : summonTarget) as Token;
+        summonToken = summonTarget;
     } else {
-        summonToken = await summon(summonTarget ?? config.actor ?? config.uuid, config.summonConfig);
+        const actor = summonTarget ?? config.actor;
+        if (!actor) return null;
+        summonToken = await summon(actor, config.summonConfig);
     }
 
     if (!summonToken) return null;
 
     const sequence = await create(token, summonToken, config);
-    if (sequence) return sequence.play();
+    return sequence?.play();
 }
 
 /**

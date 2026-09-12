@@ -149,38 +149,35 @@ async function summon(
 
 /**
  * Builds the Sequence animation.
- * If only a single token is provided, adjusts the copySprite on that token without summoning anything.
+ * If only a single token is provided (or summonTarget is omitted), adjusts the copySprite on that token without summoning anything.
  * If a caster token and a summoned token/actor are provided, builds the sequence from caster to summoned token.
  *
  * @param {Token} token Target token to adjust, or caster token if summonTarget is also provided
- * @param {Token | Actor | TokensOfTheDepartedConfig} [summonTargetOrConfig] Summoned token, actor to summon, or configuration
+ * @param {Token | Actor} [summonTarget] Summoned token or actor to summon
  * @param {TokensOfTheDepartedConfig} [config={}] Configuration options
  * @returns {Promise<Sequence | null>}
  */
 async function create(
     token: Token,
-    summonTargetOrConfig?: Token | Actor | TokensOfTheDepartedConfig,
+    summonTarget?: Token | Actor,
     config: TokensOfTheDepartedConfig = {}
 ): Promise<any> {
     if (!token) return null;
 
     let casterToken: Token | null = null;
     let targetToken: Token;
-    let mConfig: TokensOfTheDepartedConfig;
+    const mConfig = adapter.mergeObject(DEFAULT_CONFIG, settingsOverride(config));
 
-    if (isToken(summonTargetOrConfig)) {
+    if (isToken(summonTarget)) {
         casterToken = token;
-        targetToken = summonTargetOrConfig;
-        mConfig = adapter.mergeObject(DEFAULT_CONFIG, settingsOverride(config));
-    } else if (isActor(summonTargetOrConfig)) {
+        targetToken = summonTarget;
+    } else if (isActor(summonTarget)) {
         casterToken = token;
-        mConfig = adapter.mergeObject(DEFAULT_CONFIG, settingsOverride(config));
-        const summoned = await summon(summonTargetOrConfig, mConfig.summonConfig);
+        const summoned = await summon(summonTarget, mConfig.summonConfig);
         if (!summoned) return null;
         targetToken = summoned;
     } else {
         targetToken = token;
-        mConfig = adapter.mergeObject(DEFAULT_CONFIG, settingsOverride(summonTargetOrConfig));
     }
 
     const { sound, tint } = mConfig;

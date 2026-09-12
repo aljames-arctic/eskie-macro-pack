@@ -127,7 +127,7 @@ async function create(
         .effect()
             .delay(100)
             .name(`${targetToken.name} Summon Earth`)
-            .file(closest('animated-spell-effects-cartoon.smoke.11'))
+            .file(closest('eskie.smoke.01.tan'))
             .atLocation(targetToken)
             .playbackRate(0.65)
             .fadeIn(250)

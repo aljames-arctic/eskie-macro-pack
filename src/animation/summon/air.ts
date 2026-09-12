@@ -115,7 +115,7 @@ async function create(
     sequence
         .effect()
             .name(`${targetToken.name} Summon Air`)
-            .file(closest('animated-spell-effects-cartoon.air.explosion.gray'))
+            .file(closest('eskie.smoke.03.white'))
             .atLocation(targetToken, { offset: { y: -0 }, gridUnits: true })
             .scaleToObject(1.5)
             .fadeOut(500, { ease: 'easeOutExpo' })

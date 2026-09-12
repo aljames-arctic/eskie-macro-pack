@@ -117,7 +117,7 @@ async function create(
     sequence
         .effect()
             .name(`${targetToken.name} Summon Default`)
-            .file(closest('animated-spell-effects-cartoon.magic.mind sliver'))
+            .file(closest('eskie.attack.ranged.arrow.01.physical.blue'))
             .atLocation(targetToken, { offset: { y: -((imageSize - 1) / 2) }, gridUnits: true })
             .scaleToObject(1.1)
             .filter('ColorMatrix', { saturate: -1, brightness: 10 })
@@ -133,7 +133,7 @@ async function create(
 
         .effect()
             .name(`${targetToken.name} Summon Default`)
-            .file(closest('animated-spell-effects-cartoon.energy.pulse.yellow'))
+            .file(closest('jb2a.extras.tmfx.outpulse.circle.02.fast'))
             .atLocation(targetToken)
             .opacity(1)
             .scaleToObject(1.5)

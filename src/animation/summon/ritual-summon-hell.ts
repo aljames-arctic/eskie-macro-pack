@@ -128,7 +128,7 @@ function buildClimax(targetToken: Token, sumPos: { x: number; y: number }[], tok
 
         .effect()
             .name('Summoning Circle')
-            .file(closest('jb2a.extras.tmfx.outpulse.circle.02.fast'))
+            .file(closest('jb2a.fire_ring.500px.red'))
             .atLocation(targetToken)
             .filter('ColorMatrix', { brightness: 0 })
             .size(6, { gridUnits: true })
@@ -192,7 +192,7 @@ function buildClimax(targetToken: Token, sumPos: { x: number; y: number }[], tok
 
         .effect()
             .name('Summoning Core')
-            .file(closest('animated-spell-effects-cartoon.fire.13'))
+            .file(closest('jb2a.impact.fire'))
             .atLocation(targetToken, { offset: { y: -0.5 * tokenWidth }, gridUnits: true })
             .filter('ColorMatrix', { brightness: 0 })
             .scaleToObject(2.5)
@@ -321,7 +321,7 @@ async function create(
                 .name('Summoning Circle')
                 .delay(1100, 1750)
                 .atLocation(sumPos[e], { offset: { x: 0, y: -0.7 }, gridUnits: true })
-                .file(closest('animated-spell-effects-cartoon.smoke.33'))
+                .file(closest('eskie.smoke.05.white'))
                 .size(1.75, { gridUnits: true })
                 .fadeIn(1000)
                 .opacity(0.35)

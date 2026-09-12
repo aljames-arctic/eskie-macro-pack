@@ -19,7 +19,7 @@ test('tokensOfTheDeparted has required API methods and valid default_config', ()
     assert.equal(typeof tokensOfTheDeparted.create, 'function', 'tokensOfTheDeparted.create must be a function');
     assert.equal(typeof tokensOfTheDeparted.play, 'function', 'tokensOfTheDeparted.play must be a function');
     assert.equal(typeof tokensOfTheDeparted.stop, 'function', 'tokensOfTheDeparted.stop must be a function');
-    assert.equal(typeof tokensOfTheDeparted.summon, 'function', 'tokensOfTheDeparted.summon must be a function');
+    assert.equal(tokensOfTheDeparted.summon, undefined, 'tokensOfTheDeparted.summon must not be exposed');
 
     const config = tokensOfTheDeparted.default_config;
     assert.ok(config, 'default_config must exist');
@@ -164,46 +164,34 @@ test('tokensOfTheDeparted.stop terminates persistent effects on summoned token',
     assert.equal(endedObject, mockSummon);
 });
 
-test('tokensOfTheDeparted.summon delegates to adapter.summons.pick with actor and summonConfig', async () => {
+test('tokensOfTheDeparted.create delegates to adapter.summons.pick when Actor is provided', async () => {
     let pickOptionsPassed = null;
-    const mockToken = { id: 'summon-token', name: 'Departed Spirit' };
+    const mockToken = {
+        id: 'summon-token',
+        name: 'Departed Spirit',
+        document: { rotation: 0, x: 200, y: 200 },
+        center: { x: 250, y: 250 }
+    };
 
     adapter.summons.pick = async (options) => {
         pickOptionsPassed = options;
         return mockToken;
     };
 
+    const mockCaster = { id: 'caster-1', name: 'Rogue', document: { rotation: 0 }, center: { x: 100, y: 100 } };
     const mockActor = { id: 'actor-1', name: 'Spirit', uuid: 'Actor.spirit123', documentName: 'Actor' };
-    const summoned = await tokensOfTheDeparted.summon(mockActor, { drawPing: true, tint: '#58feb0' });
+    const seq = await tokensOfTheDeparted.create(mockCaster, mockActor, { summonConfig: { drawPing: true, tint: '#58feb0' } });
 
-    assert.equal(summoned, mockToken);
+    assert.ok(seq, 'Sequence must be returned');
     assert.equal(pickOptionsPassed.uuid, 'Actor.spirit123');
     assert.equal(pickOptionsPassed.drawPing, true);
     assert.ok(pickOptionsPassed.tokenData.light);
 });
 
-test('tokensOfTheDeparted.summon and play fail cleanly when inputs are missing', async () => {
-    assert.equal(await tokensOfTheDeparted.summon(undefined), null, 'summon must return null when actor is undefined');
-    assert.equal(await tokensOfTheDeparted.play(undefined), null, 'play must return null when token is undefined');
-    assert.equal(await tokensOfTheDeparted.play({ id: 'tok' }, undefined, {}), null, 'play must return null when actor is unconfigured');
-});
-
-test('tokensOfTheDeparted.summon delegates with only actor and summonConfig', async () => {
-    let pickOptionsPassed = null;
-    const mockToken = { id: 'summon-token-2', name: 'Departed Spirit 2' };
-
-    adapter.summons.pick = async (options) => {
-        pickOptionsPassed = options;
-        return mockToken;
-    };
-
-    const mockActor = { id: 'actor-2', name: 'Spirit 2', uuid: 'Actor.spirit456', documentName: 'Actor' };
-    const summoned = await tokensOfTheDeparted.summon(mockActor, { drawPing: false, tint: '#ff0000' });
-
-    assert.equal(summoned, mockToken);
-    assert.equal(pickOptionsPassed.uuid, 'Actor.spirit456');
-    assert.equal(pickOptionsPassed.drawPing, false);
-    assert.equal(pickOptionsPassed.tokenData.light.color, '#ff0000');
+test('tokensOfTheDeparted.create and play fail cleanly when inputs are missing', async () => {
+    assert.equal(await tokensOfTheDeparted.create(undefined), null, 'create must return null when token is undefined');
+    assert.equal(await tokensOfTheDeparted.play(undefined, { id: 'tok' }), null, 'play must return null when token is undefined');
+    assert.equal(await tokensOfTheDeparted.play({ id: 'tok' }, undefined), null, 'play must return null when summonTarget is undefined');
 });
 
 test('tokensOfTheDeparted.play summons a token when Actor is provided and plays animation', async () => {
@@ -277,7 +265,7 @@ test('tokensOfTheDeparted.play uses existing Token directly without invoking sum
     assert.equal(pickCalled, false, 'spawn should not be called when Token is passed directly');
 });
 
-test('tokensOfTheDeparted.summon places token directly when location is provided', async () => {
+test('tokensOfTheDeparted.create places token directly when location is provided in summonConfig', async () => {
     let createdTokenData = null;
     const mockActor = {
         id: 'actor-1',
@@ -299,9 +287,10 @@ test('tokensOfTheDeparted.summon places token directly when location is provided
         }
     };
 
-    const summoned = await tokensOfTheDeparted.summon(mockActor, { location: { x: 500, y: 600 } });
+    const mockCaster = { id: 'caster-1', name: 'Rogue', document: { rotation: 0 }, center: { x: 100, y: 100 } };
+    const seq = await tokensOfTheDeparted.create(mockCaster, mockActor, { summonConfig: { location: { x: 500, y: 600 } } });
 
-    assert.ok(summoned, 'Token placeable must be returned for direct location');
+    assert.ok(seq, 'Sequence must be returned for direct location placement');
     assert.equal(createdTokenData.x, 500);
     assert.equal(createdTokenData.y, 600);
 });

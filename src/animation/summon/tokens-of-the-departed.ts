@@ -97,31 +97,15 @@ function isActor(target: unknown): target is Actor {
 
 /**
  * Summons a token onto the canvas for an actor.
- * @param {Actor | string} actor Actor document, name, or UUID
+ * @param {Actor} actor Actor document
  * @param {SummonOptions} [summonConfig={}] Summoning placement options (crosshairs, location, tokenData)
  * @returns {Promise<Token | null>} The summoned Token placeable or null
  */
 async function summon(
-    actor: Actor | string,
+    actor: Actor,
     summonConfig: SummonOptions = {}
 ): Promise<Token | null> {
-    if (!actor) return null;
-
-    let targetUuid: string | null = null;
-    let actorDoc: Actor | null = null;
-
-    if (isActor(actor)) {
-        actorDoc = actor;
-        targetUuid = actor.uuid;
-    } else if (actor.includes('.')) {
-        targetUuid = actor;
-    } else {
-        actorDoc = game.actors.getName(actor) ?? null;
-        if (!actorDoc) return null;
-        targetUuid = actorDoc.uuid;
-    }
-
-    if (!targetUuid) return null;
+    if (!actor?.uuid) return null;
 
     const tokenData: Record<string, unknown> = {
         alpha: 0,
@@ -137,12 +121,9 @@ async function summon(
 
     const location = summonConfig.location;
     if (location) {
-        if (!actorDoc && targetUuid) {
-            actorDoc = (await fromUuid(targetUuid)) as Actor | null;
-        }
-        if (!actorDoc || !canvas.scene) return null;
+        if (!canvas.scene) return null;
 
-        const tokenDocData = await actorDoc.getTokenDocument({
+        const tokenDocData = await actor.getTokenDocument({
             x: location.x,
             y: location.y,
             ...tokenData
@@ -159,7 +140,7 @@ async function summon(
         crosshairParameters: summonConfig.crosshairParameters ?? DEFAULT_CONFIG.crosshairParameters,
         ...summonConfig,
         tokenData,
-        uuid: targetUuid,
+        uuid: actor.uuid,
         drawPing: summonConfig.drawPing ?? false
     };
 
@@ -169,16 +150,16 @@ async function summon(
 /**
  * Builds the Sequence animation.
  * If only a single token is provided, adjusts the copySprite on that token without summoning anything.
- * If a caster token and a summoned token are provided, builds the sequence from caster to summoned token.
+ * If a caster token and a summoned token/actor are provided, builds the sequence from caster to summoned token.
  *
- * @param {Token} token Target token to adjust, or caster token if summonToken is also provided
- * @param {Token | TokensOfTheDepartedConfig} [summonTokenOrConfig={}] Summoned token or configuration options
+ * @param {Token} token Target token to adjust, or caster token if summonTarget is also provided
+ * @param {Token | Actor | TokensOfTheDepartedConfig} [summonTargetOrConfig] Summoned token, actor to summon, or configuration
  * @param {TokensOfTheDepartedConfig} [config={}] Configuration options
  * @returns {Promise<Sequence | null>}
  */
 async function create(
     token: Token,
-    summonTokenOrConfig?: Token | TokensOfTheDepartedConfig,
+    summonTargetOrConfig?: Token | Actor | TokensOfTheDepartedConfig,
     config: TokensOfTheDepartedConfig = {}
 ): Promise<any> {
     if (!token) return null;
@@ -187,13 +168,19 @@ async function create(
     let targetToken: Token;
     let mConfig: TokensOfTheDepartedConfig;
 
-    if (isToken(summonTokenOrConfig)) {
+    if (isToken(summonTargetOrConfig)) {
         casterToken = token;
-        targetToken = summonTokenOrConfig;
+        targetToken = summonTargetOrConfig;
         mConfig = adapter.mergeObject(DEFAULT_CONFIG, settingsOverride(config));
+    } else if (isActor(summonTargetOrConfig)) {
+        casterToken = token;
+        mConfig = adapter.mergeObject(DEFAULT_CONFIG, settingsOverride(config));
+        const summoned = await summon(summonTargetOrConfig, mConfig.summonConfig);
+        if (!summoned) return null;
+        targetToken = summoned;
     } else {
         targetToken = token;
-        mConfig = adapter.mergeObject(DEFAULT_CONFIG, settingsOverride(summonTokenOrConfig));
+        mConfig = adapter.mergeObject(DEFAULT_CONFIG, settingsOverride(summonTargetOrConfig));
     }
 
     const { sound, tint } = mConfig;
@@ -286,17 +273,7 @@ async function play(
     config: TokensOfTheDepartedConfig = {}
 ): Promise<any> {
     if (!token || !summonTarget) return null;
-
-    let summonToken: Token | null = null;
-    if (isToken(summonTarget)) {
-        summonToken = summonTarget;
-    } else {
-        summonToken = await summon(summonTarget, config.summonConfig);
-    }
-
-    if (!summonToken) return null;
-
-    const sequence = await create(token, summonToken, config);
+    const sequence = await create(token, summonTarget, config);
     return sequence?.play();
 }
 
@@ -321,8 +298,6 @@ export const tokensOfTheDeparted = {
     create,
     play,
     stop,
-    summon,
-    spawn: summon,
     default_config: DEFAULT_CONFIG
 };
 

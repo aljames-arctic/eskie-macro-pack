@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { BlfxAutorecUpdateApp, BlfxAutorecUpdateFormApplication } from '../../src/ui/blfx/updateMenu.js';
 import { AutorecUpdateApp, autorecUpdateFormApplication } from '../../src/ui/autoanimations/updateMenu.js';
 import { WorldScriptsApp, WorldScriptsFormApplication } from '../../src/ui/world-scripts/worldScriptsMenu.js';
-import { RecommendedModulesApp, RecommendedModulesFormApplication } from '../../src/ui/recommended-modules/recommendedModulesMenu.js';
+import { RecommendedModulesApp, RecommendedModulesFormApplication, processModule } from '../../src/ui/recommended-modules/recommendedModulesMenu.js';
 import { ConfigureAutorecApp, ConfigureAutorecFormApplication } from '../../src/ui/autorec/manageAutorecMenu.js';
 
 test('BlfxAutorecUpdateApp inherits from ApplicationV2 with HandlebarsApplicationMixin', async () => {
@@ -239,13 +239,102 @@ test('RecommendedModulesApp template includes data-action="close" on close butto
 
     assert.ok(templateContent.includes('data-action="close"'));
     assert.ok(templateContent.includes('EMP.recommendedModules.closeButton'));
-    assert.ok(templateContent.includes('eskie-patreon-pill'));
+    assert.ok(templateContent.includes('eskie-patreon-pill {{patreonClass}}'));
+    assert.ok(templateContent.includes('data-patreon-status="{{patreonClass}}"'));
     assert.ok(templateContent.includes('fa-brands fa-patreon'));
     assert.ok(templateContent.includes('target="_blank"'));
     assert.ok(templateContent.includes('rel="noopener noreferrer"'));
     assert.ok(templateContent.includes('EMP.recommendedModules.patreon'));
     assert.equal(templateContent.includes('patreonTooltip'), false, 'Tooltips should be removed from Patreon pills');
     assert.equal(templateContent.includes('title='), false, 'No title tooltip attributes on Patreon pills');
+});
+
+test('RecommendedModulesApp assigns warning yellow to Patreon pills when not installed and green when installed', async () => {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
+    const dirname = path.dirname(fileURLToPath(import.meta.url));
+    const cssPath = path.resolve(dirname, '../../styles/eskie-macros.css');
+    const cssContent = fs.readFileSync(cssPath, 'utf8');
+
+    // Verify CSS styles: warning yellow (#facc15 / rgba(234, 179, 8, ...)) and installed green (#4ade80 / rgba(34, 197, 94, ...))
+    assert.ok(cssContent.includes('.eskie-patreon-pill.warning'));
+    assert.ok(cssContent.includes('.eskie-patreon-pill.installed'));
+    assert.ok(cssContent.includes('#facc15'));
+    assert.ok(cssContent.includes('#4ade80'));
+
+    const jb2aConfig = {
+        id: "jb2a_patreon",
+        name: "JB2A",
+        altIds: ["JB2A_DnD5e"],
+        description: "JB2A animations",
+        patreon: "https://www.patreon.com/c/JB2A"
+    };
+
+    // Case 1: Neither Patreon nor free version is installed -> warning yellow
+    game.modules.clear();
+    let processed = processModule(jb2aConfig);
+    assert.equal(processed.isPatreonInstalled, false);
+    assert.equal(processed.patreonClass, 'warning');
+    assert.equal(processed.statusKey, 'missing');
+
+    // Case 2: Only free version is installed and active -> card active, but Patreon pill warning yellow
+    game.modules.clear();
+    game.modules.set('JB2A_DnD5e', { active: true });
+    processed = processModule(jb2aConfig);
+    assert.equal(processed.isPatreonInstalled, false);
+    assert.equal(processed.patreonClass, 'warning');
+    assert.equal(processed.statusKey, 'active');
+
+    // Case 3: Patreon module is installed but disabled -> Patreon pill is installed (green)
+    game.modules.clear();
+    game.modules.set('jb2a_patreon', { active: false });
+    processed = processModule(jb2aConfig);
+    assert.equal(processed.isPatreonInstalled, true);
+    assert.equal(processed.patreonClass, 'installed');
+    assert.equal(processed.statusKey, 'disabled');
+
+    // Case 4: Patreon module is installed and active -> Patreon pill is installed (green)
+    game.modules.clear();
+    game.modules.set('jb2a_patreon', { active: true });
+    processed = processModule(jb2aConfig);
+    assert.equal(processed.isPatreonInstalled, true);
+    assert.equal(processed.patreonClass, 'installed');
+    assert.equal(processed.statusKey, 'active');
+
+    // Case 5: Boss Loot FX in automation category with patreonIds
+    const blfxConfig = {
+        id: "boss-loot-assets-premium",
+        name: "Boss Loot FX",
+        altIds: ["blfx-animation-editor-premium", "blfx"],
+        patreonIds: ["boss-loot-assets-premium", "blfx-animation-editor-premium"],
+        description: "Boss Loot FX",
+        patreon: "https://www.patreon.com/c/BossLoot"
+    };
+
+    // Free module only -> warning
+    game.modules.clear();
+    game.modules.set('blfx', { active: true });
+    processed = processModule(blfxConfig);
+    assert.equal(processed.isPatreonInstalled, false);
+    assert.equal(processed.patreonClass, 'warning');
+
+    // Alternative Patreon module installed (blfx-animation-editor-premium) -> installed (green)
+    game.modules.clear();
+    game.modules.set('blfx-animation-editor-premium', { active: false });
+    processed = processModule(blfxConfig);
+    assert.equal(processed.isPatreonInstalled, true);
+    assert.equal(processed.patreonClass, 'installed');
+
+    // Case 6: Module without Patreon link
+    const jaamodConfig = {
+        id: "jaamod",
+        name: "JAA",
+        description: "JAA module"
+    };
+    processed = processModule(jaamodConfig);
+    assert.equal(processed.isPatreonInstalled, false);
+    assert.equal(processed.patreonClass, 'warning');
 });
 
 test('ConfigureAutorecApp inherits from ApplicationV2 with HandlebarsApplicationMixin and manages module visibility', async () => {

@@ -11,6 +11,7 @@ export interface RecommendedModuleConfig {
     isNative?: boolean;
     note?: string;
     patreon?: string;
+    patreonIds?: string[];
 }
 
 export interface ProcessedRecommendedModule extends RecommendedModuleConfig {
@@ -19,6 +20,8 @@ export interface ProcessedRecommendedModule extends RecommendedModuleConfig {
     statusClass: string;
     statusIcon: string;
     isActive: boolean;
+    isPatreonInstalled: boolean;
+    patreonClass: string;
 }
 
 export interface RecommendedSubcategoryConfig {
@@ -199,6 +202,7 @@ export const RECOMMENDED_CATEGORIES: RecommendedCategoryConfig[] = [
                 id: "boss-loot-assets-premium",
                 name: "EMP.recommendedModules.modules.bossLootFx.name",
                 altIds: ["blfx-animation-editor-premium", "blfx"],
+                patreonIds: ["boss-loot-assets-premium", "blfx-animation-editor-premium"],
                 description: "EMP.recommendedModules.modules.bossLootFx.description",
                 icon: "fa-solid fa-dragon",
                 patreon: "https://www.patreon.com/c/BossLoot"
@@ -207,7 +211,13 @@ export const RECOMMENDED_CATEGORIES: RecommendedCategoryConfig[] = [
     }
 ];
 
-function processModule(mod: RecommendedModuleConfig): ProcessedRecommendedModule {
+export function processModule(mod: RecommendedModuleConfig): ProcessedRecommendedModule {
+    const patreonIds = mod.patreonIds ?? [mod.id];
+    const isPatreonInstalled = Boolean(
+        mod.patreon && patreonIds.some(id => Boolean(game.modules?.get(id)))
+    );
+    const patreonClass = isPatreonInstalled ? "installed" : "warning";
+
     if (mod.isNative) {
         const isSupported = Boolean(adapter.supportsRegionBehaviors);
         return {
@@ -221,7 +231,9 @@ function processModule(mod: RecommendedModuleConfig): ProcessedRecommendedModule
                 : (game.i18n?.localize("EMP.recommendedModules.status.nativeV14") ?? "Requires Foundry v14+"),
             statusClass: isSupported ? "native" : "disabled",
             statusIcon: isSupported ? "fa-solid fa-circle-check" : "fa-solid fa-circle-info",
-            isActive: isSupported
+            isActive: isSupported,
+            isPatreonInstalled,
+            patreonClass
         };
     }
 
@@ -275,7 +287,9 @@ function processModule(mod: RecommendedModuleConfig): ProcessedRecommendedModule
         statusLabel,
         statusClass,
         statusIcon,
-        isActive
+        isActive,
+        isPatreonInstalled,
+        patreonClass
     };
 }
 

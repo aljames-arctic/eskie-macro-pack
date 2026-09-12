@@ -252,13 +252,9 @@ test('tokensOfTheDeparted.play summons a token when Actor and config are provide
     assert.equal(pickOptionsPassed.uuid, 'Actor.ghost456');
     assert.equal(pickOptionsPassed.drawPing, true);
 
-    // Also test play with summonTarget omitted and configured actor
-    const playResult2 = await tokensOfTheDeparted.play(mockCaster, undefined, {
-        actor: mockActor,
-        summonConfig: { drawPing: false }
-    });
-    assert.ok(playResult2, 'Play must return sequence play result when summonTarget is omitted');
-    assert.equal(pickOptionsPassed.drawPing, false);
+    // Also verify play fails cleanly when summonTarget is omitted
+    const playResult2 = await tokensOfTheDeparted.play(mockCaster, undefined);
+    assert.equal(playResult2, null, 'Play must return null when summonTarget is omitted');
 });
 
 test('tokensOfTheDeparted.play uses existing Token directly without invoking summon spawn', async () => {
@@ -316,7 +312,7 @@ test('tokensOfTheDeparted is registered in autorec', () => {
     const entry = ontokenEntries.find(e => e.label === 'Tokens of the Departed');
 
     assert.ok(entry, 'tokensOfTheDeparted must be registered in AA menu');
-    assert.equal(entry.metaData.version, '0.0.3');
+    assert.equal(entry.metaData.version, '0.0.4');
     assert.ok(entry.macro.args.includes('eskie.summon.tokensOfTheDeparted'), 'Macro args must contain unquoted eskie.summon.tokensOfTheDeparted');
 });
 

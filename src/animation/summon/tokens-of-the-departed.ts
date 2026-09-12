@@ -39,9 +39,6 @@ export interface SummonOptions {
 
 export interface TokensOfTheDepartedConfig {
     id?: string;
-    actor?: Actor | string | null;
-    uuid?: string | null;
-    location?: { x: number; y: number } | null;
     summonConfig?: SummonOptions;
     tint?: string;
     changeLight?: boolean;
@@ -54,9 +51,6 @@ export interface TokensOfTheDepartedConfig {
 
 export const DEFAULT_CONFIG: TokensOfTheDepartedConfig = {
     id: 'tokensOfTheDeparted',
-    actor: null,
-    uuid: null,
-    location: null,
     summonConfig: {},
     tint: '#58feb0',
     changeLight: true,
@@ -280,27 +274,24 @@ async function create(
  * Plays the Tokens of the Departed sequence.
  * If summonTarget is a Token placeable, plays the animation directly with that token.
  * If summonTarget is an Actor document, summons a new token of that actor at a location first, then plays the animation.
- * If omitted, summons using the configured default actor.
  *
  * @param {Token} token Caster token
- * @param {Token | Actor} [summonTarget] Summoned token or actor to summon
+ * @param {Token | Actor} summonTarget Summoned token or actor to summon
  * @param {TokensOfTheDepartedConfig} [config={}] Configuration options
  * @returns {Promise<any>}
  */
 async function play(
     token: Token,
-    summonTarget?: Token | Actor,
+    summonTarget: Token | Actor,
     config: TokensOfTheDepartedConfig = {}
 ): Promise<any> {
-    if (!token) return null;
+    if (!token || !summonTarget) return null;
 
     let summonToken: Token | null = null;
     if (isToken(summonTarget)) {
         summonToken = summonTarget;
     } else {
-        const actor = summonTarget ?? config.actor;
-        if (!actor) return null;
-        summonToken = await summon(actor, config.summonConfig);
+        summonToken = await summon(summonTarget, config.summonConfig);
     }
 
     if (!summonToken) return null;
@@ -335,6 +326,6 @@ export const tokensOfTheDeparted = {
     default_config: DEFAULT_CONFIG
 };
 
-adapter.autorec.register('tokensOfTheDeparted', 'token', 'eskie.summon.tokensOfTheDeparted', DEFAULT_CONFIG, '0.0.3', 'Tokens of the Departed');
+adapter.autorec.register('tokensOfTheDeparted', 'token', 'eskie.summon.tokensOfTheDeparted', DEFAULT_CONFIG, '0.0.4', 'Tokens of the Departed');
 
 

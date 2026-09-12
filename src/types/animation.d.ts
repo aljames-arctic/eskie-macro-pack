@@ -47,3 +47,29 @@ export interface TrapModule<TConfig extends TrapConfig = TrapConfig> {
     setup?: (config?: Record<string, unknown>) => Promise<any>;
     default_config: TConfig;
 }
+
+export interface SummonOptions {
+    actor?: Actor | string | null;
+    uuid?: string | null;
+    crosshairParameters?: Record<string, unknown>;
+    crosshairCallbacks?: Record<string, unknown>;
+    tokenData?: Record<string, unknown>;
+    location?: { x: number; y: number } | null;
+    drawPing?: boolean;
+    [key: string]: unknown;
+}
+
+export interface SummonConfig {
+    id?: string;
+    summonConfig?: SummonOptions;
+    sound?: SoundConfig;
+    [key: string]: unknown;
+}
+
+export interface SummonModule<TConfig extends SummonConfig = SummonConfig> {
+    create: (token: Token, summonTarget?: Token | Actor, config?: TConfig) => Promise<any>;
+    play: (token: Token, summonTarget: Token | Actor, config?: TConfig) => Promise<any>;
+    stop?: (token: Token, summonTarget?: Token | Actor, config?: TConfig) => Promise<void>;
+    default_config: TConfig;
+}
+

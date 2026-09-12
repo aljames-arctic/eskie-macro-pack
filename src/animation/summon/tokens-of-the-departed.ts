@@ -5,7 +5,6 @@ import { closest } from '../../lib/filemanager.js';
 import { settingsOverride } from '../../lib/settings.js';
 import { adapter } from '../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../utils/sound.js';
-import type { SoundConfig } from '../../types/animation.js';
 
 export interface TokensOfTheDepartedLightConfig {
     dim?: number;
@@ -23,23 +22,15 @@ export interface TokensOfTheDepartedLightConfig {
     shadows?: number;
 }
 
-export interface SummonOptions {
-    actor?: Actor | string | null;
-    uuid?: string | null;
-    crosshairParameters?: Record<string, unknown>;
-    crosshairCallbacks?: Record<string, unknown>;
-    tokenData?: Record<string, unknown>;
-    location?: { x: number; y: number } | null;
-    drawPing?: boolean;
+export interface TokensOfTheDepartedSummonOptions extends SummonOptions {
     changeLight?: boolean;
     light?: TokensOfTheDepartedLightConfig;
     tint?: string;
-    [key: string]: unknown;
 }
 
-export interface TokensOfTheDepartedConfig {
+export interface TokensOfTheDepartedConfig extends SummonConfig {
     id?: string;
-    summonConfig?: SummonOptions;
+    summonConfig?: TokensOfTheDepartedSummonOptions;
     tint?: string;
     changeLight?: boolean;
     light?: TokensOfTheDepartedLightConfig;
@@ -291,7 +282,7 @@ async function stop(token: Token, summonTarget?: Token | Actor, config: TokensOf
     }
 }
 
-export const tokensOfTheDeparted = {
+export const tokensOfTheDeparted: SummonModule<TokensOfTheDepartedConfig> = {
     create,
     play,
     stop,

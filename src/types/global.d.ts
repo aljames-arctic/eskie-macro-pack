@@ -52,6 +52,9 @@ declare global {
   type ConcreteTile = import('./animation.js').ConcreteTile;
   type AnimationEffectModule<TConfig = Record<string, unknown>> = import('./animation.js').AnimationEffectModule<TConfig>;
   type TrapModule<TConfig extends TrapConfig = TrapConfig> = import('./animation.js').TrapModule<TConfig>;
+  type SummonOptions = import('./animation.js').SummonOptions;
+  type SummonConfig = import('./animation.js').SummonConfig;
+  type SummonModule<TConfig extends SummonConfig = SummonConfig> = import('./animation.js').SummonModule<TConfig>;
 
   type Dnd5eSkill = import('./systems.js').Dnd5eSkill;
   type Dnd5eTool = import('./systems.js').Dnd5eTool;

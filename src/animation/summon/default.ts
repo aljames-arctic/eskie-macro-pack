@@ -117,7 +117,7 @@ async function create(
     sequence
         .effect()
             .name(`${targetToken.name} Summon Default`)
-            .file(closest('eskie.attack.ranged.arrow.01.physical.blue'))
+            .file(closest('eskie.attack.ranged.arrow.01.physical.heavy.blue.slow'))
             .atLocation(targetToken, { offset: { y: -((imageSize - 1) / 2) }, gridUnits: true })
             .scaleToObject(1.1)
             .filter('ColorMatrix', { saturate: -1, brightness: 10 })

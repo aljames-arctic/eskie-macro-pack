@@ -222,7 +222,7 @@ test('tokensOfTheDeparted.play summons a token when Actor is provided and plays 
     assert.equal(pickOptionsPassed.uuid, 'Actor.ghost123');
 });
 
-test('tokensOfTheDeparted.play summons a token when config object with actor and summonConfig is provided', async () => {
+test('tokensOfTheDeparted.play summons a token when Actor and config are provided', async () => {
     let pickOptionsPassed = null;
     const mockSpawnedToken = {
         id: 'spawned-token-2',
@@ -239,13 +239,20 @@ test('tokensOfTheDeparted.play summons a token when config object with actor and
     const mockCaster = { id: 'caster-1', name: 'Rogue', document: { rotation: 0 }, center: { x: 100, y: 100 } };
     const mockActor = { id: 'actor-ghost-2', name: 'Ghost 2', uuid: 'Actor.ghost456', documentName: 'Actor' };
 
-    const playResult = await tokensOfTheDeparted.play(mockCaster, {
-        actor: mockActor,
+    const playResult = await tokensOfTheDeparted.play(mockCaster, mockActor, {
         summonConfig: { drawPing: true }
     });
     assert.ok(playResult, 'Play must return sequence play result when config is provided');
     assert.equal(pickOptionsPassed.uuid, 'Actor.ghost456');
     assert.equal(pickOptionsPassed.drawPing, true);
+
+    // Also test play with summonTarget omitted and configured actor
+    const playResult2 = await tokensOfTheDeparted.play(mockCaster, undefined, {
+        actor: mockActor,
+        summonConfig: { drawPing: false }
+    });
+    assert.ok(playResult2, 'Play must return sequence play result when summonTarget is omitted');
+    assert.equal(pickOptionsPassed.drawPing, false);
 });
 
 test('tokensOfTheDeparted.play uses existing Token directly without invoking summon spawn', async () => {

@@ -325,34 +325,29 @@ async function create(
  * Plays the Tokens of the Departed sequence.
  * If summonTarget is a Token placeable, plays the animation directly with that token.
  * If summonTarget is an Actor document, summons a new token of that actor at a location first, then plays the animation.
- * If omitted or a config is provided, summons using the configured default actor.
+ * If omitted, summons using the configured default actor.
  *
  * @param {Token} token Caster token
- * @param {Token | Actor | string | TokensOfTheDepartedConfig} [summonTargetOrConfig] Summoned token, actor to summon, or configuration
+ * @param {Token | Actor} [summonTarget] Summoned token or actor to summon
  * @param {TokensOfTheDepartedConfig} [config={}] Configuration options
  * @returns {Promise<any>}
  */
 async function play(
     token: Token,
-    summonTargetOrConfig?: Token | Actor | string | TokensOfTheDepartedConfig,
+    summonTarget?: Token | Actor,
     config: TokensOfTheDepartedConfig = {}
 ): Promise<any> {
     let summonToken: Token | null = null;
-    let cfg: TokensOfTheDepartedConfig;
 
-    if (isToken(summonTargetOrConfig)) {
-        summonToken = ('object' in summonTargetOrConfig && summonTargetOrConfig.object ? summonTargetOrConfig.object : summonTargetOrConfig) as Token;
-        cfg = config;
+    if (isToken(summonTarget)) {
+        summonToken = ('object' in summonTarget && summonTarget.object ? summonTarget.object : summonTarget) as Token;
     } else {
-        const isActorOrString = isActor(summonTargetOrConfig) || typeof summonTargetOrConfig === 'string';
-        cfg = isActorOrString ? config : ((summonTargetOrConfig as TokensOfTheDepartedConfig) ?? config);
-        const targetActor = isActorOrString ? summonTargetOrConfig : (cfg.actor ?? cfg.uuid);
-        summonToken = await summon(targetActor, cfg.summonConfig);
+        summonToken = await summon(summonTarget ?? config.actor ?? config.uuid, config.summonConfig);
     }
 
     if (!summonToken) return null;
 
-    const sequence = await create(token, summonToken, cfg);
+    const sequence = await create(token, summonToken, config);
     if (sequence) return sequence.play();
 }
 

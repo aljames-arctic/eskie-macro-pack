@@ -848,3 +848,32 @@ test('getGridSize delegates to getSceneDimensions and returns grid size in pixel
     assert.equal(v12.getGridSize(customScene), 150);
     assert.equal(adapter.getGridSize(customScene), 150);
 });
+
+test('adapter.isToken, isActor, and isTile correctly validate documents and placeables', () => {
+    const mockTokenDoc = { documentName: 'Token' };
+    const mockTokenPlaceable = { document: mockTokenDoc, center: { x: 100, y: 100 } };
+    const mockActorDoc = { documentName: 'Actor', items: [], uuid: 'Actor.123' };
+    const mockTileDoc = { documentName: 'Tile' };
+    const mockTilePlaceable = { document: mockTileDoc, bounds: {} };
+
+    // isToken
+    assert.equal(adapter.isToken(mockTokenDoc), true);
+    assert.equal(adapter.isToken(mockTokenPlaceable), true);
+    assert.equal(adapter.isToken(mockActorDoc), false);
+    assert.equal(adapter.isToken(mockTilePlaceable), false);
+    assert.equal(adapter.isToken(null), false);
+    assert.equal(adapter.isToken(undefined), false);
+
+    // isActor
+    assert.equal(adapter.isActor(mockActorDoc), true);
+    assert.equal(adapter.isActor(mockTokenPlaceable), false);
+    assert.equal(adapter.isActor(mockTokenDoc), false);
+    assert.equal(adapter.isActor({ items: [], uuid: 'Actor.fallback' }), true);
+    assert.equal(adapter.isActor(null), false);
+
+    // isTile
+    assert.equal(adapter.isTile(mockTileDoc), true);
+    assert.equal(adapter.isTile(mockTilePlaceable), true);
+    assert.equal(adapter.isTile(mockTokenPlaceable), false);
+    assert.equal(adapter.isTile(null), false);
+});

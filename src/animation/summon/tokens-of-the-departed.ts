@@ -65,26 +65,6 @@ export const DEFAULT_CONFIG: TokensOfTheDepartedConfig = {
     }
 };
 
-/**
- * Checks whether a target is a Token placeable or Token document.
- * @param {unknown} target
- * @returns {boolean}
- */
-function isToken(target: unknown): target is Token {
-    if (!target || typeof target !== 'object') return false;
-    if (adapter.isDocumentOfType(target, 'Token')) return true;
-    return 'document' in target || 'center' in target;
-}
-
-/**
- * Checks whether a target is an Actor document.
- * @param {unknown} target
- * @returns {boolean}
- */
-function isActor(target: unknown): target is Actor {
-    if (!target || typeof target !== 'object') return false;
-    return ('documentName' in target && (target as any).documentName === 'Actor') || ('items' in target && !('document' in target) && 'uuid' in target);
-}
 
 /**
  * Summons a token onto the canvas for an actor.
@@ -159,10 +139,10 @@ async function create(
     let targetToken: Token;
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, settingsOverride(config));
 
-    if (isToken(summonTarget)) {
+    if (adapter.isToken(summonTarget)) {
         casterToken = token;
         targetToken = summonTarget;
-    } else if (isActor(summonTarget)) {
+    } else if (adapter.isActor(summonTarget)) {
         casterToken = token;
         const summoned = await summon(summonTarget, mConfig.summonConfig);
         if (!summoned) return null;

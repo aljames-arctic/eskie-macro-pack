@@ -311,6 +311,18 @@ class Adapter {
         return this.foundry.isDocumentOfType(target, type);
     }
 
+    isToken(target: unknown): target is Token {
+        return this.foundry.isToken(target);
+    }
+
+    isActor(target: unknown): target is Actor {
+        return this.foundry.isActor(target);
+    }
+
+    isTile(target: unknown): target is Tile {
+        return this.foundry.isTile(target);
+    }
+
     getPlaceable(id: string) {
         return this.foundry.getPlaceable(id);
     }

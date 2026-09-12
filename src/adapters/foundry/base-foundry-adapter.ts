@@ -770,6 +770,43 @@ export class BaseFoundryAdapter {
     }
 
     /**
+     * Checks whether a target is a Token placeable or Token document.
+     * @param {unknown} target Target placeable or document
+     * @returns {boolean}
+     */
+    isToken(target: unknown): target is Token {
+        if (!target || typeof target !== 'object') return false;
+        const docName = this.getDocumentName(target);
+        if (docName) return docName === 'Token';
+        if ('bounds' in target && !('center' in target)) return false;
+        return 'document' in target || 'center' in target;
+    }
+
+    /**
+     * Checks whether a target is an Actor document.
+     * @param {unknown} target Target document or object
+     * @returns {boolean}
+     */
+    isActor(target: unknown): target is Actor {
+        if (!target || typeof target !== 'object') return false;
+        const docName = this.getDocumentName(target);
+        if (docName) return docName === 'Actor';
+        return 'items' in target && !('document' in target) && 'uuid' in target;
+    }
+
+    /**
+     * Checks whether a target is a Tile placeable or Tile document.
+     * @param {unknown} target Target placeable or document
+     * @returns {boolean}
+     */
+    isTile(target: unknown): target is Tile {
+        if (!target || typeof target !== 'object') return false;
+        const docName = this.getDocumentName(target);
+        if (docName) return docName === 'Tile';
+        return 'bounds' in target && !('center' in target);
+    }
+
+    /**
      * Resolve a PlaceableObject by its unique identifier across primary canvas layers.
      * @param {string} id Target placeable ID
      * @returns {PlaceableObject|null}

@@ -1,7 +1,7 @@
 // Author: .eskie
 // Modular Conversion: bakanabaka
 
-import { closest } from "../../../lib/filemanager.js";
+import { closest, absolutePath } from "../../../lib/filemanager.js";
 import { template as templatelib } from '../../../lib/templates.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 import { adapter } from "../../../adapters/index.js";
@@ -23,12 +23,10 @@ async function create(token: Token, config: any = {}, options: any = {}) {
     let upTime = jumpTime * 0.5;
     let downTime = jumpTime * 0.4;
 
-    const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
-    const portalPath = portalEntry?.file ?? portalEntry?.files?.[0] ?? portalEntry;
     const cfg = { 
         radius: 1,
         max: 500,
-        icon: portalPath, 
+        icon: absolutePath("jb2a.portals.vertical.vortex.purple"), 
         label: 'Step of the Wind'
     };
     let [position, _] = await templatelib.getPosition(template, cfg);

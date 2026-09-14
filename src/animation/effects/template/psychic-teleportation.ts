@@ -1,4 +1,4 @@
-import { closest } from '../../../lib/filemanager.js';
+import { closest, absolutePath } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
@@ -10,14 +10,11 @@ const DEFAULT_CONFIG = {
 
 async function create(token: Token, config: any = {}) {
     const { id, template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
-    
-    const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
-    const portalPath = portalEntry?.file ?? portalEntry?.files?.[0] ?? portalEntry;
 
     const cfg = { 
         radius: 1,
         max: 500,
-        icon: portalPath, 
+        icon: absolutePath("jb2a.portals.vertical.vortex.purple"), 
         label: id
     };
     let [position, _] = await templatelib.getPosition(template, cfg);

@@ -3,7 +3,7 @@
  * Modular Conversion: bakanabaka
  */
 
-import { closest } from '../../../lib/filemanager.js';
+import { closest, absolutePath } from '../../../lib/filemanager.js';
 import { template as templatelib } from '../../../lib/templates.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { adapter } from '../../../adapters/index.js';
@@ -38,15 +38,12 @@ async function create(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, template, tintMap, sound } = mConfig;
 
-    const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
-    const portalPath = portalEntry?.file ?? portalEntry?.files?.[0] ?? portalEntry;
-
     const cfg = { 
         distance: mConfig.distance ?? 100,
         width: mConfig.width ?? 5,
         type: 'ray',
         max: 500,
-        icon: portalPath, 
+        icon: absolutePath("jb2a.portals.vertical.vortex.purple"), 
         label: id,
         token
     };

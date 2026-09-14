@@ -3,7 +3,7 @@
    Update Author: bakanabaka
 ** */
 
-import { closest } from "../../../lib/filemanager.js";
+import { closest, absolutePath } from "../../../lib/filemanager.js";
 import { template as templatelib } from '../../../lib/templates.js';
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
@@ -140,12 +140,10 @@ async function createSpikeGrowth(token: Token, config: any = {}, options: any = 
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { id, size, template } = mConfig;
 
-    const portalEntry = Sequencer.Database.getEntry(closest("jb2a.portals.vertical.vortex.purple"));
-    const portalPath = portalEntry?.file ?? portalEntry?.files?.[0] ?? portalEntry;
     const cfg = { 
         radius: 20,
         max: 150,
-        icon: portalPath, 
+        icon: absolutePath("jb2a.portals.vertical.vortex.purple"), 
         label: 'Spike Growth'
     };
     let [position, _] = await templatelib.getPosition(template, cfg);

@@ -45,8 +45,18 @@ async function setupRegion(animation: string, config: Record<string, any> = {}):
     if (triggerResult !== 'continue') return;
 
     const triggerRegions = adapter.getControlledRegions();
-    if (triggerRegions.length === 0) {
+    const controlledTiles = canvas.tiles.controlled.map(t => t.document);
+
+    if (triggerRegions.length === 0 && controlledTiles.length === 0) {
         return notify.warn(localize('EMP.traps.setup.noTriggerRegions'));
+    }
+
+    if (triggerRegions.length === 0 && controlledTiles.length > 0) {
+        const hasMatt = Boolean(game.modules.get('monks-active-tiles')?.active);
+        if (!hasMatt) {
+            return notify.warn(localize('EMP.traps.setup.tileRequiresMatt', "Monk's Active Tile Triggers is required to use Tiles as triggers. Select a Region on the canvas for native triggers."));
+        }
+        return matt.trap.setup(animation, { ...config, triggerTiles: controlledTiles });
     }
 
     let originElements: any[] = [];
@@ -269,7 +279,7 @@ await Promise.all(animPromises);`
 /**
  * Universal trap setup orchestrator.
  * Dynamically routes to native Foundry V14+ Regions or Monk's Active Tile Triggers (MATT).
- * On Foundry V14+, MATT is optional; if MATT is active, prompts the user to select the preferred trigger engine.
+ * On Foundry V14+, Region setup is used by default with seamless Tile/Region selection at each step.
  *
  * @param {string} animation Global animation path (e.g. 'eskie.traps.pitfall')
  * @param {object} [config={}] Setup configuration options
@@ -280,30 +290,7 @@ export async function setupTrap(animation: string, config: Record<string, any> =
         return notify.error(localize('EMP.traps.setup.onlyGm'));
     }
 
-    let mode = config.mode;
-    const isV14 = adapter.generation >= 14;
-
-    if (!mode) {
-        if (!isV14) {
-            mode = 'matt';
-        } else {
-            const hasMatt = Boolean(game.modules.get('monks-active-tiles')?.active);
-            if (!hasMatt) {
-                mode = 'region';
-            } else {
-                mode = await adapter.buttonDialog({
-                    title: localize('EMP.traps.setup.modeDialogTitle'),
-                    buttons: [
-                        { label: localize('EMP.traps.setup.modeRegion'), value: 'region' },
-                        { label: localize('EMP.traps.setup.modeMatt'), value: 'matt' },
-                    ],
-                }, {
-                    content: localize('EMP.traps.setup.modeDialogContent'),
-                });
-                if (!mode) return;
-            }
-        }
-    }
+    const mode = config.mode ?? (adapter.generation >= 14 ? 'region' : 'matt');
 
     if (mode === 'matt') {
         return matt.trap.setup(animation, config);

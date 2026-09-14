@@ -50,20 +50,29 @@ test('setupTrap: routes dynamically based on generation and MATT availability', 
     assert.equal(mattCalled, false, 'On V14 without MATT, must not call MATT setup');
     assert.ok(resV14NoMatt?.triggerRegions, 'Must return Region setup result');
 
-    // Case 3: Generation 14 with MATT active -> prompts user
+    // Case 3: Generation 14 with MATT active -> directly runs Region setup without prompting for mode
     globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', active: true });
-    let promptedMode = null;
+    let promptedDialog = null;
     adapter.buttonDialog = async (dialogConfig) => {
-        if (dialogConfig.title?.includes?.('modeDialogTitle') || dialogConfig.title?.includes?.('Trigger Mechanism')) {
-            promptedMode = 'matt';
-            return 'matt';
-        }
+        promptedDialog = dialogConfig.title;
         return 'continue';
     };
 
-    await setupTrap('eskie.traps.spike', {});
-    assert.equal(promptedMode, 'matt');
-    assert.equal(mattCalled, true, 'Selecting MATT from prompt executes MATT setup');
+    const resV14WithMatt = await setupTrap('eskie.traps.spike', { tileCount: 2 });
+    assert.equal(mattCalled, false, 'On V14 with controlled regions, runs Region setup directly without mode prompt');
+    assert.ok(resV14WithMatt?.triggerRegions);
+    assert.ok(
+        !promptedDialog?.includes?.('modeDialogTitle') && !promptedDialog?.includes?.('Trigger Mechanism'),
+        'Must not show mode selection popup on V14 even when MATT is active'
+    );
+
+    // Case 4: Generation 14 with MATT active when Tile is selected as trigger -> routes to MATT setup
+    globalThis.canvas.regions.controlled = [];
+    globalThis.canvas.tiles = { controlled: [{ document: { id: 'trig-tile-1' }, id: 'trig-tile-1' }] };
+    mattCalled = false;
+
+    await setupTrap('eskie.traps.spike', { tileCount: 2 });
+    assert.equal(mattCalled, true, 'On V14 with controlled tile as trigger and MATT active, delegates to MATT setup');
 
     // Restore original MATT setup and V12 adapter
     (await import('../../src/animation/utils/matt-tiles.js')).matt.trap.setup = originalMattTrapSetup;

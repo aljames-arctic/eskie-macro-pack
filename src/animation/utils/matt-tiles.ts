@@ -106,21 +106,24 @@ async function setup(animation: string, config: Record<string, unknown> = {}): P
     const trapKey = pathParts[pathParts.length - 1];
     const tileCount = config.tileCount ?? 2;
 
-    // Step 1: Prompt user to select trigger tiles
-    const triggerResult = await adapter.buttonDialog({
-        title: format('EMP.traps.setup.step1Title', { name: trapKey }),
-        buttons: [
-            { label: localize('EMP.traps.common.continue'), value: 'continue' },
-            { label: localize('EMP.traps.common.cancel'), value: 'cancel' },
-        ],
-    }, {
-        content: localize('EMP.traps.setup.step1Content')
-    });
+    let triggerTiles = (config.triggerTiles as any[]) ?? [];
+    if (triggerTiles.length === 0) {
+        // Step 1: Prompt user to select trigger tiles
+        const triggerResult = await adapter.buttonDialog({
+            title: format('EMP.traps.setup.step1Title', { name: trapKey }),
+            buttons: [
+                { label: localize('EMP.traps.common.continue'), value: 'continue' },
+                { label: localize('EMP.traps.common.cancel'), value: 'cancel' },
+            ],
+        }, {
+            content: localize('EMP.traps.setup.step1Content')
+        });
 
-    if (triggerResult !== 'continue') return;
+        if (triggerResult !== 'continue') return;
 
-    const triggerTiles = canvas.tiles.controlled.map(t => t.document);
-    if (triggerTiles.length === 0) return notify.warn(localize('EMP.traps.setup.noTriggerTiles'));
+        triggerTiles = canvas.tiles.controlled.map(t => t.document);
+        if (triggerTiles.length === 0) return notify.warn(localize('EMP.traps.setup.noTriggerTiles'));
+    }
 
     let originTiles: any[] = [];
     let targetTiles: any[] = [];

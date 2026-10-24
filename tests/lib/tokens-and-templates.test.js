@@ -224,5 +224,70 @@ test('twilightSanctuary.stop ends effects by name without restricting to object:
     assert.deepEqual(endEffectsCalls[0], { name: 'twilightSanctuary - cleric-789' });
 });
 
+test('sneakAttack exports create, play, melee, and ranged with dynamic adjacency dispatch', async () => {
+    const { sneakAttack } = await import('../../src/animation/effects/on-target/sneak-attack.js');
+
+    assert.equal(typeof sneakAttack.create, 'function', 'sneakAttack.create must be a function');
+    assert.equal(typeof sneakAttack.play, 'function', 'sneakAttack.play must be a function');
+    assert.equal(typeof sneakAttack.melee.create, 'function');
+    assert.equal(typeof sneakAttack.melee.play, 'function');
+    assert.equal(typeof sneakAttack.ranged.create, 'function');
+    assert.equal(typeof sneakAttack.ranged.play, 'function');
+
+    game.modules.set('eskie-effects', { id: 'eskie-effects', active: true });
+    game.modules.set('JB2A_DnD5e', { id: 'JB2A_DnD5e', active: true });
+
+    globalThis.canvas = {
+        grid: { size: 100, distance: 5 },
+        scene: { grid: { distance: 5 } },
+        dimensions: { size: 100, distance: 5, width: 4000, height: 3000 }
+    };
+
+    const sourceToken = {
+        id: 'rogue-1',
+        x: 0,
+        y: 0,
+        w: 100,
+        h: 100,
+        center: { x: 50, y: 50 },
+        document: { elevation: 0, width: 1, height: 1, rotation: 0 }
+    };
+
+    const adjacentTarget = {
+        id: 'target-adjacent',
+        x: 100,
+        y: 0,
+        w: 100,
+        h: 100,
+        center: { x: 150, y: 50 },
+        document: { elevation: 0, width: 1, height: 1, rotation: 0 }
+    };
+
+    const rangedTarget = {
+        id: 'target-ranged',
+        x: 400,
+        y: 0,
+        w: 100,
+        h: 100,
+        center: { x: 450, y: 50 },
+        document: { elevation: 0, width: 1, height: 1, rotation: 0 }
+    };
+
+    // When adjacent, create() dispatches to melee sequence
+    const meleeSeq = await sneakAttack.create(sourceToken, adjacentTarget);
+    assert.ok(meleeSeq, 'Should return a sequence for adjacent target');
+
+    // When distant, create() dispatches to ranged sequence
+    const rangedSeq = await sneakAttack.create(sourceToken, rangedTarget);
+    assert.ok(rangedSeq, 'Should return a sequence for distant target');
+
+    // Tormenta 20 scene check: 1.5m grid
+    canvas.grid.distance = 1.5;
+    const t20AdjacentSeq = await sneakAttack.create(sourceToken, adjacentTarget);
+    assert.ok(t20AdjacentSeq);
+    const t20RangedSeq = await sneakAttack.create(sourceToken, rangedTarget);
+    assert.ok(t20RangedSeq);
+});
+
 
 

@@ -142,9 +142,12 @@ for (const target of targets) {
     const targetRotation = target.document?.rotation ?? 0;
     const targetSquare = getNearestSquareCenter(token, target);
 
-    // Determine attack style: if auto, pick melee if within reach (<= 8 ft), else ranged
+    // Determine attack style: if auto, pick melee if within reach, else ranged
     const dist = getDistance(token, target);
-    const useMelee = mode === "melee" || (mode === "auto" && dist <= 8);
+    const maxReach = (canvas.scene?.grid?.distance ?? 5) * 1.5;
+    const isAdjacent = game.modules.get("eskie-macros")?.api?.adapter?.isAdjacent?.(token, target) ??
+                       game.modules.get("eskie-macros")?.api?.util?.tokens?.isAdjacent?.(token, target);
+    const useMelee = mode === "melee" || (mode === "auto" && (isAdjacent ?? (dist <= maxReach)));
 
     if (useMelee) {
         // Vital spot melee strike dagger slash

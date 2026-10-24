@@ -165,9 +165,21 @@ const ranged = {
 const DEFAULT_CONFIG = {
     melee: DEFAULT_CONFIG_MELEE,
     ranged: DEFAULT_CONFIG_RANGED,
+};
+
+async function create(token: Token, target: Token, config: any = {}) {
+    const isMelee = adapter.isAdjacent(token, target) || (adapter.getDistance(token, target) <= (adapter.getSceneDimensions().distance * 1.5));
+    return isMelee ? createMelee(token, target, config) : createRanged(token, target, config);
+}
+
+async function play(token: Token, target: Token, config: any = {}) {
+    const seq = await create(token, target, config);
+    if (seq) { return seq.play(); }
 }
 
 export const sneakAttack = {
+    create,
+    play,
     melee,
     ranged,
     default_config: DEFAULT_CONFIG,

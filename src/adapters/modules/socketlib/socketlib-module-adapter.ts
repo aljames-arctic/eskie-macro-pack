@@ -6,7 +6,9 @@ import { token, tokenSockets } from './token.js';
 import { tokenMaskSockets } from './token-mask.js';
 import { object } from './object.js';
 
-export let socketlibInstance: any;
+import { setSocketlibInstance, socketlib, socketlibInstance } from './instance.js';
+
+export { socketlibInstance };
 
 /**
  * Socketlib Module Adapter.
@@ -49,8 +51,9 @@ export class SocketlibModuleAdapter extends BaseModuleAdapter {
      * @returns {Promise<void>}
      */
     async register() {
-        if (!socketlib) return;
-        const socket = socketlib.registerModule(MODULE_ID);
+        const socketlibApi = (globalThis as any).socketlib ?? socketlibInstance;
+        if (!socketlibApi || typeof socketlibApi.registerModule !== 'function') return;
+        const socket = socketlibApi.registerModule(MODULE_ID);
         const socketAPI = {
             doorSockets: this.doorSockets,
             tileSockets: this.tileSockets,
@@ -69,7 +72,7 @@ export class SocketlibModuleAdapter extends BaseModuleAdapter {
             (mod as any).socketlib = socket;
         }
         this._socket = socket;
-        socketlibInstance = socket;
+        setSocketlibInstance(socket);
     }
 }
 
@@ -86,4 +89,4 @@ export const socket = {
     object
 };
 
-export { socketlibInstance as socketlib };
+export { socketlib };

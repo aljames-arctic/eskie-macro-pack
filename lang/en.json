@@ -285,8 +285,10 @@
             "blastLock": "Blast Lock",
             "bless": "Bless",
             "blurredVision": "Blurred Vision",
+            "burningHands": "Burning Hands",
             "charmed": "Charmed",
             "chromaticOrb": "Chromatic Orb",
+            "cloudkill": "Cloudkill",
             "colorSpray": "Color Spray",
             "dash": "Dash",
             "dimensionDoor": "Dimension Door",
@@ -304,6 +306,7 @@
             "fightingSpirit": "Fighting Spirit",
             "fireBlast": "Fire Blast",
             "fireShield": "Fire Shield",
+            "fireball": "Fireball",
             "firecracker": "Firecracker",
             "flurryOfBlows": "Flurry Of Blows",
             "gate": "Gate",
@@ -322,6 +325,7 @@
             "lightningBolt": "Lightning Bolt",
             "magicMissile": "Magic Missile",
             "massHealingWord": "Mass Healing Word",
+            "meteorStrike": "Meteor Strike",
             "mirrorImage": "Mirror Image",
             "pathOfTheGrave": "Path of the Grave",
             "petrified": "Petrified",
@@ -348,7 +352,9 @@
             "twilightSanctuary": "Twilight Sanctuary",
             "vigilantBlessing": "Vigilant Blessing",
             "wailsFromTheGrave": "Wails from the Grave",
-            "wailsFromTheGraveDamage": "Wails from the Grave (Damage)"
+            "wailsFromTheGraveDamage": "Wails from the Grave (Damage)",
+            "wallOfFire": "Wall of Fire",
+            "web": "Web"
         },
         "traps": {
             "name": {

@@ -347,6 +347,10 @@ class Adapter {
         return this.foundry.getSpeakerActor(message);
     }
 
+    getMessageVisibilityUsers(message: ChatMessage | null | undefined): string[] {
+        return this.foundry.getMessageVisibilityUsers(message);
+    }
+
     getDistance(t1: Token, t2: Token): number {
         return this.foundry.getDistance(t1, t2);
     }

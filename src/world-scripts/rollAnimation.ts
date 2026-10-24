@@ -15,6 +15,7 @@ import { log } from '../lib/logger.js';
 export interface RollAnimationConfig {
     rollType?: string;
     outcome?: string;
+    users?: string[];
     [key: string]: unknown;
 }
 
@@ -23,6 +24,7 @@ async function playRollAnimation(token: Token, config: RollAnimationConfig = {})
 
     const rollType = config.rollType ?? "default";
     const outcome = config.outcome ?? "indeterminant";
+    const users = config.users;
 
     let color = "white";
     if (outcome === "success") color = "green";
@@ -37,24 +39,32 @@ async function playRollAnimation(token: Token, config: RollAnimationConfig = {})
 
     log.debug(`Playing animation: rollPath="${rollPath}", token="${token.name}", outcome="${outcome}"`);
 
-    new Sequence()
-        .effect()
-            .file(rollPath)
-            .atLocation(token, locationOptions)
-            .anchor({ x: 0.5, y: 0.5 })
-            .size(dieSize) 
-            .duration(1500)
-            .belowTokens(false)
-            .elevation(10)
-        .effect()
-            .file(smokePath)
-            .atLocation(token, locationOptions)
-            .delay(0)       
-            .duration(1000) 
-            .size(dieSize * 1.5) 
-            .belowTokens(false)
-            .elevation(11)  
-        .play({ remote: true }); 
+    const sequence = new Sequence();
+
+    const rollEffect = sequence.effect()
+        .file(rollPath)
+        .atLocation(token, locationOptions)
+        .anchor({ x: 0.5, y: 0.5 })
+        .size(dieSize) 
+        .duration(1500)
+        .belowTokens(false)
+        .elevation(10);
+
+    const smokeEffect = sequence.effect()
+        .file(smokePath)
+        .atLocation(token, locationOptions)
+        .delay(0)       
+        .duration(1000) 
+        .size(dieSize * 1.5) 
+        .belowTokens(false)
+        .elevation(11);
+
+    if (users && users.length > 0) {
+        rollEffect.forUsers(users);
+        smokeEffect.forUsers(users);
+    }
+
+    return sequence.play({ remote: true }); 
 }
 
 // ============================================================================
@@ -152,6 +162,15 @@ export class RollTracker {
     }
 
     /**
+     * Determines which users have visibility permission to see this roll.
+     * @param {ChatMessage} message Chat message triggering the roll
+     * @returns {string[]} Array of User IDs permitted to see the roll
+     */
+    getMessageVisibilityUsers(message: ChatMessage): string[] {
+        return adapter.getMessageVisibilityUsers(message);
+    }
+
+    /**
      * Semantically classifies a chat message to determine its purpose.
      * @returns {string} The message classification.
      */
@@ -193,6 +212,8 @@ export class RollTracker {
         const newFiredTokens = [...firedTokens];
         let updatedFlags = false;
 
+        const visibleUsers = this.getMessageVisibilityUsers(message);
+
         for (const roll of rolls) {
             const token = this.getSpeakerToken(message, roll.tokenId);
             if (!token || !token.id) continue;
@@ -203,7 +224,8 @@ export class RollTracker {
             // Trigger the sequence
             playRollAnimation(token, {
                 rollType: roll.ability ?? "default",
-                outcome: roll.outcome
+                outcome: roll.outcome,
+                users: visibleUsers
             });
 
             newFiredTokens.push(token.id);

@@ -983,6 +983,40 @@ test('getCenterPoint delegates to canvas.grid.getCenterPoint or returns point', 
     assert.deepEqual(adapter.getCenterPoint({ x: 100, y: 100 }), { x: 100, y: 100 });
 });
 
+test('getMessageVisibilityUsers returns all users for public rolls and whisper/author/GM for whispered rolls', () => {
+    const v12 = new FoundryV12Adapter();
+    const gmUser = { id: 'gm1', isGM: true };
+    const player1 = { id: 'p1', isGM: false };
+    const player2 = { id: 'p2', isGM: false };
+    const player3 = { id: 'p3', isGM: false };
+
+    globalThis.game = {
+        ...globalThis.game,
+        users: [gmUser, player1, player2, player3]
+    };
+
+    // Public roll (no whisper or empty whisper)
+    const publicMsg = { whisper: [], author: { id: 'p1' } };
+    assert.deepEqual(adapter.getMessageVisibilityUsers(publicMsg), ['gm1', 'p1', 'p2', 'p3']);
+    assert.deepEqual(v12.getMessageVisibilityUsers(null), ['gm1', 'p1', 'p2', 'p3']);
+
+    // Whispered roll to GM
+    const gmWhisperMsg = { whisper: ['gm1'], author: { id: 'p1' } };
+    const gmWhisperUsers = adapter.getMessageVisibilityUsers(gmWhisperMsg);
+    assert.ok(gmWhisperUsers.includes('p1'), 'Author must see roll');
+    assert.ok(gmWhisperUsers.includes('gm1'), 'GM must see roll');
+    assert.equal(gmWhisperUsers.includes('p2'), false, 'Uninvolved player must not see roll');
+    assert.equal(gmWhisperUsers.includes('p3'), false, 'Uninvolved player must not see roll');
+
+    // Whispered roll to another player
+    const p2WhisperMsg = { whisper: ['p2'], author: { id: 'p1' } };
+    const p2WhisperUsers = adapter.getMessageVisibilityUsers(p2WhisperMsg);
+    assert.ok(p2WhisperUsers.includes('p1'), 'Author must see roll');
+    assert.ok(p2WhisperUsers.includes('p2'), 'Target player must see roll');
+    assert.ok(p2WhisperUsers.includes('gm1'), 'GM must see roll');
+    assert.equal(p2WhisperUsers.includes('p3'), false, 'Uninvolved player must not see roll');
+});
+
 test('adapter.isToken, isActor, and isTile correctly validate documents and placeables', () => {
     const mockTokenDoc = { documentName: 'Token' };
     const mockTokenPlaceable = { document: mockTokenDoc, center: { x: 100, y: 100 } };

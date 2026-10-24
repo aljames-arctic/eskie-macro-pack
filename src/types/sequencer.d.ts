@@ -111,6 +111,9 @@ export interface EffectSection {
   tint(color: string | number): EffectSection;
   belowTokens(below?: boolean): EffectSection;
   aboveLighting(above?: boolean): EffectSection;
+  elevation(elevation: number, options?: any): EffectSection;
+  forUsers(users: any): EffectSection;
+  locally(locally?: boolean): EffectSection;
   zIndex(index: number): EffectSection;
   persist(persist?: boolean, options?: any): EffectSection;
   private(isPrivate?: boolean): EffectSection;
@@ -181,6 +184,8 @@ export interface SoundSection {
   endTime(time: number): SoundSection;
   duration(duration: number): SoundSection;
   repeats(count: number, delayMin?: number, delayMax?: number): SoundSection;
+  forUsers(users: any): SoundSection;
+  locally(locally?: boolean): SoundSection;
 
   // Root Sequence chaining extensions
   effect(file?: string | Function): EffectSection;

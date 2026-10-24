@@ -937,6 +937,46 @@ export class BaseFoundryAdapter {
         return speakerToken?.actor ?? game?.user?.character ?? null;
     }
 
+    /**
+     * Determines the list of user IDs who have visibility permission to see a chat message or roll.
+     * For public messages, all active/known world users are returned.
+     * For whispered/private messages, returns whisper recipients, the author, and all GMs.
+     * @param {ChatMessage|null|undefined} message Chat message
+     * @returns {string[]} Array of User IDs permitted to see the message
+     */
+    getMessageVisibilityUsers(message: ChatMessage | null | undefined): string[] {
+        const allUsers: any[] = Array.from(game?.users ?? []);
+        if (!message) return allUsers.map((u: any) => u.id).filter(Boolean);
+
+        const whisper = message.whisper;
+        // Public message: visible to all users
+        if (!whisper || whisper.length === 0) {
+            return allUsers.map((u: any) => u.id).filter(Boolean);
+        }
+
+        // Whispered / private message: whisper recipients, author, and all GMs
+        const allowed = new Set<string>();
+
+        for (const entry of whisper as any[]) {
+            const id = typeof entry === "string" ? entry : (entry as any)?.id;
+            if (id) allowed.add(id);
+        }
+
+        const rawAuthor = (message.author as any) ?? (message as any).user;
+        const authorId = typeof rawAuthor === "string" ? rawAuthor : rawAuthor?.id;
+        if (typeof authorId === "string" && authorId) {
+            allowed.add(authorId);
+        }
+
+        for (const u of allUsers) {
+            if (u.isGM && u.id) {
+                allowed.add(u.id);
+            }
+        }
+
+        return Array.from(allowed);
+    }
+
     /* -------------------------------------------- */
     /*  Token Distance & Grid Centering Math        */
     /* -------------------------------------------- */

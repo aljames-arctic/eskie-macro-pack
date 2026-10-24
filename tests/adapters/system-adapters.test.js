@@ -105,6 +105,29 @@ test('Dnd5eSystemAdapter qualifies messages and extracts rolls from flags', () =
     // Item usage
     const useMsg = { id: 'msg-use', flags: { dnd5e: { messageType: 'usage' } } };
     assert.equal(adapter.qualifyMessage(useMsg), 'item description');
+
+    // Modern D&D 5e flavor text check without roll flags (e.g. Acrobatics)
+    const acrobaticsMsg = {
+        id: 'msg-acrobatics',
+        flavor: 'Dexterity (Acrobatics) Check',
+        rolls: [{ total: 18, options: {} }]
+    };
+    assert.equal(adapter.qualifyMessage(acrobaticsMsg), 'ability check');
+    const acrobaticsRolls = adapter.extractRolls(acrobaticsMsg);
+    assert.equal(acrobaticsRolls.length, 1);
+    assert.equal(adapter.normalizeAbility(acrobaticsRolls[0].rawAbility, acrobaticsMsg.flavor), 'dexterity');
+
+    // Modern D&D 5e saving throw via roll options
+    const saveOptionsMsg = {
+        id: 'msg-str-save',
+        flavor: 'Strength Saving Throw',
+        rolls: [{ total: 14, options: { type: 'save', ability: 'str' } }]
+    };
+    assert.equal(adapter.qualifyMessage(saveOptionsMsg), 'saving throw');
+    const saveOptionsRolls = adapter.extractRolls(saveOptionsMsg);
+    assert.equal(saveOptionsRolls.length, 1);
+    assert.equal(saveOptionsRolls[0].rawAbility, 'str');
+    assert.equal(adapter.normalizeAbility(saveOptionsRolls[0].rawAbility), 'strength');
 });
 
 test('Dnd5eSystemAdapter getSpellLevel and getCreatureType contracts', () => {

@@ -917,8 +917,15 @@ export class BaseFoundryAdapter {
             if (speakerTarget) return speakerTarget;
         }
 
+        const speakerActorId = message?.speaker?.actor;
+        if (speakerActorId) {
+            const actor = (game?.actors as any)?.get?.(speakerActorId);
+            const activeToken = actor?.getActiveTokens?.(true, true)?.[0] ?? actor?.getActiveTokens?.()?.[0];
+            if (activeToken) return activeToken;
+        }
+
         return canvasObj.tokens.controlled?.[0]
-            ?? game?.user?.character?.getActiveTokens?.()?.[0]
+            ?? (game?.user?.character as any)?.getActiveTokens?.()?.[0]
             ?? null;
     }
 

@@ -46,10 +46,19 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
             if (rollFlags.type === "damage") return "damage";
         }
 
-        // 3. Core Item Usage
+        // 3. Roll Options from message.rolls (D20Roll in D&D 5e v3+)
+        const primaryRollType = message?.rolls?.[0]?.options?.type;
+        if (primaryRollType) {
+            if (primaryRollType === "save") return "saving throw";
+            if (["ability", "skill", "check", "tool"].includes(primaryRollType)) return "ability check";
+            if (primaryRollType === "attack") return "attack";
+            if (primaryRollType === "damage") return "damage";
+        }
+
+        // 4. Core Item Usage
         if (message?.flags?.dnd5e?.messageType === "usage") return "item description";
 
-        // 4. Midi-QOL Flags
+        // 5. Midi-QOL Flags
         if (midiQolAdapter.isActive()) {
             const midiFlags = message?.flags?.["midi-qol"];
             const messageType = midiFlags?.messageType ?? midiFlags?.type;
@@ -62,7 +71,21 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
             }
         }
 
-        // 5. Default Fallback
+        // 6. Semantic Keyword & Flavor Analysis Fallback
+        const flavorText = (message?.flavor ?? "").toLowerCase();
+        const contentText = (message?.content ?? "").toLowerCase();
+        const combinedText = `${flavorText} ${contentText}`;
+
+        const hasKeywords = /save|saving\s+throw|check|skill/.test(combinedText);
+        const isAttackOrDamage = /attack|strike|damage|damage\s+roll/.test(combinedText);
+        const hasRolls = Boolean((message?.rolls && message.rolls.length > 0) || message?.roll);
+
+        if (hasRolls && !isAttackOrDamage && hasKeywords) {
+            if (/save|saving\s+throw/.test(combinedText)) return "saving throw";
+            if (/check|skill/.test(combinedText)) return "ability check";
+        }
+
+        // 7. Default Fallback
         return super.qualifyMessage(message);
     }
 
@@ -85,7 +108,26 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
             });
         }
 
-        // 2. Process Active Module Adapters (e.g. Midi-QOL)
+        // 2. Roll options on message.rolls (D20Roll instances in modern D&D 5e)
+        if (rolls.length === 0 && message?.rolls && message.rolls.length > 0) {
+            for (const roll of message.rolls) {
+                const rollOptions = roll?.options ?? {};
+                const rawAbility = rollOptions.ability ?? rollOptions.skill ?? null;
+                let outcome = "indeterminant";
+                const target = rollOptions.target ?? rollOptions.dc;
+                if (typeof roll?.total === "number" && typeof target === "number") {
+                    outcome = roll.total >= target ? "success" : "failure";
+                }
+                rolls.push({
+                    source: "dnd5e-roll-options",
+                    rawAbility,
+                    outcome,
+                    tokenId: null
+                });
+            }
+        }
+
+        // 3. Process Active Module Adapters (e.g. Midi-QOL)
         let moduleOutcome = "indeterminant";
         if (midiQolAdapter.isActive()) {
             const midiData = midiQolAdapter.extractRolls(message);
@@ -101,6 +143,16 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
                 roll.outcome = moduleOutcome;
             }
         });
+
+        // 4. Fallback if semantic check/save was qualified from flavor text
+        if (rolls.length === 0 && Boolean((message?.rolls && message.rolls.length > 0) || message?.roll)) {
+            rolls.push({
+                source: "dnd5e-flavor-fallback",
+                rawAbility: null,
+                outcome: "indeterminant",
+                tokenId: null
+            });
+        }
 
         log.debug(`Dnd5eSystemAdapter.extractRolls: message="${message?.id}"`, {
             coreRollFlags: rollFlags,
@@ -120,11 +172,11 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
      */
     override normalizeAbility(rawAbility: any, combinedText: string = ""): string | null {
         const dnd5eMap = {
-            ath: "strength",
-            acr: "dexterity", ste: "dexterity", sle: "dexterity",
-            arc: "intelligence", his: "intelligence", inv: "intelligence", nat: "intelligence", rel: "intelligence",
-            ani: "wisdom", ins: "wisdom", med: "wisdom", per: "wisdom", sur: "wisdom",
-            dec: "charisma", itm: "charisma", prf: "charisma", pers: "charisma"
+            ath: "strength", athletics: "strength",
+            acr: "dexterity", acrobatics: "dexterity", ste: "dexterity", stealth: "dexterity", sle: "dexterity", "sleight of hand": "dexterity",
+            arc: "intelligence", arcana: "intelligence", his: "intelligence", history: "intelligence", inv: "intelligence", investigation: "intelligence", nat: "intelligence", nature: "intelligence", rel: "intelligence", religion: "intelligence",
+            ani: "wisdom", "animal handling": "wisdom", ins: "wisdom", insight: "wisdom", med: "wisdom", medicine: "wisdom", per: "wisdom", perception: "wisdom", prc: "wisdom", sur: "wisdom", survival: "wisdom",
+            dec: "charisma", deception: "charisma", itm: "charisma", intimidation: "charisma", prf: "charisma", performance: "charisma", pers: "charisma", persuasion: "charisma"
         };
         return super.normalizeAbility(rawAbility, combinedText, dnd5eMap);
     }

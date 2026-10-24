@@ -102,6 +102,13 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
             }
         });
 
+        log.debug(`Dnd5eSystemAdapter.extractRolls: message="${message?.id}"`, {
+            coreRollFlags: rollFlags,
+            midiActive: midiQolAdapter.isActive(),
+            moduleOutcome,
+            finalRolls: rolls
+        });
+
         return rolls;
     }
 

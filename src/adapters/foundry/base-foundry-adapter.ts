@@ -946,12 +946,18 @@ export class BaseFoundryAdapter {
      */
     getMessageVisibilityUsers(message: ChatMessage | null | undefined): string[] {
         const allUsers: any[] = Array.from(game?.users ?? []);
-        if (!message) return allUsers.map((u: any) => u.id).filter(Boolean);
+        if (!message) {
+            const defaultUsers = allUsers.map((u: any) => u.id).filter(Boolean);
+            log.debug("BaseFoundryAdapter.getMessageVisibilityUsers: no message provided, defaulting to all users:", defaultUsers);
+            return defaultUsers;
+        }
 
         const whisper = message.whisper;
         // Public message: visible to all users
         if (!whisper || whisper.length === 0) {
-            return allUsers.map((u: any) => u.id).filter(Boolean);
+            const publicUsers = allUsers.map((u: any) => u.id).filter(Boolean);
+            log.debug(`BaseFoundryAdapter.getMessageVisibilityUsers: public message="${message.id}", visible to all ${publicUsers.length} users:`, publicUsers);
+            return publicUsers;
         }
 
         // Whispered / private message: whisper recipients, author, and all GMs
@@ -974,7 +980,14 @@ export class BaseFoundryAdapter {
             }
         }
 
-        return Array.from(allowed);
+        const whisperUsers = Array.from(allowed);
+        log.debug(`BaseFoundryAdapter.getMessageVisibilityUsers: whispered message="${message.id}", restricted to ${whisperUsers.length} users:`, {
+            whisper,
+            rawAuthor,
+            authorId,
+            allowedUsers: whisperUsers
+        });
+        return whisperUsers;
     }
 
     /* -------------------------------------------- */

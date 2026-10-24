@@ -28,9 +28,11 @@ export function loadWorldScripts() {
  */
 export function updateWorldScripts() {
     const config = game.settings.get(MODULE_ID, "worldScriptsConfig") ?? {};
-    
+    log.debug("updateWorldScripts: checking world scripts configuration", config);
+
     for (const [scriptId, scriptInstance] of Object.entries(worldScripts)) {
-        const shouldEnable = !!config[scriptId];
+        const shouldEnable = Boolean(config[scriptId]);
+        log.debug(`updateWorldScripts: script "${scriptId}" shouldEnable=${shouldEnable}`);
         if (shouldEnable) {
             scriptInstance.enable();
         } else {

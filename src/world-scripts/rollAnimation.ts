@@ -20,7 +20,10 @@ export interface RollAnimationConfig {
 }
 
 async function playRollAnimation(token: Token, config: RollAnimationConfig = {}) {
-    if (!token) return;
+    if (!token) {
+        log.debug("playRollAnimation: aborted, no token provided", config);
+        return;
+    }
 
     const rollType = config.rollType ?? "default";
     const outcome = config.outcome ?? "indeterminant";
@@ -30,41 +33,62 @@ async function playRollAnimation(token: Token, config: RollAnimationConfig = {})
     if (outcome === "success") color = "green";
     if (outcome === "failure") color = "red";
 
-    const rollPath = closest(`eskie.ui.ability_check.d20.01.roll.${rollType}.${color}`);
-    const smokePath = closest(`eskie.smoke.07.white`);
+    const rollKey = `eskie.ui.ability_check.d20.01.roll.${rollType}.${color}`;
+    const smokeKey = `eskie.smoke.07.white`;
+    const rollPath = closest(rollKey);
+    const smokePath = closest(smokeKey);
     const dieSize = 100; 
 
     const verticalOffset = -(token.h * 0.80);
     const locationOptions = { offset: { x: 0, y: verticalOffset } };
 
-    log.debug(`Playing animation: rollPath="${rollPath}", token="${token.name}", outcome="${outcome}"`);
+    log.debug(`playRollAnimation: preparing animation for token="${token.name}"`, {
+        tokenId: token.id,
+        rollType,
+        outcome,
+        color,
+        rollKey,
+        rollPath,
+        smokeKey,
+        smokePath,
+        verticalOffset,
+        users
+    });
 
-    const sequence = new Sequence();
+    try {
+        const sequence = new Sequence();
 
-    const rollEffect = sequence.effect()
-        .file(rollPath)
-        .atLocation(token, locationOptions)
-        .anchor({ x: 0.5, y: 0.5 })
-        .size(dieSize) 
-        .duration(1500)
-        .belowTokens(false)
-        .elevation(10);
+        const rollEffect = sequence.effect()
+            .file(rollPath)
+            .atLocation(token, locationOptions)
+            .anchor({ x: 0.5, y: 0.5 })
+            .size(dieSize) 
+            .duration(1500)
+            .belowTokens(false)
+            .elevation(10);
 
-    const smokeEffect = sequence.effect()
-        .file(smokePath)
-        .atLocation(token, locationOptions)
-        .delay(0)       
-        .duration(1000) 
-        .size(dieSize * 1.5) 
-        .belowTokens(false)
-        .elevation(11);
+        const smokeEffect = sequence.effect()
+            .file(smokePath)
+            .atLocation(token, locationOptions)
+            .delay(0)       
+            .duration(1000) 
+            .size(dieSize * 1.5) 
+            .belowTokens(false)
+            .elevation(11);
 
-    if (users && users.length > 0) {
-        rollEffect.forUsers(users);
-        smokeEffect.forUsers(users);
+        if (users && users.length > 0) {
+            log.debug(`playRollAnimation: restricting playback to ${users.length} users:`, users);
+            rollEffect.forUsers(users);
+            smokeEffect.forUsers(users);
+        }
+
+        log.debug(`playRollAnimation: executing sequence.play({ remote: true }) for token "${token.name}"`);
+        const playPromise = sequence.play({ remote: true });
+        log.debug(`playRollAnimation: sequence.play dispatched for token "${token.name}"`);
+        return playPromise;
+    } catch (err) {
+        log.error(`playRollAnimation: failed to play animation on token "${token.name}":`, err);
     }
-
-    return sequence.play({ remote: true }); 
 }
 
 // ============================================================================
@@ -93,11 +117,28 @@ export class RollTracker {
         log.debug(`Enabling Eskie Roll Animations. Active System: "${this.activeAdapter.id}"`);
 
         const createId = Hooks.on("createChatMessage" as any, (message: ChatMessage, _options: unknown, userId: string) => {
+            log.debug(`RollTracker: createChatMessage hook fired`, {
+                messageId: message?.id,
+                userId,
+                currentUserId: game.user?.id,
+                isLocalUser: game.user?.id === userId
+            });
             this.processMessageAndPlay(message, userId);
         });
 
         const updateId = Hooks.on("updateChatMessage" as any, (message: ChatMessage, updateData: { content?: string; [key: string]: unknown }, _options: unknown, userId: string) => {
-            if (!updateData.content) return;
+            log.debug(`RollTracker: updateChatMessage hook fired`, {
+                messageId: message?.id,
+                updateDataKeys: Object.keys(updateData ?? {}),
+                hasContent: Boolean(updateData?.content),
+                userId,
+                currentUserId: game.user?.id,
+                isLocalUser: game.user?.id === userId
+            });
+            if (!updateData.content) {
+                log.debug(`RollTracker: updateChatMessage ignored (no content update) for message="${message?.id}"`);
+                return;
+            }
             this.processMessageAndPlay(message, userId);
         });
 
@@ -127,6 +168,7 @@ export class RollTracker {
     getRollDetails(message: ChatMessage): any[] {
         // Extract raw rolls from the system adapter
         const rolls: any[] = this.activeAdapter.extractRolls(message);
+        log.debug(`RollTracker.getRollDetails: raw rolls from adapter for message="${message?.id}":`, rolls);
         if (rolls.length === 0) return [];
 
         const flavorText = (message?.flavor ?? "").toLowerCase();
@@ -151,6 +193,7 @@ export class RollTracker {
             roll.ability = this.activeAdapter.normalizeAbility(roll.rawAbility, combinedText);
         });
 
+        log.debug(`RollTracker.getRollDetails: normalized rolls for message="${message?.id}":`, rolls);
         return rolls;
     }
 
@@ -158,7 +201,9 @@ export class RollTracker {
      * Pinpoints the exact rolling token document via the unified adapter.
      */
     getSpeakerToken(message: ChatMessage, extractedTokenId: string | null = null): Token | null {
-        return adapter.getSpeakerToken(message, extractedTokenId);
+        const token = adapter.getSpeakerToken(message, extractedTokenId);
+        log.debug(`RollTracker.getSpeakerToken: message="${message?.id}", extractedTokenId="${extractedTokenId}", resolvedToken="${token?.name ?? null}" (id: "${token?.id ?? null}")`);
+        return token;
     }
 
     /**
@@ -167,7 +212,15 @@ export class RollTracker {
      * @returns {string[]} Array of User IDs permitted to see the roll
      */
     getMessageVisibilityUsers(message: ChatMessage): string[] {
-        return adapter.getMessageVisibilityUsers(message);
+        const users = adapter.getMessageVisibilityUsers(message);
+        log.debug(`RollTracker.getMessageVisibilityUsers: resolved users for message="${message?.id}":`, {
+            whisper: message?.whisper,
+            author: (message?.author as any)?.id ?? message?.author,
+            currentUserId: game.user?.id,
+            currentUserPermitted: users.includes(game.user?.id ?? ""),
+            permittedUsers: users
+        });
+        return users;
     }
 
     /**
@@ -175,25 +228,45 @@ export class RollTracker {
      * @returns {string} The message classification.
      */
     qualifyMessage(message: ChatMessage): string {
-        return this.activeAdapter.qualifyMessage(message);
+        const messageType = this.activeAdapter.qualifyMessage(message);
+        log.debug(`RollTracker.qualifyMessage: message="${message?.id}" classified as "${messageType}"`);
+        return messageType;
     }
 
     /**
      * Evaluates the message and triggers animations for unplayed rolls.
      */
     async processMessageAndPlay(message: ChatMessage, userId: string) {
+        log.debug(`RollTracker.processMessageAndPlay: evaluating message="${message?.id}"`, {
+            userId,
+            currentUserId: game.user?.id,
+            isLocalUser: game.user?.id === userId
+        });
+
         // Only run validation calculations once on the user machine modifying the doc
-        if (game.user?.id !== userId) return;
+        if (game.user?.id !== userId) {
+            log.debug(`RollTracker.processMessageAndPlay: skipped message="${message?.id}" (current client "${game.user?.id}" is not triggering client "${userId}")`);
+            return;
+        }
 
         // Centralized Qualification Gate: Only proceed for saving throws and ability checks
         const messageType = this.qualifyMessage(message);
-        if (!["saving throw", "ability check"].includes(messageType)) return;
+        if (!["saving throw", "ability check"].includes(messageType)) {
+            log.debug(`RollTracker.processMessageAndPlay: message="${message?.id}" rejected (type "${messageType}" is not saving throw or ability check)`);
+            return;
+        }
 
         const rolls = this.getRollDetails(message);
-        if (rolls.length === 0) return;
+        if (rolls.length === 0) {
+            log.debug(`RollTracker.processMessageAndPlay: message="${message?.id}" rejected (no rolls found)`);
+            return;
+        }
 
         const messageId = message.id;
-        if (!messageId) return;
+        if (!messageId) {
+            log.debug(`RollTracker.processMessageAndPlay: message has no id, aborted`);
+            return;
+        }
         if (!this.localAnimatedTokens.has(messageId)) {
             // Prune map if it grows too large to prevent memory leaks (keep cache under 100 messages)
             if (this.localAnimatedTokens.size > 100) {
@@ -206,6 +279,10 @@ export class RollTracker {
 
         // Retrieve the list of token IDs that have already animated for this message
         const firedTokens = message?.flags?.world?.rollAnimatedTokens ?? [];
+        log.debug(`RollTracker.processMessageAndPlay: message="${messageId}" dedup status`, {
+            firedTokens,
+            localFired: localFired ? Array.from(localFired) : []
+        });
         
         // Checking newFiredTokens and localFired dynamically prevents race conditions
         // during rapid updates where multiple hooks fire before database flag write completes.
@@ -216,12 +293,27 @@ export class RollTracker {
 
         for (const roll of rolls) {
             const token = this.getSpeakerToken(message, roll.tokenId);
-            if (!token || !token.id) continue;
+            if (!token || !token.id) {
+                log.debug(`RollTracker.processMessageAndPlay: roll skipped (no token found on canvas)`, {
+                    tokenId: roll.tokenId,
+                    speaker: message?.speaker
+                });
+                continue;
+            }
 
             // Check if we've already animated this specific token
-            if (newFiredTokens.includes(token.id) || localFired?.has(token.id)) continue;
+            if (newFiredTokens.includes(token.id) || localFired?.has(token.id)) {
+                log.debug(`RollTracker.processMessageAndPlay: roll skipped (token "${token.name}" [${token.id}] already animated for message "${messageId}")`);
+                continue;
+            }
 
             // Trigger the sequence
+            log.debug(`RollTracker.processMessageAndPlay: triggering animation for token "${token.name}"`, {
+                ability: roll.ability ?? "default",
+                outcome: roll.outcome,
+                users: visibleUsers
+            });
+
             playRollAnimation(token, {
                 rollType: roll.ability ?? "default",
                 outcome: roll.outcome,
@@ -235,6 +327,7 @@ export class RollTracker {
 
         // Update the message flags if we played any new animations
         if (updatedFlags) {
+            log.debug(`RollTracker.processMessageAndPlay: updating flags.world.rollAnimatedTokens for message="${messageId}":`, newFiredTokens);
             await message.setFlag("world", "rollAnimatedTokens", newFiredTokens);
         }
     }

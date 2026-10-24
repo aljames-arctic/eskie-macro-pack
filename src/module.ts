@@ -4,6 +4,8 @@ import { MODULE_ID } from './lib/constants.js';
 import { standaloneMacros } from './lib/standalone-macros.js';
 import { adapter, Adapter } from './adapters/index.js';
 
+import { closest } from './lib/filemanager.js';
+
 // Import module settings to also run its initialization code
 import './settings.js';
 import { log } from './lib/logger.js';
@@ -40,7 +42,15 @@ export function setupModule(): void {
             Adapter,
             adapter,
             animation,
-            standaloneMacros
+            standaloneMacros,
+            util: {
+                closest,
+                tokens: {
+                    getDistance: (t1: Token, t2: Token) => adapter.getDistance(t1, t2),
+                    getNearestSquareCenter: (t1: Token, t2: Token) => adapter.getNearestSquareCenter(t1, t2),
+                    isAdjacent: (t1: Token, t2: Token, reachUnits?: number) => adapter.isAdjacent(t1, t2, reachUnits)
+                }
+            }
         };
     }
 }

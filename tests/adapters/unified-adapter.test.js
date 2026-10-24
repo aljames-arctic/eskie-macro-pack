@@ -51,3 +51,27 @@ test('Unified Adapter delegates methods seamlessly to active layers', async () =
     assert.equal(adapter.normalizeAbility(rolls[0].rawAbility), 'wisdom');
     assert.equal(adapter.getCreatureType({ system: { details: { type: { value: 'Dragon' } } } }), 'dragon');
 });
+
+test('setupModule attaches public api.util delegates to game.modules.get("eskie-macros").api', async () => {
+    const { setupModule } = await import('../../src/module.js');
+    const mockModule = { id: 'eskie-macros', api: {} };
+    game.modules.set('eskie-macros', mockModule);
+
+    setupModule();
+
+    assert.ok(mockModule.api.util, 'api.util must be exposed');
+    assert.equal(typeof mockModule.api.util.closest, 'function', 'api.util.closest must be a function');
+    assert.ok(mockModule.api.util.tokens, 'api.util.tokens must be exposed');
+    assert.equal(typeof mockModule.api.util.tokens.getDistance, 'function');
+    assert.equal(typeof mockModule.api.util.tokens.getNearestSquareCenter, 'function');
+    assert.equal(typeof mockModule.api.util.tokens.isAdjacent, 'function');
+
+    const t1 = { x: 0, y: 0, w: 100, h: 100, center: { x: 50, y: 50 }, document: { elevation: 0 } };
+    const t2 = { x: 100, y: 0, w: 100, h: 100, center: { x: 150, y: 50 }, document: { elevation: 0 } };
+    canvas.grid.size = 100;
+    canvas.scene.grid.distance = 5;
+
+    assert.equal(mockModule.api.util.tokens.isAdjacent(t1, t2), true);
+    assert.equal(mockModule.api.util.tokens.getDistance(t1, t2), 5);
+});
+

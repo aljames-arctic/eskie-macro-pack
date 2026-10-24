@@ -355,6 +355,10 @@ class Adapter {
         return this.foundry.getDistance(t1, t2);
     }
 
+    isAdjacent(token: Token, target: Token, reachUnits?: number): boolean {
+        return this.foundry.isAdjacent(token, target, reachUnits);
+    }
+
     getNearestSquareCenter(token: Token, target: Token): { x: number, y: number } | null {
         return this.foundry.getNearestSquareCenter(token, target);
     }

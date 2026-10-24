@@ -1121,6 +1121,50 @@ export class BaseFoundryAdapter {
     }
 
     /**
+     * Determines whether two tokens are adjacent on the canvas grid or within a specified reach.
+     * Evaluates 2D bounding boxes and elevation difference relative to scene grid dimensions.
+     *
+     * @param {Token} token The source token placeable
+     * @param {Token} target The target token placeable
+     * @param {number} [reachUnits] Optional maximum reach in scene units (e.g. 5, 10, 1.5). Defaults to scene grid distance.
+     * @returns {boolean} True if tokens are adjacent or within reach, false otherwise
+     */
+    isAdjacent(token: Token, target: Token, reachUnits?: number): boolean {
+        if (!token || !target) return false;
+
+        const { size: gridSize, distance: gridDistance } = this.getSceneDimensions();
+        if (gridSize <= 0 || gridDistance <= 0) return false;
+
+        // Check 3D elevation gap: elevation difference must not exceed reach
+        const el1 = token.document.elevation ?? 0;
+        const el2 = target.document.elevation ?? 0;
+        const maxElevationDiff = reachUnits ?? gridDistance;
+        if (Math.abs(el1 - el2) > maxElevationDiff) return false;
+
+        // Bounding boxes in canvas coordinates
+        const x1Min = token.x;
+        const x1Max = token.x + token.w;
+        const y1Min = token.y;
+        const y1Max = token.y + token.h;
+
+        const x2Min = target.x;
+        const x2Max = target.x + target.w;
+        const y2Min = target.y;
+        const y2Max = target.y + target.h;
+
+        // Gaps between bounding boxes in pixels
+        const gapX = Math.max(0, x2Min - x1Max, x1Min - x2Max);
+        const gapY = Math.max(0, y2Min - y1Max, y1Min - y2Max);
+
+        // Maximum allowed pixel gap based on reach
+        const maxGapPx = reachUnits !== undefined && reachUnits > gridDistance
+            ? (((reachUnits - gridDistance) / gridDistance) * gridSize) + (gridSize * 0.1)
+            : (gridSize * 0.1);
+
+        return gapX <= maxGapPx && gapY <= maxGapPx;
+    }
+
+    /**
      * Calculates an array of linearly interpolated { x, y } coordinates between two points.
      * @param {{ x: number, y: number }} point1 Starting point
      * @param {{ x: number, y: number }} point2 Ending point

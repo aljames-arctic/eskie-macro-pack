@@ -1061,3 +1061,67 @@ test('adapter.isToken, isActor, and isTile correctly validate documents and plac
     assert.equal(adapter.isTile(mockTokenPlaceable), false);
     assert.equal(adapter.isTile(null), false);
 });
+
+test('adapter.isAdjacent correctly validates token adjacency across sizes, elevations, and metric (Tormenta 20) grids', () => {
+    globalThis.canvas = {
+        grid: { size: 100, distance: 5 },
+        scene: { grid: { distance: 5 } },
+        dimensions: { size: 100, distance: 5, width: 4000, height: 3000 }
+    };
+
+    // Helper token constructor
+    const makeToken = (x, y, w = 100, h = 100, elevation = 0) => ({
+        x,
+        y,
+        w,
+        h,
+        document: { elevation, width: w / 100, height: h / 100 }
+    });
+
+    const tokenA = makeToken(0, 0); // 100x100 at (0, 0)
+    const tokenAdjacentEast = makeToken(100, 0); // touching east edge
+    const tokenAdjacentSouth = makeToken(0, 100); // touching south edge
+    const tokenAdjacentDiag = makeToken(100, 100); // touching SE corner
+    const tokenDistant = makeToken(200, 0); // 1 square gap east
+
+    assert.equal(adapter.isAdjacent(tokenA, tokenAdjacentEast), true, 'Orthogonal adjacent tokens must be adjacent');
+    assert.equal(adapter.isAdjacent(tokenA, tokenAdjacentSouth), true, 'Orthogonal adjacent south tokens must be adjacent');
+    assert.equal(adapter.isAdjacent(tokenA, tokenAdjacentDiag), true, 'Diagonal adjacent tokens must be adjacent');
+    assert.equal(adapter.isAdjacent(tokenA, tokenDistant), false, '1-square separated tokens must not be adjacent');
+
+    // Differently sized tokens: Large (200x200) adjacent to Medium (100x100)
+    const largeToken = makeToken(0, 0, 200, 200);
+    const adjacentToLarge = makeToken(200, 50, 100, 100); // touches large token eastern edge
+    const distantFromLarge = makeToken(300, 50, 100, 100); // 100px away from large token eastern edge
+
+    assert.equal(adapter.isAdjacent(largeToken, adjacentToLarge), true, 'Medium token touching Large token edge must be adjacent');
+    assert.equal(adapter.isAdjacent(largeToken, distantFromLarge), false, 'Medium token 1 square away from Large token must not be adjacent');
+
+    // Elevation checks
+    const elevatedAdjacent = makeToken(100, 0, 100, 100, 5); // 5ft elevation difference (equal to gridDistance 5)
+    const elevatedTooHigh = makeToken(100, 0, 100, 100, 10); // 10ft elevation difference (> gridDistance 5)
+    assert.equal(adapter.isAdjacent(tokenA, elevatedAdjacent), true, 'Token within 1 gridDistance elevation must be adjacent');
+    assert.equal(adapter.isAdjacent(tokenA, elevatedTooHigh), false, 'Token exceeding 1 gridDistance elevation must not be adjacent');
+
+    // Tormenta 20 Metric scene configuration (gridDistance: 1.5 meters, gridSize: 100px)
+    canvas.grid.distance = 1.5;
+    canvas.scene.grid.distance = 1.5;
+    canvas.dimensions.distance = 1.5;
+    const t20Adjacent = makeToken(100, 0, 100, 100, 1.5); // 1.5m elevation diff
+    const t20TooHigh = makeToken(100, 0, 100, 100, 3.0); // 3.0m elevation diff (> 1.5m)
+    assert.equal(adapter.isAdjacent(tokenA, t20Adjacent), true, 'Tormenta 20 adjacent token within 1.5m elevation must be adjacent');
+    assert.equal(adapter.isAdjacent(tokenA, t20TooHigh), false, 'Tormenta 20 token with 3m elevation diff must not be adjacent');
+    assert.equal(adapter.isAdjacent(tokenA, tokenDistant), false, 'Tormenta 20 token 2 squares away must not be adjacent');
+
+    // Custom reachUnits parameter
+    canvas.grid.distance = 5;
+    canvas.scene.grid.distance = 5;
+    canvas.dimensions.distance = 5;
+    // tokenDistant has 100px gap (1 square / 5ft gap) -> total distance between bounding boxes is 5ft
+    assert.equal(adapter.isAdjacent(tokenA, tokenDistant, 10), true, 'Token 1 square away must be reachable with reachUnits=10');
+    assert.equal(adapter.isAdjacent(tokenA, tokenDistant, 5), false, 'Token 1 square away must NOT be reachable with reachUnits=5');
+
+    // Null/undefined checks
+    assert.equal(adapter.isAdjacent(null, tokenA), false);
+    assert.equal(adapter.isAdjacent(tokenA, null), false);
+});

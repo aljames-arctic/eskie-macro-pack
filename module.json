@@ -1,87 +1,91 @@
 {
-    "id": "eskie-macros",
-    "title": "Eskie Macro Pack",
-    "description": "<p>A collection of macros from the <a href=\"https://discord.gg/zkKPp4Zm\" title=\"eskie\">Eskiemoh Discord Server</a>.</p><p>Come contribute and learn how to write better Sequencer macros!</p>",
-    "version": "#{VERSION}#",
-    "authors": [
-        {
-            "name": "Bakana!",
-            "url": "https://github.com/aljames-arctic",
-            "flags": {}
-        }
-    ],
-    "compatibility": {
-        "minimum": "12",
-        "verified": "14"
+  "id": "eskie-macros",
+  "title": "Eskie Macro Pack",
+  "description": "<p>A collection of macros from the <a href=\"https://discord.gg/zkKPp4Zm\" title=\"eskie\">Eskiemoh Discord Server</a>.</p><p>Come contribute and learn how to write better Sequencer macros!</p>",
+  "version": "#{VERSION}#",
+  "authors": [
+    {
+      "name": "Bakana!",
+      "url": "https://github.com/aljames-arctic",
+      "flags": {}
+    }
+  ],
+  "compatibility": {
+    "minimum": "12",
+    "verified": "14"
+  },
+  "esmodules": [
+    "dist/module.js"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json",
+      "flags": {}
     },
-    "esmodules": [
-        "dist/module.js"
-    ],
-    "languages": [
-        {
-            "lang": "en",
-            "name": "English",
-            "path": "lang/en.json",
-            "flags": {}
-        },
-        {
-            "lang": "pt-BR",
-            "name": "Português (Brasil)",
-            "path": "lang/pt-BR.json",
-            "flags": {}
-        },
-        {
-            "lang": "es",
-            "name": "Español",
-            "path": "lang/es.json",
-            "flags": {}
-        }
-    ],
-    "url": "#{URL}#",
-    "manifest": "#{MANIFEST}#",
-    "download": "#{DOWNLOAD}#",
-    "changelog": "https://github.com/aljames-arctic/eskie-macros/releases",
-    "bugs": "https://github.com/aljames-arctic/eskie-macros/issues",
-    "license": "LICENSE",
-    "relationships": {
-        "requires": [
-            {
-                "id": "sequencer",
-                "type": "module",
-                "compatibility": {}
-            },
-            {
-                "id": "socketlib",
-                "type": "module",
-                "compatibility": {}
-            }
-        ]
+    {
+      "lang": "pt-BR",
+      "name": "Português (Brasil)",
+      "path": "lang/pt-BR.json",
+      "flags": {}
     },
-    "packs": [
-        {
-            "name": "eskie-aa-integration",
-            "label": "Automated Animation Integration",
-            "path": "packs/eskie-aa-integration",
-            "type": "Macro",
-            "ownership": {
-                "PLAYER": "OBSERVER",
-                "ASSISTANT": "OWNER"
-            }
-        },
-        {
-            "name": "eskie-standalone-macros",
-            "label": "Standalone Macros",
-            "path": "packs/eskie-standalone-macros",
-            "type": "Macro",
-            "ownership": {
-                "PLAYER": "OBSERVER",
-                "ASSISTANT": "OWNER"
-            }
-        }
-    ],
-    "styles": [
-        "styles/eskie-macros.css"
-    ],
-    "socket": true,
-    "flags": {}
+    {
+      "lang": "es",
+      "name": "Español",
+      "path": "lang/es.json",
+      "flags": {}
+    }
+  ],
+  "url": "#{URL}#",
+  "manifest": "#{MANIFEST}#",
+  "download": "#{DOWNLOAD}#",
+  "changelog": "https://github.com/aljames-arctic/eskie-macros/releases",
+  "bugs": "https://github.com/aljames-arctic/eskie-macros/issues",
+  "license": "LICENSE",
+  "relationships": {
+    "requires": [
+      {
+        "id": "sequencer",
+        "type": "module",
+        "compatibility": {}
+      },
+      {
+        "id": "socketlib",
+        "type": "module",
+        "compatibility": {}
+      }
+    ]
+  },
+  "packs": [
+    {
+      "name": "eskie-aa-integration",
+      "label": "EMP Automation Bootstrap",
+      "path": "packs/eskie-aa-integration",
+      "type": "Macro",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    },
+    {
+      "name": "eskie-standalone-macros",
+      "label": "EMP Standalone Macros (Untested)",
+      "path": "packs/eskie-standalone-macros",
+      "type": "Macro",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    }
+  ],
+  "styles": [
+    {
+      "src": "styles/eskie-macros.css"
+    }
+  ],
+  "socket": true,
+  "flags": {}
 }

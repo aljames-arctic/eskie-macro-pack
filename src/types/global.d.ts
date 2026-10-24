@@ -2,8 +2,18 @@ export {};
 
 declare global {
   var eskie: Record<string, any>;
-  var Sequencer: any;
+  var Sequencer: {
+    EffectManager: {
+      endEffects(options?: any): Promise<void>;
+      getEffects(options?: any): any[];
+    };
+    Crosshair: {
+      show(config?: any, callbacks?: any): Promise<any>;
+    };
+    [key: string]: any;
+  };
   var Sequence: any;
+  type Sequence = import('./sequencer.js').SequenceBuilder;
   var Tagger: any;
   var socketlib: any;
   var dnd5e: any;

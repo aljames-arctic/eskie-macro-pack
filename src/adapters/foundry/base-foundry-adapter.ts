@@ -989,7 +989,7 @@ export class BaseFoundryAdapter {
             if (id) allowed.add(id);
         }
 
-        const rawAuthor = (message.author as any) ?? (message as any).user;
+        const rawAuthor = (message as any).author;
         const authorId = typeof rawAuthor === "string" ? rawAuthor : rawAuthor?.id;
         if (typeof authorId === "string" && authorId) {
             allowed.add(authorId);

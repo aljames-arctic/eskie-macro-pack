@@ -168,7 +168,7 @@ const DEFAULT_CONFIG = {
 };
 
 async function create(token: Token, target: Token, config: any = {}) {
-    const isMelee = adapter.isAdjacent(token, target) || (adapter.getDistance(token, target) <= (adapter.getSceneDimensions().distance * 1.5));
+    const isMelee = adapter.isAdjacent(token, target);
     return isMelee ? createMelee(token, target, config) : createRanged(token, target, config);
 }
 

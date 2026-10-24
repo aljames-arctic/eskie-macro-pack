@@ -100,6 +100,17 @@ function getDistance(t1, t2) {
     return Math.ceil(Math.hypot(dist2DUnits, elDiff));
 }
 
+/**
+ * Checks whether two tokens are adjacent (in melee reach) across grid scales and systems.
+ */
+function isAdjacent(t1, t2) {
+    const delegate = game.modules.get("eskie-macros")?.api?.util?.tokens?.isAdjacent;
+    if (delegate) return delegate(t1, t2);
+
+    const gridDistance = canvas.scene?.grid?.distance ?? 5;
+    return getDistance(t1, t2) <= gridDistance * 1.5;
+}
+
 // 3. Toggle / Re-entrant Persistent Effect Handling
 const isPlaying = Sequencer.EffectManager.getEffects({ name: label, object: token }).length > 0 ||
                   Sequencer.EffectManager.getEffects({ name: label }).length > 0;
@@ -143,11 +154,7 @@ for (const target of targets) {
     const targetSquare = getNearestSquareCenter(token, target);
 
     // Determine attack style: if auto, pick melee if within reach, else ranged
-    const dist = getDistance(token, target);
-    const maxReach = (canvas.scene?.grid?.distance ?? 5) * 1.5;
-    const isAdjacent = game.modules.get("eskie-macros")?.api?.adapter?.isAdjacent?.(token, target) ??
-                       game.modules.get("eskie-macros")?.api?.util?.tokens?.isAdjacent?.(token, target);
-    const useMelee = mode === "melee" || (mode === "auto" && (isAdjacent ?? (dist <= maxReach)));
+    const useMelee = mode === "melee" || (mode === "auto" && isAdjacent(token, target));
 
     if (useMelee) {
         // Vital spot melee strike dagger slash

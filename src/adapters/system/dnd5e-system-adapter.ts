@@ -112,9 +112,13 @@ export class Dnd5eSystemAdapter extends BaseSystemAdapter {
         if (rolls.length === 0 && message?.rolls && message.rolls.length > 0) {
             for (const roll of message.rolls) {
                 const rollOptions = roll?.options ?? {};
-                const rawAbility = rollOptions.ability ?? rollOptions.skill ?? null;
+                const rawAbility = typeof rollOptions.skill === "string"
+                    ? rollOptions.skill
+                    : (typeof rollOptions.ability === "string" ? rollOptions.ability : null);
                 let outcome = "indeterminant";
-                const target = rollOptions.target ?? rollOptions.dc;
+                const target = typeof rollOptions.target === "number"
+                    ? rollOptions.target
+                    : (typeof rollOptions.dc === "number" ? rollOptions.dc : null);
                 if (typeof roll?.total === "number" && typeof target === "number") {
                     outcome = roll.total >= target ? "success" : "failure";
                 }

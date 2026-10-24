@@ -13,11 +13,7 @@ export interface MotionRotateOptions {
   [key: string]: any;
 }
 
-export interface MotionRotateTowardsOptions {
-  duration?: number;
-  ease?: string;
-  [key: string]: any;
-}
+
 
 export interface MotionScaleOptions {
   duration: number;
@@ -57,7 +53,6 @@ export interface MotionSection {
   moveBy(offset: { x?: number; y?: number }, options: MotionMoveOptions): MotionSection;
   rotateTo(angle: number, options: MotionRotateOptions): MotionSection;
   rotateBy(angle: number, options: MotionRotateOptions): MotionSection;
-  rotateTowards(target: { x: number; y: number } | any, options?: MotionRotateTowardsOptions): MotionSection;
   scaleTo(scale: number | { x: number; y: number }, options: MotionScaleOptions): MotionSection;
   fadeTo(opacity: number, options: MotionFadeOptions): MotionSection;
   tintTo(color: string | number, options: MotionTintOptions): MotionSection;

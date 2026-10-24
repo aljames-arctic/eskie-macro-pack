@@ -42,74 +42,9 @@ const id = config.id ?? "sneakAttack";
 const label = `${id}-${token.id}`;
 const mode = config.mode ?? "auto";
 
-/**
- * Safely resolves Free vs Patreon asset paths if the eskie module is active.
- * Falls back to direct database key if running as a standalone copy-paste macro.
- */
-const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
+const adapter = game.modules.get("eskie-macros").api.adapter;
+const closest = (path) => game.modules.get("eskie-macros").api.util.closest(path);
 
-/**
- * Finds the center of the grid square on a target token that is nearest to a source token.
- */
-function getNearestSquareCenter(token, target) {
-    const delegate = game.modules.get("eskie-macros")?.api?.util?.tokens?.getNearestSquareCenter;
-    if (delegate) return delegate(token, target);
-
-    const gs = canvas.grid?.size ?? 100;
-    const srcCenter = token.center ?? { x: token.x, y: token.y };
-    const w = target.document?.width ?? 1;
-    const h = target.document?.height ?? 1;
-
-    let bestPoint = null;
-    let bestDist2 = Infinity;
-
-    for (let gx = 0; gx < w; gx++) {
-        for (let gy = 0; gy < h; gy++) {
-            const cx = target.x + (gx + 0.5) * gs;
-            const cy = target.y + (gy + 0.5) * gs;
-            const dx = cx - srcCenter.x;
-            const dy = cy - srcCenter.y;
-            const d2 = dx * dx + dy * dy;
-
-            if (d2 < bestDist2) {
-                bestDist2 = d2;
-                bestPoint = { x: cx, y: cy };
-            }
-        }
-    }
-
-    return bestPoint ?? (target.center ?? { x: target.x, y: target.y });
-}
-
-/**
- * Calculates 3D scene distance in units (e.g. feet) between two tokens.
- */
-function getDistance(t1, t2) {
-    const delegate = game.modules.get("eskie-macros")?.api?.util?.tokens?.getDistance;
-    if (delegate) return delegate(t1, t2);
-
-    const p1 = t1.center ?? { x: t1.x, y: t1.y };
-    const p2 = t2.center ?? { x: t2.x, y: t2.y };
-    const dist2DPx = Math.hypot(p1.x - p2.x, p1.y - p2.y);
-    const gridSize = canvas.grid?.size ?? 100;
-    const gridDistance = canvas.scene?.grid?.distance ?? 5;
-    const dist2DUnits = (dist2DPx / gridSize) * gridDistance;
-    const el1 = t1.document?.elevation ?? 0;
-    const el2 = t2.document?.elevation ?? 0;
-    const elDiff = el1 - el2;
-    return Math.ceil(Math.hypot(dist2DUnits, elDiff));
-}
-
-/**
- * Checks whether two tokens are adjacent (in melee reach) across grid scales and systems.
- */
-function isAdjacent(t1, t2) {
-    const delegate = game.modules.get("eskie-macros")?.api?.util?.tokens?.isAdjacent;
-    if (delegate) return delegate(t1, t2);
-
-    const gridDistance = canvas.scene?.grid?.distance ?? 5;
-    return getDistance(t1, t2) <= gridDistance * 1.5;
-}
 
 // 3. Toggle / Re-entrant Persistent Effect Handling
 const isPlaying = Sequencer.EffectManager.getEffects({ name: label, object: token }).length > 0 ||
@@ -151,10 +86,10 @@ const sequence = new Sequence();
 
 for (const target of targets) {
     const targetRotation = target.document?.rotation ?? 0;
-    const targetSquare = getNearestSquareCenter(token, target);
+    const targetSquare = adapter.getNearestSquareCenter(token, target);
 
     // Determine attack style: if auto, pick melee if within reach, else ranged
-    const useMelee = mode === "melee" || (mode === "auto" && isAdjacent(token, target));
+    const useMelee = mode === "melee" || (mode === "auto" && adapter.isAdjacent(token, target));
 
     if (useMelee) {
         // Vital spot melee strike dagger slash

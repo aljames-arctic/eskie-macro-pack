@@ -29,6 +29,12 @@ globalThis.Macro = class Macro {
 globalThis.tokenAttacher = undefined;
 globalThis.MassEdit = undefined;
 globalThis.socketlib = undefined;
+globalThis.Tagger = {
+    hasTags: () => false,
+    addTags: async () => {},
+    removeTags: async () => {},
+    getByTag: () => []
+};
 globalThis.adapter = undefined;
 globalThis.Sequence = class Sequence {
     constructor() {
@@ -391,6 +397,7 @@ globalThis.ui = {
 };
 
 const { adapter, Adapter } = await import('../src/adapters/index.js');
+await adapter.init();
 const empModule = globalThis.game.modules.get('eskie-macros');
 if (empModule) {
     empModule.api = { ...empModule.api, adapter, Adapter };

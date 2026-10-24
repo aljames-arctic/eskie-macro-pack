@@ -36,7 +36,7 @@ async function create(token: Token, target: Token, config: any = {}) {
         y: targetCenter.y + (distance > 0 ? (dy / distance) * moveDistance : 0)
     };
 
-    const location = (canvas as any)?.grid?.getCenterPoint ? (canvas as any).grid.getCenterPoint(rawLocation) : rawLocation;
+    const location = adapter.getCenterPoint(rawLocation);
     const offsetX = (location.x - targetCenter.x) / gridSize;
     const offsetY = (location.y - targetCenter.y) / gridSize;
     const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);

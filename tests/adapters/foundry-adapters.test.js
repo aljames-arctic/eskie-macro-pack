@@ -969,6 +969,20 @@ test('getGridSize delegates to getSceneDimensions and returns grid size in pixel
     assert.equal(adapter.getGridSize(customScene), 150);
 });
 
+test('getCenterPoint delegates to canvas.grid.getCenterPoint or returns point', () => {
+    const v12 = new FoundryV12Adapter();
+    globalThis.canvas = {
+        grid: {
+            getCenterPoint: ({ x, y }) => ({ x: x + 50, y: y + 50 })
+        }
+    };
+    assert.deepEqual(v12.getCenterPoint({ x: 100, y: 100 }), { x: 150, y: 150 });
+    assert.deepEqual(adapter.getCenterPoint({ x: 100, y: 100 }), { x: 150, y: 150 });
+
+    globalThis.canvas = {};
+    assert.deepEqual(adapter.getCenterPoint({ x: 100, y: 100 }), { x: 100, y: 100 });
+});
+
 test('adapter.isToken, isActor, and isTile correctly validate documents and placeables', () => {
     const mockTokenDoc = { documentName: 'Token' };
     const mockTokenPlaceable = { document: mockTokenDoc, center: { x: 100, y: 100 } };

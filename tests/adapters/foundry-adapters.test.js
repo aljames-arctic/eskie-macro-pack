@@ -983,7 +983,7 @@ test('getCenterPoint delegates to canvas.grid.getCenterPoint or returns point', 
     assert.deepEqual(adapter.getCenterPoint({ x: 100, y: 100 }), { x: 100, y: 100 });
 });
 
-test('getMessageVisibilityUsers returns all users for public rolls and whisper/author/GM for whispered rolls', () => {
+test('getMessageVisibilityUsers correctly handles all Foundry VTT roll modes', () => {
     const v12 = new FoundryV12Adapter();
     const gmUser = { id: 'gm1', isGM: true };
     const player1 = { id: 'p1', isGM: false };
@@ -995,26 +995,42 @@ test('getMessageVisibilityUsers returns all users for public rolls and whisper/a
         users: [gmUser, player1, player2, player3]
     };
 
-    // Public roll (no whisper or empty whisper)
+    // 1. Public roll (Public as User / Public as Character - no whisper or empty whisper)
     const publicMsg = { whisper: [], author: { id: 'p1' } };
     assert.deepEqual(adapter.getMessageVisibilityUsers(publicMsg), ['gm1', 'p1', 'p2', 'p3']);
     assert.deepEqual(v12.getMessageVisibilityUsers(null), ['gm1', 'p1', 'p2', 'p3']);
 
-    // Whispered roll to GM
-    const gmWhisperMsg = { whisper: ['gm1'], author: { id: 'p1' } };
+    // 2. Private to Gamemasters (whispered to GM, not blind)
+    const gmWhisperMsg = { whisper: ['gm1'], blind: false, author: { id: 'p1' } };
     const gmWhisperUsers = adapter.getMessageVisibilityUsers(gmWhisperMsg);
     assert.ok(gmWhisperUsers.includes('p1'), 'Author must see roll');
     assert.ok(gmWhisperUsers.includes('gm1'), 'GM must see roll');
-    assert.equal(gmWhisperUsers.includes('p2'), false, 'Uninvolved player must not see roll');
-    assert.equal(gmWhisperUsers.includes('p3'), false, 'Uninvolved player must not see roll');
+    assert.equal(gmWhisperUsers.includes('p2'), false, 'Uninvolved player 2 must not see roll');
+    assert.equal(gmWhisperUsers.includes('p3'), false, 'Uninvolved player 3 must not see roll');
 
-    // Whispered roll to another player
+    // 3. Blind to Gamemasters (whispered to GM, blind = true)
+    const blindMsg = { whisper: ['gm1'], blind: true, author: { id: 'p1' } };
+    const blindUsers = adapter.getMessageVisibilityUsers(blindMsg);
+    assert.ok(blindUsers.includes('gm1'), 'GM must see blind roll');
+    assert.equal(blindUsers.includes('p1'), false, 'Rolling player must NOT see blind roll');
+    assert.equal(blindUsers.includes('p2'), false, 'Uninvolved player 2 must not see blind roll');
+    assert.equal(blindUsers.includes('p3'), false, 'Uninvolved player 3 must not see blind roll');
+
+    // 4. Self Only (whispered to self only)
+    const selfMsg = { whisper: ['p1'], blind: false, author: { id: 'p1' } };
+    const selfUsers = adapter.getMessageVisibilityUsers(selfMsg);
+    assert.ok(selfUsers.includes('p1'), 'Author must see self roll');
+    assert.equal(selfUsers.includes('gm1'), false, 'GM must NOT see self roll');
+    assert.equal(selfUsers.includes('p2'), false, 'Uninvolved player 2 must not see self roll');
+    assert.equal(selfUsers.includes('p3'), false, 'Uninvolved player 3 must not see self roll');
+
+    // 5. Direct player whisper
     const p2WhisperMsg = { whisper: ['p2'], author: { id: 'p1' } };
     const p2WhisperUsers = adapter.getMessageVisibilityUsers(p2WhisperMsg);
     assert.ok(p2WhisperUsers.includes('p1'), 'Author must see roll');
     assert.ok(p2WhisperUsers.includes('p2'), 'Target player must see roll');
-    assert.ok(p2WhisperUsers.includes('gm1'), 'GM must see roll');
-    assert.equal(p2WhisperUsers.includes('p3'), false, 'Uninvolved player must not see roll');
+    assert.equal(p2WhisperUsers.includes('gm1'), false, 'Uninvolved GM must not see direct player whisper');
+    assert.equal(p2WhisperUsers.includes('p3'), false, 'Uninvolved player 3 must not see roll');
 });
 
 test('adapter.isToken, isActor, and isTile correctly validate documents and placeables', () => {

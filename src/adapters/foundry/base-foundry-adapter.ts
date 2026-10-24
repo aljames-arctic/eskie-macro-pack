@@ -945,9 +945,13 @@ export class BaseFoundryAdapter {
     }
 
     /**
-     * Determines the list of user IDs who have visibility permission to see a chat message or roll.
-     * For public messages, all active/known world users are returned.
-     * For whispered/private messages, returns whisper recipients, the author, and all GMs.
+     * Determines the list of user IDs who have visibility permission to see a chat message or roll
+     * based on Foundry VTT roll modes:
+     * - Public (Public as User / Public as Character): visible to all users
+     * - Private to Gamemasters: visible to whisper recipients (all GMs) and the author
+     * - Blind to Gamemasters: visible ONLY to GM users (author is excluded unless they are a GM)
+     * - Self Only: visible ONLY to the rolling author
+     *
      * @param {ChatMessage|null|undefined} message Chat message
      * @returns {string[]} Array of User IDs permitted to see the message
      */
@@ -959,15 +963,25 @@ export class BaseFoundryAdapter {
             return defaultUsers;
         }
 
-        const whisper = message.whisper;
-        // Public message: visible to all users
+        const isBlind = Boolean((message as any).blind);
+        const whisper = (message as any).whisper;
+
+        // Blind to Gamemasters: ONLY GM users can see the roll (even the author is excluded if not a GM)
+        if (isBlind) {
+            const gmUsers = allUsers.filter((u: any) => Boolean(u.isGM)).map((u: any) => u.id).filter(Boolean);
+            log.debug(`BaseFoundryAdapter.getMessageVisibilityUsers: blind message="${message.id}", visible only to GMs:`, gmUsers);
+            return gmUsers;
+        }
+
+        // Public roll (Public as User / Public as Character): visible to all users
         if (!whisper || whisper.length === 0) {
             const publicUsers = allUsers.map((u: any) => u.id).filter(Boolean);
             log.debug(`BaseFoundryAdapter.getMessageVisibilityUsers: public message="${message.id}", visible to all ${publicUsers.length} users:`, publicUsers);
             return publicUsers;
         }
 
-        // Whispered / private message: whisper recipients, author, and all GMs
+        // Whispered / private roll (Private to Gamemasters, Self Only, direct user whispers):
+        // Visible to whisper recipients and author.
         const allowed = new Set<string>();
 
         for (const entry of whisper as any[]) {
@@ -979,12 +993,6 @@ export class BaseFoundryAdapter {
         const authorId = typeof rawAuthor === "string" ? rawAuthor : rawAuthor?.id;
         if (typeof authorId === "string" && authorId) {
             allowed.add(authorId);
-        }
-
-        for (const u of allUsers) {
-            if (u.isGM && u.id) {
-                allowed.add(u.id);
-            }
         }
 
         const whisperUsers = Array.from(allowed);

@@ -82,8 +82,8 @@ async function playRollAnimation(token: Token, config: RollAnimationConfig = {})
             smokeEffect.forUsers(users);
         }
 
-        log.debug(`playRollAnimation: executing sequence.play({ remote: true }) for token "${token.name}"`);
-        const playPromise = sequence.play({ remote: true });
+        log.debug(`playRollAnimation: executing sequence.play() for token "${token.name}"`);
+        const playPromise = sequence.play();
         log.debug(`playRollAnimation: sequence.play dispatched for token "${token.name}"`);
         return playPromise;
     } catch (err) {

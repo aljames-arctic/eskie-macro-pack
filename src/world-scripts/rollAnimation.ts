@@ -55,6 +55,11 @@ async function playRollAnimation(token: Token, config: RollAnimationConfig = {})
         users
     });
 
+    if (!rollPath) {
+        log.warn(`playRollAnimation: roll asset path could not be resolved for key "${rollKey}"`);
+        return;
+    }
+
     try {
         const sequence = new Sequence();
 
@@ -67,19 +72,24 @@ async function playRollAnimation(token: Token, config: RollAnimationConfig = {})
             .belowTokens(false)
             .elevation(10);
 
-        const smokeEffect = sequence.effect()
-            .file(smokePath)
-            .atLocation(token, locationOptions)
-            .delay(0)       
-            .duration(1000) 
-            .size(dieSize * 1.5) 
-            .belowTokens(false)
-            .elevation(11);
-
         if (users && users.length > 0) {
             log.debug(`playRollAnimation: restricting playback to ${users.length} users:`, users);
             rollEffect.forUsers(users);
-            smokeEffect.forUsers(users);
+        }
+
+        if (smokePath) {
+            const smokeEffect = sequence.effect()
+                .file(smokePath)
+                .atLocation(token, locationOptions)
+                .delay(0)       
+                .duration(1000) 
+                .size(dieSize * 1.5) 
+                .belowTokens(false)
+                .elevation(11);
+
+            if (users && users.length > 0) {
+                smokeEffect.forUsers(users);
+            }
         }
 
         log.debug(`playRollAnimation: executing sequence.play() for token "${token.name}"`);

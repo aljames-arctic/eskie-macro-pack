@@ -211,6 +211,27 @@ class Adapter {
         return this.foundry.enrichHTML(content, options);
     }
 
+    /**
+     * The active FilePicker constructor / implementation across Foundry generations.
+     */
+    get FilePicker(): any {
+        return this.foundry.FilePicker;
+    }
+
+    /**
+     * The active TextEditor constructor / implementation across Foundry generations.
+     */
+    get TextEditor(): any {
+        return this.foundry.TextEditor;
+    }
+
+    /**
+     * Browse a directory using the active FilePicker implementation.
+     */
+    async browseDirectory(source: any, target: any, options = {}) {
+        return this.foundry.browseDirectory(source, target, options);
+    }
+
     getCombatantsByToken(combat: Combat, token: Token): Combatant[] {
         return this.foundry.getCombatantsByToken(combat, token);
     }

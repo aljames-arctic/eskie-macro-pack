@@ -75,3 +75,12 @@ test('setupModule attaches public api.util delegates to game.modules.get("eskie-
     assert.equal(mockModule.api.util.tokens.getDistance(t1, t2), 5);
 });
 
+test('Unified Adapter delegates FilePicker and browseDirectory without accessing global FilePicker directly', async () => {
+    game.release = { generation: 14 };
+    await adapter.init();
+
+    assert.equal(adapter.FilePicker, globalThis.foundry.applications.apps.FilePicker.implementation);
+    const result = await adapter.browseDirectory('data', 'modules/test');
+    assert.deepEqual(result, { target: 'modules/test', files: [], dirs: [] });
+});
+

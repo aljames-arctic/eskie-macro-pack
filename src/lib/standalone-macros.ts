@@ -1,5 +1,6 @@
 import { log } from './logger.js';
 import { MODULE_ID } from './constants.js';
+import { adapter } from '../adapters/index.js';
 
 /**
  * Known standalone macro filenames in src/standalone-macros/
@@ -204,7 +205,7 @@ export function formatMacroTitle(filename: any) {
 }
 
 /**
- * Discovers `.js` files in `src/standalone-macros/` using Foundry's FilePicker if possible,
+ * Discovers `.js` files in `src/standalone-macros/` using Foundry's FilePicker via adapter if possible,
  * falling back to the canonical known list.
  * @param {string} modulePath - The relative module root directory.
  * @returns {Promise<string[]>} List of JS filenames.
@@ -212,15 +213,15 @@ export function formatMacroTitle(filename: any) {
 async function discoverMacroFiles(modulePath: string): Promise<string[]> {
     const dirPath = `${modulePath}/src/standalone-macros`;
     try {
-        const browseResult = await (FilePicker as any).browse('data', dirPath);
-        const files = browseResult.files
+        const browseResult = await adapter.browseDirectory('data', dirPath);
+        const files = (browseResult?.files ?? [])
             .filter((filePath: string) => filePath.endsWith('.js'))
             .map((filePath: string) => filePath.split('/').pop());
         if (files.length > 0) {
             return Array.from(new Set([...KNOWN_STANDALONE_MACROS, ...files]));
         }
     } catch (err) {
-        log.debug(`FilePicker browsing not available for ${dirPath}, using known manifest`, err);
+        log.debug(`Directory browsing not available for ${dirPath}, using known manifest`, err);
     }
     return KNOWN_STANDALONE_MACROS;
 }
@@ -229,15 +230,15 @@ async function discoverAaMacroFiles(modulePath: string): Promise<string[]> {
     const dirPath = `${modulePath}/compendium-macros`;
     const knownFiles = KNOWN_AA_BOOTSTRAP_MACROS.map((m) => m.file);
     try {
-        const browseResult = await (FilePicker as any).browse('data', dirPath);
-        const files = browseResult.files
+        const browseResult = await adapter.browseDirectory('data', dirPath);
+        const files = (browseResult?.files ?? [])
             .filter((filePath: string) => filePath.endsWith('.js'))
             .map((filePath: string) => filePath.split('/').pop());
         if (files.length > 0) {
             return Array.from(new Set([...knownFiles, ...files]));
         }
     } catch (err) {
-        log.debug(`FilePicker browsing not available for ${dirPath}, using known manifest`, err);
+        log.debug(`Directory browsing not available for ${dirPath}, using known manifest`, err);
     }
     return knownFiles;
 }

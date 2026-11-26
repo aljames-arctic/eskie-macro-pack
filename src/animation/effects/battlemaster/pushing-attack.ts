@@ -5,6 +5,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
+import { resolveMotionTarget, computeCenterDelta } from '../../utils/motion.js';
 
 const DEFAULT_CONFIG = {
     id: 'pushingAttack',
@@ -60,16 +61,16 @@ async function create(token: Token, target: Token, config: any = {}) {
     }
 
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
+    const motionToken = resolveMotionTarget(token);
+    const motionTarget = resolveMotionTarget(target);
+    const pushDelta = computeCenterDelta(target, position);
+    const pushDistPx = Math.hypot(pushDelta.x, pushDelta.y);
+    const pushDuration = Math.max(100, Math.round((pushDistPx / 1250) * 1000));
 
     const sequence = new Sequence();
     applySound(sequence, sound);
 
     sequence
-        .animation()
-            .on(token)
-            .opacity(0)
-            .delay(100)
-
         .effect()
             .file(closest('eskie.smoke.02.white'))
             .atLocation({ x: tokenCenter.x - backposition.x, y: tokenCenter.y - backposition.y })
@@ -82,25 +83,23 @@ async function create(token: Token, target: Token, config: any = {}) {
 
         .canvasPan()
             .delay(250)
-            .shake({ duration: 250, strength: 2, rotation: false })
+            .shake({ duration: 250, strength: 2, rotation: false });
 
-        .effect()
-            .copySprite(token)
-            .atLocation(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: backposition.x, duration: 250, ease: 'easeOutExpo', delay: 200 })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: backposition.y, duration: 250, ease: 'easeOutExpo', delay: 200 })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: middleposition.x - backposition.x, duration: 150, ease: 'easeOutExpo', delay: 1000 })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: middleposition.y - backposition.y, duration: 150, ease: 'easeOutExpo', delay: 1000 })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -middleposition.x, duration: 450, ease: 'easeOutQuad', delay: 1150 })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -middleposition.y, duration: 450, ease: 'easeOutQuad', delay: 1150 })
-            .duration(1750)
+    if (motionToken) {
+        sequence
+            .motion(motionToken)
+            .moveBy(
+                [
+                    { v: { x: 0, y: 0 } },
+                    { v: backposition, duration: 250, inEase: 'easeOutExpo', hold: 550 },
+                    { v: middleposition, duration: 150, inEase: 'easeOutExpo' },
+                    { v: { x: 0, y: 0 }, duration: 450, inEase: 'easeOutQuad' },
+                ],
+                { delay: 200, return: false }
+            );
+    }
 
-        .animation()
-            .on(token)
-            .opacity(1)
-            .delay(1650)
-
+    sequence
         .effect()
             .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.slow`))
             .atLocation(token)
@@ -137,26 +136,26 @@ async function create(token: Token, target: Token, config: any = {}) {
             .size(tokenWidth * 1.5, { gridUnits: true })
             .zIndex(1)
 
-        .wait(250)
+        .wait(250);
 
-        .animation()
+    if (motionTarget && pushDistPx >= 1) {
+        sequence
+            .motion(motionTarget)
+            .moveBy(pushDelta, { delay: 200, duration: pushDuration, ease: 'easeOutCirc', return: false })
+            .persistUntilUpdate()
+            .wait(200 + pushDuration)
+            .animation()
             .on(target)
-            .opacity(0)
-            .delay(100)
-
-        .effect()
-            .copySprite(target)
-            .atLocation(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .moveTowards(position, { rotate: false, ease: 'easeOutCirc', delay: 200 })
-            .moveSpeed(1250)
-            .waitUntilFinished(-100)
-
-        .animation()
+            .teleportTo(position, { relativeToCenter: true })
+            .snapToGrid();
+    } else if (pushDistPx >= 1) {
+        sequence
+            .animation()
             .on(target)
-            .moveTowards(position, { relativeToCenter: true })
-            .snapToGrid()
-            .opacity(1);
+            .delay(200)
+            .teleportTo(position, { relativeToCenter: true })
+            .snapToGrid();
+    }
 
     return sequence;
 }

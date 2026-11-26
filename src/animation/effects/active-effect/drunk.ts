@@ -1,6 +1,7 @@
 import { closest } from "../../../lib/filemanager.js";
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
+import { resolveMotionTarget, endEffectsAndMotions } from "../../utils/motion.js";
 import { blur } from "../../scene-overlays/status-blur.js";
 import { log } from '../../../lib/logger.js';
 
@@ -24,9 +25,62 @@ async function create(token: Token, config: any = {}) {
     const { id, duration, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
     const label = `${id} - ${token.id}`;
+    const motionToken = resolveMotionTarget(token);
 
     let drunkEffect = new Sequence();
     applySound(drunkEffect, sound);
+
+    // Sway and bob the native token sprite directly so attached/targeted effects track it
+    if (motionToken) {
+        let swayMotion = drunkEffect.motion(motionToken).name(label);
+        if (duration > 0) {
+            const ramp = Math.min(250, Math.max(1, Math.floor(duration / 2)));
+            const hold = Math.max(0, duration - (ramp * 2));
+            swayMotion = swayMotion
+                .moveBy(
+                    [
+                        { v: { x: 0, y: 0 } },
+                        { v: { x: 0, y: 10 }, duration: ramp, inEase: "easeOutQuad", hold },
+                        { v: { x: 0, y: 0 }, duration: ramp, inEase: "easeInQuad" },
+                    ],
+                    { return: false }
+                )
+                .oscillate({
+                    period: 5000,
+                    waveform: "sine",
+                    duration,
+                    fadeOutDuration: ramp,
+                    x: { amplitude: 20, phase: 1.5 * Math.PI },
+                    rotation: { amplitude: 10, phase: 1.5 * Math.PI },
+                })
+                .oscillate({
+                    period: 5000,
+                    waveform: "triangle",
+                    duration,
+                    fadeOutDuration: ramp,
+                    y: { amplitude: 10, phase: 1.5 * Math.PI },
+                });
+        } else {
+            swayMotion = swayMotion
+                .moveBy({ y: 10 }, { duration: 250, ease: "easeOutQuad", returnDuration: 250, easeOut: "easeInQuad" })
+                .oscillate({
+                    period: 5000,
+                    waveform: "sine",
+                    fadeOutDuration: 250,
+                    x: { amplitude: 20, phase: 1.5 * Math.PI },
+                    rotation: { amplitude: 10, phase: 1.5 * Math.PI },
+                })
+                .oscillate({
+                    period: 5000,
+                    waveform: "triangle",
+                    fadeOutDuration: 250,
+                    y: { amplitude: 10, phase: 1.5 * Math.PI },
+                })
+                .persist();
+        }
+        drunkEffect = swayMotion;
+    }
+
     drunkEffect = drunkEffect
         // Drunk bubbles effect
         .effect()
@@ -47,40 +101,20 @@ async function create(token: Token, config: any = {}) {
         .attachTo(token, { bindAlpha: false, bindRotation: false })
         .private()
 
-        .animation()
-        .on(token)
-        .opacity(0)
-
-        // Blush effect attached to token with bobbing motion
+        // Blush effect attached to token (tracks motion X/Y automatically; keeps rotational sway)
         .effect()
         .file(closest('eskie.emote.blush.01'))
         .zIndex(0)
         .name(label)
         .opacity(0.85)
         .scaleToObject(0.5)
-        .loopProperty('spriteContainer', 'position.x', { from: -20, to: 20, duration: 2500, pingPong: true, ease: "easeInOutSine" })
-        .loopProperty('spriteContainer', 'position.y', { values: [0, 20, 0, 20], duration: 2500, pingPong: true })
         .loopProperty('sprite', "rotation", { from: -10, to: 10, duration: 2500, pingPong: true, ease: "easeInOutSine" });
     drunkEffect = (duration > 0) ? drunkEffect.duration(duration) : drunkEffect.persist();
     drunkEffect = drunkEffect
         .atLocation(token)
         .spriteOffset({ x: -0.15 * tokenWidth, y: 0.15 * tokenWidth }, { gridUnits: true, local: true })
         .attachTo(token, { bindAlpha: false, bindRotation: true })
-        .private()
-
-        // Sway effect attached to token
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .scaleToObject(1, { considerTokenScale: true })
-        .name(label)
-        .atLocation(token)
-        .loopProperty('spriteContainer', 'position.x', { from: -20, to: 20, duration: 2500, pingPong: true, ease: "easeInOutSine" })
-        .loopProperty('spriteContainer', 'position.y', { values: [0, 20, 0, 20], duration: 2500, pingPong: true })
-        .loopProperty('sprite', "rotation", { from: -10, to: 10, duration: 2500, pingPong: true, ease: "easeInOutSine" });
-    drunkEffect = (duration > 0) ? drunkEffect.duration(duration) : drunkEffect.persist();
-    drunkEffect = drunkEffect
-        .attachTo(token, { bindAlpha: false })
+        .private();
 
     return drunkEffect;
 }
@@ -108,15 +142,9 @@ async function stop(token: Token, config: any = {}) {
         const owners = adapter.getTokenOwners(token, { applyPC: overlay.applyPC, applyGM: overlay.applyGM });
         blur.drunk.stop(owners)
     }
-    
-    const label = `${id} - ${token.id}`;
-    Sequencer.EffectManager.endEffects({ name: label, object: token });
 
-    new Sequence()
-        .animation()
-        .on(token)
-        .opacity(1)
-        .play();
+    const label = `${id} - ${token.id}`;
+    return endEffectsAndMotions(token, label);
 }
 
 export const drunk = {

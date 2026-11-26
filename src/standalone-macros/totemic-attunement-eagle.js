@@ -22,25 +22,23 @@ const label = `${id} - ${tokenId}`;
 
 // Toggle off if persistent eagle flight is active
 const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
-if (activeEffects.length > 0) {
-    await new Sequence().animation().on(token).opacity(1).play();
-    Sequencer.EffectManager.endEffects({ name: label, object: token });
+const endedMotions = Sequencer.MotionManager.endMotions(token, { name: label });
+if (activeEffects.length > 0 || endedMotions > 0) {
+    await Sequencer.EffectManager.endEffects({ name: label, object: token });
     return ui.notifications.info("Ended Eagle flight spirit aura.");
 }
 
 const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
+const gridSize = canvas.grid?.size ?? 100;
+const hoverCenterY = -0.5 - (0.05 * sway);
 let seq = new Sequence();
 
-seq.animation()
-    .delay(100)
-    .on(token)
-    .opacity(0);
-
+// Ground shadow anchored via ignoreMotion: true
 seq.effect()
     .name(label)
     .copySprite(token)
     .spriteRotation(-tokenRotation)
-    .attachTo(token, { bindAlpha: false })
+    .attachTo(token, { bindAlpha: false, ignoreMotion: true })
     .scaleToObject(0.8, { considerTokenScale: true })
     .zIndex(0.1)
     .persist()
@@ -49,10 +47,24 @@ seq.effect()
     .filter("Blur", { blurX: 5, blurY: 10 })
     .opacity(0.65);
 
+// Native hovering flight motion on token
+seq.motion(token)
+    .name(label)
+    .zIndex(0.1)
+    .moveBy({ y: hoverCenterY }, { gridUnits: true, delay: 100, duration: 1000, ease: "easeOutBack", returnDuration: 500, easeOut: "easeInOutQuad" })
+    .oscillate({
+        period: 6000,
+        waveform: "sine",
+        delay: 100,
+        fadeOutDuration: 500,
+        y: { amplitude: 0.05 * sway * gridSize, phase: Math.PI / 6 },
+    })
+    .persist();
+
 seq.effect()
     .delay(400)
     .file(closest("eskie.sound.roar.01"))
-    .attachTo(token, { offset: { y: -0.5 - 0.1 * sway }, gridUnits: true, bindAlpha: false })
+    .attachTo(token, { bindAlpha: false })
     .scaleToObject(3.5)
     .opacity(0.75)
     .randomRotation();
@@ -61,10 +73,8 @@ if (flaps !== 0) {
     let wing1 = seq.effect()
         .name(label)
         .file(closest("eskie.wings.bird.01"))
-        .attachTo(token, { offset: { y: -0.5 - 0.1 * sway }, gridUnits: true, bindAlpha: false })
+        .attachTo(token, { bindAlpha: false })
         .scaleToObject(3 * wingSize)
-        .animateProperty("spriteContainer", "position.y", { from: 0.5 + 0.1 * sway, to: 0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-        .loopProperty("spriteContainer", "position.y", { values: [0.075 * sway, 0.1 * sway, 0.025 * sway, 0, 0.025 * sway, 0.05 * sway], duration: 1000, gridUnits: true, ease: "linear", pingPong: true })
         .playbackRate(2);
     if (flaps > 0) wing1.loopOptions({ loops: flaps, loopDelay: 1000, endOnLastLoop: true });
     wing1.fadeIn(500, { ease: "easeOutCubic", delay: 350 })
@@ -78,10 +88,8 @@ if (flaps !== 0) {
     let wing2 = seq.effect()
         .name(label)
         .file(closest("eskie.wings.bird.01"))
-        .attachTo(token, { offset: { y: -0.5 - 0.1 * sway }, gridUnits: true, bindAlpha: false })
+        .attachTo(token, { bindAlpha: false })
         .scaleToObject(3 * wingSize)
-        .animateProperty("spriteContainer", "position.y", { from: 0.5 + 0.1 * sway, to: 0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-        .loopProperty("spriteContainer", "position.y", { values: [0.075 * sway, 0.1 * sway, 0.025 * sway, 0, 0.025 * sway, 0.05 * sway], duration: 1000, gridUnits: true, ease: "linear", pingPong: true })
         .playbackRate(2);
     if (flaps > 0) wing2.loopOptions({ loops: flaps, loopDelay: 1000, endOnLastLoop: true });
     wing2.fadeIn(500, { ease: "easeOutCubic", delay: 350 })
@@ -97,9 +105,7 @@ if (flaps !== 0) {
 seq.effect()
     .name(label)
     .file(closest(`eskie.buff.loop.simple.${color}`))
-    .attachTo(token, { offset: { y: -0.5 - 0.1 * sway }, gridUnits: true, bindAlpha: false })
-    .animateProperty("spriteContainer", "position.y", { from: 0.5 + 0.1 * sway, to: 0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-    .loopProperty("spriteContainer", "position.y", { values: [0.075 * sway, 0.1 * sway, 0.025 * sway, 0, 0.025 * sway, 0.05 * sway], duration: 1000, gridUnits: true, ease: "linear", pingPong: true })
+    .attachTo(token, { bindAlpha: false })
     .scaleToObject(1)
     .opacity(0.5)
     .filter("ColorMatrix", { saturate: 1 })
@@ -111,23 +117,10 @@ seq.effect()
 seq.effect()
     .name(label)
     .file(closest(`eskie.aura.token.generic.02.${color}`))
-    .attachTo(token, { offset: { y: -0.5 - 0.1 * sway }, gridUnits: true, bindAlpha: false })
-    .animateProperty("spriteContainer", "position.y", { from: 0.5 + 0.1 * sway, to: 0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-    .loopProperty("spriteContainer", "position.y", { values: [0.075 * sway, 0.1 * sway, 0.025 * sway, 0, 0.025 * sway, 0.05 * sway], duration: 1000, gridUnits: true, ease: "linear", pingPong: true })
+    .attachTo(token, { bindAlpha: false })
     .scaleToObject(2.1)
     .zIndex(0.2)
     .timeRange(500, 2500)
     .persist();
-
-seq.effect()
-    .name(label)
-    .copySprite(token)
-    .spriteRotation(-tokenRotation)
-    .attachTo(token, { offset: { y: -0.5 - 0.1 * sway }, gridUnits: true, bindAlpha: false })
-    .scaleToObject(1, { considerTokenScale: true })
-    .zIndex(0.1)
-    .persist()
-    .animateProperty("spriteContainer", "position.y", { from: 0.5 + 0.1 * sway, to: 0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-    .loopProperty("spriteContainer", "position.y", { values: [0.075 * sway, 0.1 * sway, 0.025 * sway, 0, 0.025 * sway, 0.05 * sway], duration: 1000, gridUnits: true, ease: "linear", pingPong: true });
 
 await seq.play();

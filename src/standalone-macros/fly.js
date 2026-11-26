@@ -15,61 +15,63 @@ const id = "fly";
 const tokenId = token.id ?? token.document?.id ?? "";
 const label = `${id} - ${tokenId}`;
 
-// Toggle / re-entrant persistent effect handling
-const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token });
-if ((activeEffects?.length ?? 0) > 0) {
-    Sequencer.EffectManager.endEffects({ name: label, object: token });
-    await new Sequence()
-        .animation()
-            .on(token)
-            .opacity(1)
-        .play();
+// Toggle / re-entrant persistent effect & motion handling
+const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
+const endedMotions = Sequencer.MotionManager.endMotions(token, { name: label });
+if (activeEffects.length > 0 || endedMotions > 0) {
+    await Sequencer.EffectManager.endEffects({ name: label, object: token });
     return;
 }
 
+const gridSize = canvas.grid?.size ?? 100;
+const tokenHeightPx = token.h ?? ((token.document?.height ?? 1) * gridSize);
+// Original used anchor({ y: 0.9 }) (+0.4*h lift) + 500ms ramp + 0..-50px linear 2500ms pingPong
+const baseOffsetY = 0.4 * tokenHeightPx;
+const rotation = -(token.document?.rotation ?? token.rotation ?? 0);
+
 const sequence = new Sequence();
 
-// Misty step launch burst
+// Misty step launch burst (anchored on ground)
 sequence.effect()
     .file(closest("jb2a.misty_step.01.blue"))
-    .atLocation(token)
+    .atLocation(token, { ignoreMotion: true })
     .scaleToObject(1.75)
     .belowTokens();
 
-// Hide original token sprite while elevated flight sprite is active
-sequence.animation()
-    .on(token)
-    .opacity(0);
-
-// Elevated floating token sprite (wind/feather float loop animation)
-sequence.effect()
-    .copySprite(token)
-    .spriteRotation(-(token.document?.rotation ?? token.rotation ?? 0))
+// Elevated floating token motion (exact 1:1 lift + linear bobbing cycle)
+sequence.motion(token)
     .name(label)
-    .atLocation(token)
-    .scaleToObject(1, { considerTokenScale: true })
-    .opacity(1)
-    .duration(800)
-    .anchor({ x: 0.55, y: 0.9 })
-    .animateProperty('spriteContainer', 'position.y', { from: 50, to: 0, duration: 500 })
-    .loopProperty('spriteContainer', 'position.y', { from: 0, to: -50, duration: 2500, pingPong: true, delay: 500 })
-    .attachTo(token, { bindAlpha: false })
     .zIndex(2)
+    .moveBy(
+        [
+            { v: { x: 0, y: 0 } },
+            { v: { x: 0, y: -baseOffsetY }, duration: 500, inEase: "linear" },
+            { v: { x: 0, y: -(baseOffsetY + 25) }, duration: 1250, inEase: "linear" },
+        ],
+        { returnDuration: 500, ease: "linear" }
+    )
+    .oscillate({
+        period: 5000,
+        waveform: "triangle",
+        delay: 1750,
+        fadeOutDuration: 300,
+        y: { amplitude: -25 },
+    })
     .persist();
 
-// Ground shadow sprite (altitude elevation scale and blur shadow animation)
+// Ground shadow sprite (anchored to resting document square via ignoreMotion: true)
 sequence.effect()
     .copySprite(token)
-    .spriteRotation(-(token.document?.rotation ?? token.rotation ?? 0))
+    .spriteRotation(rotation)
     .name(label)
-    .atLocation(token)
+    .atLocation(token, { ignoreMotion: true })
     .scaleToObject(0.9, { considerTokenScale: true })
     .duration(1000)
     .opacity(0.5)
     .belowTokens()
     .filter("ColorMatrix", { brightness: -1 })
     .filter("Blur", { blurX: 5, blurY: 10 })
-    .attachTo(token, { bindAlpha: false })
+    .attachTo(token, { bindAlpha: false, ignoreMotion: true })
     .zIndex(1)
     .persist();
 

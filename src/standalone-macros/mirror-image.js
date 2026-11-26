@@ -189,10 +189,8 @@ if (choice === "v1") {
     const sequence = new Sequence();
 
     sequence
-        .animation()
-            .delay(250)
-            .on(token)
-            .opacity(0)
+        .motion(token)
+            .fadeTo(0.5, { delay: 250, duration: 500, ease: "easeOutCubic", returnDuration: 250, easeOut: "easeInCubic" })
 
         .effect()
             .file(closest("eskie.casting.arcane.01.center.one_shot.purple"))
@@ -201,14 +199,6 @@ if (choice === "v1") {
             .zIndex(2)
 
         .effect()
-            .copySprite(token)
-            .attachTo(token, { bindAlpha: false })
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty("sprite", "alpha", { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", delay: 250 })
-            .animateProperty("sprite", "alpha", { from: 0, to: 0.5, duration: 250, ease: "easeInCubic", delay: 750 })
-            .duration(1250)
-
-        .effect()
             .file(closest("blfx.spell.template.circle.particles.3.rise.star1.loop.color1"))
             .attachTo(token, { bindAlpha: false })
             .scaleToObject(1.75, { considerTokenScale: true })
@@ -263,11 +253,6 @@ if (choice === "v1") {
             .fadeIn(500, { ease: "easeOutCubic" })
             .fadeOut(500, { ease: "easeInCubic" })
             .belowTokens()
-
-        .animation()
-            .delay(1000)
-            .on(token)
-            .opacity(1)
 
         .effect()
             .delay(750)

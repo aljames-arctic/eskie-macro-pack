@@ -17,14 +17,14 @@ When adding or updating scripts in `src/standalone-macros/`, adhere strictly to 
   const tokenId = token.id ?? token.document?.id ?? "";
   const label = `${id} - ${tokenId}`;
 
-  // Top-level Run-1 Start / Run-2 Stop Toggle Check
-  const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }).concat(
-      Sequencer.EffectManager.getEffects({ name: `*${id}*` })
+  // Top-level Run-1 Start / Run-2 Stop Toggle Check (Sequencer 4.3.1+)
+  const activeEffects = (Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? []).concat(
+      Sequencer.EffectManager.getEffects({ name: `*${id}*` }) ?? []
   );
-  if (activeEffects.length > 0) {
-      Sequencer.EffectManager.endEffects({ name: label, object: token });
-      Sequencer.EffectManager.endEffects({ name: `*${id}*` });
-      await new Sequence().animation().on(token).opacity(1).show(true).play();
+  const endedMotions = Sequencer.MotionManager.endMotions(token, { name: label });
+  if (activeEffects.length > 0 || endedMotions > 0) {
+      await Sequencer.EffectManager.endEffects({ name: label, object: token });
+      await Sequencer.EffectManager.endEffects({ name: `*${id}*` });
       return ui.notifications.info(`Ended ${id}.`);
   }
   ```

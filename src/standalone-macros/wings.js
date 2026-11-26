@@ -15,17 +15,13 @@ const id = "wings";
 const tokenId = token.id ?? token.document?.id ?? "";
 const label = `${id} - ${tokenId}`;
 
-// Toggle / re-entrant persistent effect handling
-const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token });
-const wildcardEffects = Sequencer.EffectManager.getEffects({ name: `${id}*`, object: token });
-if ((activeEffects?.length ?? 0) > 0 || (wildcardEffects?.length ?? 0) > 0) {
-    Sequencer.EffectManager.endEffects({ name: label, object: token });
-    Sequencer.EffectManager.endEffects({ name: `${id}*`, object: token });
-    await new Sequence()
-        .animation()
-            .on(token)
-            .opacity(1)
-        .play();
+// Toggle / re-entrant persistent effect & motion handling
+const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
+const wildcardEffects = Sequencer.EffectManager.getEffects({ name: `${id}*`, object: token }) ?? [];
+const endedMotions = Sequencer.MotionManager.endMotions(token, { name: label });
+if (activeEffects.length > 0 || wildcardEffects.length > 0 || endedMotions > 0) {
+    await Sequencer.EffectManager.endEffects({ name: label, object: token });
+    await Sequencer.EffectManager.endEffects({ name: `${id}*`, object: token });
     return ui.notifications.info(`Stopped Wings effect on ${token.name}.`);
 }
 
@@ -121,32 +117,29 @@ const cfg = WING_CONFIGS[wingType] ?? WING_CONFIGS.angelic;
 const { image, hue, brightness, saturate, wingSize, speedMulti, swayMulti, introParticle, introHue, tint } = cfg;
 
 const rotation = token.document?.rotation ?? token.rotation ?? 0;
+const gridSize = canvas.grid?.size ?? 100;
+const hoverCenterY = -0.5 - (0.05 * swayMulti);
 const offset = { x: 0, y: 0 };
 
 const sequence = new Sequence();
 
-// Initial attach burst particle
+// Initial attach burst particle (anchored on ground)
 if (introParticle) {
     let introFx = sequence.effect()
         .file(closest(introParticle))
-        .atLocation(token)
+        .atLocation(token, { ignoreMotion: true })
         .scaleToObject(2)
         .opacity(0.8);
     if (introHue) introFx.filter("ColorMatrix", { hue: introHue });
 }
 
-// 1. Hide original token sprite while hovering altitude scale effect is active
-sequence.animation()
-    .on(token)
-    .opacity(0);
-
-// 2. Ground drop shadow beneath token
+// 1. Ground drop shadow beneath token (anchored via ignoreMotion: true)
 sequence.effect()
     .name(label)
     .copySprite(token)
     .rotate(rotation)
     .spriteRotation(rotation)
-    .attachTo(token, { bindAlpha: false })
+    .attachTo(token, { bindAlpha: false, ignoreMotion: true })
     .scaleToObject(0.8, { considerTokenScale: true })
     .zIndex(0.1)
     .persist()
@@ -155,29 +148,27 @@ sequence.effect()
     .filter("Blur", { blurX: 5, blurY: 10 })
     .opacity(0.65);
 
-// 3. Hover altitude body scale animation (swaying floating token body)
-sequence.effect()
+// 2. Hover altitude body motion (native token lift + sine hover oscillation)
+sequence.motion(token)
     .name(label)
-    .copySprite(token)
-    .rotate(rotation)
-    .spriteRotation(rotation)
-    .attachTo(token, { offset: { y: -0.5 - (0.1 * swayMulti) }, gridUnits: true, bindAlpha: false })
-    .scaleToObject(1, { considerTokenScale: true })
     .zIndex(0.2)
-    .persist()
-    .animateProperty('spriteContainer', 'position.y', { from: 0.5 + (0.1 * swayMulti), to: 0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-    .loopProperty('spriteContainer', 'position.y', { values: [0.075 * swayMulti, 0.1 * swayMulti, 0.025 * swayMulti, 0, 0.025 * swayMulti, 0.05 * swayMulti], duration: (3000 / speedMulti) / 6, gridUnits: true, ease: "linear", pingPong: true });
+    .moveBy({ y: hoverCenterY }, { gridUnits: true, duration: 1000, ease: "easeOutBack", returnDuration: 500, easeOut: "easeInOutQuad" })
+    .oscillate({
+        period: 3000 / speedMulti,
+        waveform: "sine",
+        fadeOutDuration: 500,
+        y: { amplitude: 0.05 * swayMulti * gridSize, phase: Math.PI / 6 },
+    })
+    .persist();
 
-// 4. Wings attachment on token sides with flapping animation loop & color profile
+// 3. Wings attachment on token sides (tracks token hover motion automatically)
 let wingsEffect = sequence.effect()
     .name(label)
     .file(closest(image))
-    .attachTo(token, { offset: { y: offset.y - 0.5 - (0.1 * swayMulti), x: offset.x }, gridUnits: true, bindAlpha: false })
+    .attachTo(token, { offset: { y: offset.y, x: offset.x }, gridUnits: true, bindAlpha: false })
     .scaleToObject(3 * wingSize)
     .zIndex(0.15)
     .persist()
-    .animateProperty('spriteContainer', 'position.y', { from: 0.5 + (0.1 * swayMulti), to: 0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-    .loopProperty('spriteContainer', 'position.y', { values: [0.075 * swayMulti, 0.1 * swayMulti, 0.025 * swayMulti, 0, 0.025 * swayMulti, 0.05 * swayMulti], duration: (3000 / speedMulti) / 6, gridUnits: true, ease: "linear", pingPong: true })
     .playbackRate(speedMulti)
     .filter("ColorMatrix", { hue: hue, brightness: brightness, saturate: saturate });
 

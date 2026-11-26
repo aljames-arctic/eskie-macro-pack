@@ -17,21 +17,21 @@ const label = `${id}-${tokenId}`;
 
 const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
 const activeIdEffects = Sequencer.EffectManager.getEffects({ name: id, object: token }) ?? [];
-if (activeEffects.length > 0 || activeIdEffects.length > 0) {
-    Sequencer.EffectManager.endEffects({ name: label, object: token });
-    Sequencer.EffectManager.endEffects({ name: id, object: token });
+const endedMotions = Sequencer.MotionManager.endMotions(token, { name: label })
+    + Sequencer.MotionManager.endMotions(token, { name: id });
+if (activeEffects.length > 0 || activeIdEffects.length > 0 || endedMotions > 0) {
+    await Sequencer.EffectManager.endEffects({ name: label, object: token });
+    await Sequencer.EffectManager.endEffects({ name: id, object: token });
     return;
 }
 
 const tokenWidth = token.document?.width ?? 1;
-const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
+const gridSize = canvas.grid?.size ?? 100;
 const facingFactor = 1;
+const bounceHalfPx = 0.005 * gridSize;
+const scaleHalf = 0.0075 / Math.max(tokenWidth, 0.5);
 
 let laughEffect = new Sequence();
-
-laughEffect.animation()
-    .on(token)
-    .opacity(0);
 
 laughEffect.effect()
     .name(label)
@@ -44,22 +44,16 @@ laughEffect.effect()
     .persist()
     .private();
 
-laughEffect.effect()
+laughEffect.motion(token)
     .name(label)
-    .copySprite(token)
-    .spriteRotation(-tokenRotation)
-    .scaleToObject(1, { considerTokenScale: true })
-    .atLocation(token)
-    .attachTo(token, { bindAlpha: false })
-    .loopProperty("spriteContainer", "position.y", { from: 0, to: -0.01, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
-    .loopProperty("sprite", "width", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
-    .loopProperty("sprite", "height", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
-    .mirrorY(token.document?.mirrorX)
-    .persist()
-    .waitUntilFinished(-200);
-
-laughEffect.animation()
-    .on(token)
-    .opacity(1);
+    .moveBy({ y: -bounceHalfPx }, { duration: 100, ease: "easeOutQuad", returnDuration: 150, easeOut: "easeInQuad" })
+    .oscillate({
+        period: 300,
+        waveform: "sine",
+        fadeOutDuration: 150,
+        y: { amplitude: -bounceHalfPx, phase: 1.5 * Math.PI },
+        scale: { baseline: 1 + scaleHalf, amplitude: scaleHalf, phase: 1.5 * Math.PI },
+    })
+    .persist();
 
 await laughEffect.play();

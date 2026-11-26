@@ -16,21 +16,17 @@ const tokenId = token.id ?? token.document?.id ?? "";
 const label = `${id} - ${tokenId}`;
 const tokenWidth = token.document?.width ?? token.width ?? 1;
 
-// Toggle / re-entrant persistent effect handling
-const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token });
-if ((activeEffects?.length ?? 0) > 0) {
-    Sequencer.EffectManager.endEffects({ name: label, object: token });
-    await new Sequence()
-        .animation()
-            .on(token)
-            .opacity(1)
-        .play();
+// Toggle / re-entrant persistent effect & motion handling
+const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
+const endedMotions = Sequencer.MotionManager.endMotions(token, { name: label });
+if (activeEffects.length > 0 || endedMotions > 0) {
+    await Sequencer.EffectManager.endEffects({ name: label, object: token });
     return;
 }
 
 const sequence = new Sequence();
 
-// Drunk bubbles effect (bubble froth)
+// Drunk bubbles effect (tracks token sway automatically)
 sequence.effect()
     .file(closest("eskie.emote.drunk_bubbles.01"))
     .zIndex(0)
@@ -48,20 +44,13 @@ sequence.effect()
     .attachTo(token, { bindAlpha: false, bindRotation: false })
     .private();
 
-// Hide original token sprite while swaying stumble token sprite is active
-sequence.animation()
-    .on(token)
-    .opacity(0);
-
-// Floating beer/dizzy/blush icons attached to token with bobbing motion
+// Floating blush icon attached to token (inherits token sway X/Y automatically; keeps rotation loop)
 sequence.effect()
     .file(closest("eskie.emote.blush.01"))
     .zIndex(0)
     .name(label)
     .opacity(0.85)
     .scaleToObject(0.5)
-    .loopProperty("spriteContainer", "position.x", { from: -20, to: 20, duration: 2500, pingPong: true, ease: "easeInOutSine" })
-    .loopProperty("spriteContainer", "position.y", { values: [0, 20, 0, 20], duration: 2500, pingPong: true })
     .loopProperty("sprite", "rotation", { from: -10, to: 10, duration: 2500, pingPong: true, ease: "easeInOutSine" })
     .persist()
     .atLocation(token)
@@ -69,17 +58,23 @@ sequence.effect()
     .attachTo(token, { bindAlpha: false, bindRotation: true })
     .private();
 
-// Wobbling drunken stumble token tilt (sway copySprite attached to token)
-sequence.effect()
-    .copySprite(token)
-    .spriteRotation(-(token.document?.rotation ?? token.rotation ?? 0))
-    .scaleToObject(1, { considerTokenScale: true })
+// Wobbling drunken stumble token tilt natively via .motion()
+sequence.motion(token)
     .name(label)
-    .atLocation(token)
-    .loopProperty("spriteContainer", "position.x", { from: -20, to: 20, duration: 2500, pingPong: true, ease: "easeInOutSine" })
-    .loopProperty("spriteContainer", "position.y", { values: [0, 20, 0, 20], duration: 2500, pingPong: true })
-    .loopProperty("sprite", "rotation", { from: -10, to: 10, duration: 2500, pingPong: true, ease: "easeInOutSine" })
-    .persist()
-    .attachTo(token, { bindAlpha: false });
+    .moveBy({ y: 10 }, { duration: 250, ease: "easeOutQuad", returnDuration: 250, easeOut: "easeInQuad" })
+    .oscillate({
+        period: 5000,
+        waveform: "sine",
+        fadeOutDuration: 300,
+        x: { amplitude: 20, phase: 1.5 * Math.PI },
+        rotation: { amplitude: 10, phase: 1.5 * Math.PI },
+    })
+    .oscillate({
+        period: 5000,
+        waveform: "triangle",
+        fadeOutDuration: 300,
+        y: { amplitude: 10, phase: 1.5 * Math.PI },
+    })
+    .persist();
 
 await sequence.play();

@@ -13,6 +13,8 @@ import { ManageAutorecApp } from "../../../ui/autorec/manageAutorecMenu.js";
 export class AutorecManager {
     aa: any;
     blfx: any;
+    private triggersByPath: Map<string, string> = new Map();
+    private triggersByConfig: WeakMap<object, string> = new WeakMap();
 
     constructor(aa: any = autoanimationsAdapter, blfx: any = blfxAdapter) {
         this.aa = aa;
@@ -30,8 +32,30 @@ export class AutorecManager {
      * @param {object} [options={}] Additional integration-specific configuration
      */
     register(key: any, trigger: any, animation: any, config: any, version: string = "0.0.0", fallback: any = key, options: any = {}): void {
+        if (animation && trigger && !this.triggersByPath.has(animation)) {
+            this.triggersByPath.set(animation, trigger);
+        }
+        if (config && trigger && !this.triggersByConfig.has(config)) {
+            this.triggersByConfig.set(config, trigger);
+        }
         this.aa.register(key, trigger, animation, config, version, fallback);
         this.blfx.register(key, trigger, animation, config, version, fallback, options);
+    }
+
+    /**
+     * Look up the primary autorec trigger category registered for an animation path or default_config reference.
+     * @param {string} [animationPath] Global animation path (e.g. "eskie.effect.silence")
+     * @param {object} [defaultConfig] Effect module's DEFAULT_CONFIG reference
+     * @returns {string|null} Trigger category ('template', 'effect', 'aura', 'token', 'melee-target', 'ranged-target') or null
+     */
+    getTrigger(animationPath?: string, defaultConfig?: object | null): string | null {
+        if (animationPath && this.triggersByPath.has(animationPath)) {
+            return this.triggersByPath.get(animationPath) ?? null;
+        }
+        if (defaultConfig && this.triggersByConfig.has(defaultConfig)) {
+            return this.triggersByConfig.get(defaultConfig) ?? null;
+        }
+        return null;
     }
 
     /**
@@ -157,8 +181,13 @@ export function promptDestinationDialog() {
     return autorecManager.promptDestinationDialog();
 }
 
+export function getTrigger(animationPath?: string, defaultConfig?: object | null): string | null {
+    return autorecManager.getTrigger(animationPath, defaultConfig);
+}
+
 export const autorec = {
     register,
+    getTrigger,
     submit,
     promptDestinationDialog,
     CONCENTRATING,

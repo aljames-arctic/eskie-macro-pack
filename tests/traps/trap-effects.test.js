@@ -6,6 +6,7 @@ import {
     createCasterProxy,
     executeTrapEffect,
     playEffectAsTrap,
+    resolveTrapDispatchMode,
     setupTrap
 } from '../../src/animation/traps/trap-manager.js';
 import { MODULE_ID } from '../../src/lib/constants.js';
@@ -51,6 +52,8 @@ test('createCasterProxy: creates Token-compatible proxy for Tile placeable', () 
     // dx = 400 - 150 = 250, dy = 600 - 250 = 350 -> angle in degrees
     const expectedAngle = Math.atan2(350, 250) * 180 / Math.PI;
     assert.ok(Math.abs(proxy.rotation - expectedAngle) < 0.001);
+    assert.equal(proxy.isTrapCasterProxy, true);
+    assert.equal(proxy.isRegionOrigin, false);
     assert.ok(proxy.document);
     assert.equal(proxy.document.texture.src, 'tiles/spout.png');
     assert.equal(proxy.document.name, 'Wall Spout');
@@ -74,8 +77,27 @@ test('createCasterProxy: creates Token-compatible proxy for Region placeable', (
     assert.equal(proxy.name, 'Gargoyle Statue');
     assert.deepEqual(proxy.center, { x: 150, y: 150 });
     assert.equal(proxy.rotation, 0);
+    assert.equal(proxy.isTrapCasterProxy, true);
+    assert.equal(proxy.isRegionOrigin, true);
     assert.equal(proxy.document.elevation, 10);
     assert.equal(proxy.document.texture.src, 'icons/statue.png');
+
+    // Foundry V14 Region elevation ranges normalize to a finite number
+    const rangedRegion = {
+        id: 'region-origin-2',
+        documentName: 'Region',
+        shapes: [{ x: 0, y: 0, width: 100, height: 100 }],
+        elevation: { bottom: 20, top: 30 }
+    };
+    assert.equal(createCasterProxy(rangedRegion).document.elevation, 20);
+
+    const unboundedRegion = {
+        id: 'region-origin-3',
+        documentName: 'Region',
+        shapes: [{ x: 0, y: 0, width: 100, height: 100 }],
+        elevation: { bottom: -Infinity, top: Infinity }
+    };
+    assert.equal(createCasterProxy(unboundedRegion).document.elevation, 0);
 });
 
 test('createCasterProxy: passes through Token placeables unchanged and handles null', () => {
@@ -833,7 +855,7 @@ test('fireball: ensures explosion target has at minimum 1x1 token scale and clea
     globalThis.Sequencer.EffectManager.endEffects = originalEndEffects;
 });
 
-test('lightningBolt as V14 Region trap originates at center of origin Region and stretches to center of target Region', async () => {
+test('lightningBolt as V14 Region trap and Tile trap receive identical Sequencer-safe cachedLocation proxies', async () => {
     const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
     const { lightningBolt } = await import('../../src/animation/effects/template/lightning-bolt.js');
 
@@ -857,7 +879,15 @@ test('lightningBolt as V14 Region trap originates at center of origin Region and
                     if (prop === 'then') return undefined;
                     if (prop === 'effect') {
                         return () => {
-                            currentEffect = { files: [], atLocations: [], stretchTos: [], rotateTowards: [] };
+                            currentEffect = {
+                                files: [],
+                                atLocations: [],
+                                stretchTos: [],
+                                rotateTowards: [],
+                                scaleToObjects: [],
+                                sizes: [],
+                                masks: []
+                            };
                             effects.push(currentEffect);
                             return proxy;
                         };
@@ -874,6 +904,15 @@ test('lightningBolt as V14 Region trap originates at center of origin Region and
                     if (prop === 'rotateTowards') {
                         return (loc) => { currentEffect?.rotateTowards.push(loc); return proxy; };
                     }
+                    if (prop === 'scaleToObject') {
+                        return (scale, opts) => { currentEffect?.scaleToObjects.push({ scale, opts }); return proxy; };
+                    }
+                    if (prop === 'size') {
+                        return (val, opts) => { currentEffect?.sizes.push({ val, opts }); return proxy; };
+                    }
+                    if (prop === 'mask') {
+                        return (...args) => { currentEffect?.masks.push(args); return proxy; };
+                    }
                     return (..._args) => proxy;
                 }
             };
@@ -883,20 +922,21 @@ test('lightningBolt as V14 Region trap originates at center of origin Region and
     };
 
     try {
-        // Foundry V14 Rectangle Region placeables: PIXI container at (0, 0), shape x/y is top-left corner
+        // Non-square Foundry V14 Rectangle Region placeables: PIXI container at (0, 0), shape x/y is top-left corner
         const originRegion = {
             id: 'reg-bolt-origin',
             documentName: 'Region',
             x: 0,
             y: 0,
-            bounds: { x: 200, y: 300, width: 100, height: 100 },
-            center: { x: 250, y: 350 },
+            bounds: { x: 200, y: 300, width: 300, height: 100 },
+            center: { x: 350, y: 350 },
             document: {
                 id: 'reg-bolt-origin',
                 uuid: 'Scene.scene1.Region.reg-bolt-origin',
                 name: 'Lightning Nozzle',
                 documentName: 'Region',
-                shapes: [{ type: 'rectangle', x: 200, y: 300, width: 100, height: 100, rotation: 0 }]
+                elevation: { bottom: 10, top: 20 },
+                shapes: [{ type: 'rectangle', x: 200, y: 300, width: 300, height: 100, rotation: 0 }]
             }
         };
 
@@ -920,43 +960,47 @@ test('lightningBolt as V14 Region trap originates at center of origin Region and
             sound: { primary: { enable: false }, secondary: { enable: false } }
         });
 
-        // Verify the main lightning bolt beam stretches from center of originRegion to center of targetRegion
+        // 1. Main stretched lightning bolt originates at center of originRegion and stretches to center of targetRegion
         const boltEffect = effects.find(e => e.stretchTos.length > 0);
         assert.ok(boltEffect, 'Must have a stretched lightning bolt beam effect');
-        assert.deepEqual(
-            boltEffect.atLocations[0],
-            { x: 250, y: 350 },
-            'Lightning bolt beam must originate at the center of the origin Region (250, 350), not top-left corner'
-        );
-        assert.deepEqual(
-            boltEffect.stretchTos[0].loc,
-            { x: 900, y: 600 },
-            'Lightning bolt beam must stretch to the center of the target Region (900, 600), not top-left corner or 100ft east'
-        );
+        assert.deepEqual(boltEffect.atLocations[0], { x: 350, y: 350 });
+        assert.deepEqual(boltEffect.stretchTos[0].loc, { x: 900, y: 600 });
 
-        // Verify caster-origin effects receive a centered CasterProxy (so Sequencer validate_document resolves center, not top-left)
-        const casterEffects = effects.filter(e => e.atLocations[0]?.isTrapCasterProxy);
-        assert.ok(casterEffects.length >= 4, 'Caster lightning buildup/discharge effects must receive CasterProxy');
-        for (const ce of casterEffects) {
-            const proxy = ce.atLocations[0];
-            assert.deepEqual(proxy.center, { x: 250, y: 350 });
-            assert.equal(proxy.x, 250, 'CasterProxy.x must be center X for Sequencer');
-            assert.equal(proxy.y, 350, 'CasterProxy.y must be center Y for Sequencer');
-            assert.equal(proxy.document.x, 250, 'CasterProxy.document.x must be center X so Sequencer validate_document resolves center');
-            assert.equal(proxy.document.y, 350, 'CasterProxy.document.y must be center Y so Sequencer validate_document resolves center');
-            assert.equal(proxy.document.w, 100, 'CasterProxy.document.w must preserve pixel width');
-            assert.equal(proxy.document.h, 100, 'CasterProxy.document.h must preserve pixel height');
-            if (ce.rotateTowards.length > 0) {
-                assert.deepEqual(ce.rotateTowards[0], { x: 900, y: 600 }, 'Caster effects must rotate towards center of target Region');
-            }
+        // 2. Origin effects receive a Sequencer-safe cachedLocation synthetic CasterProxy (no live Region UUID / .object leak, uniform 1x1 dimensions)
+        const staticEffect = effects.find(e => e.stretchTos.length === 0 && e.rotateTowards.length === 0);
+        assert.ok(staticEffect, 'Must have static electricity buildup effect');
+        assert.equal(effects.length, 5, 'lightningBolt must emit all 5 sequence effects');
+        const regionProxy = staticEffect.atLocations[0];
+        assert.equal(regionProxy.isTrapCasterProxy, true);
+        assert.equal(regionProxy.isRegionOrigin, true);
+        assert.equal(regionProxy.cachedLocation, true, 'CasterProxy must set cachedLocation: true for Sequencer');
+        assert.equal(regionProxy.object, undefined, 'CasterProxy must not expose .object so Sequencer cannot unwrap live Region');
+        assert.equal(regionProxy.document.uuid, 'TrapOrigin.reg-bolt-origin', 'CasterProxy must use synthetic non-Foundry UUID so Sequencer skips live Region resolution & polygon masking');
+        assert.deepEqual(regionProxy.center, { x: 350, y: 350 });
+        assert.equal(regionProxy.x, 350);
+        assert.equal(regionProxy.y, 350);
+        assert.equal(regionProxy.w, 100, 'Non-square 300x100 Region CasterProxy must normalize to 1x1 uniform pixel width');
+        assert.equal(regionProxy.h, 100, 'Non-square 300x100 Region CasterProxy must normalize to 1x1 uniform pixel height');
+        assert.equal(regionProxy.document.width, 1);
+        assert.equal(regionProxy.document.height, 1);
+        assert.equal(regionProxy.elevation, 10);
+        assert.equal(regionProxy.document.elevation, 10);
+
+        // 3. Remaining origin discharge effects (02/03/04) share the same centered proxy and rotate towards target center
+        const dischargeEffects = effects.filter(e => e.rotateTowards.length > 0);
+        assert.equal(dischargeEffects.length, 3);
+        for (const de of dischargeEffects) {
+            assert.equal(de.atLocations[0], regionProxy);
+            assert.deepEqual(de.rotateTowards[0], { x: 900, y: 600 });
         }
 
-        // Also verify Polygon -> Rectangle RegionDocuments (without precomputed .center or .bounds)
+        // 4. Polygon -> Rectangle RegionDocuments (without precomputed .center or .bounds)
         effects.length = 0;
         const polyOriginDoc = {
             id: 'reg-poly-origin',
             uuid: 'Scene.scene1.Region.reg-poly-origin',
             documentName: 'Region',
+            elevation: { bottom: -Infinity, top: Infinity },
             shapes: [{ type: 'polygon', points: [100, 100, 300, 100, 300, 300, 100, 300] }]
         };
         const rectTargetDoc = {
@@ -971,14 +1015,373 @@ test('lightningBolt as V14 Region trap originates at center of origin Region and
         });
 
         const polyBoltEffect = effects.find(e => e.stretchTos.length > 0);
-        assert.ok(polyBoltEffect);
-        assert.deepEqual(polyBoltEffect.atLocations[0], { x: 200, y: 200 }, 'Polygon origin RegionDocument must originate at bounding center (200, 200)');
-        assert.deepEqual(polyBoltEffect.stretchTos[0].loc, { x: 1100, y: 450 }, 'Rectangle target RegionDocument must stretch to bounding center (1100, 450)');
+        assert.deepEqual(polyBoltEffect.atLocations[0], { x: 200, y: 200 });
+        assert.deepEqual(polyBoltEffect.stretchTos[0].loc, { x: 1100, y: 450 });
+        const polyStaticEffect = effects.find(e => e.stretchTos.length === 0 && e.rotateTowards.length === 0);
+        assert.equal(polyStaticEffect.atLocations[0].cachedLocation, true);
+        assert.equal(polyStaticEffect.atLocations[0].document.uuid, 'TrapOrigin.reg-poly-origin');
+        assert.equal(polyStaticEffect.atLocations[0].w, 100);
+        assert.equal(polyStaticEffect.atLocations[0].h, 100);
+        assert.equal(polyStaticEffect.atLocations[0].elevation, 0);
+
+        // 5. Tile trap receives the exact same synthetic cachedLocation contract (identical animation parity with Regions)
+        effects.length = 0;
+        const originTile = {
+            id: 'tile-bolt-origin',
+            documentName: 'Tile',
+            x: 250,
+            y: 350,
+            w: 300,
+            h: 100,
+            document: {
+                id: 'tile-bolt-origin',
+                uuid: 'Scene.scene1.Tile.tile-bolt-origin',
+                name: 'Tile Nozzle',
+                documentName: 'Tile',
+                x: 250,
+                y: 350,
+                width: 300,
+                height: 100,
+                anchor: { x: 0.5, y: 0.5 },
+                texture: { src: 'tiles/nozzle.png' }
+            }
+        };
+        const targetTile = {
+            id: 'tile-bolt-target',
+            documentName: 'Tile',
+            x: 850,
+            y: 350,
+            w: 100,
+            h: 100,
+            document: {
+                id: 'tile-bolt-target',
+                uuid: 'Scene.scene1.Tile.tile-bolt-target',
+                name: 'Tile Target',
+                documentName: 'Tile',
+                x: 850,
+                y: 350,
+                width: 100,
+                height: 100,
+                anchor: { x: 0.5, y: 0.5 },
+                texture: { src: 'tiles/target.png' }
+            }
+        };
+
+        await executeTrapEffect(lightningBolt, originTile, targetTile, [], {
+            sound: { primary: { enable: false }, secondary: { enable: false } }
+        });
+
+        const tileStaticEffect = effects.find(e => e.stretchTos.length === 0 && e.rotateTowards.length === 0);
+        const tileProxy = tileStaticEffect.atLocations[0];
+        assert.equal(tileProxy.isTrapCasterProxy, true);
+        assert.equal(tileProxy.isRegionOrigin, false);
+        assert.equal(tileProxy.cachedLocation, true);
+        assert.equal(tileProxy.object, undefined);
+        assert.equal(tileProxy.document.uuid, 'TrapOrigin.tile-bolt-origin');
+        assert.equal(tileProxy.w, 100, 'Non-square Tile CasterProxy also normalizes to 1x1 uniform width');
+        assert.equal(tileProxy.h, 100);
+
+        // 6. Real Token caster still passes through unchanged with live Token UUID & mesh masking
+        effects.length = 0;
+        const wizardToken = {
+            id: 'tok-wizard',
+            name: 'Wizard',
+            center: { x: 150, y: 150 },
+            document: { id: 'tok-wizard', name: 'Wizard', width: 1, height: 1, elevation: 0 }
+        };
+        await lightningBolt.create(wizardToken, {
+            template: targetTile,
+            sound: { primary: { enable: false }, secondary: { enable: false } }
+        });
+
+        const tokenStaticEffect = effects.find(e => e.stretchTos.length === 0 && e.rotateTowards.length === 0);
+        assert.equal(tokenStaticEffect.atLocations[0], wizardToken);
+        assert.equal(tokenStaticEffect.scaleToObjects[0].scale, 1.5);
+        assert.equal(tokenStaticEffect.masks.length, 1);
     } finally {
         adapter.foundry = originalFoundry;
         globalThis.Sequence = originalSequence;
         globalThis.game.release = originalRelease;
     }
+});
+
+test('Layer 1: CasterProxy and TargetProxy synthetic contracts and adapter geometry helpers', async () => {
+    const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
+    const originalFoundry = adapter.foundry;
+    adapter.foundry = new FoundryV14Adapter(adapter);
+
+    try {
+        let mutated = false;
+        const wideRegion = {
+            id: 'reg-hallway',
+            documentName: 'Region',
+            x: 0,
+            y: 0,
+            bounds: { x: 100, y: 200, width: 400, height: 100 },
+            center: { x: 300, y: 250 },
+            document: {
+                id: 'reg-hallway',
+                uuid: 'Scene.s1.Region.reg-hallway',
+                name: 'Hallway Trap',
+                documentName: 'Region',
+                elevation: { bottom: 15, top: 25 },
+                shapes: [{ type: 'rectangle', x: 100, y: 200, width: 400, height: 100 }],
+                update: async () => { mutated = true; }
+            }
+        };
+
+        const casterProxy = adapter.createCasterProxy(wideRegion);
+        assert.equal(casterProxy.cachedLocation, true);
+        assert.equal(casterProxy.object, undefined);
+        assert.equal(casterProxy.sourcePlaceable, undefined, 'CasterProxy must not retain circular live placeable references');
+        assert.equal(casterProxy.document.uuid, 'TrapOrigin.reg-hallway');
+        assert.equal(casterProxy.w, 100);
+        assert.equal(casterProxy.h, 100);
+        assert.equal(casterProxy.width, 100);
+        assert.equal(casterProxy.height, 100);
+        assert.equal(casterProxy.elevation, 15);
+        assert.equal(casterProxy.document.elevation, 15);
+
+        // Regression test: live PIXI Tile/Region with circular `_events.pointerover.context` must not break JSON.stringify / foundry.utils.duplicate
+        const circularTile = {
+            id: 'tile-circ',
+            documentName: 'Tile',
+            x: 200,
+            y: 300,
+            w: 100,
+            h: 100,
+            document: { id: 'tile-circ', uuid: 'Scene.s1.Tile.tile-circ', documentName: 'Tile', x: 200, y: 300, width: 100, height: 100 }
+        };
+        circularTile._events = { pointerover: { context: circularTile } };
+        const circularCasterProxy = adapter.createCasterProxy(circularTile);
+        assert.doesNotThrow(() => JSON.stringify(circularCasterProxy), 'CasterProxy from circular PIXI Tile must serialize cleanly to JSON');
+
+        const circularActor = { id: 'actor-circ' };
+        circularActor.self = circularActor;
+        const circularToken = {
+            id: 'tok-circ',
+            w: 50,
+            h: 50,
+            center: { x: 125, y: 125 },
+            document: { id: 'tok-circ', width: 0.5, height: 0.5 },
+            actor: circularActor
+        };
+        const circularTargetProxy = adapter.createTargetProxy(circularToken);
+        assert.doesNotThrow(() => JSON.stringify(circularTargetProxy), 'TargetProxy from Token with circular actor must serialize cleanly to JSON');
+        assert.doesNotThrow(() => JSON.stringify(adapter.createTargetProxy(circularTile)), 'TargetProxy from circular PIXI Tile must serialize cleanly to JSON');
+
+        // Safe no-op update must not mutate underlying Region/Tile document
+        await casterProxy.document.update({ x: 999, y: 999 });
+        assert.equal(mutated, false, 'CasterProxy.document.update must be a safe no-op');
+
+        // TargetProxy uses synthetic UUID, cachedLocation, normalized elevation, and uniform square dimensions for non-square Regions
+        const targetProxy = adapter.createTargetProxy(wideRegion);
+        assert.equal(targetProxy.cachedLocation, true);
+        assert.equal(targetProxy.object, undefined);
+        assert.equal(targetProxy.sourcePlaceable, undefined);
+        assert.equal(targetProxy.document.uuid, 'TargetProxy.reg-hallway');
+        assert.equal(targetProxy.document.width, 1, '400x100 non-square Region TargetProxy must use uniform min span (1x1)');
+        assert.equal(targetProxy.document.height, 1);
+        assert.equal(targetProxy.w, 100);
+        assert.equal(targetProxy.h, 100);
+        assert.equal(targetProxy.width, 100);
+        assert.equal(targetProxy.height, 100);
+        assert.equal(targetProxy.elevation, 15);
+        await targetProxy.document.update({ x: 999 });
+        assert.equal(mutated, false);
+
+        // adapter.getBounds(proxy) returns exact centered pixel bounds instead of misreading grid units as pixels
+        const bounds = adapter.getBounds(casterProxy);
+        assert.deepEqual(bounds, {
+            minX: 250,
+            maxX: 350,
+            minY: 200,
+            maxY: 300,
+            center: { x: 300, y: 250 },
+            width: 100,
+            height: 100,
+            anchor: { x: 0.5, y: 0.5 }
+        });
+
+        // adapter.isAdjacent & getNearestSquareCenter derive top-left from center - w/2 for centered proxies
+        // Adjacent token sits immediately east of casterProxy [250..350, 200..300] at [350..450, 200..300]
+        const eastToken = {
+            id: 'tok-east',
+            x: 350,
+            y: 200,
+            w: 100,
+            h: 100,
+            center: { x: 400, y: 250 },
+            document: { id: 'tok-east', x: 350, y: 200, width: 1, height: 1, elevation: 15 }
+        };
+        assert.equal(adapter.isAdjacent(casterProxy, eastToken), true, 'Adjacent token immediately east of centered CasterProxy must be detected as adjacent');
+
+        const nearestSq = adapter.getNearestSquareCenter(eastToken, targetProxy);
+        assert.deepEqual(nearestSq, { x: 300, y: 250 }, 'getNearestSquareCenter on centered TargetProxy must resolve center (300, 250), not shifted (+50, +50)');
+    } finally {
+        adapter.foundry = originalFoundry;
+    }
+});
+
+test('Layer 2: registry-driven executeTrapEffect dispatch routes template, victim, origin, position, array, bound this, and namespace guards cleanly', async () => {
+    const { silence } = await import('../../src/animation/effects/template/silence.js');
+    const { spikeGrowth } = await import('../../src/animation/effects/template/spike-growth.js');
+    const { tashasCausticBrew } = await import('../../src/animation/effects/template/tashas-caustic-brew.js');
+    const { charmed } = await import('../../src/animation/effects/active-effect/charmed.js');
+    const { twilightSanctuary } = await import('../../src/animation/effects/aura/twilight-sanctuary.js');
+
+    // 1. Autorec registry resolves trigger categories for previously misclassified effects
+    assert.equal(adapter.autorec.getTrigger('eskie.effect.silence'), 'template');
+    assert.equal(adapter.autorec.getTrigger(undefined, silence.default_config), 'template');
+    assert.equal(adapter.autorec.getTrigger('eskie.effect.spikeGrowth'), 'template');
+    assert.equal(adapter.autorec.getTrigger('eskie.effect.tashasCausticBrew'), 'template');
+    assert.equal(adapter.autorec.getTrigger('eskie.effect.charmed'), 'effect');
+    assert.equal(adapter.autorec.getTrigger('eskie.effect.twilightSanctuary'), 'aura');
+
+    // 2. resolveTrapDispatchMode classifies all categories accurately
+    assert.equal(resolveTrapDispatchMode('eskie.effect.silence', silence), 'template');
+    assert.equal(resolveTrapDispatchMode('', spikeGrowth), 'template');
+    assert.equal(resolveTrapDispatchMode('eskie.effect.tashasCausticBrew', tashasCausticBrew), 'template');
+    assert.equal(resolveTrapDispatchMode('eskie.effect.charmed', charmed), 'victim');
+    assert.equal(resolveTrapDispatchMode('eskie.effect.twilightSanctuary', twilightSanctuary), 'origin');
+    assert.equal(resolveTrapDispatchMode('eskie.effect.callLightning', { default_config: { radius: 7.5 }, play: () => {} }), 'caster-to-position');
+    assert.equal(resolveTrapDispatchMode('eskie.effect.chainLightning', { play: (token, targetTokens) => {} }), 'caster-to-targets');
+    assert.equal(resolveTrapDispatchMode('eskie.effect.sleep', { play: (targets) => {} }), 'targets-only');
+    assert.equal(resolveTrapDispatchMode('eskie.effect.curseOfTheWerewolf', { play: (target) => {} }), 'victim');
+    assert.equal(resolveTrapDispatchMode('eskie.effect.detect.magic', { default_config: { distance: 30 }, play: (token) => {} }), 'origin');
+
+    const originTile = {
+        id: 'tile-dispatch-origin',
+        documentName: 'Tile',
+        x: 100,
+        y: 100,
+        document: { id: 'tile-dispatch-origin', documentName: 'Tile', x: 100, y: 100, width: 100, height: 100 }
+    };
+    const landingTile = {
+        id: 'tile-dispatch-target',
+        documentName: 'Tile',
+        x: 500,
+        y: 500,
+        document: { id: 'tile-dispatch-target', documentName: 'Tile', x: 500, y: 500, width: 100, height: 100 }
+    };
+    const victim1 = { id: 'tok-v1', name: 'Hero 1', center: { x: 550, y: 550 }, document: { id: 'tok-v1', width: 1, height: 1 } };
+    const victim2 = { id: 'tok-v2', name: 'Hero 2', center: { x: 560, y: 560 }, document: { id: 'tok-v2', width: 1, height: 1 } };
+
+    // 3. Bound `this` preservation (fixes tashasCausticBrew calling this.create)
+    let boundThisMatched = false;
+    const thisBoundEffect = {
+        default_config: { id: 'BoundTemplate', template: undefined },
+        create(token, cfg) {
+            return { ok: true, token, cfg };
+        },
+        async play(token, cfg) {
+            boundThisMatched = this === thisBoundEffect;
+            return this.create(token, cfg);
+        }
+    };
+    const boundRes = await executeTrapEffect(thisBoundEffect, originTile, landingTile, [victim1]);
+    assert.equal(boundThisMatched, true, 'executeTrapEffect must preserve `this` binding when calling effectObj.play');
+    assert.equal(boundRes.ok, true);
+
+    // 4. Victim dispatch passes real victim Token as arg 1 and targetConfig as arg 2 (not casterProxy + victimToken!)
+    const victimCalls = [];
+    const mockCurse = {
+        default_config: charmed.default_config, // registered as 'effect' in autorec
+        play: async (target, cfg) => {
+            victimCalls.push({ target, cfg });
+            return target.id;
+        }
+    };
+    await executeTrapEffect(mockCurse, originTile, landingTile, [victim1, victim2], { duration: 3000 });
+    assert.equal(victimCalls.length, 2);
+    assert.equal(victimCalls[0].target, victim1, 'Victim effect must receive victim1 Token, not CasterProxy');
+    assert.equal(victimCalls[0].cfg.duration, 3000, 'Victim effect must receive config as 2nd arg, not victim Token');
+    assert.equal(victimCalls[1].target, victim2);
+
+    // 5. Origin dispatch fires once on CasterProxy even when 0 tokens are present
+    const originCalls = [];
+    const mockAura = {
+        default_config: twilightSanctuary.default_config, // registered as 'aura' in autorec
+        play: async (caster, cfg) => {
+            originCalls.push({ caster, cfg });
+            return 'played';
+        }
+    };
+    await executeTrapEffect(mockAura, originTile, null, [], { radius: 30 });
+    assert.equal(originCalls.length, 1);
+    assert.equal(originCalls[0].caster.isTrapCasterProxy, true);
+    assert.equal(originCalls[0].cfg.radius, 30);
+
+    // 6. Array-accepting caster-to-targets receives [targetProxy] on 0 tokens (no `targets is not iterable` crash)
+    let capturedArrayArgs = null;
+    const mockChain = {
+        play: async (caster, targetTokens, cfg) => {
+            capturedArrayArgs = { caster, targetTokens, cfg };
+            return 'chained';
+        }
+    };
+    await executeTrapEffect(mockChain, originTile, landingTile, [], { maxJumps: 3 });
+    assert.ok(Array.isArray(capturedArrayArgs.targetTokens), 'caster-to-targets must wrap 0-target TargetProxy in an array');
+    assert.equal(capturedArrayArgs.targetTokens.length, 1);
+    assert.equal(capturedArrayArgs.targetTokens[0].isTrapTargetProxy, true);
+    assert.equal(capturedArrayArgs.targetTokens[0].cachedLocation, true);
+
+    // 7. Non-callable container namespace returns null safely instead of throwing TypeError
+    const containerNamespace = { cast: { play: async () => {} }, damage: { play: async () => {} } };
+    const nsResult = await executeTrapEffect(containerNamespace, originTile, landingTile, [victim1]);
+    assert.equal(nsResult, null, 'Non-callable container namespace must return null gracefully');
+});
+
+test('Layer 3: getTemplatePosition defaults primary to center on Tiles and V14 Rectangle/Polygon Regions when cfg.token is omitted', async () => {
+    const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
+    const v12 = new FoundryV12Adapter(adapter);
+    const v14 = new FoundryV14Adapter(adapter);
+
+    // V12/V13 Tile without cfg.token -> primary must be Tile center (300, 400), not top-left (200, 300)
+    const tile = {
+        id: 'tile-aoe',
+        documentName: 'Tile',
+        x: 200,
+        y: 300,
+        document: { id: 'tile-aoe', documentName: 'Tile', x: 200, y: 300, width: 200, height: 200, texture: { src: 'a.png' } }
+    };
+    const [tilePrimary, , tileCenter] = v12.getTemplatePosition(tile, {});
+    assert.deepEqual(tilePrimary, { x: 300, y: 400 }, 'Tile template without cfg.token must center primary');
+    assert.deepEqual(tileCenter, { x: 300, y: 400 });
+
+    // V14 Rectangle Region without cfg.token -> primary must be center (500, 400), not top-left (400, 300)
+    const rectRegion = {
+        id: 'reg-rect-aoe',
+        documentName: 'Region',
+        x: 0,
+        y: 0,
+        bounds: { x: 400, y: 300, width: 200, height: 200 },
+        center: { x: 500, y: 400 },
+        document: {
+            id: 'reg-rect-aoe',
+            documentName: 'Region',
+            shapes: [{ type: 'rectangle', x: 400, y: 300, width: 200, height: 200, rotation: 0 }]
+        }
+    };
+    const [rectPrimary, , rectCenter] = v14.getTemplatePosition(rectRegion, {});
+    assert.deepEqual(rectPrimary, { x: 500, y: 400 }, 'V14 Rectangle Region without cfg.token must center primary');
+    assert.deepEqual(rectCenter, { x: 500, y: 400 });
+
+    // V14 Polygon Region placeable (container x=0, y=0) without cfg.token -> primary must be bounding center (600, 500), not (0, 0)
+    const polyRegion = {
+        id: 'reg-poly-aoe',
+        documentName: 'Region',
+        x: 0,
+        y: 0,
+        document: {
+            id: 'reg-poly-aoe',
+            documentName: 'Region',
+            shapes: [{ type: 'polygon', points: [500, 400, 700, 400, 700, 600, 500, 600] }]
+        }
+    };
+    const [polyPrimary, , polyCenter] = v14.getTemplatePosition(polyRegion, {});
+    assert.deepEqual(polyPrimary, { x: 600, y: 500 }, 'V14 Polygon Region without cfg.token must center primary, never container (0, 0)');
+    assert.deepEqual(polyCenter, { x: 600, y: 500 });
 });
 
 

@@ -428,10 +428,140 @@ export function createCasterProxy(placeable: any, targetLocation: { x: number; y
     return adapter.createCasterProxy(placeable, targetLocation);
 }
 
+export type TrapDispatchMode =
+    | 'trap'
+    | 'template'
+    | 'victim'
+    | 'origin'
+    | 'position'
+    | 'caster-to-position'
+    | 'targets-only'
+    | 'caster-to-targets'
+    | 'caster-to-target';
+
+const VALID_TRAP_DISPATCH_MODES = new Set<string>([
+    'trap',
+    'template',
+    'victim',
+    'origin',
+    'position',
+    'caster-to-position',
+    'targets-only',
+    'caster-to-targets',
+    'caster-to-target',
+]);
+
+/**
+ * Explicit trap dispatch overrides for effects whose JS entry signature differs
+ * from the standard autorec trigger mapping.
+ */
+const TRAP_DISPATCH_OVERRIDES: Record<string, TrapDispatchMode> = {
+    'eskie.effect.callLightning': 'caster-to-position',
+    'eskie.effect.skyRocket': 'position',
+    'eskie.effect.cloudOfSand': 'position',
+    'eskie.effect.sleep': 'targets-only',
+    'eskie.effect.shuffle': 'targets-only',
+    'eskie.effect.chainLightning': 'caster-to-targets',
+    'eskie.effect.bless': 'caster-to-targets',
+    'eskie.effect.curseOfTheWerewolf': 'victim',
+    'eskie.effect.animateDead': 'victim',
+    'eskie.effect.wailsFromTheGrave.damage': 'victim',
+    'eskie.effect.armorOfAgathys.cast': 'victim',
+    'eskie.effect.trueStrike.cast': 'victim',
+    'eskie.effect.disintegrate.dissolve': 'victim',
+    'eskie.effect.disintegrate.reform': 'victim',
+    'eskie.effect.vortexWarp': 'victim',
+    'eskie.effect.frightfulMoan': 'origin',
+    'eskie.effect.dreadLord': 'origin',
+    'eskie.effect.bless.cast': 'origin',
+    'eskie.effect.haloOfSpores.aura': 'origin',
+    'eskie.effect.twilightSanctuary': 'origin',
+    'eskie.effect.faerieFire': 'template',
+    'eskie.effect.meteorStrike': 'template',
+};
+
+/**
+ * Resolves how executeTrapEffect should invoke an effect module or function.
+ * Consultation order:
+ * 1. Explicit `config.type` override
+ * 2. Native trap module (`eskie.traps.*` or has `.setup`)
+ * 3. Explicit signature override table (`TRAP_DISPATCH_OVERRIDES` / `eskie.effect.detect.*`)
+ * 4. Registered autorec trigger category (`adapter.autorec.getTrigger`)
+ * 5. Fallback heuristics for custom/unregistered effects
+ *
+ * @param {string} animationPath Resolved animation path (if invoked by string)
+ * @param {any} effectObj Resolved effect module or function
+ * @param {string} [explicitType] Optional explicit `config.type` override
+ * @returns {TrapDispatchMode}
+ */
+export function resolveTrapDispatchMode(
+    animationPath: string,
+    effectObj: any,
+    explicitType?: string
+): TrapDispatchMode {
+    if (explicitType && VALID_TRAP_DISPATCH_MODES.has(explicitType)) {
+        return explicitType as TrapDispatchMode;
+    }
+
+    if (Boolean(effectObj?.setup) || animationPath.includes('.traps.')) {
+        return 'trap';
+    }
+
+    if (animationPath && TRAP_DISPATCH_OVERRIDES[animationPath]) {
+        return TRAP_DISPATCH_OVERRIDES[animationPath];
+    }
+
+    if (animationPath.startsWith('eskie.effect.detect.')) {
+        return 'origin';
+    }
+
+    const playFn = effectObj?.play ?? effectObj;
+    const fnStr = playFn?.toString ? playFn.toString() : '';
+    const acceptsTargetArray = /\(\s*[^,)]+\s*,\s*(?:targets|targetTokens)\b/.test(fnStr);
+    const acceptsSingleTarget = /\(\s*[^,)]+\s*,\s*(?:target|ally|target1)\b/.test(fnStr);
+
+    const autorecTrigger = adapter.autorec.getTrigger(animationPath, effectObj?.default_config);
+    if (autorecTrigger) {
+        if (autorecTrigger === 'template') return 'template';
+        if (autorecTrigger === 'effect') return 'victim';
+        if (autorecTrigger === 'aura') return 'origin';
+        if (autorecTrigger === 'ranged-target' || autorecTrigger === 'melee-target') {
+            return acceptsTargetArray ? 'caster-to-targets' : 'caster-to-target';
+        }
+        if (autorecTrigger === 'token') {
+            if (acceptsTargetArray) return 'caster-to-targets';
+            if (acceptsSingleTarget) return 'caster-to-target';
+            return 'origin';
+        }
+    }
+
+    const defaultConfig = effectObj?.default_config;
+    const isFallbackTemplate = animationPath.includes('.template.')
+        || animationPath.includes('templatefx')
+        || Boolean(defaultConfig && (
+            'radius' in defaultConfig
+            || 'template' in defaultConfig
+            || 'aoeDistance' in defaultConfig
+            || ('distance' in defaultConfig && !('pushDistance' in defaultConfig))
+        ));
+    if (isFallbackTemplate) {
+        return 'template';
+    }
+
+    if (acceptsTargetArray) {
+        return 'caster-to-targets';
+    }
+
+    return 'caster-to-target';
+}
+
 /**
  * Executes an animation effect as a trap.
  * Origin placeable stands in for the caster, firing towards the trap target placeable / target tokens.
- * Supports template effects (e.g. Fireball, Lightning Bolt), targeted effects (e.g. Disintegrate, Guiding Bolt),
+ * Supports template effects (e.g. Fireball, Lightning Bolt, Silence, Spike Growth),
+ * targeted effects (e.g. Disintegrate, Guiding Bolt, Chain Lightning),
+ * victim-only effects (e.g. Charmed, Petrified, Banishment, Emotes),
+ * origin effects (e.g. Frightful Moan, Twilight Sanctuary),
  * and standard trap modules (e.g. Fire, Spike, Projectile).
  *
  * @param {string|object|Function} animation Global animation path (e.g. 'eskie.effect.fireball') or effect module
@@ -448,8 +578,10 @@ export async function executeTrapEffect(
     targets: Token[] = [],
     config: Record<string, any> = {}
 ): Promise<any> {
-    const origin = typeof originPlaceable === 'string' ? adapter.getPlaceable(originPlaceable) : originPlaceable;
-    const target = typeof targetPlaceable === 'string' ? adapter.getPlaceable(targetPlaceable) : targetPlaceable;
+    const isStringOrigin = Boolean(originPlaceable?.substring);
+    const isStringTarget = Boolean(targetPlaceable?.substring);
+    const origin = isStringOrigin ? adapter.getPlaceable(originPlaceable) : originPlaceable;
+    const target = isStringTarget ? adapter.getPlaceable(targetPlaceable) : targetPlaceable;
 
     if (!origin) {
         log.warn('executeTrapEffect | Origin placeable is missing or invalid.');
@@ -458,12 +590,21 @@ export async function executeTrapEffect(
 
     let effectObj: any = animation;
     let animationPath = '';
-    if (typeof animation === 'string') {
+    if (animation?.substring) {
         animationPath = animation;
         effectObj = adapter.getProperty(globalThis, animation);
         if (!effectObj) {
-            effectObj = adapter.getProperty(globalThis, `eskie.effect.${animation}`)
-                ?? adapter.getProperty(globalThis, `eskie.traps.${animation}`);
+            const effectCandidate = adapter.getProperty(globalThis, `eskie.effect.${animation}`);
+            if (effectCandidate) {
+                animationPath = `eskie.effect.${animation}`;
+                effectObj = effectCandidate;
+            } else {
+                const trapCandidate = adapter.getProperty(globalThis, `eskie.traps.${animation}`);
+                if (trapCandidate) {
+                    animationPath = `eskie.traps.${animation}`;
+                    effectObj = trapCandidate;
+                }
+            }
         }
     }
 
@@ -471,6 +612,16 @@ export async function executeTrapEffect(
         log.error(`executeTrapEffect | Animation "${animation}" could not be resolved.`);
         return null;
     }
+
+    const hasBoundPlay = Boolean(effectObj.play?.apply);
+    const isDirectCallable = Boolean(effectObj.apply);
+    if (!hasBoundPlay && !isDirectCallable) {
+        log.error(`executeTrapEffect | Animation "${animation}" does not expose a playable function (specify a sub-effect such as .cast or .attack).`);
+        return null;
+    }
+
+    const invokeEffect = (...args: any[]) =>
+        hasBoundPlay ? effectObj.play(...args) : effectObj(...args);
 
     const targetLocation = config.targetLocation
         ? adapter.getTargetLocation(config.targetLocation)
@@ -484,26 +635,17 @@ export async function executeTrapEffect(
         resolvedTargets = adapter.getTokensInPlaceable(trapZone);
     }
 
-    const explicitType = config.type;
-    const isTrapModule = explicitType === 'trap'
-        || Boolean(effectObj.setup)
-        || animationPath.includes('.traps.');
+    const dispatchMode = resolveTrapDispatchMode(animationPath, effectObj, config.type);
 
-    const isTemplateEffect = explicitType === 'template'
-        || animationPath.includes('.template.')
-        || animationPath.includes('templatefx')
-        || Boolean(effectObj.default_config && ('radius' in effectObj.default_config || 'template' in effectObj.default_config || ('distance' in effectObj.default_config && !('pushDistance' in effectObj.default_config))));
-
-    if (isTrapModule) {
+    if (dispatchMode === 'trap') {
         const trapConfig = { ...config };
         if (targetLocation && !trapConfig.targetLocation) {
             trapConfig.targetLocation = targetLocation;
         }
-        const playFn = effectObj.play ?? effectObj;
-        return playFn(origin, resolvedTargets, trapConfig);
+        return invokeEffect(origin, resolvedTargets, trapConfig);
     }
 
-    if (isTemplateEffect) {
+    if (dispatchMode === 'template') {
         const templateConfig = {
             ...config,
             template: config.template ?? target ?? origin,
@@ -511,28 +653,69 @@ export async function executeTrapEffect(
             target: config.target ?? target,
             targets: config.targets ?? resolvedTargets,
         };
-        const playFn = effectObj.play ?? effectObj;
-        return playFn(casterProxy, templateConfig);
+        return invokeEffect(casterProxy, templateConfig);
     }
 
-    const playFn = effectObj.play ?? effectObj;
     const targetConfig = {
         ...config,
         targetLocation,
     };
 
-    if (resolvedTargets.length > 0) {
-        const fnStr = typeof playFn === 'function' ? playFn.toString() : '';
-        const acceptsArray = /\(\s*[^,)]+\s*,\s*targets\b/.test(fnStr);
-        if (acceptsArray) {
-            return playFn(casterProxy, resolvedTargets, targetConfig);
+    if (dispatchMode === 'origin') {
+        return invokeEffect(casterProxy, targetConfig);
+    }
+
+    if (dispatchMode === 'victim') {
+        if (resolvedTargets.length > 0) {
+            return Promise.all(resolvedTargets.map(victim => invokeEffect(victim, targetConfig)));
         }
-        return Promise.all(resolvedTargets.map(targetToken => playFn(casterProxy, targetToken, targetConfig)));
+        if (target) {
+            const targetProxy = adapter.createTargetProxy(target);
+            return invokeEffect(targetProxy, targetConfig);
+        }
+        return null;
+    }
+
+    if (dispatchMode === 'position') {
+        const resolvedPos = targetLocation
+            ?? (resolvedTargets[0] ? adapter.getCenter(resolvedTargets[0]) : null)
+            ?? casterProxy.center;
+        return invokeEffect(resolvedPos, targetConfig);
+    }
+
+    if (dispatchMode === 'caster-to-position') {
+        const resolvedPos = targetLocation
+            ?? (resolvedTargets[0] ? adapter.getCenter(resolvedTargets[0]) : null)
+            ?? casterProxy.center;
+        return invokeEffect(casterProxy, resolvedPos, targetConfig);
+    }
+
+    if (dispatchMode === 'targets-only') {
+        const targetList = resolvedTargets.length > 0
+            ? resolvedTargets
+            : (target ? [adapter.createTargetProxy(target)] : []);
+        if (targetList.length === 0) return null;
+        return invokeEffect(targetList, {
+            ...targetConfig,
+            position: config.position ?? targetLocation ?? casterProxy.center,
+        });
+    }
+
+    if (dispatchMode === 'caster-to-targets') {
+        const targetList = resolvedTargets.length > 0
+            ? resolvedTargets
+            : (target ? [adapter.createTargetProxy(target)] : []);
+        if (targetList.length === 0) return null;
+        return invokeEffect(casterProxy, targetList, targetConfig);
+    }
+
+    if (resolvedTargets.length > 0) {
+        return Promise.all(resolvedTargets.map(targetToken => invokeEffect(casterProxy, targetToken, targetConfig)));
     }
 
     if (target) {
-        const targetProxy = adapter.createCasterProxy(target);
-        return playFn(casterProxy, targetProxy, targetConfig);
+        const targetProxy = adapter.createTargetProxy(target);
+        return invokeEffect(casterProxy, targetProxy, targetConfig);
     }
 
     return null;

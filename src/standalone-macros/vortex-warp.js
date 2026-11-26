@@ -13,10 +13,11 @@ const target = game.user.targets.first();
 if (!target) return ui.notifications.warn("Please target a token to warp!");
 
 const label = "Vortex Warp";
-const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: target });
-if (activeEffects.length > 0 || (target.document?.opacity ?? 1) === 0) {
-    Sequencer.EffectManager.endEffects({ name: label, object: target });
-    new Sequence().animation().on(target).opacity(1).play();
+const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: target }) ?? [];
+const endedMotions = Sequencer.MotionManager.endMotions(target, { name: label });
+if (activeEffects.length > 0 || endedMotions > 0 || (target.document?.opacity ?? 1) === 0) {
+    await Sequencer.EffectManager.endEffects({ name: label, object: target });
+    await new Sequence().animation().on(target).opacity(1).play();
     return;
 }
 
@@ -38,6 +39,11 @@ const crosshairConfig = {
 const position = await Sequencer.Crosshair.show(crosshairConfig);
 if (!position || position.cancelled || !position.x) return;
 
+const targetCenter = target.center ?? {
+    x: target.x + (target.w ?? (targetWidth * gridSize)) / 2,
+    y: target.y + (target.h ?? ((target.document?.height ?? 1) * gridSize)) / 2,
+};
+const hasMove = Math.hypot(position.x - targetCenter.x, position.y - targetCenter.y) >= 1;
 const portalFile = closest("jb2a.portals.horizontal.vortex.purple");
 
 let sequence = new Sequence();
@@ -57,16 +63,21 @@ sequence = sequence.effect()
     .belowTokens()
     .waitUntilFinished(-500);
 
-sequence = sequence.effect()
+let outMotion = sequence
+    .motion(target)
     .name(label)
-    .copySprite(target)
-    .spriteRotation(-(target.document?.rotation ?? 0))
-    .scaleToObject(1, { considerTokenScale: true })
-    .duration(500)
-    .scaleOut(0, 500, { ease: "easeInOutElastic" })
-    .rotateOut(180, 300, { ease: "easeOutCubic" });
+    .scaleTo(0.01, { duration: 500, ease: "easeInOutElastic", return: false })
+    .rotateBy(180, { delay: 200, duration: 300, ease: "easeOutCubic", return: false });
+if (hasMove) {
+    outMotion = outMotion.persistUntilUpdate();
+} else {
+    outMotion = outMotion.fadeTo(0, { delay: 450, duration: 50, return: false });
+}
+sequence = outMotion;
 
-sequence = sequence.animation()
+sequence = sequence
+    .wait(500)
+    .animation()
     .on(target)
     .opacity(0);
 
@@ -89,18 +100,27 @@ sequence = sequence.effect()
     .duration(2000)
     .waitUntilFinished(-500);
 
-sequence = sequence.effect()
-    .name(label)
-    .copySprite(target)
-    .spriteRotation(-(target.document?.rotation ?? 0))
-    .scaleToObject(1, { considerTokenScale: true })
-    .scaleIn(0, 500, { ease: "easeInOutElastic" })
-    .rotateIn(180, 300, { ease: "easeOutCubic" })
-    .duration(500)
-    .waitUntilFinished(-250);
-
 sequence = sequence.animation()
     .on(target)
     .opacity(1);
+
+sequence = sequence
+    .motion(target)
+    .name(label)
+    .scaleTo(
+        [
+            { v: 0.01 },
+            { v: 1, duration: 500, inEase: "easeInOutElastic" },
+        ],
+        { return: false }
+    )
+    .rotateBy(
+        [
+            { v: 180 },
+            { v: 0, duration: 300, inEase: "easeOutCubic" },
+        ],
+        { return: false }
+    )
+    .waitUntilFinished(-250);
 
 await sequence.play();

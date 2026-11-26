@@ -15,16 +15,17 @@ const id = "leap";
 const tokenId = token.id ?? token.document?.id ?? "";
 const label = `${id} - ${tokenId}`;
 
-// Toggle / re-entrant persistent effect handling
+// Toggle / re-entrant cleanup handling
 const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
-if (activeEffects.length > 0) {
-    Sequencer.EffectManager.endEffects({ name: label, object: token });
-    await new Sequence().animation().on(token).opacity(1).play();
+const endedMotions = Sequencer.MotionManager.endMotions(token, { name: label });
+if (activeEffects.length > 0 || endedMotions > 0) {
+    await Sequencer.EffectManager.endEffects({ name: label, object: token });
     return;
 }
 
 const tokenWidth = token.document?.width ?? token.width ?? 1;
 const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
+const gridSize = canvas.grid?.size ?? 100;
 
 const crosshairConfig = {
     size: tokenWidth,
@@ -40,21 +41,26 @@ const crosshairConfig = {
 const position = await Sequencer.Crosshair.show(crosshairConfig);
 if (!position || position.cancelled || !position.x) return;
 
+const startCenter = token.center ?? {
+    x: token.x + (token.w ?? (tokenWidth * gridSize)) / 2,
+    y: token.y + (token.h ?? ((token.document?.height ?? 1) * gridSize)) / 2,
+};
+const delta = {
+    x: position.x - startCenter.x,
+    y: position.y - startCenter.y,
+};
+const dist = Math.hypot(delta.x, delta.y);
+
 const jumpTime = 900;
 const upTime = jumpTime * 0.5;
 const downTime = jumpTime * 0.5;
 
 const sequence = new Sequence();
 
-// Hide original token during super-hero airborne jump
-sequence.animation()
-    .on(token)
-    .opacity(0);
-
 // --- 1. POWERFUL SUPERHERO JUMP TAKEOFF CRATER EXPLOSION ---
 sequence.effect()
     .file(closest("eskie.smoke.06.white"))
-    .atLocation(token)
+    .atLocation(startCenter)
     .scaleToObject(2.2)
     .belowTokens()
     .randomRotation()
@@ -64,7 +70,7 @@ sequence.effect()
 
 sequence.effect()
     .file(closest("eskie.smoke.03.white"))
-    .atLocation(token)
+    .atLocation(startCenter)
     .scaleToObject(1.8)
     .belowTokens()
     .randomRotation()
@@ -75,7 +81,7 @@ sequence.effect()
 
 sequence.effect()
     .file(closest("jb2a.impact.009.orange"))
-    .atLocation(token)
+    .atLocation(startCenter)
     .scaleToObject(1.5)
     .belowTokens()
     .randomRotation()
@@ -87,7 +93,7 @@ sequence.effect()
     .name(label)
     .copySprite(token)
     .spriteRotation(-tokenRotation)
-    .atLocation(token)
+    .atLocation(startCenter)
     .scaleToObject(0.95, { considerTokenScale: true })
     .opacity(0.55)
     .belowTokens()
@@ -102,25 +108,30 @@ sequence.effect()
     .animateProperty('sprite', 'height', { from: 0, to: 0.45, duration: downTime, delay: upTime, gridUnits: true, ease: "easeInCubic" })
     .zIndex(2);
 
-// --- 3. HIGH ARC AERIAL SPIN TRAJECTORY ---
-sequence.effect()
+// --- 3. HIGH ARC AERIAL SPIN TRAJECTORY VIA .motion() ---
+let leapMotion = sequence.motion(token)
     .name(label)
-    .copySprite(token)
-    .spriteRotation(-tokenRotation)
-    .atLocation(token)
-    .scaleToObject(1, { considerTokenScale: true })
-    .opacity(1)
-    .moveTowards(position, { ease: "linear", rotate: false })
-    .duration(jumpTime)
-    .animateProperty('spriteContainer', 'position.y', { from: 0, to: -2.8, duration: upTime, gridUnits: true, ease: "easeOutQuad" })
-    .animateProperty('spriteContainer', 'position.y', { from: 0, to: 2.8, duration: downTime, delay: upTime, gridUnits: true, ease: "easeInQuad" })
-    .animateProperty('sprite', 'rotation', { from: 0, to: 720, duration: jumpTime, ease: "easeInOutSine" })
-    .zIndex(5);
+    .zIndex(5)
+    .moveBy(
+        [
+            { v: { x: 0, y: 0 } },
+            { v: { x: 0, y: -2.8 }, duration: upTime, inEase: "easeOutQuad" },
+            { v: { x: 0, y: 0 }, duration: downTime, inEase: "easeInQuad" },
+        ],
+        { gridUnits: true, return: false }
+    )
+    .rotateBy(720, { duration: jumpTime, ease: "easeInOutSine", return: false });
+
+if (dist >= 1) {
+    leapMotion
+        .moveBy(delta, { duration: jumpTime, ease: "linear", return: false })
+        .persistUntilUpdate();
+}
 
 sequence.effect()
     .file(closest("jb2a.wind_stream.white"))
     .anchor({ x: 0.5, y: 1 })
-    .atLocation(token)
+    .atLocation(startCenter)
     .duration(jumpTime)
     .opacity(0.85)
     .scale(tokenWidth * 0.03)
@@ -132,15 +143,13 @@ sequence.effect()
 sequence.wait(jumpTime);
 
 // Teleport actual token to selected landing position
-sequence.animation()
-    .on(token)
-    .teleportTo(position)
-    .snapToGrid()
-    .waitUntilFinished();
-
-sequence.animation()
-    .on(token)
-    .opacity(1);
+if (dist >= 1) {
+    sequence.animation()
+        .on(token)
+        .teleportTo(position, { relativeToCenter: true })
+        .snapToGrid()
+        .waitUntilFinished();
+}
 
 // --- 4. THUNDEROUS GROUND POUNDING ARRIVAL SHOCKWAVE ---
 sequence.effect()

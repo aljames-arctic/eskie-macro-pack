@@ -16,6 +16,14 @@ const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.
 
 const tokenCenter = token.center ?? { x: token.x ?? 0, y: token.y ?? 0 };
 const targetCenter = target.center ?? { x: target.x ?? 0, y: target.y ?? 0 };
+const tokenDelta = { x: targetCenter.x - tokenCenter.x, y: targetCenter.y - tokenCenter.y };
+const targetDelta = { x: tokenCenter.x - targetCenter.x, y: tokenCenter.y - targetCenter.y };
+const dist = Math.hypot(tokenDelta.x, tokenDelta.y);
+
+const targetMoveDuration = Math.max(1, Math.round((dist / 500) * 1000));
+const tokenMoveDuration = Math.max(1, Math.round((dist / 300) * 1000));
+const targetArrive = Math.max(750, 250 + targetMoveDuration);
+const tokenArrive = Math.max(1000, 500 + tokenMoveDuration);
 
 let blurDirectionX = 0;
 let blurDirectionY = 0;
@@ -24,36 +32,34 @@ if (token.y === target.y) blurDirectionX = 20;
 
 const sequence = new Sequence();
 
+if (dist >= 1) {
+    sequence
+        .motion(target)
+            .zIndex(0.2)
+            .moveBy(targetDelta, {
+                delay: 250,
+                duration: targetMoveDuration,
+                ease: "easeInBack",
+                return: false,
+            })
+            .persistUntilUpdate()
+
+        .motion(token)
+            .moveBy(tokenDelta, {
+                delay: 500,
+                duration: tokenMoveDuration,
+                ease: "easeOutCubic",
+                return: false,
+            })
+            .persistUntilUpdate();
+}
+
 sequence
-    .animation()
-        .on(target)
-        .opacity(0)
-        .delay(150)
-
-    .animation()
-        .on(token)
-        .opacity(0)
-        .delay(250)
-
-    .effect()
-        .copySprite(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .moveTowards(token, { rotate: false, ease: "easeInBack", delay: 250 })
-        .moveSpeed(500)
-        .duration(1000)
-        .zIndex(0.2)
-
     .effect()
         .copySprite(token)
+        .atLocation(tokenCenter)
         .scaleToObject(1, { considerTokenScale: true })
-        .moveTowards(target, { rotate: false, ease: "easeOutCubic", delay: 500 })
-        .moveSpeed(300)
-        .duration(1250)
-
-    .effect()
-        .copySprite(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .moveTowards(target, { rotate: false, ease: "easeOutCubic", delay: 500 })
+        .moveTowards(targetCenter, { rotate: false, ease: "easeOutCubic", delay: 500 })
         .moveSpeed(300)
         .duration(1250)
         .opacity(0.85)
@@ -72,20 +78,21 @@ sequence
         .opacity(0.4)
         .spriteOffset({ x: -0.5 }, { gridUnits: true })
         .mirrorX()
-        .spriteRotation(180)
+        .spriteRotation(180);
 
-    .animation()
-        .delay(1000)
-        .on(token)
-        .teleportTo(targetCenter, { relativeToCenter: false })
-        .snapToGrid()
-        .opacity(1)
+if (dist >= 1) {
+    sequence
+        .animation()
+            .delay(targetArrive)
+            .on(target)
+            .teleportTo(tokenCenter, { relativeToCenter: true })
+            .snapToGrid()
 
-    .animation()
-        .delay(750)
-        .on(target)
-        .teleportTo(tokenCenter, { relativeToCenter: false })
-        .snapToGrid()
-        .opacity(1);
+        .animation()
+            .delay(tokenArrive)
+            .on(token)
+            .teleportTo(targetCenter, { relativeToCenter: true })
+            .snapToGrid();
+}
 
 await sequence.play();

@@ -436,14 +436,10 @@ for (let e = 0; e < 10; e++) {
                         .delay(700)
                         .waitUntilFinished(-500)
 
-                        .animation()
-                        .on(target)
-                        .opacity(0)
-
                         .effect()
                         .copySprite(target)
                         .spriteRotation(-targetRot)
-                        .atLocation(target, { local: true })
+                        .atLocation(target, { local: true, ignoreMotion: true })
                         .scaleToObject(1, { considerTokenScale: true })
                         .filter("ColorMatrix", { brightness: -1 })
                         .filter("Blur", { blurX: 5, blurY: 10 })
@@ -454,35 +450,32 @@ for (let e = 0; e < 10; e++) {
                         .opacity(0.5)
                         .belowTokens()
 
-                        .effect()
-                        .copySprite(target)
-                        .spriteRotation(-targetRot)
-                        .atLocation(target, { local: true })
-                        .scaleToObject(1, { considerTokenScale: true })
-                        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.25, duration: 500, gridUnits: true, ease: "easeOutCubic" })
-                        .animateProperty('sprite', 'rotation', { from: 0, to: 90, duration: 500, ease: "easeInOutBack" })
-                        .animateProperty('spriteContainer', 'position.y', { from: 0.25, to: 0, duration: 250, gridUnits: true, delay: 500, ease: "easeOutCubic" })
-                        .extraEndDuration(100)
-                        .waitUntilFinished(-100)
+                        .motion(target)
+                        .moveBy(
+                            [
+                                { v: { x: 0, y: 0 } },
+                                { v: { x: 0, y: -0.25 }, duration: 500, inEase: "easeOutCubic" },
+                                { v: { x: 0, y: 0 }, duration: 250, inEase: "easeOutCubic" },
+                            ],
+                            { gridUnits: true, return: false }
+                        )
+                        .rotateBy(
+                            [
+                                { v: 0 },
+                                { v: 90, duration: 500, inEase: "easeInOutBack", hold: 1750 },
+                                { v: 0, duration: 150, inEase: "easeOutCubic" },
+                            ],
+                            { return: false }
+                        )
+
+                        .wait(750)
 
                         .effect()
                         .file(closest("eskie.smoke.06.white"))
-                        .atLocation(target)
+                        .atLocation(target, { ignoreMotion: true })
                         .scaleToObject(1.5)
                         .belowTokens()
                         .opacity(0.5)
-
-                        .animation()
-                        .on(target)
-                        .rotate(90)
-                        .opacity(1)
-
-                        .wait(1500)
-
-                        .animation()
-                        .on(target)
-                        .rotate(0)
-                        .opacity(1)
 
                         .play();
                 });

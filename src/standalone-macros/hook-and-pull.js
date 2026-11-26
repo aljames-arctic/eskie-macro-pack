@@ -16,14 +16,12 @@ if (target === token) return ui.notifications.warn("You cannot target yourself!"
 
 const label = `HookAndPull-${token.id}`;
 
-// Check if effect sequence is active and toggle off cleanly if running again
-const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token });
-if (activeEffects.length > 0) {
-    Sequencer.EffectManager.endEffects({ name: label, object: token });
-    Sequencer.EffectManager.endEffects({ name: label, object: target });
-    new Sequence()
-        .animation().on(target).opacity(1)
-        .play();
+// Check if effect/motion sequence is active and toggle off cleanly if running again
+const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
+const endedMotions = Sequencer.MotionManager.endMotions(target, { name: label });
+if (activeEffects.length > 0 || endedMotions > 0) {
+    await Sequencer.EffectManager.endEffects({ name: label, object: token });
+    await Sequencer.EffectManager.endEffects({ name: label, object: target });
     return;
 }
 
@@ -105,13 +103,12 @@ const latchAsset = config.latch ?? "eskie.objects.meat_hook.ranged.01.physical.l
 // Determine pull location (best adjacent square to the caster along the line to the target)
 const location = getBestAdjacentLocation(token, target);
 
-// Determine travel distance in grid units
-const targetCenterX = target.center.x;
-const targetCenterY = target.center.y;
-const gridSize = canvas.grid.size;
-const offsetX = (location.x - targetCenterX) / gridSize;
-const offsetY = (location.y - targetCenterY) / gridSize;
-const targetRotation = target.document.rotation;
+// Determine pixel travel delta
+const pullDelta = {
+    x: location.x - target.center.x,
+    y: location.y - target.center.y,
+};
+const pullDist = Math.hypot(pullDelta.x, pullDelta.y);
 
 const sequence = new Sequence();
 
@@ -135,30 +132,27 @@ sequence.effect()
     .waitUntilFinished(-750)
     .playIf(!missed);
 
-// Turn target token invisible
-sequence.animation()
-    .delay(100)
-    .on(target)
-    .opacity(0)
-    .playIf(!missed);
+if (!missed && pullDist >= 1) {
+    const slideDelay = Math.max(0, 101 + timingAdjust);
 
-// Create effect copy of target and pull it toward location
-sequence.effect()
-    .name(label)
-    .copySprite(target)
-    .spriteRotation(-targetRotation)
-    .zIndex(0)
-    .animateProperty("spriteContainer", "position.x", { from: 0, to: offsetX, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: "easeInCubic" })
-    .animateProperty("spriteContainer", "position.y", { from: 0, to: offsetY, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: "easeInCubic" })
-    .duration(700 + timingAdjust)
-    .waitUntilFinished(-100)
-    .playIf(!missed);
+    // Pull target toward adjacent location via .motion().persistUntilUpdate()
+    sequence.motion(target)
+        .name(label)
+        .zIndex(0)
+        .moveBy(pullDelta, {
+            delay: slideDelay,
+            duration: 500,
+            ease: "easeInCubic",
+            return: false,
+        })
+        .persistUntilUpdate();
 
-// Teleport target to pull location with grid snapping and make visible again
-sequence.animation()
-    .on(target)
-    .teleportTo(location, { relativeToCenter: true })
-    .opacity(1)
-    .playIf(!missed);
+    sequence.wait(slideDelay + 500);
+
+    // Teleport target to pull location
+    sequence.animation()
+        .on(target)
+        .teleportTo(location, { relativeToCenter: true });
+}
 
 await sequence.play();

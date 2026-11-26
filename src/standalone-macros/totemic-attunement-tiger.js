@@ -19,10 +19,10 @@ const label = `${id} - ${tokenId}`;
 const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const activeEffects = Sequencer.EffectManager.getEffects({ name: label, object: token }) ?? [];
-if (activeEffects.length > 0) {
-    Sequencer.EffectManager.endEffects({ name: label, object: token });
-    Sequencer.EffectManager.endEffects({ name: label });
-    await new Sequence().animation().on(token).opacity(1).play();
+const endedMotions = Sequencer.MotionManager.endMotions(token, { name: label });
+if (activeEffects.length > 0 || endedMotions > 0) {
+    await Sequencer.EffectManager.endEffects({ name: label, object: token });
+    await Sequencer.EffectManager.endEffects({ name: label });
     return ui.notifications.info("Ended Tiger Totemic Attunement.");
 }
 
@@ -30,16 +30,18 @@ const target = game.user.targets.first();
 if (!target) return ui.notifications.warn("Please target an enemy to tiger pounce!");
 
 const tokenWidth = token.document.width;
-const dx = target.center.x - token.center.x;
-const dy = target.center.y - token.center.y;
-const dist = Math.hypot(dx, dy) || 1;
+const startCenter = token.center;
+const dx = target.center.x - startCenter.x;
+const dy = target.center.y - startCenter.y;
+const dist = Math.hypot(dx, dy);
+const safeDist = dist > 0 ? dist : 1;
 
 const sizeAdjust = (tokenWidth - 1) / 2;
 const totalSquares = 1 + sizeAdjust;
 const totalPixels = totalSquares * canvas.grid.size;
 
-const ux = dx / dist;
-const uy = dy / dist;
+const ux = dx / safeDist;
+const uy = dy / safeDist;
 
 const rawCenter = {
     x: target.center.x - ux * totalPixels,
@@ -50,38 +52,24 @@ const tokenSpan = (tokenWidth * canvas.grid.size) / 2;
 const rawPosition = { x: rawCenter.x - tokenSpan, y: rawCenter.y - tokenSpan };
 const gridSnap = canvas.grid.getSnappedPosition ? canvas.grid.getSnappedPosition(rawPosition.x, rawPosition.y, 1) : rawPosition;
 const location = { x: gridSnap.x + tokenSpan, y: gridSnap.y + tokenSpan };
-const tokenRotation = token.document.rotation;
+const dashDelta = { x: location.x - startCenter.x, y: location.y - startCenter.y };
+const dashDist = Math.hypot(dashDelta.x, dashDelta.y);
 
 let seq = new Sequence();
-
-seq.animation()
-    .delay(100)
-    .on(token)
-    .opacity(0);
 
 seq.effect()
     .file(closest(`eskie.aura.token.generic.02.${color}`))
     .name(label)
-    .atLocation(token)
+    .attachTo(token, { bindAlpha: false })
     .scaleToObject(2.1)
     .startTime(550)
-    .moveTowards(location, { relativeToCenter: true, ease: "easeOutQuint", rotate: false, delay: 240, snapToGrid: true })
-    .attachTo(token)
     .persist()
     .zIndex(1);
 
 seq.effect()
-    .copySprite(token)
-    .spriteRotation(-tokenRotation)
-    .atLocation(token)
-    .scaleToObject(1, { considerTokenScale: true })
-    .duration(900)
-    .moveTowards(location, { relativeToCenter: true, ease: "easeOutQuint", rotate: false, delay: 250, snapToGrid: true });
-
-seq.effect()
     .delay(250)
     .file(closest("jb2a.teleport.01.white"))
-    .atLocation(token)
+    .atLocation(startCenter)
     .rotateTowards(target)
     .scaleToObject(4)
     .spriteScale({ x: 1.25, y: 1 }, { gridUnits: true })
@@ -93,7 +81,7 @@ seq.effect()
 seq.effect()
     .delay(100)
     .file(closest("eskie.velocity.01.white"))
-    .atLocation(token)
+    .atLocation(startCenter)
     .rotateTowards(target)
     .scaleToObject(4)
     .opacity(0.5)
@@ -103,11 +91,17 @@ seq.effect()
 seq.canvasPan()
     .shake({ duration: 500, strength: 1, rotation: false, fadeOut: 500, delay: 200 });
 
-seq.animation()
-    .delay(250)
-    .on(token)
-    .teleportTo(location, { relativeToCenter: false })
-    .snapToGrid();
+if (dashDist >= 1) {
+    seq.motion(token)
+        .name(label)
+        .moveBy(dashDelta, {
+            delay: 250,
+            duration: 650,
+            ease: "easeOutQuint",
+            return: false,
+        })
+        .persistUntilUpdate();
+}
 
 seq.effect()
     .delay(400)
@@ -136,10 +130,13 @@ seq.effect()
     .mirrorY()
     .playIf(count >= 2);
 
-seq.wait(850);
+seq.wait(900);
 
-seq.animation()
-    .on(token)
-    .opacity(1);
+if (dashDist >= 1) {
+    seq.animation()
+        .on(token)
+        .teleportTo(location, { relativeToCenter: true })
+        .snapToGrid();
+}
 
 await seq.play();

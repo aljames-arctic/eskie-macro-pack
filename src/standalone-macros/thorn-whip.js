@@ -25,10 +25,15 @@ const rawLocation = {
 };
 
 const location = canvas.grid.getCenterPoint ? canvas.grid.getCenterPoint(rawLocation) : rawLocation;
-const offsetX = (location.x - target.center.x) / canvas.grid.size;
-const offsetY = (location.y - target.center.y) / canvas.grid.size;
+const pullDelta = {
+    x: location.x - target.center.x,
+    y: location.y - target.center.y,
+};
+const pullDist = Math.hypot(pullDelta.x, pullDelta.y);
+const canPull = (target.document?.width ?? 1) <= 2 && pullDist >= 1;
 
-new Sequence()
+const sequence = new Sequence();
+sequence
     .effect()
     .file(closest('eskie.casting.nature.01.side.one_shot.green'))
     .attachTo(token)
@@ -50,30 +55,30 @@ new Sequence()
     .randomRotation()
     .effect()
     .copySprite(target)
-    .spriteRotation(-target.document.rotation)
+    .spriteRotation(-(target.document?.rotation ?? 0))
     .attachTo(target)
     .scaleToObject(1, { considerTokenScale: true })
     .loopProperty('sprite', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
     .opacity(0.5)
     .duration(1000)
-    .fadeOut(250)
-    .animation()
-    .delay(100)
-    .on(target)
-    .opacity(0)
-    .playIf(target.document.width <= 2)
-    .effect()
-    .copySprite(target)
-    .spriteRotation(-target.document.rotation)
-    .zIndex(0)
-    .animateProperty('spriteContainer', 'position.x', { from: 0, to: offsetX, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })
-    .animateProperty('spriteContainer', 'position.y', { from: 0, to: offsetY, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })
-    .duration(700 + timingAdjust)
-    .waitUntilFinished(-100)
-    .playIf(target.document.width <= 2)
-    .animation()
-    .on(target)
-    .teleportTo(location, { relativeToCenter: true })
-    .opacity(1)
-    .playIf(target.document.width <= 2)
-    .play();
+    .fadeOut(250);
+
+if (canPull) {
+    const slideDelay = Math.max(0, 101 + timingAdjust);
+    sequence
+        .motion(target)
+        .zIndex(0)
+        .moveBy(pullDelta, {
+            delay: slideDelay,
+            duration: 500,
+            ease: 'easeInCubic',
+            return: false,
+        })
+        .persistUntilUpdate()
+        .wait(slideDelay + 500)
+        .animation()
+        .on(target)
+        .teleportTo(location, { relativeToCenter: true });
+}
+
+await sequence.play();

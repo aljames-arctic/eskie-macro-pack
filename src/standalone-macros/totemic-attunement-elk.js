@@ -49,15 +49,10 @@ seq.effect()
 if (target) {
     const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
 
-    seq.animation()
-        .delay(100)
-        .on(target)
-        .opacity(0);
-
     seq.effect()
         .copySprite(target)
         .spriteRotation(-targetRotation)
-        .attachTo(target, { bindAlpha: false, bindRotation: false, local: false })
+        .attachTo(target, { bindAlpha: false, bindRotation: false, local: false, ignoreMotion: true })
         .scaleToObject(0.9, { considerTokenScale: true })
         .zIndex(0.1)
         .belowTokens()
@@ -69,7 +64,7 @@ if (target) {
     seq.effect()
         .delay(100)
         .file(closest(`eskie.damage.bludgeoning.01.${color}`))
-        .attachTo(target, { bindAlpha: false, bindRotation: false })
+        .attachTo(target, { bindAlpha: false, bindRotation: false, ignoreMotion: true })
         .scaleToObject(1.5)
         .opacity(1)
         .zIndex(1)
@@ -77,20 +72,28 @@ if (target) {
         .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", gridUnits: true })
         .filter("ColorMatrix", { saturate: 1 });
 
-    seq.effect()
-        .copySprite(target)
-        .spriteRotation(-targetRotation)
-        .attachTo(target, { bindAlpha: false, bindRotation: false, local: false })
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", delay: 100, gridUnits: true })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: 0.5, duration: 250, ease: "easeOutCubic", delay: 600, gridUnits: true })
-        .animateProperty("sprite", "rotation", { from: 0, to: 90, duration: 250, ease: "easeOutCubic", delay: 100 })
-        .duration(1200)
-        .waitUntilFinished(-500);
+    seq.motion(target)
+        .moveBy(
+            [
+                { v: { x: 0, y: 0 } },
+                { v: { x: 0, y: -0.5 }, duration: 500, inEase: "easeOutCubic" },
+                { v: { x: 0, y: 0 }, duration: 250, inEase: "easeOutCubic" },
+            ],
+            { gridUnits: true, delay: 100, return: false }
+        )
+        .rotateBy(90, {
+            delay: 100,
+            duration: 250,
+            ease: "easeOutCubic",
+            return: false,
+        })
+        .persistUntilUpdate();
+
+    seq.wait(700);
 
     seq.effect()
         .file(closest("eskie.smoke.03.tan"))
-        .attachTo(target, { bindAlpha: false, bindRotation: false })
+        .attachTo(target, { bindAlpha: false, bindRotation: false, ignoreMotion: true })
         .scaleToObject(2)
         .opacity(0.8)
         .belowTokens();
@@ -98,7 +101,6 @@ if (target) {
     seq.animation()
         .delay(300)
         .on(target)
-        .opacity(1)
         .rotate(targetRotation + 90);
 }
 

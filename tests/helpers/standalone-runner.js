@@ -172,13 +172,16 @@ export async function runStandaloneMacro(filename, options = {}) {
         const fn = new AsyncFunction('scope', source);
         await fn(scope);
 
-        // Execute any synchronous/async thenDo callbacks if requested
+        // Execute any synchronous/async thenDo callbacks if requested (deduped across addSequence merges)
         if (options.runThenDo) {
+            const seenCallbacks = new Set();
             const snapshot = [...rec.sequences];
             for (const seq of snapshot) {
                 for (const sec of seq.sections) {
-                    if (sec.type === 'thenDo' && typeof sec.initArgs[0] === 'function') {
-                        await sec.initArgs[0]();
+                    const cb = sec.initArgs[0];
+                    if (sec.type === 'thenDo' && typeof cb === 'function' && !seenCallbacks.has(cb)) {
+                        seenCallbacks.add(cb);
+                        await cb();
                     }
                 }
             }

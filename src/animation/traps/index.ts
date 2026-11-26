@@ -1,6 +1,6 @@
 import { adapter } from '../../adapters/index.js';
 import { localize, format } from '../../lib/utils.js';
-import { setupTrap, executeTrapEffect, playEffectAsTrap, createCasterProxy } from './trap-manager.js';
+import { setupTrap, executeTrapEffect, playEffectAsTrap, createCasterProxy, validateTrapSetupEnvironment } from './trap-manager.js';
 
 import { bullRushStatue } from './bull-rush-statue.js';
 import { electricDoor } from './electric-door.js';
@@ -27,6 +27,11 @@ async function setup(
     animationOrConfig: string | Record<string, unknown> = {},
     config: Record<string, unknown> = {}
 ): Promise<any> {
+    const requestedMode = typeof animationOrConfig === 'string'
+        ? (config.mode as string | undefined)
+        : ((config.mode ?? (animationOrConfig as Record<string, unknown> | null)?.mode) as string | undefined);
+    if (!validateTrapSetupEnvironment(requestedMode)) return;
+
     // 1. Direct invocation with an animation string: eskie.traps.setup('eskie.effect.fireball', config)
     if (typeof animationOrConfig === 'string') {
         return setupTrap(normalizeAnimationPath(animationOrConfig), config);

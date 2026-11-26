@@ -103,7 +103,7 @@ async function setup(config: Record<string, unknown> = {}): Promise<any> {
             {
                 key: 'floodingRoomSplashOrigins',
                 label: 'Water Splash Origin Tile(s)',
-                prompt: 'Select the **Water Splash Origin Tile(s)** on the canvas (where the water sprays out from).'
+                prompt: 'Select the <strong>Water Splash Origin Tile(s)</strong> on the canvas (where the water sprays out from).'
             }
         ],
         ...config

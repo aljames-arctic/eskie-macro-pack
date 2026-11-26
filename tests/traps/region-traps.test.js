@@ -781,3 +781,193 @@ test('setupTrap: targets only tokens currently or moving into trap placeables, i
     adapter.foundry = new FoundryV12Adapter(adapter);
     globalThis.game.release = { generation: 12 };
 });
+
+test('eskie.traps.setup: verifies Foundry version and MATT availability with accurate prompt copy', async () => {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const enJson = JSON.parse(fs.readFileSync(path.resolve('lang/en.json'), 'utf-8'));
+
+    const resolveKey = (key) => key.split('.').reduce((acc, part) => acc?.[part], enJson);
+    const originalI18n = globalThis.game.i18n;
+    const originalError = globalThis.ui.notifications.error;
+    const originalWarn = globalThis.ui.notifications.warn;
+    const originalButtonDialog = adapter.buttonDialog;
+    const originalFoundry = adapter.foundry;
+    const originalRelease = globalThis.game.release;
+
+    globalThis.game.i18n = {
+        has: (key) => typeof resolveKey(key) === 'string',
+        localize: (key) => resolveKey(key) ?? key,
+        format: (key, data = {}) => {
+            let str = resolveKey(key) ?? key;
+            for (const [k, v] of Object.entries(data)) {
+                str = str.replace(`{${k}}`, String(v));
+            }
+            return str;
+        }
+    };
+
+    try {
+        const { traps } = await import('../../src/animation/traps/index.js');
+        const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
+        const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
+
+        globalThis.game.user = { isGM: true, id: 'gm-user-1' };
+
+        // (a1) Below v14 WITHOUT MATT -> errors immediately without opening dialogs
+        globalThis.game.release = { generation: 13 };
+        adapter.foundry = new FoundryV12Adapter(adapter);
+        globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', active: false });
+
+        const errors = [];
+        globalThis.ui.notifications.error = (msg) => errors.push(msg);
+
+        let dialogsOpened = 0;
+        adapter.buttonDialog = async () => {
+            dialogsOpened++;
+            return 'continue';
+        };
+
+        const resInteractive = await traps.setup();
+        const resDirect = await traps.setup('lightningBolt');
+        log._flushQueues();
+
+        assert.equal(resInteractive, undefined);
+        assert.equal(resDirect, undefined);
+        assert.equal(dialogsOpened, 0, 'Must not open any setup dialogs below v14 when MATT is inactive');
+        assert.ok(errors.length >= 1, 'Must emit error notification below v14 when MATT is inactive');
+        assert.ok(
+            errors.some(m => m.includes("Monk's Active Tile Triggers")),
+            `Error message must mention MATT, got: ${JSON.stringify(errors)}`
+        );
+
+        // (a2) Below v14 WITH MATT -> only mentions Tiles (never Regions) and prompts 3 tiles for lightningBolt
+        globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', active: true });
+        const tile1 = { id: 't-trig', documentName: 'Tile', getFlag: () => [], update: async () => tile1 };
+        const tile2 = { id: 't-orig', documentName: 'Tile', getFlag: () => [], update: async () => tile2 };
+        const tile3 = { id: 't-targ', documentName: 'Tile', getFlag: () => [], update: async () => tile3 };
+        globalThis.canvas.tiles = {
+            controlled: [{ document: tile1, id: 't-trig' }],
+            get: (id) => (id === 't-trig' ? { document: tile1, id } : id === 't-orig' ? { document: tile2, id } : id === 't-targ' ? { document: tile3, id } : null)
+        };
+
+        const v13Prompts = [];
+        adapter.buttonDialog = async (btnData, opts) => {
+            v13Prompts.push({ title: btnData.title, content: opts?.content ?? '' });
+            if (v13Prompts.length === 1) globalThis.canvas.tiles.controlled = [{ document: tile1, id: 't-trig' }];
+            if (v13Prompts.length === 2) globalThis.canvas.tiles.controlled = [{ document: tile2, id: 't-orig' }];
+            if (v13Prompts.length === 3) globalThis.canvas.tiles.controlled = [{ document: tile3, id: 't-targ' }];
+            return 'continue';
+        };
+
+        await traps.setup('lightningBolt');
+        assert.equal(v13Prompts.length, 3, 'Below v14 with MATT must prompt for 3 tiles for lightningBolt');
+        for (const p of v13Prompts) {
+            assert.ok(/tile/i.test(p.title) && /tile/i.test(p.content), `Below v14 prompt must mention tiles: ${JSON.stringify(p)}`);
+            assert.ok(!/region/i.test(p.title) && !/region/i.test(p.content), `Below v14 prompt must NOT mention regions: ${JSON.stringify(p)}`);
+        }
+
+        // (b1) V14+ WITHOUT MATT -> only mentions Regions (never Tiles) across all 3 steps of lightningBolt
+        globalThis.game.release = { generation: 14 };
+        adapter.foundry = new FoundryV14Adapter(adapter);
+        globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', active: false });
+
+        const reg1 = { id: 'r-trig', documentName: 'Region', createEmbeddedDocuments: async (_t, [d]) => [d] };
+        const reg2 = { id: 'r-orig', documentName: 'Region' };
+        const reg3 = { id: 'r-targ', documentName: 'Region' };
+        globalThis.canvas.regions = { controlled: [{ document: reg1, id: 'r-trig' }] };
+        globalThis.canvas.tiles = { controlled: [], get: () => null };
+
+        const v14NoMattPrompts = [];
+        adapter.buttonDialog = async (btnData, opts) => {
+            v14NoMattPrompts.push({ title: btnData.title, content: opts?.content ?? '' });
+            if (v14NoMattPrompts.length === 1) globalThis.canvas.regions.controlled = [{ document: reg1, id: 'r-trig' }];
+            if (v14NoMattPrompts.length === 2) globalThis.canvas.regions.controlled = [{ document: reg2, id: 'r-orig' }];
+            if (v14NoMattPrompts.length === 3) globalThis.canvas.regions.controlled = [{ document: reg3, id: 'r-targ' }];
+            return 'continue';
+        };
+
+        await traps.setup('lightningBolt');
+        assert.equal(v14NoMattPrompts.length, 3, 'V14 without MATT must prompt for 3 regions for lightningBolt');
+        for (const p of v14NoMattPrompts) {
+            assert.ok(/region/i.test(p.title) && /region/i.test(p.content), `V14 without MATT prompt must mention regions: ${JSON.stringify(p)}`);
+            assert.ok(!/tile/i.test(p.title) && !/tile/i.test(p.content), `V14 without MATT prompt must NOT mention tiles: ${JSON.stringify(p)}`);
+        }
+
+        // Also check built-in 3-step trap (fire) on V14 without MATT -> only mentions Regions
+        const fireNoMattPrompts = [];
+        globalThis.canvas.regions.controlled = [{ document: reg1, id: 'r-trig' }];
+        adapter.buttonDialog = async (btnData, opts) => {
+            fireNoMattPrompts.push({ title: btnData.title, content: opts?.content ?? '' });
+            if (fireNoMattPrompts.length === 2) globalThis.canvas.regions.controlled = [{ document: reg2, id: 'r-orig' }];
+            if (fireNoMattPrompts.length === 3) globalThis.canvas.regions.controlled = [{ document: reg3, id: 'r-targ' }];
+            return 'continue';
+        };
+        await traps.fire.setup();
+        assert.equal(fireNoMattPrompts.length, 3);
+        for (const p of fireNoMattPrompts) {
+            assert.ok(/region/i.test(p.content), `Fire V14 without MATT must mention region: ${JSON.stringify(p)}`);
+            assert.ok(!/tile/i.test(p.content), `Fire V14 without MATT must NOT mention tile: ${JSON.stringify(p)}`);
+        }
+
+        // (b2) V14+ WITH MATT -> mentions BOTH Regions and Tiles
+        globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', active: true });
+        globalThis.canvas.regions.controlled = [{ document: reg1, id: 'r-trig' }];
+        globalThis.canvas.tiles = { controlled: [], get: () => null };
+
+        const v14WithMattPrompts = [];
+        adapter.buttonDialog = async (btnData, opts) => {
+            v14WithMattPrompts.push({ title: btnData.title, content: opts?.content ?? '' });
+            if (v14WithMattPrompts.length === 2) globalThis.canvas.regions.controlled = [{ document: reg2, id: 'r-orig' }];
+            if (v14WithMattPrompts.length === 3) globalThis.canvas.regions.controlled = [{ document: reg3, id: 'r-targ' }];
+            return 'continue';
+        };
+
+        await traps.setup('lightningBolt');
+        assert.equal(v14WithMattPrompts.length, 3, 'V14 with MATT must prompt for 3 placeables for lightningBolt');
+        for (const p of v14WithMattPrompts) {
+            assert.ok(
+                /region/i.test(p.content) && /tile/i.test(p.content),
+                `V14 with MATT prompt must mention both Regions and Tiles: ${JSON.stringify(p)}`
+            );
+        }
+
+        // (b3) V14+ WITH MATT when selecting a Tile in Step 1 -> routes to MATT and prompts 3 tiles total without leaking triggerTiles
+        const editedMattTiles = new Map();
+        const trigTileDoc = { id: 'v14-tile-trig', documentName: 'Tile', getFlag: () => [], update: async (d) => { editedMattTiles.set('v14-tile-trig', d); return trigTileDoc; } };
+        const origTileDoc = { id: 'v14-tile-orig', documentName: 'Tile', getFlag: () => [], update: async (d) => { editedMattTiles.set('v14-tile-orig', d); return origTileDoc; } };
+        const targTileDoc = { id: 'v14-tile-targ', documentName: 'Tile', getFlag: () => [], update: async (d) => { editedMattTiles.set('v14-tile-targ', d); return targTileDoc; } };
+
+        globalThis.canvas.regions.controlled = [];
+        globalThis.canvas.tiles = {
+            controlled: [{ document: trigTileDoc, id: 'v14-tile-trig' }],
+            get: (id) => (id === 'v14-tile-trig' ? { document: trigTileDoc, id } : id === 'v14-tile-orig' ? { document: origTileDoc, id } : id === 'v14-tile-targ' ? { document: targTileDoc, id } : null)
+        };
+
+        let tileFlowSteps = 0;
+        adapter.buttonDialog = async () => {
+            tileFlowSteps++;
+            if (tileFlowSteps === 2) globalThis.canvas.tiles.controlled = [{ document: origTileDoc, id: 'v14-tile-orig' }];
+            if (tileFlowSteps === 3) globalThis.canvas.tiles.controlled = [{ document: targTileDoc, id: 'v14-tile-targ' }];
+            return 'continue';
+        };
+
+        const tileSetupRes = await traps.setup('lightningBolt');
+        assert.equal(tileFlowSteps, 3, 'Selecting a Tile in V14 Step 1 for lightningBolt must prompt for 3 tiles total (trigger, origin, target)');
+        assert.equal(tileSetupRes.triggerTiles[0].id, 'v14-tile-trig');
+        assert.equal(tileSetupRes.originTiles[0].id, 'v14-tile-orig');
+        assert.equal(tileSetupRes.targetTiles[0].id, 'v14-tile-targ');
+
+        const origCode = editedMattTiles.get('v14-tile-orig')['flags.monks-active-tiles.actions'][0].data.code;
+        assert.ok(!origCode.includes('triggerTiles'), 'Forwarded triggerTiles must be stripped from serialized runtime trap config');
+        assert.ok(origCode.includes("const targetTile = canvas.tiles.get('v14-tile-targ');"), 'MATT script must target the 3rd destination tile');
+    } finally {
+        globalThis.game.i18n = originalI18n;
+        globalThis.ui.notifications.error = originalError;
+        globalThis.ui.notifications.warn = originalWarn;
+        adapter.buttonDialog = originalButtonDialog;
+        adapter.foundry = originalFoundry;
+        globalThis.game.release = originalRelease;
+    }
+});
+

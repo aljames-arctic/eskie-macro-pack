@@ -8,6 +8,7 @@
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
+import { resolveMotionTarget } from '../../utils/motion.js';
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
@@ -67,6 +68,10 @@ async function create(source: Token, target: Token, config: any = {}) {
     const ny = dy / dist;
     const nxt = -nx;
     const nyt = -ny;
+    const kbDuration = Math.max(1, knockbackDuration);
+    const retDuration = Math.max(1, returnDuration);
+    const motionSource = resolveMotionTarget(source);
+    const motionTarget = resolveMotionTarget(target);
 
     // --- Charging Phase ---
     applySound(sequence, sound.charge);
@@ -135,11 +140,6 @@ async function create(source: Token, target: Token, config: any = {}) {
         .belowTokens()
         .waitUntilFinished(-1850);
 
-    sequence.animation()
-        .delay(200)
-        .on(source)
-        .opacity(0);
-
     applySound(sequence, sound.sacredFlame);
 
     sequence.effect()
@@ -157,45 +157,20 @@ async function create(source: Token, target: Token, config: any = {}) {
         .rotateTowards(target)
         .waitUntilFinished(-1000);
 
-    // Source Knockback
-    sequence.effect()
-        .delay(100)
-        .copySprite(source)
-        .spriteRotation(-adapter.getTokenRotation(source))
-        .animateProperty('spriteContainer', 'position.x', {
-            from: 0,
-            to: nxt * gridSize * 0.2,
-            duration: knockbackDuration,
-            ease: 'easeOutExpo'
-        })
-        .animateProperty('spriteContainer', 'position.y', {
-            from: 0,
-            to: nyt * gridSize * 0.2,
-            duration: knockbackDuration,
-            ease: 'easeOutExpo'
-        });
-
-    sequence.effect()
-        .delay(100)
-        .copySprite(source)
-        .spriteRotation(-adapter.getTokenRotation(source))
-        .animateProperty('spriteContainer', 'position.x', {
-            from: nxt * gridSize * 0.2,
-            to: 0,
-            duration: returnDuration,
-            ease: 'easeInQuart'
-        })
-        .animateProperty('spriteContainer', 'position.y', {
-            from: nyt * gridSize * 0.2,
-            to: 0,
-            duration: returnDuration,
-            ease: 'easeInQuart'
-        });
-
-    sequence.animation()
-        .delay(returnDuration + 60)
-        .on(source)
-        .opacity(1);
+    // Source Recoil
+    if (motionSource) {
+        sequence.motion(motionSource)
+            .moveBy(
+                { x: nxt * gridSize * 0.2, y: nyt * gridSize * 0.2 },
+                {
+                    delay: 100,
+                    duration: kbDuration,
+                    ease: 'easeOutExpo',
+                    returnDuration: retDuration,
+                    easeOut: 'easeInQuart',
+                }
+            );
+    }
 
     // Projectile
     sequence.effect()
@@ -216,50 +191,20 @@ async function create(source: Token, target: Token, config: any = {}) {
         .opacity(1)
         .zIndex(2);
 
-    sequence.animation()
-        .on(target)
-        .opacity(0);
-
     // Target Knockback
-    sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .animateProperty('spriteContainer', 'position.x', {
-            from: 0,
-            to: nx * pushDistance * 0.15,
-            duration: knockbackDuration,
-            ease: 'easeOutExpo'
-        })
-        .animateProperty('spriteContainer', 'position.y', {
-            from: 0,
-            to: ny * pushDistance * 0.15,
-            duration: knockbackDuration,
-            ease: 'easeOutExpo'
-        })
-        .zIndex(1);
-
-    sequence.effect()
-        .delay(100)
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .animateProperty('spriteContainer', 'position.x', {
-            from: nx * pushDistance * 0.15,
-            to: 0,
-            duration: returnDuration,
-            ease: 'easeInQuart'
-        })
-        .animateProperty('spriteContainer', 'position.y', {
-            from: ny * pushDistance * 0.15,
-            to: 0,
-            duration: returnDuration,
-            ease: 'easeInQuart'
-        })
-        .zIndex(1);
-
-    sequence.animation()
-        .delay(returnDuration + 50)
-        .on(target)
-        .opacity(1);
+    if (motionTarget) {
+        sequence.motion(motionTarget)
+            .zIndex(1)
+            .moveBy(
+                { x: nx * pushDistance * 0.15, y: ny * pushDistance * 0.15 },
+                {
+                    duration: kbDuration,
+                    ease: 'easeOutExpo',
+                    returnDuration: retDuration,
+                    easeOut: 'easeInQuart',
+                }
+            );
+    }
 
     return sequence;
 }

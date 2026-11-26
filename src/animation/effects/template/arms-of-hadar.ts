@@ -7,6 +7,7 @@
 import { closest } from "../../../lib/filemanager.js";
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
+import { resolveMotionTarget } from "../../utils/motion.js";
 
 const DEFAULT_CONFIG = {
     id: 'armsOfHadar',
@@ -26,29 +27,10 @@ const DEFAULT_CONFIG = {
  * @returns {Promise<Sequence>} A promise that resolves with the Sequence object.
  */
 async function create(token: Token, config: any = {}) {
-    const { id, targets, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { targets, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     let sequence = new Sequence();
     applySound(sequence, sound);
-    sequence.thenDo(function () {
-        targets.forEach((target: Token) => {
-            new Sequence()
-                .effect()
-                .name(`${target.name} ${id}`)
-                .copySprite(target)
-                .spriteRotation(-target.document.rotation)
-                .atLocation(target)
-                .scaleToObject(1, { considerTokenScale: true })
-                .fadeOut(100)
-                .persist()
-                .wait(150)
-
-                .animation()
-                .on(target)
-                .opacity(0)
-                .play();
-        });
-    });
 
     sequence
         .effect()
@@ -137,48 +119,36 @@ async function create(token: Token, config: any = {}) {
                 const gridSize = adapter.getGridSize();
                 const tokenPos = adapter.getCenter(token);
                 const targetPos = adapter.getCenter(target);
-                const newX = targetPos.x - (gridSize / 2.5 * Math.sign(tokenPos.x - targetPos.x));
-                const newY = targetPos.y - (gridSize / 2.5 * Math.sign(tokenPos.y - targetPos.y));
+                const pushDelta = {
+                    x: -(gridSize / 2.5) * Math.sign(tokenPos.x - targetPos.x),
+                    y: -(gridSize / 2.5) * Math.sign(tokenPos.y - targetPos.y),
+                };
                 const targetRotation = adapter.getTokenRotation(target);
                 const targetWidth = adapter.getTokenDimensions(target).widthUnits;
+                const motionTarget = resolveMotionTarget(target);
 
-                new Sequence()
-                    .thenDo(function () {
-                        Sequencer.EffectManager.endEffects({ name: `${target.name} ${id}`, object: target });
-                    })
+                const targetSeq = new Sequence();
+                if (motionTarget) {
+                    targetSeq
+                        .motion(motionTarget)
+                        .moveBy(pushDelta, {
+                            duration: 750,
+                            ease: "easeOutBack",
+                            returnDuration: 1500,
+                            easeOut: "easeOutBack",
+                        });
+                }
 
+                targetSeq
                     .effect()
                     .copySprite(target)
                     .spriteRotation(-targetRotation)
-                    .atLocation(target)
+                    .attachTo(target, { bindAlpha: false })
                     .scaleToObject(targetWidth, { considerTokenScale: true })
-                    .moveTowards({ x: newX, y: newY }, { rotate: false, ease: "easeOutBack" })
                     .duration(750)
                     .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 175, pingPong: true, gridUnits: true })
                     .opacity(0.15)
                     .zIndex(0.1)
-
-                    .effect()
-                    .copySprite(target)
-                    .spriteRotation(-targetRotation)
-                    .atLocation(target)
-                    .scaleToObject(targetWidth, { considerTokenScale: true })
-                    .moveTowards({ x: newX, y: newY }, { rotate: false, ease: "easeOutBack" })
-                    .duration(750)
-                    .waitUntilFinished(-50)
-
-                    .effect()
-                    .copySprite(target)
-                    .spriteRotation(-targetRotation)
-                    .atLocation({ x: newX, y: newY })
-                    .scaleToObject(1, { considerTokenScale: true })
-                    .moveTowards(target, { rotate: false, ease: "easeOutBack" })
-                    .duration(1500)
-                    .waitUntilFinished(-50)
-
-                    .animation()
-                    .on(target)
-                    .opacity(1)
                     .play();
             });
         });

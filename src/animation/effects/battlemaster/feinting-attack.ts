@@ -5,6 +5,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
+import { resolveMotionTarget } from '../../utils/motion.js';
 
 const DEFAULT_CONFIG = {
     id: 'feintingAttack',
@@ -37,39 +38,41 @@ async function create(token: Token, target: Token, config: any = {}) {
     const counterRot = deg(baseRad);
 
     const baseRadTarget = Math.atan2(src.y - tgt.y, src.x - tgt.x);
-    const counterRotTarget = deg(baseRadTarget);
+    const targetRecoil = {
+        x: -0.5 * Math.cos(baseRadTarget),
+        y: -0.5 * Math.sin(baseRadTarget),
+    };
 
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
+    const motionTarget = resolveMotionTarget(target);
 
     const sequence = new Sequence();
     applySound(sequence, sound);
 
+    if (motionTarget) {
+        sequence
+            .motion(motionTarget)
+            .moveBy(
+                [
+                    { v: { x: 0, y: 0 } },
+                    { v: targetRecoil, duration: 250, inEase: 'easeOutSine', hold: 250 },
+                    { v: { x: 0, y: 0 }, duration: 250, inEase: 'easeOutCubic' },
+                ],
+                { gridUnits: true, delay: 250, return: false }
+            )
+            .rotateBy(
+                [
+                    { v: 0 },
+                    { v: 20, duration: 500, inEase: 'easeOutCubic' },
+                    { v: 0, duration: 250, inEase: 'easeOutBack' },
+                    { v: 10, duration: 250, inEase: 'easeOutSine' },
+                    { v: 0, duration: 250, inEase: 'easeOutSine' },
+                ],
+                { delay: 250, return: false }
+            );
+    }
+
     sequence
-        .animation()
-            .on(target)
-            .opacity(0)
-            .delay(100)
-
-        .effect()
-            .copySprite(target)
-            .attachTo(target, { bindAlpha: false })
-            .rotateTowards(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -0.5, duration: 250, ease: 'easeOutSine', gridUnits: true, delay: 250 })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: 0.5, duration: 250, ease: 'easeOutCubic', gridUnits: true, delay: 750 })
-            .animateProperty('sprite', 'rotation', { from: 0, to: 20, duration: 500, ease: 'easeOutCubic', delay: 250 })
-            .animateProperty('sprite', 'rotation', { from: 0, to: -20, duration: 250, ease: 'easeOutBack', delay: 750 })
-            .animateProperty('sprite', 'rotation', { from: 0, to: 10, duration: 250, ease: 'easeOutSine', delay: 1000 })
-            .animateProperty('sprite', 'rotation', { from: 0, to: -10, duration: 250, ease: 'easeOutSine', delay: 1250 })
-            .spriteOffset({ x: -0.5 }, { gridUnits: true })
-            .spriteRotation(-counterRotTarget)
-            .duration(1350)
-
-        .animation()
-            .on(target)
-            .opacity(1)
-            .delay(1250)
-
         .wait(250)
 
         .effect()

@@ -5,6 +5,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
+import { resolveMotionTarget } from '../../utils/motion.js';
 
 const DEFAULT_CONFIG = {
     id: 'parry',
@@ -14,8 +15,6 @@ const DEFAULT_CONFIG = {
     color: 'blue',
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
-
-function deg(rad: any) { return (rad * 180) / Math.PI; }
 
 async function create(token: Token, target: Token, config: any = {}) {
     config = settingsOverride(config);
@@ -28,29 +27,30 @@ async function create(token: Token, target: Token, config: any = {}) {
     const tgtCenter = adapter.getCenter(target);
 
     const baseRad = Math.atan2(tgtCenter.y - src.y, tgtCenter.x - src.x);
-    const baseDeg = deg(baseRad);
+    const stepBack = {
+        x: -0.6 * Math.cos(baseRad),
+        y: -0.6 * Math.sin(baseRad),
+    };
 
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
+    const motionToken = resolveMotionTarget(token);
 
     const sequence = new Sequence();
     applySound(sequence, sound);
 
-    sequence
-        .animation()
-            .on(token)
-            .opacity(0)
-            .delay(100)
-
-        .effect()
+    if (motionToken) {
+        sequence
+            .motion(motionToken)
             .name('Parry')
-            .copySprite(token)
-            .atLocation(token)
-            .rotateTowards(target)
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -0.6, duration: 250, gridUnits: true, ease: 'easeOutCubic', delay: 100 })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: 0.6, duration: 400, gridUnits: true, ease: 'easeOutSine', delay: 450 })
-            .duration(1000)
-            .spriteRotation(-baseDeg)
-            .spriteOffset({ x: -0.5 }, { gridUnits: true });
+            .moveBy(
+                [
+                    { v: { x: 0, y: 0 } },
+                    { v: stepBack, duration: 250, inEase: 'easeOutCubic', hold: 100 },
+                    { v: { x: 0, y: 0 }, duration: 400, inEase: 'easeOutSine' },
+                ],
+                { gridUnits: true, delay: 100, return: false }
+            );
+    }
 
     if (!slowParry) {
         sequence
@@ -88,12 +88,6 @@ async function create(token: Token, target: Token, config: any = {}) {
                 .zIndex(1.1)
                 .spriteOffset({ x: -1.25 * tokenWidth }, { gridUnits: true });
     }
-
-    sequence
-        .wait(850)
-        .animation()
-            .on(token)
-            .opacity(1);
 
     return sequence;
 }

@@ -4,6 +4,7 @@
 import { closest } from "../../../lib/filemanager.js";
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
+import { resolveMotionTarget } from "../../utils/motion.js";
 
 const DEFAULT_CONFIG = {
     id: 'stunningFist',
@@ -12,7 +13,7 @@ const DEFAULT_CONFIG = {
 
 async function create(token: Token, target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, sound } = mConfig;
+    const { sound } = mConfig;
 
     const srcCenter = adapter.getCenter(token);
     const tgtCenter = adapter.getCenter(target);
@@ -25,60 +26,65 @@ async function create(token: Token, target: Token, config: any = {}) {
     const tokenScaleY = token.document.texture.scaleY ?? 1;
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
     const targetWidth = adapter.getTokenDimensions(target).widthUnits;
+    const motionToken = resolveMotionTarget(token);
+    const motionTarget = resolveMotionTarget(target);
+
+    const attackerLunge = {
+        x: tokenScaleX * middleposition.x,
+        y: tokenScaleY * middleposition.y,
+    };
+    const targetKnockback = {
+        x: tokenScaleX * middleposition.x + 0.5,
+        y: tokenScaleY * middleposition.y + 0.5,
+    };
 
     let seq = new Sequence();
     applySound(seq, sound);
 
-    seq.animation()
-        .delay(250)
-        .on(token)
-        .opacity(0)
+    if (motionTarget) {
+        seq
+            .motion(motionTarget)
+            .moveBy(targetKnockback, {
+                delay: 1350,
+                duration: 100,
+                ease: "easeOutExpo",
+                returnDuration: 250,
+                easeOut: "easeInOutQuad",
+            })
+            .rotateBy(45, {
+                delay: 1300,
+                duration: 150,
+                ease: "easeOutCubic",
+                returnDuration: 350,
+                easeOut: "easeOutBack",
+            });
+    }
 
-    .animation()
-        .delay(250)
-        .on(target)
-        .opacity(0)
+    if (motionToken) {
+        seq
+            .motion(motionToken)
+            .moveBy(attackerLunge, {
+                delay: 1250,
+                duration: 100,
+                ease: "easeOutExpo",
+                returnDuration: 350,
+                easeOut: "easeInOutQuad",
+            });
+    }
 
+    seq
     .effect()
         .copySprite(target)
         .attachTo(target, {bindAlpha: false})
         .scaleToObject(1, { considerTokenScale: true })
         .spriteRotation(-adapter.getTokenRotation(target))
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: tokenScaleX * middleposition.x + 0.5, duration: 100, ease:"easeOutExpo", delay: 1350})
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: tokenScaleY * middleposition.y + 0.5, duration: 100, ease:"easeOutExpo", delay: 1350})
         .animateProperty('sprite', 'rotation', { from: 0, to: 45, duration: 150, ease:"easeOutCubic", delay: 1300})
         .animateProperty('sprite', 'rotation', { from: 0, to: -45, duration: 350, ease:"easeOutBack", delay: 1450})
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: -tokenScaleX * middleposition.x - 0.5, duration: 250, ease:"easeInOutQuad", delay: 1450})
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -tokenScaleY * middleposition.y - 0.5, duration: 250, ease:"easeInOutQuad", delay: 1450})
         .fadeIn(200, {delay:1250})
         .fadeOut(500)
         .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true})
         .opacity(0.25)
         .duration(2500)  
-
-    .effect()
-        .copySprite(target)
-        .attachTo(target, {bindAlpha: false})
-        .scaleToObject(1, { considerTokenScale: true })
-        .spriteRotation(-adapter.getTokenRotation(target))
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: tokenScaleX * middleposition.x + 0.5, duration: 100, ease:"easeOutExpo", delay: 1350})
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: tokenScaleY * middleposition.y + 0.5, duration: 100, ease:"easeOutExpo", delay: 1350})
-        .animateProperty('sprite', 'rotation', { from: 0, to: 45, duration: 150, ease:"easeOutCubic", delay: 1300})
-        .animateProperty('sprite', 'rotation', { from: 0, to: -45, duration: 350, ease:"easeOutBack", delay: 1450})
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: -tokenScaleX * middleposition.x - 0.5, duration: 250, ease:"easeInOutQuad", delay: 1450})
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -tokenScaleY * middleposition.y - 0.5, duration: 250, ease:"easeInOutQuad", delay: 1450})
-        .duration(2000)  
-
-    .effect()
-        .copySprite(token)
-        .attachTo(token, {bindAlpha: false})
-        .scaleToObject(1, { considerTokenScale: true })
-        .spriteRotation(-adapter.getTokenRotation(token))
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: tokenScaleX * middleposition.x, duration: 100, ease:"easeOutExpo", delay: 1250})
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: tokenScaleY * middleposition.y, duration: 100, ease:"easeOutExpo", delay: 1250})
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: -tokenScaleX * middleposition.x, duration: 350, ease:"easeInOutQuad", delay: 1350})
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -tokenScaleY * middleposition.y, duration: 350, ease:"easeInOutQuad", delay: 1350})
-        .duration(2000)
 
     .effect()
         .file(closest("jb2a.sacred_flame.target.blue"))
@@ -160,16 +166,6 @@ async function create(token: Token, target: Token, config: any = {}) {
     .canvasPan()
         .delay(250)
         .shake({duration: 250, strength: 2, rotation: false })
-
-    .animation()
-        .on(token)
-        .opacity(1)
-        .delay(600)
-
-    .animation()
-        .on(target)
-        .opacity(1)
-        .delay(600)
 
     .effect()
         .file(closest("jb2a.impact.010.blue"))

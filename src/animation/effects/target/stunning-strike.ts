@@ -7,6 +7,7 @@ import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
+import { resolveMotionTarget } from "../../utils/motion.js";
 const DEFAULT_CONFIG = {
     id: 'stunningStrike',
     sound: { ...DEFAULT_SOUND_CONFIG },
@@ -34,6 +35,7 @@ async function createStunningStrike(token: Token, target: Token, config: any = {
         y: (targetCenter.y - tokenCenter.y) * 0.25,
     };
     const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);
+    const motionToken = resolveMotionTarget(token);
 
     sequence
         .effect()
@@ -79,28 +81,22 @@ async function createStunningStrike(token: Token, target: Token, config: any = {
         .scaleToObject(0.75)
         .fadeOut(2000)
         .atLocation(token)
-        .zIndex(1)
+        .zIndex(1);
 
-        .animation()
-        .on(token)
-        .opacity(0)
+    if (motionToken) {
+        sequence
+            .motion(motionToken)
+            .moveBy(
+                [
+                    { v: { x: 0, y: 0 } },
+                    { v: middle, duration: 100, inEase: "easeOutExpo", hold: 150 },
+                    { v: { x: 0, y: 0 }, duration: 350, inEase: "easeInOutQuad" },
+                ],
+                { return: false }
+            );
+    }
 
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .mirrorX(token.document.texture.scaleX < 0)
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: middle.x, duration: 100, ease: "easeOutExpo" })
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: middle.y, duration: 100, ease: "easeOutExpo" })
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: -middle.x, duration: 350, ease: "easeInOutQuad", fromEnd: true })
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -middle.y, duration: 350, ease: "easeInOutQuad", fromEnd: true })
-        .duration(600)
-
-        .animation()
-        .on(token)
-        .opacity(1)
-        .delay(600)
+    sequence
 
         .effect()
         .file(closest("jb2a.impact.010.blue"))

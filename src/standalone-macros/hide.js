@@ -1,9 +1,9 @@
-// Standalone Macro: Hide
+// Standalone Macro: Hiding
 // Original Author: EskieMoh#2969 / .eskie
 // Integration: bakanabaka
 
 if (!game.modules.get("sequencer")?.active) {
-    return ui.notifications.error("The 'Hide' macro requires the 'Sequencer' module to be installed and active!");
+    return ui.notifications.error("The 'Hiding' macro requires the 'Sequencer' module to be installed and active!");
 }
 
 const token = canvas.tokens.controlled[0];
@@ -11,7 +11,7 @@ if (!token) return ui.notifications.warn("Please select a token!");
 
 const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
-const id = "hide";
+const id = "Hiding";
 const tokenId = token.id ?? token.document?.id ?? "";
 const label = `${id} - ${tokenId}`;
 

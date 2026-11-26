@@ -7,7 +7,7 @@ import { closest } from "../../../lib/filemanager.js";
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
 const DEFAULT_CONFIG = {
-    id: "hide",
+    id: "Hiding",
     sound: { ...DEFAULT_SOUND_CONFIG },
 };
 
@@ -88,4 +88,4 @@ export const hide = {
     default_config: DEFAULT_CONFIG,
 };
 
-adapter.autorec.register("hide", "effect", "eskie.effect.hide", DEFAULT_CONFIG, "0.0.2", "Hide");
+adapter.autorec.register("Hiding", "effect", "eskie.effect.hide", DEFAULT_CONFIG, "0.0.2", "Hiding");

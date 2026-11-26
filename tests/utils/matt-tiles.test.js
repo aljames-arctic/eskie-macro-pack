@@ -600,4 +600,87 @@ test('matt.trap.setup overrides pre-existing enter trigger on trap tile to manua
     assert.equal(trapUpdate['flags.monks-active-tiles.trigger'], 'manual', 'Trap tile must be set to manual even if previously enter');
 });
 
+test('matt.trap.setup defaults non-eskie-trap spell effects (e.g. lightningBolt) to 3 tiles (trigger, source, destination)', async () => {
+    const updatedTiles = new Map();
+    globalThis.game.user = { isGM: true, id: 'gm-user-1' };
+    globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', active: true });
+
+    const createTile = (id) => {
+        const doc = {
+            id,
+            flags: {},
+            getFlag: () => [],
+            update: async (data) => {
+                updatedTiles.set(id, data);
+                return doc;
+            }
+        };
+        return { id, document: doc };
+    };
+
+    const triggerTile = createTile('tile-lb-trig');
+    const sourceTile = createTile('tile-lb-src');
+    const destTile = createTile('tile-lb-dst');
+
+    globalThis.canvas.tiles = {
+        controlled: [triggerTile],
+        get: (id) => (id === 'tile-lb-trig' ? triggerTile : id === 'tile-lb-src' ? sourceTile : id === 'tile-lb-dst' ? destTile : null)
+    };
+
+    let dialogCount = 0;
+    adapter.buttonDialog = async () => {
+        dialogCount++;
+        if (dialogCount === 1) globalThis.canvas.tiles.controlled = [triggerTile];
+        else if (dialogCount === 2) globalThis.canvas.tiles.controlled = [sourceTile];
+        else if (dialogCount === 3) globalThis.canvas.tiles.controlled = [destTile];
+        return 'continue';
+    };
+
+    // Call WITHOUT explicit tileCount — must default to 3 matching Region setup
+    const result = await matt.trap.setup('eskie.effect.lightningBolt', {});
+    assert.equal(dialogCount, 3, 'Spell trap setup via MATT must prompt for 3 tiles (trigger, source, destination)');
+    assert.equal(result.triggerTiles[0].id, 'tile-lb-trig');
+    assert.equal(result.originTiles[0].id, 'tile-lb-src');
+    assert.equal(result.targetTiles[0].id, 'tile-lb-dst');
+
+    const sourceUpdate = updatedTiles.get('tile-lb-src');
+    assert.ok(sourceUpdate, 'Source tile must be configured');
+    const actionCode = sourceUpdate['flags.monks-active-tiles.actions'][0].data.code;
+    assert.ok(actionCode.includes("const targetTile = canvas.tiles.get('tile-lb-dst');"), 'Action code must resolve destination targetTile');
+    assert.ok(actionCode.includes('adapter.executeTrapEffect(animation, tilePlaceable, targetTile, targets,'), 'Action code must execute trap effect with targetTile');
+});
+
+test('matt.trap.setup bypasses Step 2 when tileCount === 1', async () => {
+    const updatedTiles = new Map();
+    globalThis.game.user = { isGM: true, id: 'gm-user-1' };
+    globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', active: true });
+
+    const doorTileDoc = {
+        id: 'tile-door-single',
+        flags: {},
+        getFlag: () => [],
+        update: async (data) => {
+            updatedTiles.set('tile-door-single', data);
+            return doorTileDoc;
+        }
+    };
+
+    globalThis.canvas.tiles = {
+        controlled: [{ document: doorTileDoc, id: 'tile-door-single' }],
+        get: (id) => (id === 'tile-door-single' ? { document: doorTileDoc, id } : null)
+    };
+
+    let dialogCount = 0;
+    adapter.buttonDialog = async () => {
+        dialogCount++;
+        return 'continue';
+    };
+
+    const result = await matt.trap.setup('eskie.traps.electricDoor', { tileCount: 1, trigger: 'door' });
+    assert.equal(dialogCount, 1, 'tileCount === 1 must show only Step 1 dialog');
+    assert.equal(result.triggerTiles[0].id, 'tile-door-single');
+    assert.equal(result.originTiles[0].id, 'tile-door-single');
+});
+
+
 

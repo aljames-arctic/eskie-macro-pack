@@ -104,7 +104,8 @@ async function setup(animation: string, config: Record<string, unknown> = {}): P
 
     const pathParts = animation.split('.');
     const trapKey = pathParts[pathParts.length - 1];
-    const tileCount = config.tileCount ?? 2;
+    const isEskieTrap = animation.startsWith('eskie.traps.');
+    const tileCount = config.tileCount ?? (isEskieTrap ? 2 : 3);
 
     let triggerTiles = (config.triggerTiles as any[]) ?? [];
     if (triggerTiles.length === 0) {
@@ -128,7 +129,10 @@ async function setup(animation: string, config: Record<string, unknown> = {}): P
     let originTiles: any[] = [];
     let targetTiles: any[] = [];
 
-    if (tileCount === 3) {
+    if (tileCount === 1) {
+        // Pure single-tile trap (e.g. Electric Door): Trigger tile IS the animation tile
+        originTiles = triggerTiles;
+    } else if (tileCount === 3) {
         // Step 2: Prompt user to select trap origin/launcher tiles
         const originResult = await adapter.buttonDialog({
             title: format('EMP.traps.setup.step2OriginTitle', { name: trapKey }),
@@ -219,7 +223,7 @@ async function setup(animation: string, config: Record<string, unknown> = {}): P
     for (const [tileId, tileDoc] of allTiles) {
         const isTrigger = triggerTileIds.has(tileId);
 
-        const { tileCount: _tc, extraFlags: _ef, extraTiles: _et, trigger: _tr, controlled: _co, playPath: _pp, ...trapOptions } = config;
+        const { tileCount: _tc, extraFlags: _ef, extraTiles: _et, trigger: _tr, controlled: _co, playPath: _pp, triggerTiles: _tt, mode: _md, events: _ev, requiresTile: _rt, ...trapOptions } = config;
         const targetTileId = tileCount === 3 ? (targetTiles[0]?.id ?? null) : null;
         const trapConfig = { ...trapOptions };
 

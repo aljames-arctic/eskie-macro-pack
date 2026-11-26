@@ -2,6 +2,7 @@ import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
+import { resolveMotionTarget, endEffectsAndMotions } from "../../utils/motion.js";
 /* **
    Originally Published: 6/5/2023
    Author: EskieMoh#2969 
@@ -43,19 +44,22 @@ const DEFAULT_CONFIG = {
  */
 async function create(token: Token, config: any = {}) {
     // TODO(bakanabaka): Utilizes old [] -> {}
-    let { id, duration, effect, facing , sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    let { id, duration, effect, facing, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
 
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
+    const gridSize = adapter.getGridSize();
+    const motionToken = resolveMotionTarget(token);
     const mirrorFace = facing === 'right';
     const facingFactor = mirrorFace ? -1 : 1;
 
+    // Original ping-ponged y in [0 .. -0.01] GU and width/height in [0 .. +0.015] GU every 150ms (300ms period).
+    const bounceHalfPx = 0.005 * gridSize;
+    const scaleHalf = 0.0075 / Math.max(tokenWidth, 0.5);
+
     let laughEffect = new Sequence();
     applySound(laughEffect, sound);
-    laughEffect = laughEffect
-        .animation()
-        .on(token)
-        .opacity(0)
 
+    laughEffect = laughEffect
         .effect()
         .name(id)
         .file(closest(effect[0].img))
@@ -68,25 +72,42 @@ async function create(token: Token, config: any = {}) {
         .private();
     laughEffect = (duration > 0) ? laughEffect.duration(duration) : laughEffect.persist();
 
-    laughEffect = laughEffect
-        .effect()
-        .name(id)
-        .copySprite(token)
-        .spriteRotation(-adapter.getTokenRotation(token))
-        .scaleToObject(1, { considerTokenScale: true })
-        .atLocation(token)
-        .attachTo(token, { bindAlpha: false })
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: -0.01, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
-        .loopProperty('sprite', "width", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
-        .loopProperty('sprite', "height", { from: 0, to: 0.015, duration: 150, gridUnits: true, pingPong: true, ease: "easeOutQuad" })
-        .mirrorY(token.document.texture.scaleX < 0)
-        .waitUntilFinished(-200)
-    laughEffect = (duration > 0) ? laughEffect.duration(duration) : laughEffect.persist();
-
-    laughEffect = laughEffect
-        .animation()
-        .on(token)
-        .opacity(1);
+    if (motionToken) {
+        let bounceMotion = laughEffect.motion(motionToken).name(id);
+        if (duration > 0) {
+            const ramp = Math.min(100, Math.max(1, Math.floor(duration / 2)));
+            const hold = Math.max(0, duration - (ramp * 2));
+            bounceMotion = bounceMotion
+                .moveBy(
+                    [
+                        { v: { x: 0, y: 0 } },
+                        { v: { x: 0, y: -bounceHalfPx }, duration: ramp, inEase: "easeOutQuad", hold },
+                        { v: { x: 0, y: 0 }, duration: ramp, inEase: "easeInQuad" },
+                    ],
+                    { return: false }
+                )
+                .oscillate({
+                    period: 300,
+                    waveform: "sine",
+                    duration,
+                    fadeOutDuration: ramp,
+                    y: { amplitude: -bounceHalfPx, phase: 1.5 * Math.PI },
+                    scale: { baseline: 1 + scaleHalf, amplitude: scaleHalf, phase: 1.5 * Math.PI },
+                });
+        } else {
+            bounceMotion = bounceMotion
+                .moveBy({ y: -bounceHalfPx }, { duration: 100, ease: "easeOutQuad", returnDuration: 150, easeOut: "easeInQuad" })
+                .oscillate({
+                    period: 300,
+                    waveform: "sine",
+                    fadeOutDuration: 150,
+                    y: { amplitude: -bounceHalfPx, phase: 1.5 * Math.PI },
+                    scale: { baseline: 1 + scaleHalf, amplitude: scaleHalf, phase: 1.5 * Math.PI },
+                })
+                .persist();
+        }
+        laughEffect = bounceMotion;
+    }
 
     return laughEffect;
 }
@@ -98,7 +119,7 @@ async function play(token: Token, config: any = {}) {
 
 async function stop(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    return Sequencer.EffectManager.endEffects({ name: mConfig.id, object: token });
+    return endEffectsAndMotions(token, mConfig.id);
 }
 
 export const laugh = {

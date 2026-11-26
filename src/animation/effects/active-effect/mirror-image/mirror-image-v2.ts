@@ -7,6 +7,7 @@ import { closest } from '../../../../lib/filemanager.js';
 import { settingsOverride } from '../../../../lib/settings.js';
 import { adapter } from '../../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../../utils/sound.js';
+import { resolveMotionTarget } from '../../../utils/motion.js';
 
 export const DEFAULT_CONFIG = {
     id: 'mirrorImage',
@@ -24,7 +25,7 @@ export const DEFAULT_CONFIG = {
 async function create(token: Token, config: any = {}) {
     config = settingsOverride(config);
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, imageNumber, sound } = mConfig;
+    const { imageNumber, sound } = mConfig;
 
     if (!token) return;
 
@@ -32,13 +33,15 @@ async function create(token: Token, config: any = {}) {
     applySound(sequence, sound);
 
     const tokenName = token.name;
+    const motionToken = resolveMotionTarget(token);
+
+    if (motionToken) {
+        sequence
+            .motion(motionToken)
+            .fadeTo(0.5, { delay: 250, duration: 500, ease: 'easeOutCubic', returnDuration: 250, easeOut: 'easeInCubic' });
+    }
 
     sequence
-        .animation()
-            .delay(250)
-            .on(token)
-            .opacity(0)
-
         .effect()
             .file(closest('eskie.casting.arcane.01.center.one_shot.purple'))
             .attachTo(token, { bindAlpha: false })
@@ -46,14 +49,6 @@ async function create(token: Token, config: any = {}) {
             .zIndex(2)
 
         .effect()
-            .copySprite(token)
-            .attachTo(token, { bindAlpha: false })
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty('sprite', 'alpha', { from: 0, to: -0.5, duration: 500, ease: 'easeOutCubic', delay: 250 })
-            .animateProperty('sprite', 'alpha', { from: 0, to: 0.5, duration: 250, ease: 'easeInCubic', delay: 750 })
-            .duration(1250)
-
-        .effect()
             .file(closest('blfx.spell.template.circle.particles.3.rise.star1.loop.color1'))
             .attachTo(token, { bindAlpha: false })
             .scaleToObject(1.75, { considerTokenScale: true })
@@ -108,11 +103,6 @@ async function create(token: Token, config: any = {}) {
             .fadeIn(500, { ease: 'easeOutCubic' })
             .fadeOut(500, { ease: 'easeInCubic' })
             .belowTokens()
-
-        .animation()
-            .delay(1000)
-            .on(token)
-            .opacity(1)
 
         .effect()
             .delay(750)

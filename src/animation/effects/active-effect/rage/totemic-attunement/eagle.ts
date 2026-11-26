@@ -5,6 +5,7 @@ import { closest } from "../../../../../lib/filemanager.js";
 
 import { adapter } from "../../../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../../../utils/sound.js";
+import { resolveMotionTarget, endEffectsAndMotions } from "../../../../utils/motion.js";
 const DEFAULT_CONFIG = {
     id: 'Eagle Totemic Attunement',
     flight: {
@@ -26,20 +27,39 @@ function create(token: Token, config: any = {}) {
     const { id, color, flight, sound } = mConfig;
     const { wingSize, flaps, sway } = flight;
     const label = `${id} - ${token.id}`;
+    const motionToken = resolveMotionTarget(token);
+    const gridSize = adapter.getGridSize();
+
+    // Original lifted by -(0.5 + 0.1 * sway) GU over 1000ms (easeOutBack), then stepped across 6 values
+    // spanning [0 .. 0.1 * sway] GU at 1000ms per step (6000ms full cycle).
+    const hoverCenterY = -(0.5 + (0.05 * sway));
+    const swayAmplitudePx = 0.05 * sway * gridSize;
 
     let seq = new Sequence();
     applySound(seq, sound);
 
-    seq = seq.animation()
-      .delay(100)
-      .on(token)
-      .opacity(0)
-    
-    .effect()
+    if (motionToken) {
+        seq = seq
+            .motion(motionToken)
+            .name(label)
+            .zIndex(2)
+            .moveBy({ y: hoverCenterY }, { gridUnits: true, delay: 100, duration: 1000, ease: "easeOutBack", returnDuration: 500, easeOut: "easeInOutQuad" })
+            .oscillate({
+                period: 6000,
+                waveform: "sine",
+                delay: 100,
+                fadeInDuration: 300,
+                fadeOutDuration: 300,
+                y: { amplitude: swayAmplitudePx, phase: Math.PI / 6 },
+            })
+            .persist();
+    }
+
+    seq = seq.effect()
       .name(label)
       .copySprite(token)
       .spriteRotation(-token.document.rotation)
-      .attachTo(token,{ bindAlpha: false})
+      .attachTo(token, { bindAlpha: false, ignoreMotion: true })
       .scaleToObject(0.8, { considerTokenScale: true })
       .zIndex(0.1)
       .persist()
@@ -51,7 +71,7 @@ function create(token: Token, config: any = {}) {
     .effect()
       .delay(400)
       .file(closest(`eskie.sound.roar.01`))
-      .attachTo(token,{offset:{y:-0.5-(0.1*sway)},gridUnits:true, bindAlpha:false})
+      .attachTo(token, { bindAlpha: false })
       .scaleToObject(3.5)
       .opacity(0.75)
       .randomRotation();
@@ -60,10 +80,8 @@ function create(token: Token, config: any = {}) {
     seq = seq.effect()
       .name(label)
       .file(closest(`eskie.wings.bird.01`))
-      .attachTo(token,{offset:{y:-0.5-(0.1*sway)},gridUnits:true, bindAlpha:false})
+      .attachTo(token, { bindAlpha: false })
       .scaleToObject(3*wingSize)
-      .animateProperty('spriteContainer', 'position.y', { from: 0.5+(0.1*sway), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-      .loopProperty('spriteContainer', 'position.y', { values:[0.075*sway,0.1*sway,0.025*sway,0,0.025*sway,0.05*sway], duration: 1000, gridUnits: true, ease: "linear",pingPong: true })
       .playbackRate(2);
       if (flaps > 0) seq = seq.loopOptions({ loops: flaps, loopDelay:1000, endOnLastLoop:true });
       seq = seq.fadeIn(500, {ease:"easeOutCubic", delay:350})
@@ -77,10 +95,8 @@ function create(token: Token, config: any = {}) {
     .effect()
       .name(label)
       .file(closest(`eskie.wings.bird.01`))
-      .attachTo(token,{offset:{y:-0.5-(0.1*sway)},gridUnits:true, bindAlpha:false})
+      .attachTo(token, { bindAlpha: false })
       .scaleToObject(3*wingSize)
-      .animateProperty('spriteContainer', 'position.y', { from: 0.5+(0.1*sway), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-      .loopProperty('spriteContainer', 'position.y', { values:[0.075*sway,0.1*sway,0.025*sway,0,0.025*sway,0.05*sway], duration: 1000, gridUnits: true, ease: "linear",pingPong: true })
       .playbackRate(2);
       if (flaps > 0) seq = seq.loopOptions({ loops: flaps, loopDelay:1000, endOnLastLoop:true });
       seq = seq.fadeIn(500, {ease:"easeOutCubic", delay:350})
@@ -96,9 +112,7 @@ function create(token: Token, config: any = {}) {
     seq = seq.effect()
       .name(label)
       .file(closest(`eskie.buff.loop.simple.${color}`))
-      .attachTo(token,{offset:{y:-0.5-(0.1*sway)},gridUnits:true, bindAlpha: false})
-      .animateProperty('spriteContainer', 'position.y', { from: 0.5+(0.1*sway), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-      .loopProperty('spriteContainer', 'position.y', { values:[0.075*sway,0.1*sway,0.025*sway,0,0.025*sway,0.05*sway], duration: 1000, gridUnits: true, ease: "linear",pingPong: true })
+      .attachTo(token, { bindAlpha: false })
       .scaleToObject(1)
       .opacity(0.5)
       .filter("ColorMatrix", {saturate: 1})
@@ -110,24 +124,11 @@ function create(token: Token, config: any = {}) {
     .effect()
       .name(label)
       .file(closest(`eskie.aura.token.generic.02.${color}`))
-      .attachTo(token,{offset:{y:-0.5-(0.1*sway)},gridUnits:true, bindAlpha: false})
-      .animateProperty('spriteContainer', 'position.y', { from: 0.5+(0.1*sway), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-      .loopProperty('spriteContainer', 'position.y', { values:[0.075*sway,0.1*sway,0.025*sway,0,0.025*sway,0.05*sway], duration: 1000, gridUnits: true, ease: "linear",pingPong: true })
+      .attachTo(token, { bindAlpha: false })
       .scaleToObject(2.1)
       .zIndex(0.2)
       .timeRange(500, 2500)
-      .persist()
-    
-    .effect()
-      .name(label)
-      .copySprite(token)
-      .spriteRotation(-token.document.rotation)
-      .attachTo(token,{offset:{y:-0.5-(0.1*sway)},gridUnits:true, bindAlpha: false})
-      .scaleToObject(1, { considerTokenScale: true })
-      .zIndex(0.1)
-      .persist()
-      .animateProperty('spriteContainer', 'position.y', { from: 0.5+(0.1*sway), to: -0, duration: 1000, gridUnits: true, ease: "easeOutBack" })
-      .loopProperty('spriteContainer', 'position.y', { values:[0.075*sway,0.1*sway,0.025*sway,0,0.025*sway,0.05*sway], duration: 1000, gridUnits: true, ease: "linear",pingPong: true })
+      .persist();
 
     return seq;
 }
@@ -136,8 +137,7 @@ async function stop(token: Token, config: any = {}) {
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
 
-    await new Sequence().animation().on(token).opacity(1).play();
-    return Sequencer.EffectManager.endEffects({ name: label, object: token });
+    return endEffectsAndMotions(token, label);
 }
 
 export const eagleAttunement = {

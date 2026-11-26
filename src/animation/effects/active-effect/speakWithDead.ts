@@ -3,6 +3,7 @@
 import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
+import { resolveMotionTarget, endEffectsAndMotions } from "../../utils/motion.js";
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
@@ -55,7 +56,7 @@ function _addMagicCircleEffects(token: Token, id: any) {
     sequence
         .effect()
         .name(id)
-        .atLocation(token)
+        .atLocation(token, { ignoreMotion: true })
         .file(closest(`jb2a.magic_signs.circle.02.necromancy.loop.blue`))
         .scaleToObject(1.25)
         .scaleIn(0, 600, { ease: "easeOutCubic" })
@@ -68,7 +69,7 @@ function _addMagicCircleEffects(token: Token, id: any) {
 
         .effect()
         .name(id)
-        .atLocation(token)
+        .atLocation(token, { ignoreMotion: true })
         .file(closest(`jb2a.magic_signs.circle.02.necromancy.loop.green`))
         .scaleToObject(1.25)
         .scaleIn(0, 600, { ease: "easeOutCubic" })
@@ -91,6 +92,9 @@ function _addMagicCircleEffects(token: Token, id: any) {
  */
 function _addTokenVisualEffects(token: Token, label: any) {
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
+    const gridSize = adapter.getGridSize();
+    const motionToken = resolveMotionTarget(token);
+
     let sequence = new Sequence();
     sequence
         // Token effect
@@ -124,15 +128,11 @@ function _addTokenVisualEffects(token: Token, label: any) {
         .name(label)
         .delay(100)
         .file(closest("jb2a.detect_magic.circle.blue"))
-        .atLocation(token)
+        .atLocation(token, { ignoreMotion: true })
         .scaleToObject(1.25)
         .filter("ColorMatrix", { hue: -65 })
         .fadeOut(3500)
         .zIndex(1.5)
-        .animation()
-        .delay(200)
-        .on(token)
-        .opacity(0)
 
         .effect()
         .name(label)
@@ -143,8 +143,6 @@ function _addTokenVisualEffects(token: Token, label: any) {
         .opacity(0.5)
         .filter("ColorMatrix", { hue: -65 })
         .zIndex(1.1)
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.2, duration: 2000, delay: 2000, gridUnits: true, ease: "easeInSine" })
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: 0.05, duration: 2500, delay: 4000, gridUnits: true, ease: "easeInOutQuad", pingPong: true })
         .persist()
 
         .effect()
@@ -152,7 +150,7 @@ function _addTokenVisualEffects(token: Token, label: any) {
         .delay(100)
         .copySprite(token)
         .spriteRotation(-token.document.rotation)
-        .attachTo(token, { bindAlpha: false, bindRotation: false })
+        .attachTo(token, { bindAlpha: false, bindRotation: false, ignoreMotion: true })
         .scaleToObject(0.95, { considerTokenScale: true })
         .opacity(0.5)
         .belowTokens()
@@ -165,7 +163,7 @@ function _addTokenVisualEffects(token: Token, label: any) {
         .name(label)
         .delay(2000)
         .file(closest("jb2a.spirit_guardians.blue.spirits"))
-        .attachTo(token, { offset: { y: 0 }, gridUnits: true, bindAlpha: false, bindRotation: false })
+        .attachTo(token, { offset: { y: 0 }, gridUnits: true, bindAlpha: false, bindRotation: false, ignoreMotion: true })
         .scaleToObject(1.35, { considerTokenScale: true })
         .persist()
         .filter("ColorMatrix", { hue: -65 })
@@ -177,41 +175,53 @@ function _addTokenVisualEffects(token: Token, label: any) {
         .name(label)
         .delay(3000)
         .file(closest("jb2a.magic_signs.rune.necromancy.complete.blue"))
-        .attachTo(token, { offset: { y: -0.77 * tokenWidth }, gridUnits: true, bindAlpha: false, bindRotation: false })
+        .attachTo(token, { offset: { y: (-0.77 * tokenWidth) + 0.2 }, gridUnits: true, bindAlpha: false, bindRotation: false })
         .scaleToObject(0.4, { considerTokenScale: true })
         .persist()
         .filter("ColorMatrix", { hue: -65 })
         .opacity(1)
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: 0.05, duration: 2500, delay: 1000, gridUnits: true, ease: "easeInOutQuad", pingPong: true })
         .zIndex(2)
 
         .effect()
         .name(label)
         .delay(3000)
         .file(closest("jb2a.magic_signs.rune.necromancy.complete.blue"))
-        .attachTo(token, { offset: { y: -0.55 * tokenWidth }, gridUnits: true, bindAlpha: false, bindRotation: false })
+        .attachTo(token, { offset: { y: -0.55 * tokenWidth }, gridUnits: true, bindAlpha: false, bindRotation: false, ignoreMotion: true })
         .scaleToObject(0.4, { considerTokenScale: true })
         .persist()
         .opacity(0.5)
         .belowTokens()
         .filter("ColorMatrix", { brightness: -1 })
         .filter("Blur", { blurX: 5, blurY: 10 })
-        .zIndex(2)
+        .zIndex(2);
 
-        .effect()
-        .name(label)
-        .delay(100)
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .attachTo(token, { bindAlpha: false, bindRotation: false })
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.2, duration: 2000, delay: 2000, gridUnits: true, ease: "easeInSine" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: 15, duration: 1000, delay: 2500, ease: "easeInOutBack" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: -15, duration: 1000, delay: 3000, ease: "easeInOutBack" })
-        .loopProperty('spriteContainer', 'position.y', { from: 0, to: 0.05, duration: 2500, delay: 4000, gridUnits: true, ease: "easeInOutQuad", pingPong: true })
-        .persist()
-        .zIndex(0.2)
-        .waitUntilFinished(-500); // Small wait to ensure persistence starts before play returns
+    if (motionToken) {
+        // Original lifted 0 -> -0.2 GU over 2000ms (delay 2100), tilted +15°/-15° overlapping,
+        // then ping-ponged 0 -> +0.05 GU every 2500ms (oscillating between -0.2 and -0.15 GU).
+        sequence
+            .motion(motionToken)
+            .name(label)
+            .zIndex(0.2)
+            .moveBy(
+                [
+                    { v: { x: 0, y: 0 } },
+                    { v: { x: 0, y: -0.2 }, duration: 2000, inEase: "easeInSine" },
+                    { v: { x: 0, y: -0.175 }, duration: 1250, inEase: "easeInSine" },
+                ],
+                { gridUnits: true, delay: 2100, returnDuration: 500, ease: "easeOutSine" }
+            )
+            .rotateBy(15, { duration: 1000, delay: 2600, ease: "easeInOutBack", return: false })
+            .rotateBy(-15, { duration: 1000, delay: 3100, ease: "easeInOutBack", return: false })
+            .oscillate({
+                period: 5000,
+                waveform: "sine",
+                delay: 5350,
+                fadeOutDuration: 500,
+                y: { amplitude: 0.025 * gridSize },
+            })
+            .persist();
+    }
+
     return sequence;
 }
 
@@ -229,7 +239,7 @@ function _addCornerFlameEffects(token: Token, id: any, xOffset: any, yOffset: an
     sequence
         .effect()
         .name(id)
-        .atLocation(token, { offset: { x: xOffset, y: yOffset }, gridUnits: true })
+        .atLocation(token, { offset: { x: xOffset, y: yOffset }, gridUnits: true, ignoreMotion: true })
         .file(closest("jb2a.impact.008.blue"))
         .filter("ColorMatrix", { hue: -65 })
         .scaleToObject(1)
@@ -237,7 +247,7 @@ function _addCornerFlameEffects(token: Token, id: any, xOffset: any, yOffset: an
 
         .effect()
         .name(id)
-        .atLocation(token, { offset: { x: xOffset, y: yOffset }, gridUnits: true })
+        .atLocation(token, { offset: { x: xOffset, y: yOffset }, gridUnits: true, ignoreMotion: true })
         .file(closest("jb2a.flames.01.blue"))
         .belowTokens()
         .filter("ColorMatrix", { hue: -65 })
@@ -249,7 +259,7 @@ function _addCornerFlameEffects(token: Token, id: any, xOffset: any, yOffset: an
         .effect()
         .name(id)
         .delay(250)
-        .atLocation(token, { offset: { x: xOffset, y: yOffset - 0.35 }, gridUnits: true })
+        .atLocation(token, { offset: { x: xOffset, y: yOffset - 0.35 }, gridUnits: true, ignoreMotion: true })
         .file(closest("eskie.smoke.05.black"))
         .scaleToObject(0.8)
         .opacity(0.4)
@@ -306,10 +316,8 @@ async function preload(config: any) {
 async function stop(token: Token, config: any = {}) {
     const { id } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const label = `${id} - ${token.id}`;
-    let opacity = new Sequence().animation().on(token).opacity(1);
     return Promise.all([
-        opacity.play(),
-        Sequencer.EffectManager.endEffects({ name: label, object: token }),
+        endEffectsAndMotions(token, label),
         Sequencer.EffectManager.endEffects({ name: label })
     ]);
 }

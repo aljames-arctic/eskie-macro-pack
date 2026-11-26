@@ -7,6 +7,7 @@ import { closest } from "../../../lib/filemanager.js";
 import { settingsOverride } from "../../../lib/settings.js";
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
+import { resolveMotionTarget } from "../../utils/motion.js";
 
 const DEFAULT_CONFIG = {
     id: 'banish',
@@ -242,79 +243,70 @@ async function createBanish(target: Token, config: any = {}) {
         .fadeIn(250)
         .fadeOut(750);
 
+    const motionTarget = resolveMotionTarget(target);
+    if (motionTarget) {
+        sequence.motion(motionTarget)
+            .moveBy(
+                [
+                    { v: { x: 0, y: 0 } },
+                    { v: { x: 0, y: -15 }, duration: 250, inEase: "easeInOutBack" },
+                    { v: { x: 0, y: 0 }, duration: 2000, inEase: "easeInOutBack" },
+                    { v: { x: 0, y: -40 }, duration: 500, inEase: "easeInOutBack" },
+                    { v: { x: 0, y: -15 }, duration: 2000, inEase: "easeInOutBack" },
+                    { v: { x: 0, y: -200 }, duration: 375, inEase: "easeInOutBack" },
+                ],
+                { return: false }
+            )
+            .rotateBy(
+                [
+                    { v: 0 },
+                    { v: 8, duration: 500, inEase: "easeOutCubic" },
+                    { v: -8, duration: 500, inEase: "easeOutCubic" },
+                    { v: 8, duration: 500, inEase: "easeOutCubic" },
+                    { v: -8, duration: 500, inEase: "easeInCubic" },
+                    { v: 0, duration: 250, inEase: "easeOutCubic" },
+                ],
+                { delay: 250, return: false }
+            )
+            .rotateBy(
+                [
+                    { v: 0 },
+                    { v: 8, duration: 500, inEase: "easeOutCubic" },
+                    { v: -8, duration: 500, inEase: "easeOutCubic" },
+                    { v: 8, duration: 500, inEase: "easeOutCubic" },
+                    { v: -8, duration: 500, inEase: "easeInCubic" },
+                    { v: 0, duration: 250, inEase: "easeOutCubic" },
+                ],
+                { delay: 2750, return: false }
+            )
+            .scaleTo(0.01, { delay: 4750, duration: 375, ease: "linear", return: false })
+            .fadeTo(0, { delay: 5050, duration: 75, return: false })
+            .waitUntilFinished(-150);
+    }
+
     sequence.animation()
         .on(target)
         .opacity(0)
         .show(false);
 
     sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -15, duration: 250, ease: "easeInOutBack" })
-        .waitUntilFinished(-100);
-
-    sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('spriteContainer', 'position.y', { from: -15, to: 0, duration: 2000, ease: "easeInOutBack" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: 8, duration: 500, ease: "easeOutCubic" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: -16, duration: 500, delay: 500, ease: "easeOutCubic" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: 16, duration: 500, delay: 1000, ease: "easeOutCubic" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: -16, duration: 500, delay: 1500, ease: "easeInCubic" })
-        .waitUntilFinished(-100);
-
-    sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: -40, duration: 500, ease: "easeInOutBack" })
-        .waitUntilFinished(-100);
-
-    sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('spriteContainer', 'position.y', { from: -40, to: -15, duration: 2000, ease: "easeInOutBack" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: 8, duration: 500, ease: "easeOutCubic" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: -16, duration: 500, delay: 500, ease: "easeOutCubic" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: 16, duration: 500, delay: 1000, ease: "easeOutCubic" })
-        .animateProperty('sprite', 'rotation', { from: 0, to: -16, duration: 500, delay: 1500, ease: "easeInCubic" })
-        .waitUntilFinished(-100);
-
-    sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('spriteContainer', 'position.y', { from: -15, to: -200, duration: 750, ease: "easeInOutBack" })
-        .scaleOut(0, 750)
-        .duration(375)
-        .waitUntilFinished(-150);
-
-    sequence.effect()
         .file(closest(`jb2a.explosion.02.${portal.color}`))
-        .atLocation(target, { offset: { x: 0, y: -85 } })
+        .atLocation(target, { offset: { x: 0, y: -85 }, ignoreMotion: true })
         .scaleToObject(0.5)
         .filter("ColorMatrix", { hue: 15 })
         .zIndex(0.9);
 
     sequence.effect()
         .file(closest(`jb2a.detect_magic.cone.${portal.color}`))
-        .rotateTowards(target)
-        .atLocation(target, { offset: { x: 0, y: -110 } })
+        .rotateTowards(target, { ignoreMotion: true })
+        .atLocation(target, { offset: { x: 0, y: -110 }, ignoreMotion: true })
         .scaleToObject(1)
         .playbackRate(1.5)
         .zIndex(1);
 
     sequence.effect()
         .file(closest(`jb2a.template_circle.out_pulse.02.loop.${portal.color}`))
-        .atLocation(target, { offset: { x: 0, y: -75 } })
+        .atLocation(target, { offset: { x: 0, y: -75 }, ignoreMotion: true })
         .scaleToObject(1.75)
         .delay(1000)
         .fadeOut(1000)
@@ -322,7 +314,7 @@ async function createBanish(target: Token, config: any = {}) {
 
     sequence.effect()
         .file(closest(`jb2a.fireflies.many.02.${portal.color}`))
-        .atLocation(target, { offset: { x: 0, y: -75 } })
+        .atLocation(target, { offset: { x: 0, y: -75 }, ignoreMotion: true })
         .scaleToObject(0.75)
         .duration(2000)
         .fadeIn(500)
@@ -339,20 +331,21 @@ async function playBanish(target: Token, config: any = {}) {
 
 async function createReturn(target: Token, config: any = {}) {
     config = settingsOverride(config);
-    const { color, sound, portal } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const { sound, portal } = adapter.mergeObject(DEFAULT_CONFIG, config);
     modifyPortal(portal, target);
+    const motionTarget = resolveMotionTarget(target);
 
     const sequence = new Sequence();
     applySound(sequence, sound.return);
     sequence.effect()
         .file(closest(`jb2a.explosion.01.${portal.color}`))
-        .atLocation(target, { offset: { x: 5, y: -75 } })
+        .atLocation(target, { offset: { x: 5, y: -75 }, ignoreMotion: true })
         .scaleToObject(1.5)
         .delay(1500)
         .zIndex(1);
     sequence.effect()
         .file(closest(portal.file))
-        .atLocation(target, { offset: portal.offset })
+        .atLocation(target, { offset: portal.offset, ignoreMotion: true })
         .scaleToObject(portal.scale)
         .duration(6000)
         .scaleIn({ x: 0, y: 0.8 }, 500)
@@ -362,20 +355,36 @@ async function createReturn(target: Token, config: any = {}) {
         .belowTokens()
         .delay(1500)
         .waitUntilFinished(-4000);
-    sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-target.document.rotation)
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty('spriteContainer', 'position.y', { from: -75, to: 0, duration: 500, ease: "easeOutBounce" })
-        .scaleIn(0.25, 500)
-        .fadeIn(250)
-        .delay(1500)
-        .waitUntilFinished(-150);
+    sequence.wait(1500);
     sequence.animation()
         .on(target)
         .show(true)
         .opacity(1);
+    if (motionTarget) {
+        sequence.motion(motionTarget)
+            .moveBy(
+                [
+                    { v: { x: 0, y: -75 } },
+                    { v: { x: 0, y: 0 }, duration: 500, inEase: "easeOutBounce" },
+                ],
+                { return: false }
+            )
+            .scaleTo(
+                [
+                    { v: 0.25 },
+                    { v: 1, duration: 500, inEase: "linear" },
+                ],
+                { return: false }
+            )
+            .fadeTo(
+                [
+                    { v: 0 },
+                    { v: 1, duration: 250, inEase: "linear" },
+                ],
+                { return: false }
+            )
+            .waitUntilFinished(-150);
+    }
     return sequence;
 }
 

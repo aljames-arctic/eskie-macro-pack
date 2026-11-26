@@ -2,9 +2,10 @@ import { closest } from '../../lib/filemanager.js';
 import { deathEffect } from './sun-halo-dragon/death-effect.js';
 import { adapter } from '../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../utils/sound.js';
+import { resolveMotionTarget } from '../utils/motion.js';
 
 async function getPositions(token: any) {
-    const pos1 = {x: token.x, y: token.y };
+    const pos1 = { x: token.x, y: token.y };
     const pos2 = adjustTeleport(await Sequencer.Crosshair.show());
     return { pos1, pos2 };
 }
@@ -52,180 +53,184 @@ async function create(token: any, targets: any[] = [], config: any = {}) {
     const { impact, screen, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const { pos1, pos2 } = await getPositions(token);
     const mirrorY = pos1.x > pos2.x;
+    const startCenter = adapter.getCenter(token);
+    const dashDelta = { x: pos2.x - pos1.x, y: pos2.y - pos1.y };
+    const dashDist = Math.hypot(dashDelta.x, dashDelta.y);
+    const motionToken = resolveMotionTarget(token);
 
-    const seq = new Sequence()
-        .animation()
-            .on(token)
-            .opacity(0)
+    const seq = new Sequence();
 
+    if (motionToken && dashDist >= 1) {
+        seq.motion(motionToken)
+            .moveBy(dashDelta, {
+                delay: 2000 + 150,
+                duration: 500,
+                ease: "easeOutQuint",
+                return: false,
+            })
+            .persistUntilUpdate();
+    }
+
+    seq
         .effect()
             .copySprite(token)
             .spriteRotation(-token.document.rotation)
-            .scaleToObject(1, {considerTokenScale:true})
-            .atLocation(token)
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: xdelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: ydelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
-            .duration(3500)
-
-        .effect()
-            .copySprite(token)
-            .spriteRotation(-token.document.rotation)
-            .scaleToObject(1, {considerTokenScale:true})
-            .atLocation(token)
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: xdelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: ydelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
-            .duration(2000+150+500)
-            .fadeIn(100,{delay: 2500+150})
+            .scaleToObject(1, { considerTokenScale: true })
+            .atLocation(startCenter)
+            .animateProperty('spriteContainer', 'position.x', { from: 0, to: xdelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint", delay: 2000 + 150 })
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: ydelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint", delay: 2000 + 150 })
+            .duration(2000 + 150 + 500)
+            .fadeIn(100, { delay: 2500 + 150 })
             .fadeOut(250)
             .filter("Blur", { blurX: 15, blurY: 0 });
 
-        applySound(seq, sound.intro);
+    applySound(seq, sound.intro);
 
-        seq.effect()
-            .file(closest("eskie.screen_overlay.speed_lines.horizontal.02.orange"))
-            .screenSpace()
-            .screenSpaceScale({fitX:true,fitY:true})
-            .mirrorX()
-            .fadeOut(500)
-            .duration(2500)
-            .delay(200)
-            .playIf(screen)
+    seq.effect()
+        .file(closest("eskie.screen_overlay.speed_lines.horizontal.02.orange"))
+        .screenSpace()
+        .screenSpaceScale({ fitX: true, fitY: true })
+        .mirrorX()
+        .fadeOut(500)
+        .duration(2500)
+        .delay(200)
+        .playIf(screen)
 
-        .effect()
-            .file(closest("jb2a.wind_stream.white"))
-            .name("Rage")
-            .attachTo(token, {bindAlpha: false})
-            .scaleToObject()
-            .rotate(90)
-            .opacity(1)
-            .filter("ColorMatrix", {saturate: 1})
-            .tint("#FF5733")
-            .private()
-            //.mask()
-            .duration(2000)
-            .delay(200)
-            .fadeOut(250)
-            .zIndex(5)
+    .effect()
+        .file(closest("jb2a.wind_stream.white"))
+        .name("Rage")
+        .attachTo(token, { bindAlpha: false, ignoreMotion: true })
+        .scaleToObject()
+        .rotate(90)
+        .opacity(1)
+        .filter("ColorMatrix", { saturate: 1 })
+        .tint("#FF5733")
+        .private()
+        //.mask()
+        .duration(2000)
+        .delay(200)
+        .fadeOut(250)
+        .zIndex(5)
 
-        // Fire Aura
-        .effect()
-            .file(closest("eskie.aura.token.generic.01.red"))
-            .atLocation(token)
-            .scaleToObject(2.1)
-            .zIndex(0.1)
-            .belowTokens()
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: xdelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: ydelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint",delay: 2000+150 })
-            .animateProperty('sprite', 'rotation', { from: 0, to: 90, duration: 50, ease: "easeOutQuint",delay: 2000+50 })
+    // Fire Aura
+    .effect()
+        .file(closest("eskie.aura.token.generic.01.red"))
+        .atLocation(startCenter)
+        .scaleToObject(2.1)
+        .zIndex(0.1)
+        .belowTokens()
+        .animateProperty('spriteContainer', 'position.x', { from: 0, to: xdelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint", delay: 2000 + 150 })
+        .animateProperty('spriteContainer', 'position.y', { from: 0, to: ydelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint", delay: 2000 + 150 })
+        .animateProperty('sprite', 'rotation', { from: 0, to: 90, duration: 50, ease: "easeOutQuint", delay: 2000 + 50 })
 
+    // Dragon Eyes
+    .effect()
+        .file(closest("eskie.fire.03.orange"))
+        .atLocation(startCenter, { offset: { x: -0.3, y: -0.15 }, gridUnits: true })
+        .scaleToObject(0.5)
+        .playbackRate(1.2)
+        .mirrorX()
+        .zIndex(1)
+    .effect()
+        .file(closest("eskie.fire.03.orange"))
+        .atLocation(startCenter, { offset: { x: 0.3, y: -0.2 }, gridUnits: true })
+        .scaleToObject(0.5)
+        .playbackRate(1.2)
+        .zIndex(1)
 
-        // Dragon Eyes
-        .effect()
-            .file(closest("eskie.fire.03.orange"))
-            .atLocation(token, {offset:{x:-0.3, y:-0.15}, gridUnits:true})
-            .scaleToObject(0.5)
-            .playbackRate(1.2)
-            .mirrorX()
-            .zIndex(1)
-        .effect()
-            .file(closest("eskie.fire.03.orange"))
-            .atLocation(token, {offset:{x:0.3, y:-0.2}, gridUnits:true})
-            .scaleToObject(0.5)
-            .playbackRate(1.2)
-            .zIndex(1)
-
-        .thenDo(() => {
-                for (const target of targets) {
-                    deathEffect.play(target);
-                }
-            });
-            
-        const bg = adapter.getSceneBackground(canvas?.scene);
-        if (bg?.src) {
-            const sceneCenter = adapter.getSceneCenter(canvas?.scene);
-            const sceneDims = adapter.getSceneDimensions(canvas?.scene);
-            seq.effect()
-                .delay(2100)
-                .name(`Casting ${token.name}`)
-                .file(closest(bg.src))
-                .filter("ColorMatrix", { saturate: 1, brightness: 0.6 })
-                .atLocation(sceneCenter)
-                .size({ width: sceneDims.sceneRect.width / sceneDims.size, height: sceneDims.sceneRect.height / sceneDims.size }, { gridUnits: true })
-                .duration(250)
-                .filter("ColorMatrix", { brightness: 0 })
-                .belowTiles()
-                .fadeOut(125)
-                .fadeIn(125)
-                .opacity(1)
-                .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY })
-                .playIf(impact);
+    .thenDo(() => {
+        for (const target of targets) {
+            deathEffect.play(target);
         }
-
-        seq.effect()
-            .delay(2100)
-            .file(closest("eskie.environment.lighting.shine.01.rainbow"))
-            .atLocation(token)
-            .scaleToObject(4)
-            .scaleIn(0, 250, {ease: "easeOutCubic"})
-            .duration(250)
-            .fadeOut(150)
-            .playIf(impact)
-
-        .effect()
-            .delay(2100)
-            .file(closest("eskie.particle.04.orange"))
-            .atLocation(token)
-            .scaleToObject(5)
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -7.5, duration: 500, gridUnits: true, ease: "easeOutQuint" })
-            .belowTokens()
-            .playIf(!impact)
-
-        .effect()
-            .delay(2000)
-            .file(closest("eskie.velocity.01.white"))
-            .atLocation(token)
-            .mirrorX()
-            .scaleToObject(7.5)
-            .opacity(0.5)
-            .zIndex(10)
-            .playbackRate(1.5)
-
-        .canvasPan()
-            .delay(2000)
-            .shake({ duration: 250, strength: 1.5, rotation: false, fadeOut: 250 })
-
-        .wait(1000);
-        applySound(seq, sound.cast);
-        seq.wait(1000);
-
-        seq.effect()
-            .file(closest("eskie.fire.fire_dragon.01"))
-            .atLocation(pos1)
-            .stretchTo(pos2)
-            .scale(0.75)
-            .belowTokens()
-            .playbackRate(1.25)
-            .mirrorX(true)
-            .mirrorY(mirrorY)
-
-        seq.effect()
-            .delay(150)
-            .file(closest("eskie.slice.01_ranged.color.rainbow"))
-            .atLocation(pos1)
-            .stretchTo(pos2)
-            .scale(1.5)
-            .playbackRate(0.75)
-            .zIndex(5)
-            .waitUntilFinished()
-
-        .canvasPan()
-            .shake({ duration: 500, strength: 1.5, rotation: false, fadeOut: 250 })
-
-        .animation()
-            .on(token)
-            .teleportTo(pos2)
-            .opacity(1);
+    });
         
+    const bg = adapter.getSceneBackground(canvas?.scene);
+    if (bg?.src) {
+        const sceneCenter = adapter.getSceneCenter(canvas?.scene);
+        const sceneDims = adapter.getSceneDimensions(canvas?.scene);
+        seq.effect()
+            .delay(2100)
+            .name(`Casting ${token.name}`)
+            .file(closest(bg.src))
+            .filter("ColorMatrix", { saturate: 1, brightness: 0.6 })
+            .atLocation(sceneCenter)
+            .size({ width: sceneDims.sceneRect.width / sceneDims.size, height: sceneDims.sceneRect.height / sceneDims.size }, { gridUnits: true })
+            .duration(250)
+            .filter("ColorMatrix", { brightness: 0 })
+            .belowTiles()
+            .fadeOut(125)
+            .fadeIn(125)
+            .opacity(1)
+            .spriteOffset({ x: -bg.offsetX, y: -bg.offsetY })
+            .playIf(impact);
+    }
+
+    seq.effect()
+        .delay(2100)
+        .file(closest("eskie.environment.lighting.shine.01.rainbow"))
+        .atLocation(startCenter)
+        .scaleToObject(4)
+        .scaleIn(0, 250, { ease: "easeOutCubic" })
+        .duration(250)
+        .fadeOut(150)
+        .playIf(impact)
+
+    .effect()
+        .delay(2100)
+        .file(closest("eskie.particle.04.orange"))
+        .atLocation(startCenter)
+        .scaleToObject(5)
+        .animateProperty('spriteContainer', 'position.x', { from: 0, to: -7.5, duration: 500, gridUnits: true, ease: "easeOutQuint" })
+        .belowTokens()
+        .playIf(!impact)
+
+    .effect()
+        .delay(2000)
+        .file(closest("eskie.velocity.01.white"))
+        .atLocation(startCenter)
+        .mirrorX()
+        .scaleToObject(7.5)
+        .opacity(0.5)
+        .zIndex(10)
+        .playbackRate(1.5)
+
+    .canvasPan()
+        .delay(2000)
+        .shake({ duration: 250, strength: 1.5, rotation: false, fadeOut: 250 })
+
+    .wait(1000);
+    applySound(seq, sound.cast);
+    seq.wait(1000);
+
+    seq.effect()
+        .file(closest("eskie.fire.fire_dragon.01"))
+        .atLocation(pos1)
+        .stretchTo(pos2)
+        .scale(0.75)
+        .belowTokens()
+        .playbackRate(1.25)
+        .mirrorX(true)
+        .mirrorY(mirrorY);
+
+    seq.effect()
+        .delay(150)
+        .file(closest("eskie.slice.01_ranged.color.rainbow"))
+        .atLocation(pos1)
+        .stretchTo(pos2)
+        .scale(1.5)
+        .playbackRate(0.75)
+        .zIndex(5)
+        .waitUntilFinished()
+
+    .canvasPan()
+        .shake({ duration: 500, strength: 1.5, rotation: false, fadeOut: 250 });
+
+    if (dashDist >= 1) {
+        seq.animation()
+            .on(token)
+            .teleportTo(pos2);
+    }
+    
     return seq;
 }
 

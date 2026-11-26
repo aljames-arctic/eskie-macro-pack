@@ -7,6 +7,7 @@ import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
+import { resolveMotionTarget } from "../../utils/motion.js";
 const DEFAULT_CONFIG = {
     id: 'enlargeReduce',
     scaleFactor: 1, // Default scale factor for enlarge/reduce
@@ -25,7 +26,8 @@ const DEFAULT_CONFIG = {
  */
 async function createEnlarge(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, scaleFactor, sound } = mConfig;
+    const { scaleFactor, sound } = mConfig;
+    const motionToken = resolveMotionTarget(token);
 
     const sequence = new Sequence();
     applySound(sequence, sound.enlarge);
@@ -52,21 +54,26 @@ async function createEnlarge(token: Token, config: any = {}) {
         .fadeOut(250)
         .repeats(3, 500, 500)
         .opacity(0.2)
-        .zIndex(1)
+        .zIndex(1);
 
+    if (motionToken) {
+        sequence
+            .motion(motionToken)
+            .zIndex(0)
+            .oscillate({
+                period: 150,
+                waveform: "triangle",
+                delay: 200,
+                duration: 1800,
+                rotation: { amplitude: 10, phase: 1.5 * Math.PI },
+            })
+            .waitUntilFinished(-200);
+    }
+
+    sequence
         .animation()
         .on(token)
         .opacity(0)
-
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .loopProperty('sprite', "rotation", { from: -10, to: 10, duration: 75, pingPong: true, delay: 200 })
-        .duration(2000)
-        .waitUntilFinished(-200)
-        .zIndex(0)
 
         .thenDo(function () {
             return (token.document as any).update({
@@ -83,14 +90,23 @@ async function createEnlarge(token: Token, config: any = {}) {
 
         .wait(200)
 
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .duration(3000)
-        .scaleIn(0.25, 700, { ease: "easeOutBounce" })
+        .animation()
+        .on(token)
+        .opacity(1);
 
+    if (motionToken) {
+        sequence
+            .motion(motionToken)
+            .scaleTo(
+                [
+                    { v: 0.25 },
+                    { v: 1, duration: 700, inEase: "easeOutBounce" },
+                ],
+                { return: false }
+            );
+    }
+
+    sequence
         .effect()
         .file(closest("jb2a.extras.tmfx.outpulse.circle.01.fast"))
         .atLocation(token)
@@ -124,12 +140,7 @@ async function createEnlarge(token: Token, config: any = {}) {
         .scaleToObject(1)
         .fadeIn(250)
         .fadeOut(250)
-        .waitUntilFinished(-3000)
-
-        .animation()
-        .on(token)
-        .opacity(1)
-    ;
+        .waitUntilFinished(-3000);
 
     return sequence;
 }
@@ -155,7 +166,8 @@ async function playEnlarge(token: Token, config: any = {}) {
  */
 async function createReduce(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    const { id, scaleFactor, sound } = mConfig;
+    const { scaleFactor, sound } = mConfig;
+    const motionToken = resolveMotionTarget(token);
 
     const sequence = new Sequence();
     applySound(sequence, sound.reduce);
@@ -181,21 +193,26 @@ async function createReduce(token: Token, config: any = {}) {
         .fadeOut(250)
         .repeats(3, 500, 500)
         .opacity(0.2)
-        .zIndex(1)
+        .zIndex(1);
 
+    if (motionToken) {
+        sequence
+            .motion(motionToken)
+            .zIndex(0)
+            .oscillate({
+                period: 150,
+                waveform: "triangle",
+                delay: 200,
+                duration: 1800,
+                rotation: { amplitude: 10, phase: 1.5 * Math.PI },
+            })
+            .waitUntilFinished(-200);
+    }
+
+    sequence
         .animation()
         .on(token)
         .opacity(0)
-
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .loopProperty('sprite', "rotation", { from: -10, to: 10, duration: 75, pingPong: true, delay: 200 })
-        .duration(2000)
-        .waitUntilFinished(-200)
-        .zIndex(0)
 
         .thenDo(function () {
             return (token.document as any).update({
@@ -212,14 +229,23 @@ async function createReduce(token: Token, config: any = {}) {
 
         .wait(200)
 
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .duration(3000)
-        .scaleIn(0.25, 700, { ease: "easeOutBounce" })
+        .animation()
+        .on(token)
+        .opacity(1);
 
+    if (motionToken) {
+        sequence
+            .motion(motionToken)
+            .scaleTo(
+                [
+                    { v: 0.25 },
+                    { v: 1, duration: 700, inEase: "easeOutBounce" },
+                ],
+                { return: false }
+            );
+    }
+
+    sequence
         .effect()
         .file(closest("jb2a.extras.tmfx.outpulse.circle.01.fast"))
         .atLocation(token)
@@ -252,12 +278,7 @@ async function createReduce(token: Token, config: any = {}) {
         .scaleToObject(1)
         .fadeIn(250)
         .fadeOut(250)
-        .waitUntilFinished(-3000)
-
-        .animation()
-        .on(token)
-        .opacity(1)
-    ;
+        .waitUntilFinished(-3000);
 
     return sequence;
 }

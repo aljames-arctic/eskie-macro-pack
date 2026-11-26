@@ -5,6 +5,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
+import { resolveMotionTarget, endEffectsAndMotions } from '../../utils/motion.js';
 
 const DEFAULT_CONFIG = {
     id: 'banishingArrow',
@@ -18,6 +19,7 @@ async function create(token: Token, target: Token, config: any = {}) {
 
     if (!target) return;
 
+    const motionTarget = resolveMotionTarget(target);
     const sequence = new Sequence();
     applySound(sequence, sound);
 
@@ -28,19 +30,22 @@ async function create(token: Token, target: Token, config: any = {}) {
             .rotateTowards(target)
             .scaleToObject(1, { considerTokenScale: true })
             .zIndex(2)
-            .waitUntilFinished(-1250)
+            .waitUntilFinished(-1250);
 
-        .effect()
-            .copySprite(target)
-            .attachTo(target, { bindAlpha: false, bindVisibility: false })
-            .scaleToObject(1, { considerTokenScale: true })
-            .duration(2000)
-            .scaleOut(0, 1000, { ease: 'easeInOutCubic' })
-            .rotateOut(360, 1000, { ease: 'easeInOutQuint' })
+    if (motionTarget) {
+        sequence
+            .motion(motionTarget)
+            .name(`${target.name} Banishing Arrow`)
+            .scaleTo(0.01, { delay: 1000, duration: 1000, ease: 'easeInOutCubic', return: false })
+            .rotateBy(360, { delay: 1000, duration: 1000, ease: 'easeInOutQuint', return: false })
+            .fadeTo(0, { delay: 1900, duration: 100, return: false });
+    }
 
+    sequence
         .wait(500)
 
         .animation()
+            .delay(1500)
             .on(target)
             .hide()
 
@@ -111,7 +116,7 @@ async function play(token: Token, target: Token, config: any = {}) {
 }
 
 async function stop(token: Token, target: Token, config: any = {}) {
-    Sequencer.EffectManager.endEffects({ name: `${target.name} Banishing Arrow`, object: target });
+    await endEffectsAndMotions(target, `${target.name} Banishing Arrow`);
     await new Sequence()
         .animation()
         .on(target)

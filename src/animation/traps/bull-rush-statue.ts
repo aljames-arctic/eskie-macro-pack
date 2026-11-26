@@ -11,6 +11,7 @@ import { log } from '../../lib/logger.js';
 
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
+import { resolveMotionTarget } from "../utils/motion.js";
 
 export interface BullRushStatueConfig extends TrapConfig {
     targetLocation?: { x: number; y: number } | string | null;
@@ -47,6 +48,7 @@ async function create(tile: Tile, targets: Token[] = [], config: BullRushStatueC
         return seq;
     }
 
+    const motionTile = !config.textureSrc ? resolveMotionTarget(tile) : null;
     const textureSrc = config.textureSrc ?? adapter.getPlaceableTexture(tile) ?? closest('jb2a.boulder.01.brown');
     const scaleX = tileDoc.texture?.scaleX ?? 1;
     const scaleY = tileDoc.texture?.scaleY ?? 1;
@@ -82,9 +84,20 @@ async function create(tile: Tile, targets: Token[] = [], config: BullRushStatueC
         y: distance.y - (gridSize * 0.5) * direction.y
     };
 
-        seq = seq
-            .wait(500)
+    seq = seq.wait(500);
 
+    if (motionTile) {
+        seq = seq
+            .motion(motionTile)
+            .moveBy(slideDistance, {
+                delay: 200,
+                duration: 500,
+                ease: 'easeOutQuint',
+                returnDuration: 3000,
+                easeOut: 'easeInOutQuad',
+            });
+    } else {
+        seq = seq
             .effect()
             .file(textureSrc)
             .atLocation(tileCenter)
@@ -100,36 +113,39 @@ async function create(tile: Tile, targets: Token[] = [], config: BullRushStatueC
             .animation()
             .delay(200)
             .on(tile)
-            .opacity(0)
+            .opacity(0);
+    }
 
-            // Smoke at statue origin (Right)
-            .effect()
-            .delay(200)
-            .file(closest('eskie.smoke.01.white'))
-            .atLocation(tileCenter)
-            .size({ width: tileWidth * 1.75, height: tileHeight * 1.75 })
-            .belowTokens()
-            .opacity(0.5)
+    seq = seq
+        // Smoke at statue origin (Right)
+        .effect()
+        .delay(200)
+        .file(closest('eskie.smoke.01.white'))
+        .atLocation(tileCenter)
+        .size({ width: tileWidth * 1.75, height: tileHeight * 1.75 })
+        .belowTokens()
+        .opacity(0.5)
 
-            // Smoke at statue origin (Left)
-            .effect()
-            .delay(200)
-            .file(closest('eskie.smoke.01.white'))
-            .atLocation(tileCenter)
-            .size({ width: tileWidth * 1.75, height: tileHeight * 1.75 })
-            .mirrorX()
-            .belowTokens()
-            .opacity(0.5);
+        // Smoke at statue origin (Left)
+        .effect()
+        .delay(200)
+        .file(closest('eskie.smoke.01.white'))
+        .atLocation(tileCenter)
+        .size({ width: tileWidth * 1.75, height: tileHeight * 1.75 })
+        .mirrorX()
+        .belowTokens()
+        .opacity(0.5);
 
-        if (target) {
-            seq = seq
-                // Move the target back
-                .animation()
-                .delay(300)
-                .on(target)
-                .moveTowards(destination, { relativeToCenter: true });
-        }
+    if (target) {
+        seq = seq
+            // Move the target back
+            .animation()
+            .delay(300)
+            .on(target)
+            .moveTowards(destination, { relativeToCenter: true });
+    }
 
+    if (!motionTile) {
         seq = seq
             .wait(3700)
 
@@ -137,6 +153,7 @@ async function create(tile: Tile, targets: Token[] = [], config: BullRushStatueC
             .animation()
             .on(tile)
             .opacity(1);
+    }
 
     return seq;
 }

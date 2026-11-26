@@ -10,6 +10,7 @@ import { setupTrap } from './trap-manager.js';
 
 import { adapter } from "../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../utils/sound.js";
+import { resolveMotionTarget } from "../utils/motion.js";
 
 export interface FallingSkyTrapConfig extends TrapConfig {
     reveal?: boolean;
@@ -48,13 +49,16 @@ async function create(trapObject: Tile, targets: Token[] = [], config: FallingSk
 
     if (targets.length > 0) {
         const targetSeqs: any[] = [];
+        const safeStartScale = Math.max(0.01, startScale);
+
         targets.forEach(target => {
             const { widthUnits: targetWidth, widthPx, heightPx } = adapter.getTokenDimensions(target);
             const targetRotation = adapter.getTokenRotation(target);
             const staggerDelay = Math.random() * (randomDelay);
+            const motionTarget = resolveMotionTarget(target);
 
-            const targetSeq = new Sequence()
-                // Hide the actual token at the start of fall
+            let targetSeq = new Sequence()
+                // Hide the actual token during the high-altitude aboveLighting preview
                 .animation()
                 .delay(staggerDelay)
                 .on(target)
@@ -86,17 +90,32 @@ async function create(trapObject: Tile, targets: Token[] = [], config: FallingSk
                 .duration(1000)
                 .waitUntilFinished()
 
-                // Copy sprite falls from the sky
-                .effect()
-                .copySprite(target)
-                .attachTo(target, { bindAlpha: false })
-                .scaleToObject(1, { considerTokenScale: true })
-                .scaleIn(startScale, 1000, { ease: 'easeInQuad' })
-                .spriteRotation(-targetRotation)
-                .fadeIn(250)
-                .duration(1000)
-                .waitUntilFinished()
+                // Restore token opacity and animate the sky-fall descent natively via .motion()
+                .animation()
+                .on(target)
+                .opacity(1);
 
+            if (motionTarget) {
+                targetSeq = targetSeq
+                    .motion(motionTarget)
+                    .scaleTo(
+                        [
+                            { v: safeStartScale },
+                            { v: 1, duration: 1000, inEase: 'easeInQuad' },
+                        ],
+                        { return: false }
+                    )
+                    .fadeTo(
+                        [
+                            { v: 0 },
+                            { v: 1, duration: 250, inEase: 'linear' },
+                        ],
+                        { return: false }
+                    )
+                    .waitUntilFinished();
+            }
+
+            targetSeq = targetSeq
                 // Smoke puff when landing
                 .effect()
                 .file(closest('jb2a.smoke.puff.ring.01.white'))
@@ -119,12 +138,7 @@ async function create(trapObject: Tile, targets: Token[] = [], config: FallingSk
                 .size({ width: widthPx * 2, height: heightPx * 2 })
                 .belowTokens()
                 .fadeOut(1000)
-                .duration(5000)
-
-                // Restore token opacity
-                .animation()
-                .on(target)
-                .opacity(1);
+                .duration(5000);
 
             targetSeqs.push(targetSeq);
         });

@@ -60,19 +60,23 @@ const cfg = {
 const position = await getPosition(scope?.template, cfg);
 if (!position) return;
 
-const sequence = new Sequence();
+const gridSize = canvas.grid?.size ?? 100;
+const startCenter = token.center ?? {
+    x: token.x + (token.w ?? ((token.document?.width ?? 1) * gridSize)) / 2,
+    y: token.y + (token.h ?? ((token.document?.height ?? 1) * gridSize)) / 2,
+};
+const diveDelta = {
+    x: position.x - startCenter.x,
+    y: position.y - startCenter.y,
+};
 
-// Temporary hide token while copy sprite arc animates the dive
-sequence.animation()
-    .delay(100)
-    .on(token)
-    .opacity(0);
+const sequence = new Sequence();
 
 // Departure dust puff at launch location
 sequence.effect()
     .delay(100)
     .file(closest("eskie.smoke.06.white"))
-    .atLocation(token)
+    .atLocation(token, { ignoreMotion: true })
     .scaleToObject(1.1)
     .belowTokens()
     .playbackRate(1.5)
@@ -82,7 +86,7 @@ sequence.effect()
 sequence.effect()
     .copySprite(token)
     .spriteRotation(-tokenRotation)
-    .atLocation(token)
+    .atLocation(token, { ignoreMotion: true })
     .scaleToObject(0.85, { considerTokenScale: true })
     .moveTowards(position, { delay: 100, rotate: false, ease: "easeOutQuint" })
     .duration(1600)
@@ -96,32 +100,34 @@ sequence.effect()
     .delay(900)
     .file(closest("eskie.smoke.01.white"))
     .atLocation(position)
-    .rotateTowards(token)
+    .rotateTowards(token, { ignoreMotion: true })
     .scaleToObject(1.5)
     .belowTokens()
     .spriteOffset({ x: -1.25 }, { gridUnits: true })
     .spriteRotation(-180)
     .opacity(0.5);
 
-// Quick reactive dive jumping sprite trajectory and prone rotation tilt
-sequence.effect()
-    .copySprite(token)
-    .spriteRotation(-tokenRotation)
-    .atLocation(token)
-    .scaleToObject(1, { considerTokenScale: true })
-    .moveTowards(position, { delay: 100, rotate: false, ease: "easeOutQuint" })
-    .duration(1300)
-    .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.8, duration: 550, delay: 100, gridUnits: true, ease: "easeOutQuint" })
-    .animateProperty('spriteContainer', 'position.y', { from: 0, to: 0.8, duration: 550, delay: 650, gridUnits: true, ease: "easeOutQuad" })
-    .animateProperty('sprite', 'rotation', { from: 0, to: 90, duration: 500, delay: 100, ease: "easeOutCubic" })
-    .waitUntilFinished(-200);
+// Quick reactive dive parabolic trajectory and prone rotation tilt via .motion()
+sequence.motion(token)
+    .moveBy(diveDelta, { delay: 100, duration: 1100, ease: "easeOutQuint", return: false })
+    .moveBy(
+        [
+            { v: { x: 0, y: 0 } },
+            { v: { x: 0, y: -0.8 }, duration: 550, inEase: "easeOutQuint" },
+            { v: { x: 0, y: 0 }, duration: 550, inEase: "easeOutQuad" },
+        ],
+        { delay: 100, gridUnits: true, return: false }
+    )
+    .rotateBy(90, { delay: 100, duration: 500, ease: "easeOutCubic", return: false })
+    .persistUntilUpdate();
+
+sequence.wait(1200);
 
 // Teleport and tilt actual token +90deg into staying low prone state
 sequence.animation()
     .on(token)
     .teleportTo(position, { relativeToCenter: true })
-    .rotate(tokenRotation + 90)
-    .opacity(1);
+    .rotate(tokenRotation + 90);
 
 // Persistent tracking effect for staying low evasive cover state & macro toggle support
 sequence.effect()

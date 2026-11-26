@@ -34,65 +34,60 @@ const middleposition = {
     y: (targetCenter.y - tokenCenter.y) * 0.25,
 };
 
-const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
 const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
 const scaleX = token.document?.texture?.scaleX ?? 1;
 const scaleY = token.document?.texture?.scaleY ?? 1;
 const tokenWidth = token.document?.width ?? token.width ?? 1;
 const targetWidth = target.document?.width ?? target.width ?? 1;
 
+const attackerLunge = {
+    x: scaleX * middleposition.x,
+    y: scaleY * middleposition.y,
+};
+const targetKnockback = {
+    x: scaleX * middleposition.x + 0.5,
+    y: scaleY * middleposition.y + 0.5,
+};
+
 let seq = new Sequence();
 
-seq.animation()
-    .delay(250)
-    .on(token)
-    .opacity(0);
+seq.motion(target)
+    .moveBy(targetKnockback, {
+        delay: 1350,
+        duration: 100,
+        ease: "easeOutExpo",
+        returnDuration: 250,
+        easeOut: "easeInOutQuad",
+    })
+    .rotateBy(45, {
+        delay: 1300,
+        duration: 150,
+        ease: "easeOutCubic",
+        returnDuration: 350,
+        easeOut: "easeOutBack",
+    });
 
-seq.animation()
-    .delay(250)
-    .on(target)
-    .opacity(0);
+seq.motion(token)
+    .moveBy(attackerLunge, {
+        delay: 1250,
+        duration: 100,
+        ease: "easeOutExpo",
+        returnDuration: 350,
+        easeOut: "easeInOutQuad",
+    });
 
 seq.effect()
     .copySprite(target)
     .attachTo(target, { bindAlpha: false })
     .scaleToObject(1, { considerTokenScale: true })
     .spriteRotation(-targetRotation)
-    .animateProperty("spriteContainer", "position.x", { from: 0, to: scaleX * middleposition.x + 0.5, duration: 100, ease: "easeOutExpo", delay: 1350 })
-    .animateProperty("spriteContainer", "position.y", { from: 0, to: scaleY * middleposition.y + 0.5, duration: 100, ease: "easeOutExpo", delay: 1350 })
     .animateProperty("sprite", "rotation", { from: 0, to: 45, duration: 150, ease: "easeOutCubic", delay: 1300 })
     .animateProperty("sprite", "rotation", { from: 0, to: -45, duration: 350, ease: "easeOutBack", delay: 1450 })
-    .animateProperty("spriteContainer", "position.x", { from: 0, to: -scaleX * middleposition.x - 0.5, duration: 250, ease: "easeInOutQuad", delay: 1450 })
-    .animateProperty("spriteContainer", "position.y", { from: 0, to: -scaleY * middleposition.y - 0.5, duration: 250, ease: "easeInOutQuad", delay: 1450 })
     .fadeIn(200, { delay: 1250 })
     .fadeOut(500)
     .loopProperty("spriteContainer", "position.x", { from: -0.05, to: 0.05, duration: 50, pingPong: true, gridUnits: true })
     .opacity(0.25)
     .duration(2500);
-
-seq.effect()
-    .copySprite(target)
-    .attachTo(target, { bindAlpha: false })
-    .scaleToObject(1, { considerTokenScale: true })
-    .spriteRotation(-targetRotation)
-    .animateProperty("spriteContainer", "position.x", { from: 0, to: scaleX * middleposition.x + 0.5, duration: 100, ease: "easeOutExpo", delay: 1350 })
-    .animateProperty("spriteContainer", "position.y", { from: 0, to: scaleY * middleposition.y + 0.5, duration: 100, ease: "easeOutExpo", delay: 1350 })
-    .animateProperty("sprite", "rotation", { from: 0, to: 45, duration: 150, ease: "easeOutCubic", delay: 1300 })
-    .animateProperty("sprite", "rotation", { from: 0, to: -45, duration: 350, ease: "easeOutBack", delay: 1450 })
-    .animateProperty("spriteContainer", "position.x", { from: 0, to: -scaleX * middleposition.x - 0.5, duration: 250, ease: "easeInOutQuad", delay: 1450 })
-    .animateProperty("spriteContainer", "position.y", { from: 0, to: -scaleY * middleposition.y - 0.5, duration: 250, ease: "easeInOutQuad", delay: 1450 })
-    .duration(2000);
-
-seq.effect()
-    .copySprite(token)
-    .attachTo(token, { bindAlpha: false })
-    .scaleToObject(1, { considerTokenScale: true })
-    .spriteRotation(-tokenRotation)
-    .animateProperty("spriteContainer", "position.x", { from: 0, to: scaleX * middleposition.x, duration: 100, ease: "easeOutExpo", delay: 1250 })
-    .animateProperty("spriteContainer", "position.y", { from: 0, to: scaleY * middleposition.y, duration: 100, ease: "easeOutExpo", delay: 1250 })
-    .animateProperty("spriteContainer", "position.x", { from: 0, to: -scaleX * middleposition.x, duration: 350, ease: "easeInOutQuad", delay: 1350 })
-    .animateProperty("spriteContainer", "position.y", { from: 0, to: -scaleY * middleposition.y, duration: 350, ease: "easeInOutQuad", delay: 1350 })
-    .duration(2000);
 
 seq.effect()
     .file(closest("jb2a.sacred_flame.target.blue"))
@@ -174,16 +169,6 @@ seq.effect()
 seq.canvasPan()
     .delay(250)
     .shake({ duration: 250, strength: 2, rotation: false });
-
-seq.animation()
-    .on(token)
-    .opacity(1)
-    .delay(600);
-
-seq.animation()
-    .on(target)
-    .opacity(1)
-    .delay(600);
 
 seq.effect()
     .file(closest("jb2a.impact.010.blue"))

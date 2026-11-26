@@ -166,9 +166,11 @@ export async function runStandaloneMacro(filename, options = {}) {
         GRID_SNAPPING_MODES: { CENTER: 1, VERTEX: 2 },
     };
 
+    const scope = options.scope ?? {};
+
     try {
-        const fn = new AsyncFunction(source);
-        await fn();
+        const fn = new AsyncFunction('scope', source);
+        await fn(scope);
 
         // Execute any synchronous/async thenDo callbacks if requested
         if (options.runThenDo) {

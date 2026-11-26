@@ -28,7 +28,7 @@ const DEFAULT_CONFIG = {
     knockbackDuration: 200,
     returnDuration: 600,
     sound: {
-        enabled: true,
+        enable: true,
         volume: 0.5,
     },
 };
@@ -36,7 +36,7 @@ const DEFAULT_CONFIG = {
 const id = DEFAULT_CONFIG.id ?? "FireBlast";
 const label = `${id}-${token.id ?? ""}`;
 
-// 3. Toggle / Re-entrant Persistent Effect Handling
+// 3. Toggle / Re-entrant Effect & Motion Handling
 let isPlaying = false;
 for (const target of targets) {
     if (Sequencer.EffectManager.getEffects({ name: label, object: target }).length > 0 ||
@@ -51,21 +51,21 @@ if (!isPlaying && (Sequencer.EffectManager.getEffects({ name: label }).length > 
 }
 
 if (isPlaying) {
-    Sequencer.EffectManager.endEffects({ name: label });
-    Sequencer.EffectManager.endEffects({ name: id });
+    await Sequencer.EffectManager.endEffects({ name: label });
+    await Sequencer.EffectManager.endEffects({ name: id });
+    Sequencer.MotionManager.endMotions(token, { name: label });
     for (const target of targets) {
-        Sequencer.EffectManager.endEffects({ name: label, object: target });
-        Sequencer.EffectManager.endEffects({ name: id, object: target });
-        new Sequence().animation().on(target).opacity(1).fadeIn(200).play();
+        await Sequencer.EffectManager.endEffects({ name: label, object: target });
+        await Sequencer.EffectManager.endEffects({ name: id, object: target });
+        Sequencer.MotionManager.endMotions(target, { name: label });
     }
-    new Sequence().animation().on(token).opacity(1).fadeIn(200).play();
     return;
 }
 
 const pushDistance = DEFAULT_CONFIG.pushDistance ?? 80;
-const knockbackDuration = DEFAULT_CONFIG.knockbackDuration ?? 200;
-const returnDuration = DEFAULT_CONFIG.returnDuration ?? 600;
-const soundEnabled = DEFAULT_CONFIG.sound?.enabled ?? true;
+const kbDuration = Math.max(1, DEFAULT_CONFIG.knockbackDuration ?? 200);
+const retDuration = Math.max(1, DEFAULT_CONFIG.returnDuration ?? 600);
+const soundEnabled = Boolean(DEFAULT_CONFIG.sound?.enable ?? true);
 const soundVolume = DEFAULT_CONFIG.sound?.volume ?? 0.5;
 const gridSize = canvas.grid?.size ?? 100;
 
@@ -88,9 +88,6 @@ for (const target of targets) {
     const ny = dy / dist;
     const nxt = -nx;
     const nyt = -ny;
-
-    const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
-    const targetRotation = target.document?.rotation ?? target.rotation ?? 0;
 
     // --- Charging Phase ---
     if (soundEnabled) {
@@ -194,11 +191,6 @@ for (const target of targets) {
         .belowTokens()
         .waitUntilFinished(-1850);
 
-    sequence.animation()
-        .delay(200)
-        .on(token)
-        .opacity(0);
-
     if (soundEnabled) {
         sequence.sound()
             .file(closest("blfx.sound.spell.sacred_flame1.impact.2"))
@@ -230,47 +222,19 @@ for (const target of targets) {
         .rotateTowards(target)
         .waitUntilFinished(-1000);
 
-    // Source Knockback
-    sequence.effect()
+    // Source Recoil via .motion()
+    sequence.motion(token)
         .name(label)
-        .delay(100)
-        .copySprite(token)
-        .spriteRotation(-tokenRotation)
-        .animateProperty("spriteContainer", "position.x", {
-            from: 0,
-            to: nxt * gridSize * 0.2,
-            duration: knockbackDuration,
-            ease: "easeOutExpo"
-        })
-        .animateProperty("spriteContainer", "position.y", {
-            from: 0,
-            to: nyt * gridSize * 0.2,
-            duration: knockbackDuration,
-            ease: "easeOutExpo"
-        });
-
-    sequence.effect()
-        .name(label)
-        .delay(100)
-        .copySprite(token)
-        .spriteRotation(-tokenRotation)
-        .animateProperty("spriteContainer", "position.x", {
-            from: nxt * gridSize * 0.2,
-            to: 0,
-            duration: returnDuration,
-            ease: "easeInQuart"
-        })
-        .animateProperty("spriteContainer", "position.y", {
-            from: nyt * gridSize * 0.2,
-            to: 0,
-            duration: returnDuration,
-            ease: "easeInQuart"
-        });
-
-    sequence.animation()
-        .delay(returnDuration + 60)
-        .on(token)
-        .opacity(1);
+        .moveBy(
+            { x: nxt * gridSize * 0.2, y: nyt * gridSize * 0.2 },
+            {
+                delay: 100,
+                duration: kbDuration,
+                ease: "easeOutExpo",
+                returnDuration: retDuration,
+                easeOut: "easeInQuart",
+            }
+        );
 
     // Explosive Infernal Flame Torrent Ray Projectile
     sequence.effect()
@@ -325,52 +289,19 @@ for (const target of targets) {
         .duration(1500)
         .zIndex(3);
 
-    sequence.animation()
-        .on(target)
-        .opacity(0);
-
-    // Target Knockback
-    sequence.effect()
+    // Target Knockback via .motion()
+    sequence.motion(target)
         .name(label)
-        .copySprite(target)
-        .spriteRotation(-targetRotation)
-        .animateProperty("spriteContainer", "position.x", {
-            from: 0,
-            to: nx * pushDistance * 0.15,
-            duration: knockbackDuration,
-            ease: "easeOutExpo"
-        })
-        .animateProperty("spriteContainer", "position.y", {
-            from: 0,
-            to: ny * pushDistance * 0.15,
-            duration: knockbackDuration,
-            ease: "easeOutExpo"
-        })
-        .zIndex(1);
-
-    sequence.effect()
-        .name(label)
-        .delay(100)
-        .copySprite(target)
-        .spriteRotation(-targetRotation)
-        .animateProperty("spriteContainer", "position.x", {
-            from: nx * pushDistance * 0.15,
-            to: 0,
-            duration: returnDuration,
-            ease: "easeInQuart"
-        })
-        .animateProperty("spriteContainer", "position.y", {
-            from: ny * pushDistance * 0.15,
-            to: 0,
-            duration: returnDuration,
-            ease: "easeInQuart"
-        })
-        .zIndex(1);
-
-    sequence.animation()
-        .delay(returnDuration + 50)
-        .on(target)
-        .opacity(1);
+        .zIndex(1)
+        .moveBy(
+            { x: nx * pushDistance * 0.15, y: ny * pushDistance * 0.15 },
+            {
+                duration: kbDuration,
+                ease: "easeOutExpo",
+                returnDuration: retDuration,
+                easeOut: "easeInQuart",
+            }
+        );
 }
 
 await sequence.play();

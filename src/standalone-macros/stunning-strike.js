@@ -87,26 +87,15 @@ sequence
     .atLocation(token)
     .zIndex(1)
 
-    .animation()
-    .on(token)
-    .opacity(0)
-
-    .effect()
-    .copySprite(token)
-    .spriteRotation(-tokenRotation)
-    .atLocation(token)
-    .scaleToObject(1, { considerTokenScale: true })
-    .mirrorX(tokenMirrorX)
-    .animateProperty("spriteContainer", "position.x", { from: 0, to: middle.x, duration: 100, ease: "easeOutExpo" })
-    .animateProperty("spriteContainer", "position.y", { from: 0, to: middle.y, duration: 100, ease: "easeOutExpo" })
-    .animateProperty("spriteContainer", "position.x", { from: 0, to: -middle.x, duration: 350, ease: "easeInOutQuad", fromEnd: true })
-    .animateProperty("spriteContainer", "position.y", { from: 0, to: -middle.y, duration: 350, ease: "easeInOutQuad", fromEnd: true })
-    .duration(600)
-
-    .animation()
-    .on(token)
-    .opacity(1)
-    .delay(600)
+    .motion(token)
+    .moveBy(
+        [
+            { v: { x: 0, y: 0 } },
+            { v: middle, duration: 100, inEase: "easeOutExpo", hold: 150 },
+            { v: { x: 0, y: 0 }, duration: 350, inEase: "easeInOutQuad" },
+        ],
+        { return: false }
+    )
 
     .effect()
     .file(closest("jb2a.impact.010.blue"))

@@ -55,6 +55,8 @@ const tgt = target.center;
 
 const baseRad = Math.atan2(tgt.y - src.y, tgt.x - src.x);
 const counterRot = deg(baseRad);
+const cos = Math.cos(baseRad);
+const sin = Math.sin(baseRad);
 
 const dx = tgt.x - src.x;
 let hop = -0.25;
@@ -71,19 +73,39 @@ if (dx === 0) {
     hopVert = 0;
 }
 
+const lungeVec = { x: 0.5 * cos, y: 0.5 * sin };
+const hopWorld = {
+    x: (hopVert * cos) - (hop * sin),
+    y: (hopVert * sin) + (hop * cos),
+};
+
 const tokenWidth = token.document?.width ?? token.width ?? 1;
 
 const sequence = new Sequence();
 
 sequence
-    .animation()
-        .on(token)
-        .opacity(0)
-        .delay(100)
+    .motion(token)
+        .zIndex(1)
+        .moveBy(
+            [
+                { v: { x: 0, y: 0 } },
+                { v: lungeVec, duration: 500, inEase: "easeOutSine", hold: 250 },
+                { v: { x: 0, y: 0 }, duration: 1000, inEase: "easeOutCubic" },
+            ],
+            { gridUnits: true, delay: 250, return: false }
+        )
+        .moveBy(
+            [
+                { v: { x: 0, y: 0 } },
+                { v: hopWorld, duration: 250, inEase: "easeOutCubic" },
+                { v: { x: 0, y: 0 }, duration: 250, inEase: "easeOutCubic" },
+            ],
+            { gridUnits: true, delay: 250, return: false }
+        )
 
     .effect()
         .copySprite(token)
-        .attachTo(token, { bindAlpha: false })
+        .attachTo(token, { bindAlpha: false, ignoreMotion: true })
         .rotateTowards(target)
         .scaleToObject(0.9, { considerTokenScale: true })
         .animateProperty("spriteContainer", "position.x", { from: 0, to: 0.5, duration: 500, ease: "easeOutSine", gridUnits: true, delay: 250 })
@@ -98,25 +120,9 @@ sequence
         .spriteRotation(-counterRot)
 
     .effect()
-        .copySprite(token)
-        .attachTo(token, { bindAlpha: false })
-        .rotateTowards(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: 0.5, duration: 500, ease: "easeOutSine", gridUnits: true, delay: 250 })
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: -0.5, duration: 1000, ease: "easeOutCubic", gridUnits: true, delay: 1000 })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: hop, duration: 250, ease: "easeOutCubic", gridUnits: true, delay: 250 })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: -hop, duration: 250, ease: "easeOutCubic", gridUnits: true, delay: 500 })
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: hopVert, duration: 250, ease: "easeOutCubic", gridUnits: true, delay: 250 })
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: -hopVert, duration: 250, ease: "easeOutCubic", gridUnits: true, delay: 500 })
-        .spriteOffset({ x: -0.5 }, { gridUnits: true })
-        .duration(2100)
-        .spriteRotation(-counterRot)
-        .zIndex(1)
-
-    .effect()
         .delay(50)
         .copySprite(token)
-        .attachTo(token, { bindAlpha: false })
+        .attachTo(token, { bindAlpha: false, ignoreMotion: true })
         .rotateTowards(target)
         .scaleToObject(1, { considerTokenScale: true })
         .animateProperty("spriteContainer", "position.x", { from: 0, to: 0.5, duration: 500, ease: "easeOutSine", gridUnits: true, delay: 250 })
@@ -136,7 +142,7 @@ sequence
     .effect()
         .delay(100)
         .copySprite(token)
-        .attachTo(token, { bindAlpha: false })
+        .attachTo(token, { bindAlpha: false, ignoreMotion: true })
         .rotateTowards(target)
         .scaleToObject(1, { considerTokenScale: true })
         .animateProperty("spriteContainer", "position.x", { from: 0, to: 0.5, duration: 500, ease: "easeOutSine", gridUnits: true, delay: 250 })
@@ -153,16 +159,11 @@ sequence
         .filter("ColorMatrix", { brightness: 1.5 })
         .spriteRotation(-counterRot)
 
-    .animation()
-        .on(token)
-        .opacity(1)
-        .delay(2000)
-
     .wait(400)
 
     .effect()
         .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.normal.02`))
-        .atLocation(token)
+        .atLocation(token, { ignoreMotion: true })
         .rotateTowards(targetSquare)
         .scaleToObject(effectSize, { considerTokenScale: true })
         .spriteOffset({ x: effectOffset * tokenWidth + 0.75 }, { gridUnits: true })

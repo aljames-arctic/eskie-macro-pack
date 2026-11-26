@@ -81,15 +81,16 @@ if (distanceY < distanceX) {
 }
 
 const tokenWidth = token.document?.width ?? token.width ?? 1;
+const pushDelta = {
+    x: position.x - targetCenter.x,
+    y: position.y - targetCenter.y,
+};
+const pushDistPx = Math.hypot(pushDelta.x, pushDelta.y);
+const pushDuration = Math.max(100, Math.round((pushDistPx / 1250) * 1000));
 
 const sequence = new Sequence();
 
 sequence
-    .animation()
-        .on(token)
-        .opacity(0)
-        .delay(100)
-
     .effect()
         .file(closest("eskie.smoke.02.white"))
         .atLocation({ x: tokenCenter.x - backposition.x, y: tokenCenter.y - backposition.y })
@@ -104,22 +105,16 @@ sequence
         .delay(250)
         .shake({ duration: 250, strength: 2, rotation: false })
 
-    .effect()
-        .copySprite(token)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: backposition.x, duration: 250, ease: "easeOutExpo", delay: 200 })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: backposition.y, duration: 250, ease: "easeOutExpo", delay: 200 })
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: middleposition.x - backposition.x, duration: 150, ease: "easeOutExpo", delay: 1000 })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: middleposition.y - backposition.y, duration: 150, ease: "easeOutExpo", delay: 1000 })
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: -middleposition.x, duration: 450, ease: "easeOutQuad", delay: 1150 })
-        .animateProperty("spriteContainer", "position.y", { from: 0, to: -middleposition.y, duration: 450, ease: "easeOutQuad", delay: 1150 })
-        .duration(1750)
-
-    .animation()
-        .on(token)
-        .opacity(1)
-        .delay(1650)
+    .motion(token)
+        .moveBy(
+            [
+                { v: { x: 0, y: 0 } },
+                { v: backposition, duration: 250, inEase: "easeOutExpo", hold: 550 },
+                { v: middleposition, duration: 150, inEase: "easeOutExpo" },
+                { v: { x: 0, y: 0 }, duration: 450, inEase: "easeOutQuad" },
+            ],
+            { delay: 200, return: false }
+        )
 
     .effect()
         .file(closest(`eskie.attack.melee.generic.01.${type}.${weight}.${color}.slow`))
@@ -157,25 +152,18 @@ sequence
         .size(tokenWidth * 1.5, { gridUnits: true })
         .zIndex(1)
 
-    .wait(250)
+    .wait(250);
 
-    .animation()
-        .on(target)
-        .opacity(0)
-        .delay(100)
-
-    .effect()
-        .copySprite(target)
-        .atLocation(target)
-        .scaleToObject(1, { considerTokenScale: true })
-        .moveTowards(position, { rotate: false, ease: "easeOutCirc", delay: 200 })
-        .moveSpeed(1250)
-        .waitUntilFinished(-100)
-
-    .animation()
-        .on(target)
-        .moveTowards(position, { relativeToCenter: true })
-        .snapToGrid()
-        .opacity(1);
+if (pushDistPx >= 1) {
+    sequence
+        .motion(target)
+            .moveBy(pushDelta, { delay: 200, duration: pushDuration, ease: "easeOutCirc", return: false })
+            .persistUntilUpdate()
+        .wait(200 + pushDuration)
+        .animation()
+            .on(target)
+            .teleportTo(position, { relativeToCenter: true })
+            .snapToGrid();
+}
 
 await sequence.play();

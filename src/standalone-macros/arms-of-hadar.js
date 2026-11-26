@@ -33,28 +33,6 @@ if (casterEffects.length > 0 || canvasEffects.length > 0 || wildcardEffects.leng
 
 const sequence = new Sequence();
 
-sequence.thenDo(function () {
-    targets.forEach(target => {
-        const targetName = target?.name ?? "Target";
-        const rotation = target.document?.rotation ?? target.rotation ?? 0;
-        new Sequence()
-            .effect()
-            .name(`${targetName} ${id}`)
-            .copySprite(target)
-            .spriteRotation(-rotation)
-            .atLocation(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .fadeOut(100)
-            .persist()
-            .wait(150)
-
-            .animation()
-            .on(target)
-            .opacity(0)
-            .play();
-    });
-});
-
 sequence
     .effect()
     .name(id)
@@ -144,54 +122,35 @@ sequence
         const tokenCenterY = token.center?.y ?? token.y;
 
         targets.forEach(target => {
-            const targetName = target?.name ?? "Target";
             const targetCenterX = target.center?.x ?? target.x;
             const targetCenterY = target.center?.y ?? target.y;
             const rotation = target.document?.rotation ?? target.rotation ?? 0;
             const width = target.document?.width ?? 1;
 
-            let newX = targetCenterX - (gridSize / 2.5 * Math.sign(tokenCenterX - targetCenterX));
-            let newY = targetCenterY - (gridSize / 2.5 * Math.sign(tokenCenterY - targetCenterY));
+            const pushDelta = {
+                x: -(gridSize / 2.5) * Math.sign(tokenCenterX - targetCenterX),
+                y: -(gridSize / 2.5) * Math.sign(tokenCenterY - targetCenterY),
+            };
 
             new Sequence()
-                .thenDo(function () {
-                    Sequencer.EffectManager.endEffects({ name: `${targetName} ${id}`, object: target });
+                .motion(target)
+                .moveBy(pushDelta, {
+                    duration: 750,
+                    ease: "easeOutBack",
+                    returnDuration: 1500,
+                    easeOut: "easeOutBack",
                 })
-
                 .effect()
                 .copySprite(target)
                 .spriteRotation(-rotation)
-                .atLocation(target)
+                .attachTo(target, { bindAlpha: false })
                 .scaleToObject(width, { considerTokenScale: true })
-                .moveTowards({ x: newX, y: newY }, { rotate: false, ease: "easeOutBack" })
                 .duration(750)
                 .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 175, pingPong: true, gridUnits: true })
                 .opacity(0.15)
                 .zIndex(0.1)
-
-                .effect()
-                .copySprite(target)
-                .spriteRotation(-rotation)
-                .atLocation(target)
-                .scaleToObject(width, { considerTokenScale: true })
-                .moveTowards({ x: newX, y: newY }, { rotate: false, ease: "easeOutBack" })
-                .duration(750)
-                .waitUntilFinished(-50)
-
-                .effect()
-                .copySprite(target)
-                .spriteRotation(-rotation)
-                .atLocation({ x: newX, y: newY })
-                .scaleToObject(1, { considerTokenScale: true })
-                .moveTowards(target, { rotate: false, ease: "easeOutBack" })
-                .duration(1500)
-                .waitUntilFinished(-50)
-
-                .animation()
-                .on(target)
-                .opacity(1)
                 .play();
         });
     });
 
-sequence.play();
+await sequence.play();

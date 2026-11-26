@@ -18,33 +18,30 @@ const type = "slashing";
 const weight = "medium";
 const color = "blue";
 
-const deg = (rad) => (rad * 180) / Math.PI;
 const src = token.center ?? { x: token.x ?? 0, y: token.y ?? 0 };
 const tgtCenter = target.center ?? { x: target.x ?? 0, y: target.y ?? 0 };
 
 const baseRad = Math.atan2(tgtCenter.y - src.y, tgtCenter.x - src.x);
-const baseDeg = deg(baseRad);
+const stepBack = {
+    x: -0.6 * Math.cos(baseRad),
+    y: -0.6 * Math.sin(baseRad),
+};
 
 const tokenWidth = token.document?.width ?? token.width ?? 1;
 
 const sequence = new Sequence();
 
 sequence
-    .animation()
-        .on(token)
-        .opacity(0)
-        .delay(100)
-
-    .effect()
+    .motion(token)
         .name("Parry")
-        .copySprite(token)
-        .atLocation(token)
-        .rotateTowards(target)
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: -0.6, duration: 250, gridUnits: true, ease: "easeOutCubic", delay: 100 })
-        .animateProperty("spriteContainer", "position.x", { from: 0, to: 0.6, duration: 400, gridUnits: true, ease: "easeOutSine", delay: 450 })
-        .duration(1000)
-        .spriteRotation(-baseDeg)
-        .spriteOffset({ x: -0.5 }, { gridUnits: true });
+        .moveBy(
+            [
+                { v: { x: 0, y: 0 } },
+                { v: stepBack, duration: 250, inEase: "easeOutCubic", hold: 100 },
+                { v: { x: 0, y: 0 }, duration: 400, inEase: "easeOutSine" },
+            ],
+            { gridUnits: true, delay: 100, return: false }
+        );
 
 if (!slowParry) {
     sequence
@@ -82,11 +79,5 @@ if (!slowParry) {
             .zIndex(1.1)
             .spriteOffset({ x: -1.25 * tokenWidth }, { gridUnits: true });
 }
-
-sequence
-    .wait(850)
-    .animation()
-        .on(token)
-        .opacity(1);
 
 await sequence.play({ preload: true });

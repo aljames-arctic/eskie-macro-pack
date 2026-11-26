@@ -96,19 +96,20 @@ async function playEnlarge(token, options = {}) {
             .opacity(0.2)
             .zIndex(1)
 
+        .motion(token)
+            .zIndex(0)
+            .oscillate({
+                period: 150,
+                waveform: "triangle",
+                delay: 200,
+                duration: 1800,
+                rotation: { amplitude: 10, phase: 1.5 * Math.PI },
+            })
+            .waitUntilFinished(-200)
+
         .animation()
             .on(token)
             .opacity(0)
-
-        .effect()
-            .copySprite(token)
-            .spriteRotation(-tokenRotation)
-            .atLocation(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .loopProperty('sprite', "rotation", { from: -10, to: 10, duration: 75, pingPong: true, delay: 200 })
-            .duration(2000)
-            .waitUntilFinished(-200)
-            .zIndex(0)
 
         .thenDo(function () {
             const currentHeight = token.document?.height ?? 1;
@@ -127,13 +128,18 @@ async function playEnlarge(token, options = {}) {
 
         .wait(200)
 
-        .effect()
-            .copySprite(token)
-            .spriteRotation(-tokenRotation)
-            .atLocation(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .duration(3000)
-            .scaleIn(0.25, 700, { ease: "easeOutBounce" })
+        .animation()
+            .on(token)
+            .opacity(1)
+
+        .motion(token)
+            .scaleTo(
+                [
+                    { v: 0.25 },
+                    { v: 1, duration: 700, inEase: "easeOutBounce" },
+                ],
+                { return: false }
+            )
 
         .effect()
             .file(closest("jb2a.extras.tmfx.outpulse.circle.01.fast"))
@@ -168,11 +174,7 @@ async function playEnlarge(token, options = {}) {
             .scaleToObject(1)
             .fadeIn(250)
             .fadeOut(250)
-            .waitUntilFinished(-3000)
-
-        .animation()
-            .on(token)
-            .opacity(1);
+            .waitUntilFinished(-3000);
 
     if (!options.isToggleOff) {
         sequence.effect()
@@ -218,19 +220,20 @@ async function playReduce(token, options = {}) {
             .opacity(0.2)
             .zIndex(1)
 
+        .motion(token)
+            .zIndex(0)
+            .oscillate({
+                period: 150,
+                waveform: "triangle",
+                delay: 200,
+                duration: 1800,
+                rotation: { amplitude: 10, phase: 1.5 * Math.PI },
+            })
+            .waitUntilFinished(-200)
+
         .animation()
             .on(token)
             .opacity(0)
-
-        .effect()
-            .copySprite(token)
-            .spriteRotation(-tokenRotation)
-            .atLocation(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .loopProperty('sprite', "rotation", { from: -10, to: 10, duration: 75, pingPong: true, delay: 200 })
-            .duration(2000)
-            .waitUntilFinished(-200)
-            .zIndex(0)
 
         .thenDo(function () {
             const currentHeight = token.document?.height ?? 1;
@@ -249,13 +252,18 @@ async function playReduce(token, options = {}) {
 
         .wait(200)
 
-        .effect()
-            .copySprite(token)
-            .spriteRotation(-tokenRotation)
-            .atLocation(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .duration(3000)
-            .scaleIn(0.25, 700, { ease: "easeOutBounce" })
+        .animation()
+            .on(token)
+            .opacity(1)
+
+        .motion(token)
+            .scaleTo(
+                [
+                    { v: 0.25 },
+                    { v: 1, duration: 700, inEase: "easeOutBounce" },
+                ],
+                { return: false }
+            )
 
         .effect()
             .file(closest("jb2a.extras.tmfx.outpulse.circle.01.fast"))
@@ -289,11 +297,7 @@ async function playReduce(token, options = {}) {
             .scaleToObject(1)
             .fadeIn(250)
             .fadeOut(250)
-            .waitUntilFinished(-3000)
-
-        .animation()
-            .on(token)
-            .opacity(1);
+            .waitUntilFinished(-3000);
 
     if (!options.isToggleOff) {
         sequence.effect()

@@ -27,22 +27,22 @@ const DEFAULT_CONFIG = {
     id: "banishment",
     color: "yellow", // Colors: "yellow" (holy), "purple" or "dark_red" (dark), "blue", "green"
     sound: {
-        enabled: true,
+        enable: true,
         volume: 0.5,
     },
 };
 
 const id = DEFAULT_CONFIG.id ?? "banishment";
 const color = DEFAULT_CONFIG.color ?? "yellow";
-const sound = DEFAULT_CONFIG.sound ?? { enabled: true, volume: 0.5 };
+const sound = DEFAULT_CONFIG.sound ?? { enable: true, volume: 0.5 };
 
 // 3. Toggle / Re-entrant Persistent Effect Handling
 let anyActive = false;
 for (const target of targets) {
     const targetId = target.id ?? target.document?.id ?? "";
     const effectName = `${id}-${targetId}`;
-    const activeFx = Sequencer.EffectManager.getEffects({ name: effectName, object: target });
-    const globalFx = Sequencer.EffectManager.getEffects({ name: id, object: target });
+    const activeFx = Sequencer.EffectManager.getEffects({ name: effectName, object: target }) ?? [];
+    const globalFx = Sequencer.EffectManager.getEffects({ name: id, object: target }) ?? [];
     if (activeFx.length > 0 || globalFx.length > 0 || target.document?.opacity === 0 || target.alpha === 0) {
         anyActive = true;
         break;
@@ -56,12 +56,12 @@ if (anyActive) {
     for (const target of targets) {
         const targetId = target.id ?? target.document?.id ?? "";
         const effectName = `${id}-${targetId}`;
-        const targetRot = -(target.document?.rotation ?? target.rotation ?? 0);
 
-        Sequencer.EffectManager.endEffects({ name: effectName, object: target });
-        Sequencer.EffectManager.endEffects({ name: id, object: target });
+        await Sequencer.EffectManager.endEffects({ name: effectName, object: target });
+        await Sequencer.EffectManager.endEffects({ name: id, object: target });
+        Sequencer.MotionManager.endMotions(target, { name: effectName });
 
-        if (sound.enabled) {
+        if (sound.enable) {
             sequence.sound()
                 .file(closest("psfx.2nd-level-spells.moonbeam.intro"))
                 .volume(sound.volume);
@@ -69,14 +69,14 @@ if (anyActive) {
 
         sequence.effect()
             .file(closest(`jb2a.explosion.01.${color}`))
-            .atLocation(target, { offset: { x: 5, y: -75 } })
+            .atLocation(target, { offset: { x: 5, y: -75 }, ignoreMotion: true })
             .scaleToObject(1.5)
             .delay(1500)
             .zIndex(1);
 
         sequence.effect()
             .file(closest(`jb2a.portals.vertical.vortex.${color}`))
-            .atLocation(target, { offset: { x: 0, y: -75 } })
+            .atLocation(target, { offset: { x: 0, y: -75 }, ignoreMotion: true })
             .scaleToObject(2)
             .duration(6000)
             .scaleIn({ x: 0, y: 0.8 }, 500)
@@ -87,21 +87,37 @@ if (anyActive) {
             .delay(1500)
             .waitUntilFinished(-4000);
 
-        sequence.effect()
-            .copySprite(target)
-            .spriteRotation(targetRot)
-            .atLocation(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty("spriteContainer", "position.y", { from: -75, to: 0, duration: 500, ease: "easeOutBounce" })
-            .scaleIn(0.25, 500)
-            .fadeIn(250)
-            .delay(1500)
-            .waitUntilFinished(-150);
+        sequence.wait(1500);
 
         sequence.animation()
             .on(target)
             .show(true)
             .opacity(1);
+
+        sequence.motion(target)
+            .name(effectName)
+            .moveBy(
+                [
+                    { v: { x: 0, y: -75 } },
+                    { v: { x: 0, y: 0 }, duration: 500, inEase: "easeOutBounce" },
+                ],
+                { return: false }
+            )
+            .scaleTo(
+                [
+                    { v: 0.25 },
+                    { v: 1, duration: 500, inEase: "linear" },
+                ],
+                { return: false }
+            )
+            .fadeTo(
+                [
+                    { v: 0 },
+                    { v: 1, duration: 250, inEase: "linear" },
+                ],
+                { return: false }
+            )
+            .waitUntilFinished(-150);
     }
 } else {
     // --- BANISHMENT SEQUENCE (TOGGLE ON) ---
@@ -123,7 +139,7 @@ if (anyActive) {
         const effectName = `${id}-${targetId}`;
         const targetRot = -(target.document?.rotation ?? target.rotation ?? 0);
 
-        if (sound.enabled) {
+        if (sound.enable) {
             sequence.sound()
                 .file(closest("psfx.magic-signs.circle.v1.abjuration.complete"))
                 .volume(sound.volume);
@@ -150,7 +166,7 @@ if (anyActive) {
         let runeDelay = 0;
         let animationDelay = 4000;
         for (const rune of RUNE_DATA.runes) {
-            if (sound.enabled) {
+            if (sound.enable) {
                 sequence.sound()
                     .file(closest("psfx.casting.generic.001"))
                     .volume(sound.volume)
@@ -193,7 +209,7 @@ if (anyActive) {
 
         sequence.wait(3000);
 
-        if (sound.enabled) {
+        if (sound.enable) {
             sequence.sound()
                 .file(closest("psfx.2nd-level-spells.moonbeam.intro"))
                 .volume(sound.volume);
@@ -251,17 +267,11 @@ if (anyActive) {
             .fadeIn(250)
             .fadeOut(750);
 
-        // Hide actual token sprite on map
-        sequence.animation()
-            .on(target)
-            .opacity(0)
-            .show(false);
-
-        // Ground shadow dissipation animation as target floats into portal
+        // Ground shadow dissipation animation anchored on floor
         sequence.effect()
             .copySprite(target)
             .spriteRotation(targetRot)
-            .atLocation(target)
+            .atLocation(target, { ignoreMotion: true })
             .scaleToObject(0.9, { considerTokenScale: true })
             .belowTokens()
             .filter("ColorMatrix", { brightness: -1 })
@@ -271,76 +281,70 @@ if (anyActive) {
             .fadeOut(1000)
             .scaleOut(0, 4500);
 
-        // Dimensional banishment hover & pop-out wobbling animation
-        sequence.effect()
-            .copySprite(target)
-            .spriteRotation(targetRot)
-            .atLocation(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty("spriteContainer", "position.y", { from: 0, to: -15, duration: 250, ease: "easeInOutBack" })
-            .waitUntilFinished(-100);
-
-        sequence.effect()
-            .copySprite(target)
-            .spriteRotation(targetRot)
-            .atLocation(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty("spriteContainer", "position.y", { from: -15, to: 0, duration: 2000, ease: "easeInOutBack" })
-            .animateProperty("sprite", "rotation", { from: 0, to: 8, duration: 500, ease: "easeOutCubic" })
-            .animateProperty("sprite", "rotation", { from: 0, to: -16, duration: 500, delay: 500, ease: "easeOutCubic" })
-            .animateProperty("sprite", "rotation", { from: 0, to: 16, duration: 500, delay: 1000, ease: "easeOutCubic" })
-            .animateProperty("sprite", "rotation", { from: 0, to: -16, duration: 500, delay: 1500, ease: "easeInCubic" })
-            .waitUntilFinished(-100);
-
-        sequence.effect()
-            .copySprite(target)
-            .spriteRotation(targetRot)
-            .atLocation(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty("spriteContainer", "position.y", { from: 0, to: -40, duration: 500, ease: "easeInOutBack" })
-            .waitUntilFinished(-100);
-
-        sequence.effect()
-            .copySprite(target)
-            .spriteRotation(targetRot)
-            .atLocation(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty("spriteContainer", "position.y", { from: -40, to: -15, duration: 2000, ease: "easeInOutBack" })
-            .animateProperty("sprite", "rotation", { from: 0, to: 8, duration: 500, ease: "easeOutCubic" })
-            .animateProperty("sprite", "rotation", { from: 0, to: -16, duration: 500, delay: 500, ease: "easeOutCubic" })
-            .animateProperty("sprite", "rotation", { from: 0, to: 16, duration: 500, delay: 1000, ease: "easeOutCubic" })
-            .animateProperty("sprite", "rotation", { from: 0, to: -16, duration: 500, delay: 1500, ease: "easeInCubic" })
-            .waitUntilFinished(-100);
-
-        // Dimensional pop-out burst into portal vortex
-        sequence.effect()
-            .copySprite(target)
-            .spriteRotation(targetRot)
-            .atLocation(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty("spriteContainer", "position.y", { from: -15, to: -200, duration: 750, ease: "easeInOutBack" })
-            .scaleOut(0, 750)
-            .duration(375)
+        // Dimensional banishment struggle, wobble, and pull-in via .motion()
+        sequence.motion(target)
+            .name(effectName)
+            .moveBy(
+                [
+                    { v: { x: 0, y: 0 } },
+                    { v: { x: 0, y: -15 }, duration: 250, inEase: "easeInOutBack" },
+                    { v: { x: 0, y: 0 }, duration: 2000, inEase: "easeInOutBack" },
+                    { v: { x: 0, y: -40 }, duration: 500, inEase: "easeInOutBack" },
+                    { v: { x: 0, y: -15 }, duration: 2000, inEase: "easeInOutBack" },
+                    { v: { x: 0, y: -200 }, duration: 375, inEase: "easeInOutBack" },
+                ],
+                { return: false }
+            )
+            .rotateBy(
+                [
+                    { v: 0 },
+                    { v: 8, duration: 500, inEase: "easeOutCubic" },
+                    { v: -8, duration: 500, inEase: "easeOutCubic" },
+                    { v: 8, duration: 500, inEase: "easeOutCubic" },
+                    { v: -8, duration: 500, inEase: "easeInCubic" },
+                    { v: 0, duration: 250, inEase: "easeOutCubic" },
+                ],
+                { delay: 250, return: false }
+            )
+            .rotateBy(
+                [
+                    { v: 0 },
+                    { v: 8, duration: 500, inEase: "easeOutCubic" },
+                    { v: -8, duration: 500, inEase: "easeOutCubic" },
+                    { v: 8, duration: 500, inEase: "easeOutCubic" },
+                    { v: -8, duration: 500, inEase: "easeInCubic" },
+                    { v: 0, duration: 250, inEase: "easeOutCubic" },
+                ],
+                { delay: 2750, return: false }
+            )
+            .scaleTo(0.01, { delay: 4750, duration: 375, ease: "linear", return: false })
+            .fadeTo(0, { delay: 5050, duration: 75, return: false })
             .waitUntilFinished(-150);
+
+        // Hide actual token sprite on map once pulled into portal
+        sequence.animation()
+            .on(target)
+            .opacity(0)
+            .show(false);
 
         sequence.effect()
             .file(closest(`jb2a.explosion.02.${color}`))
-            .atLocation(target, { offset: { x: 0, y: -85 } })
+            .atLocation(target, { offset: { x: 0, y: -85 }, ignoreMotion: true })
             .scaleToObject(0.5)
             .filter("ColorMatrix", { hue: 15 })
             .zIndex(0.9);
 
         sequence.effect()
             .file(closest(`jb2a.detect_magic.cone.${color}`))
-            .rotateTowards(target)
-            .atLocation(target, { offset: { x: 0, y: -110 } })
+            .rotateTowards(target, { ignoreMotion: true })
+            .atLocation(target, { offset: { x: 0, y: -110 }, ignoreMotion: true })
             .scaleToObject(1)
             .playbackRate(1.5)
             .zIndex(1);
 
         sequence.effect()
             .file(closest(`jb2a.template_circle.out_pulse.02.loop.${color}`))
-            .atLocation(target, { offset: { x: 0, y: -75 } })
+            .atLocation(target, { offset: { x: 0, y: -75 }, ignoreMotion: true })
             .scaleToObject(1.75)
             .delay(1000)
             .fadeOut(1000)
@@ -348,7 +352,7 @@ if (anyActive) {
 
         sequence.effect()
             .file(closest(`jb2a.fireflies.many.02.${color}`))
-            .atLocation(target, { offset: { x: 0, y: -75 } })
+            .atLocation(target, { offset: { x: 0, y: -75 }, ignoreMotion: true })
             .scaleToObject(0.75)
             .duration(2000)
             .fadeIn(500)
@@ -358,7 +362,7 @@ if (anyActive) {
         // Persistent tracking effect for toggle/stop state
         sequence.effect()
             .name(effectName)
-            .atLocation(target)
+            .atLocation(target, { ignoreMotion: true })
             .file(closest(`jb2a.magic_signs.circle.02.conjuration.loop.${color}`))
             .scaleToObject(0.1)
             .opacity(0)

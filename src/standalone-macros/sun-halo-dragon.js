@@ -30,6 +30,12 @@ const gridSize = canvas.grid.size;
 const pos1 = { x: token.x, y: token.y };
 const pos2 = { x: targetCoord.x - gridSize / 2, y: targetCoord.y - gridSize / 2 };
 const mirrorY = pos1.x > pos2.x;
+const startCenter = token.center ?? {
+    x: token.x + (token.w ?? ((token.document?.width ?? 1) * gridSize)) / 2,
+    y: token.y + (token.h ?? ((token.document?.height ?? 1) * gridSize)) / 2,
+};
+const dashDelta = { x: pos2.x - pos1.x, y: pos2.y - pos1.y };
+const dashDist = Math.hypot(dashDelta.x, dashDelta.y);
 
 const xdelta = (p1, p2) => (p2.x - p1.x) / gridSize;
 const ydelta = (p1, p2) => (p2.y - p1.y) / gridSize;
@@ -37,24 +43,22 @@ const ydelta = (p1, p2) => (p2.y - p1.y) / gridSize;
 const tokenRotation = token.document?.rotation ?? token.rotation ?? 0;
 const seq = new Sequence();
 
-seq.animation()
-    .on(token)
-    .opacity(0);
+if (dashDist >= 1) {
+    seq.motion(token)
+        .moveBy(dashDelta, {
+            delay: 2150,
+            duration: 500,
+            ease: "easeOutQuint",
+            return: false,
+        })
+        .persistUntilUpdate();
+}
 
 seq.effect()
     .copySprite(token)
     .spriteRotation(-tokenRotation)
     .scaleToObject(1, { considerTokenScale: true })
-    .atLocation(token)
-    .animateProperty("spriteContainer", "position.x", { from: 0, to: xdelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint", delay: 2150 })
-    .animateProperty("spriteContainer", "position.y", { from: 0, to: ydelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint", delay: 2150 })
-    .duration(3500);
-
-seq.effect()
-    .copySprite(token)
-    .spriteRotation(-tokenRotation)
-    .scaleToObject(1, { considerTokenScale: true })
-    .atLocation(token)
+    .atLocation(startCenter)
     .animateProperty("spriteContainer", "position.x", { from: 0, to: xdelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint", delay: 2150 })
     .animateProperty("spriteContainer", "position.y", { from: 0, to: ydelta(pos1, pos2), duration: 500, gridUnits: true, ease: "easeOutQuint", delay: 2150 })
     .duration(2650)
@@ -78,7 +82,7 @@ seq.effect()
 seq.effect()
     .file(closest("jb2a.wind_stream.white"))
     .name("Rage")
-    .attachTo(token, { bindAlpha: false })
+    .attachTo(token, { bindAlpha: false, ignoreMotion: true })
     .scaleToObject()
     .rotate(90)
     .opacity(1)
@@ -92,7 +96,7 @@ seq.effect()
 
 seq.effect()
     .file(closest("eskie.aura.token.generic.01.red"))
-    .atLocation(token)
+    .atLocation(startCenter)
     .scaleToObject(2.1)
     .zIndex(0.1)
     .belowTokens()
@@ -103,7 +107,7 @@ seq.effect()
 // Dragon Eyes
 seq.effect()
     .file(closest("eskie.fire.03.orange"))
-    .atLocation(token, { offset: { x: -0.3, y: -0.15 }, gridUnits: true })
+    .atLocation(startCenter, { offset: { x: -0.3, y: -0.15 }, gridUnits: true })
     .scaleToObject(0.5)
     .playbackRate(1.2)
     .mirrorX()
@@ -111,7 +115,7 @@ seq.effect()
 
 seq.effect()
     .file(closest("eskie.fire.03.orange"))
-    .atLocation(token, { offset: { x: 0.3, y: -0.2 }, gridUnits: true })
+    .atLocation(startCenter, { offset: { x: 0.3, y: -0.2 }, gridUnits: true })
     .scaleToObject(0.5)
     .playbackRate(1.2)
     .zIndex(1);
@@ -289,14 +293,14 @@ seq.thenDo(() => {
 seq.effect()
     .delay(2100)
     .file(closest("eskie.particle.04.orange"))
-    .atLocation(token)
+    .atLocation(startCenter)
     .scaleToObject(5)
     .animateProperty("spriteContainer", "position.x", { from: 0, to: -7.5, duration: 500, gridUnits: true, ease: "easeOutQuint" })
     .belowTokens();
 
 seq.effect()
     .file(closest("eskie.velocity.01.white"))
-    .atLocation(token)
+    .atLocation(startCenter)
     .mirrorX()
     .scaleToObject(7.5)
     .opacity(0.5)
@@ -338,9 +342,10 @@ seq.effect()
 seq.canvasPan()
     .shake({ duration: 500, strength: 1.5, rotation: false, fadeOut: 250 });
 
-seq.animation()
-    .on(token)
-    .teleportTo(pos2)
-    .opacity(1);
+if (dashDist >= 1) {
+    seq.animation()
+        .on(token)
+        .teleportTo(pos2);
+}
 
 await seq.play();

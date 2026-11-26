@@ -15,10 +15,11 @@ if (!target) return ui.notifications.warn("Please select a target!");
 const closest = (path) => game.modules.get('eskie-macros')?.api?.util?.closest?.(path) ?? path;
 
 const label = `${target.name} Banishing Arrow`;
-const isPlaying = Sequencer.EffectManager.getEffects({ name: label }).length > 0;
+const activeEffects = Sequencer.EffectManager.getEffects({ name: label }) ?? [];
+const endedMotions = Sequencer.MotionManager.endMotions(target, { name: label });
 
-if (isPlaying) {
-    Sequencer.EffectManager.endEffects({ name: label });
+if (activeEffects.length > 0 || endedMotions > 0) {
+    await Sequencer.EffectManager.endEffects({ name: label });
     await new Sequence().animation().on(target).show().play();
     return ui.notifications.info(`Ended Banishing Arrow on ${target.name}.`);
 }
@@ -34,17 +35,16 @@ sequence
         .zIndex(2)
         .waitUntilFinished(-1250)
 
-    .effect()
-        .copySprite(target)
-        .attachTo(target, { bindAlpha: false, bindVisibility: false })
-        .scaleToObject(1, { considerTokenScale: true })
-        .duration(2000)
-        .scaleOut(0, 1000, { ease: "easeInOutCubic" })
-        .rotateOut(360, 1000, { ease: "easeInOutQuint" })
+    .motion(target)
+        .name(label)
+        .scaleTo(0.01, { delay: 1000, duration: 1000, ease: "easeInOutCubic", return: false })
+        .rotateBy(360, { delay: 1000, duration: 1000, ease: "easeInOutQuint", return: false })
+        .fadeTo(0, { delay: 1900, duration: 100, return: false })
 
     .wait(500)
 
     .animation()
+        .delay(1500)
         .on(target)
         .hide()
 

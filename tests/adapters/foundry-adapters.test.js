@@ -3,7 +3,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { initializeFoundryAdapter, BaseFoundryAdapter } from '../../src/adapters/foundry/index.js';
 import { BaseFoundryAdapter as BaseAdapterClass, USER_PERMISSION_TIERS } from '../../src/adapters/foundry/base-foundry-adapter.js';
-import { FoundryV12Adapter } from '../../src/adapters/foundry/foundry-v12-adapter.js';
 import { FoundryV13Adapter } from '../../src/adapters/foundry/foundry-v13-adapter.js';
 import { FoundryV14Adapter } from '../../src/adapters/foundry/foundry-v14-adapter.js';
 import { adapter } from '../../src/adapters/index.js';
@@ -31,21 +30,12 @@ test('BaseFoundryAdapter enforces abstract contracts for version-specific proper
     await assert.rejects(async () => base.loadTemplates([]), /BaseFoundryAdapter\.loadTemplates must be implemented/);
 });
 
-test('initializeFoundryAdapter selects FoundryV12Adapter on v12, FoundryV13Adapter on v13, and FoundryV14Adapter on v14+', () => {
-    // V12 baseline
-    game.release = { generation: 12 };
-    game.version = '12.331';
-    const v12 = initializeFoundryAdapter();
-    assert.ok(v12 instanceof FoundryV12Adapter);
-    assert.ok(v12 instanceof BaseFoundryAdapter);
-    assert.equal(v12.generation, 12);
-
-    // V13
+test('initializeFoundryAdapter selects FoundryV13Adapter on v13 baseline and FoundryV14Adapter on v14+', () => {
+    // V13 baseline
     game.release = { generation: 13 };
-    game.version = '13.300';
+    game.version = '13.341';
     const v13 = initializeFoundryAdapter();
     assert.ok(v13 instanceof FoundryV13Adapter);
-    assert.ok(v13 instanceof FoundryV12Adapter);
     assert.ok(v13 instanceof BaseFoundryAdapter);
     assert.equal(v13.generation, 13);
 
@@ -55,20 +45,11 @@ test('initializeFoundryAdapter selects FoundryV12Adapter on v12, FoundryV13Adapt
     const v14 = initializeFoundryAdapter();
     assert.ok(v14 instanceof FoundryV14Adapter);
     assert.ok(v14 instanceof FoundryV13Adapter);
-    assert.ok(v14 instanceof FoundryV12Adapter);
     assert.ok(v14 instanceof BaseFoundryAdapter);
     assert.equal(v14.generation, 14);
 });
 
-test('Constructor getters contracts across FoundryV12Adapter, FoundryV13Adapter, and FoundryV14Adapter', () => {
-    const v12 = new FoundryV12Adapter();
-    assert.equal(v12.ContextMenu, globalThis.ContextMenu);
-    assert.equal(v12.KeyboardManager, globalThis.KeyboardManager);
-    assert.equal(v12.Token, globalThis.Token);
-    assert.equal(v12.Tile, globalThis.Tile);
-    assert.equal(v12.FilePicker, globalThis.FilePicker);
-    assert.equal(v12.TextEditor, globalThis.TextEditor);
-
+test('Constructor getters contracts across FoundryV13Adapter and FoundryV14Adapter', () => {
     const v13 = new FoundryV13Adapter();
     assert.equal(v13.ContextMenu, globalThis.foundry.applications.ux.ContextMenu.implementation);
     assert.equal(v13.KeyboardManager, globalThis.foundry.helpers.interaction.KeyboardManager.implementation);
@@ -87,11 +68,7 @@ test('Constructor getters contracts across FoundryV12Adapter, FoundryV13Adapter,
     assert.equal(v14.TextEditor, globalThis.foundry.applications.ux.TextEditor.implementation);
 });
 
-test('loadTemplates contract across FoundryV12Adapter, FoundryV13Adapter, and FoundryV14Adapter', async () => {
-    const v12 = new FoundryV12Adapter();
-    const resV12 = await v12.loadTemplates(['templates/test.html']);
-    assert.deepEqual(resV12, ['templates/test.html']);
-
+test('loadTemplates contract across FoundryV13Adapter and FoundryV14Adapter', async () => {
     const v13 = new FoundryV13Adapter();
     const resV13 = await v13.loadTemplates(['templates/test.html']);
     assert.deepEqual(resV13, ['templates/test.html']);
@@ -101,7 +78,7 @@ test('loadTemplates contract across FoundryV12Adapter, FoundryV13Adapter, and Fo
     assert.deepEqual(resV14, ['templates/test.html']);
 });
 
-test('Tile offset calculations: V12/V13 top-left origin math vs V14+ centered origin math', () => {
+test('Tile offset calculations: V13 top-left origin math vs V14+ centered origin math', () => {
     const mockToken = {
         x: 500,
         y: 600,
@@ -116,23 +93,16 @@ test('Tile offset calculations: V12/V13 top-left origin math vs V14+ centered or
 
     canvas.grid.size = 100;
 
-    // V12 FoundryV12Adapter
-    const v12 = new FoundryV12Adapter();
-    const v12Reveal = v12.getRevealOffset(mockToken, 1);
+    // V13 FoundryV13Adapter top-left origin math
+    const v13 = new FoundryV13Adapter();
+    const v13Reveal = v13.getRevealOffset(mockToken, 1);
     // x = 500 - (100 * 1 * (1.2 - 1) / 2) = 500 - 10 = 490
     // y = 600 - (100 * 1 * (1.2 - 1) / 2) = 600 - 10 = 590
-    assert.deepEqual(v12Reveal, { x: 490, y: 590 });
-    assert.deepEqual(v12.getShapeOffset(mockToken), { x: 500, y: 600 });
-    assert.deepEqual(v12.getTileOffset(mockToken, 'reveal', 1), { x: 490, y: 590 });
-    assert.deepEqual(v12.getTileOffset(mockToken, 'shape'), { x: 500, y: 600 });
-    assert.throws(() => v12.getTileOffset(mockToken, 'unknown'), /Invalid offset type/);
-
-    // V13 FoundryV13Adapter inherits V12 top-left origin math
-    const v13 = new FoundryV13Adapter();
-    assert.deepEqual(v13.getRevealOffset(mockToken, 1), { x: 490, y: 590 });
+    assert.deepEqual(v13Reveal, { x: 490, y: 590 });
     assert.deepEqual(v13.getShapeOffset(mockToken), { x: 500, y: 600 });
     assert.deepEqual(v13.getTileOffset(mockToken, 'reveal', 1), { x: 490, y: 590 });
     assert.deepEqual(v13.getTileOffset(mockToken, 'shape'), { x: 500, y: 600 });
+    assert.throws(() => v13.getTileOffset(mockToken, 'unknown'), /Invalid offset type/);
 
     // V14+ FoundryV14Adapter overrides with centered origin math
     const v14 = new FoundryV14Adapter();
@@ -141,9 +111,9 @@ test('Tile offset calculations: V12/V13 top-left origin math vs V14+ centered or
     assert.deepEqual(v14.getTileOffset(mockToken, 'reveal', 1), { x: 550, y: 650 });
     assert.deepEqual(v14.getTileOffset(mockToken, 'shape'), { x: 550, y: 650 });
 
-    // Tile bounding box: V12/V13 top-left origin (100, 100) vs V14 centered origin (200, 200) for a 200x200 tile
-    const v12Tile = { x: 100, y: 100, width: 200, height: 200, document: { x: 100, y: 100, width: 200, height: 200 } };
-    assert.deepEqual(v12.getTileBounds(v12Tile), {
+    // Tile bounding box: V13 top-left origin (100, 100) vs V14 centered origin (200, 200) for a 200x200 tile
+    const v13Tile = { x: 100, y: 100, width: 200, height: 200, document: { x: 100, y: 100, width: 200, height: 200 } };
+    assert.deepEqual(v13.getTileBounds(v13Tile), {
         minX: 100,
         maxX: 300,
         minY: 100,
@@ -236,9 +206,9 @@ test('adapter.isTokenInOrMovingIntoPlaceable: evaluates containment and movement
     assert.equal(adapter.isTokenInOrMovingIntoPlaceable(tokenOutside, tile, { movement: { destination: { x: 10, y: 10 } } }), false);
 });
 
-test('Template position extraction: V12/V13 MeasuredTemplate vs V14+ Region shapes', () => {
-    // V12 MeasuredTemplate
-    const v12 = new FoundryV12Adapter();
+test('Template position extraction: V13 MeasuredTemplate vs V14+ Region shapes', () => {
+    // V13 MeasuredTemplate
+    const v13 = new FoundryV13Adapter();
     const mockTemplate = {
         x: 1000,
         y: 2000,
@@ -249,15 +219,10 @@ test('Template position extraction: V12/V13 MeasuredTemplate vs V14+ Region shap
     canvas.grid.size = 100;
     canvas.grid.distance = 5;
 
-    const v12Pos = v12.getTemplatePosition(mockTemplate);
-    assert.equal(v12Pos.length, 3);
-    assert.deepEqual(v12Pos[0], { x: 1000, y: 2000 }); // primary
-    assert.deepEqual(v12Pos[1], { x: 1030, y: 2000 }); // secondary
-
-    // V13 inherits V12 MeasuredTemplate extraction
-    const v13 = new FoundryV13Adapter();
     const v13Pos = v13.getTemplatePosition(mockTemplate);
-    assert.deepEqual(v13Pos, v12Pos);
+    assert.equal(v13Pos.length, 3);
+    assert.deepEqual(v13Pos[0], { x: 1000, y: 2000 }); // primary
+    assert.deepEqual(v13Pos[1], { x: 1030, y: 2000 }); // secondary
 
     // Template without ray (e.g. Automated Animations templateData)
     const rawTemplateData = {
@@ -268,7 +233,7 @@ test('Template position extraction: V12/V13 MeasuredTemplate vs V14+ Region shap
         width: 5,
         t: 'ray'
     };
-    const rawPos = v12.getTemplatePosition(rawTemplateData);
+    const rawPos = v13.getTemplatePosition(rawTemplateData);
     assert.equal(rawPos.length, 3);
     assert.deepEqual(rawPos[0], { x: 500, y: 600 }); // primary
     // 100 distance / 5 gridDistance * 100 gridSize = 2000px in 90 deg direction (downwards)
@@ -277,7 +242,7 @@ test('Template position extraction: V12/V13 MeasuredTemplate vs V14+ Region shap
 
     // Template with zero distance and no ray returns undefined secondary
     const zeroTemplate = { x: 100, y: 200, distance: 0 };
-    const zeroPos = v12.getTemplatePosition(zeroTemplate);
+    const zeroPos = v13.getTemplatePosition(zeroTemplate);
     assert.equal(zeroPos[1], undefined);
 
     // V14 Region
@@ -320,7 +285,7 @@ test('Template position extraction: V12/V13 MeasuredTemplate vs V14+ Region shap
 
     // V14 delegates MeasuredTemplate to V13 super method
     const v14TemplatePos = v14.getTemplatePosition(mockTemplate);
-    assert.deepEqual(v14TemplatePos, v12Pos);
+    assert.deepEqual(v14TemplatePos, v13Pos);
 });
 
 test('Permission tiers and ownership evaluation on BaseFoundryAdapter', () => {
@@ -357,33 +322,25 @@ test('Permission tiers and ownership evaluation on BaseFoundryAdapter', () => {
     assert.equal(adapter.isUserInCharge(mockToken, gmUser), false); // player owns it and is active
 });
 
-test('getSceneBackground: V12/V13 Scene#background vs V14+ Level#background and Level#textures', () => {
-    // V12 FoundryV12Adapter
-    const v12 = new FoundryV12Adapter();
-    const v12Scene = {
+test('getSceneBackground: V13 Scene#background vs V14+ Level#background and Level#textures', () => {
+    // V13 FoundryV13Adapter
+    const v13 = new FoundryV13Adapter();
+    const v13Scene = {
         background: {
-            src: 'maps/dungeon-v12.webp',
+            src: 'maps/dungeon-v13.webp',
             offsetX: 50,
             offsetY: 75
         }
     };
-    assert.deepEqual(v12.getSceneBackground(v12Scene), {
-        src: 'maps/dungeon-v12.webp',
+    assert.deepEqual(v13.getSceneBackground(v13Scene), {
+        src: 'maps/dungeon-v13.webp',
         offsetX: 50,
         offsetY: 75
     });
-    assert.deepEqual(v12.getSceneBackground(null), {
+    assert.deepEqual(v13.getSceneBackground(null), {
         src: null,
         offsetX: 0,
         offsetY: 0
-    });
-
-    // V13 inherits V12 Scene#background
-    const v13 = new FoundryV13Adapter();
-    assert.deepEqual(v13.getSceneBackground(v12Scene), {
-        src: 'maps/dungeon-v12.webp',
-        offsetX: 50,
-        offsetY: 75
     });
 
     // V14+ FoundryV14Adapter with Levels
@@ -472,8 +429,8 @@ test('getSceneBackground: V12/V13 Scene#background vs V14+ Level#background and 
 });
 
 test('DialogV2 and buttonDialog delegation on BaseFoundryAdapter', async () => {
-    const v12 = new FoundryV12Adapter();
-    assert.ok(v12.DialogV2);
+    const v13 = new FoundryV13Adapter();
+    assert.ok(v13.DialogV2);
 
     const buttonData = {
         title: 'Select Spell',
@@ -482,12 +439,12 @@ test('DialogV2 and buttonDialog delegation on BaseFoundryAdapter', async () => {
             { label: 'Lightning', value: 'lightning' }
         ]
     };
-    const chosen = await v12.buttonDialog(buttonData);
+    const chosen = await v13.buttonDialog(buttonData);
     assert.equal(chosen, 'fireball');
 });
 
 test('buttonDialog guarantees Cancel button is positioned as the rightmost button (last in array, flex order 999)', async () => {
-    const v12 = new FoundryV12Adapter();
+    const v13 = new FoundryV13Adapter();
     let passedButtons = [];
     const origWait = foundry.applications.api.DialogV2.wait;
     try {
@@ -496,7 +453,7 @@ test('buttonDialog guarantees Cancel button is positioned as the rightmost butto
             return config.buttons.find(b => b.action === '1')?.action;
         };
 
-        await v12.buttonDialog({
+        await v13.buttonDialog({
             title: 'Confirm Action',
             buttons: [
                 { label: 'Cancel', value: '0' },
@@ -517,7 +474,7 @@ test('buttonDialog guarantees Cancel button is positioned as the rightmost butto
 });
 
 test('buttonDialog preserves natural visual left-to-right order for multiple action options with Cancel on the right', async () => {
-    const v12 = new FoundryV12Adapter();
+    const v13 = new FoundryV13Adapter();
     let passedButtons = [];
     let passedConfig = null;
     const origWait = foundry.applications.api.DialogV2.wait;
@@ -528,7 +485,7 @@ test('buttonDialog preserves natural visual left-to-right order for multiple act
             return config.buttons[0].action;
         };
 
-        await v12.buttonDialog({
+        await v13.buttonDialog({
             title: 'Multiple Actions',
             buttons: [
                 { label: 'Cancel', value: 'cancel' },
@@ -573,29 +530,29 @@ test('buttonDialog preserves natural visual left-to-right order for multiple act
 });
 
 test('getDocumentName, isDocumentOfType, and getPlaceable resolution', () => {
-    const v12 = new FoundryV12Adapter();
+    const v13 = new FoundryV13Adapter();
 
     const mockToken = { id: 'tok-1', documentName: 'Token' };
     const mockTile = { id: 'tile-1', document: { documentName: 'Tile' } };
 
-    assert.equal(v12.getDocumentName(mockToken), 'Token');
-    assert.equal(v12.getDocumentName(mockTile), 'Tile');
-    assert.equal(v12.getDocumentName(null), undefined);
+    assert.equal(v13.getDocumentName(mockToken), 'Token');
+    assert.equal(v13.getDocumentName(mockTile), 'Tile');
+    assert.equal(v13.getDocumentName(null), undefined);
 
-    assert.equal(v12.isDocumentOfType(mockToken, 'Token'), true);
-    assert.equal(v12.isDocumentOfType(mockToken, 'Tile'), false);
-    assert.equal(v12.isDocumentOfType(mockTile, 'Tile'), true);
+    assert.equal(v13.isDocumentOfType(mockToken, 'Token'), true);
+    assert.equal(v13.isDocumentOfType(mockToken, 'Tile'), false);
+    assert.equal(v13.isDocumentOfType(mockTile, 'Tile'), true);
 
     canvas.tokens.get = (id) => id === 'tok-1' ? mockToken : null;
     canvas.tiles.get = (id) => id === 'tile-1' ? mockTile : null;
 
-    assert.equal(v12.getPlaceable('tok-1'), mockToken);
-    assert.equal(v12.getPlaceable('tile-1'), mockTile);
-    assert.equal(v12.getPlaceable('unknown'), null);
+    assert.equal(v13.getPlaceable('tok-1'), mockToken);
+    assert.equal(v13.getPlaceable('tile-1'), mockTile);
+    assert.equal(v13.getPlaceable('unknown'), null);
 });
 
 test('getSpeakerToken and getSpeakerActor resolution', () => {
-    const v12 = new FoundryV12Adapter();
+    const v13 = new FoundryV13Adapter();
 
     const mockActor = { id: 'act-1', name: 'Hero' };
     const mockToken = { id: 'tok-1', name: 'Hero Token', actor: mockActor };
@@ -608,13 +565,13 @@ test('getSpeakerToken and getSpeakerActor resolution', () => {
         speaker: { token: 'tok-1', actor: 'act-1' }
     };
 
-    assert.equal(v12.getSpeakerToken(message), mockToken);
-    assert.equal(v12.getSpeakerToken(null, 'tok-1'), mockToken);
-    assert.equal(v12.getSpeakerActor(message), mockActor);
+    assert.equal(v13.getSpeakerToken(message), mockToken);
+    assert.equal(v13.getSpeakerToken(null, 'tok-1'), mockToken);
+    assert.equal(v13.getSpeakerActor(message), mockActor);
 });
 
 test('getDistance and getNearestSquareCenter 3D math', () => {
-    const v12 = new FoundryV12Adapter();
+    const v13 = new FoundryV13Adapter();
 
     canvas.grid.size = 100;
     canvas.grid.distance = 5;
@@ -634,16 +591,16 @@ test('getDistance and getNearestSquareCenter 3D math', () => {
 
     // 2D distance between centers (50, 50) and (350, 450) = hypot(300, 400) = 500px = 25 units
     // Elevation diff = 0. 3D distance = 25
-    assert.equal(v12.getDistance(t1, t2), 25);
+    assert.equal(v13.getDistance(t1, t2), 25);
 
     // Nearest square center on 2x2 target t2 (x: 300..500, y: 400..600) to t1 (50, 50)
     // Nearest square is gx=0, gy=0 -> cx = 300 + 50 = 350, cy = 400 + 50 = 450
-    const nearest = v12.getNearestSquareCenter(t1, t2);
+    const nearest = v13.getNearestSquareCenter(t1, t2);
     assert.deepEqual(nearest, { x: 350, y: 450 });
 });
 
 test('getTokenOwners and placeable attachment contracts on BaseFoundryAdapter', async () => {
-    const v12 = new FoundryV12Adapter();
+    const v13 = new FoundryV13Adapter();
 
     const p1 = { id: 'p1', isGM: false, active: true };
     const gm = { id: 'gm1', isGM: true, role: 4, active: true };
@@ -655,7 +612,7 @@ test('getTokenOwners and placeable attachment contracts on BaseFoundryAdapter', 
     };
     const token = { actor, document: { id: 't1', actor } };
 
-    const owners = v12.getTokenOwners(token);
+    const owners = v13.getTokenOwners(token);
     assert.equal(owners.length, 2);
     assert.ok(owners.includes(p1));
     assert.ok(owners.includes(gm));
@@ -667,10 +624,10 @@ test('getTokenOwners and placeable attachment contracts on BaseFoundryAdapter', 
     };
     game.modules.set('token-attacher', { id: 'token-attacher', active: true });
 
-    const attachRes = await v12.attachPlaceableElements([{ id: 'tile-1' }], token);
+    const attachRes = await v13.attachPlaceableElements([{ id: 'tile-1' }], token);
     assert.deepEqual(attachRes, { attached: true, count: 1 });
 
-    const detachRes = await v12.detachPlaceableElements([{ id: 'tile-1' }], token);
+    const detachRes = await v13.detachPlaceableElements([{ id: 'tile-1' }], token);
     assert.deepEqual(detachRes, { detached: true, count: 1 });
 
     // Verify BaseFoundryAdapter reads from parent adapter and navigates to massEdit / tokenAttacher
@@ -684,7 +641,7 @@ test('getTokenOwners and placeable attachment contracts on BaseFoundryAdapter', 
             detachElementsFromToken: async (elements, target) => ({ mockDetached: true, targetId: target.id })
         }
     };
-    const adapterWithParent = new FoundryV12Adapter(mockParentAdapter);
+    const adapterWithParent = new FoundryV13Adapter(mockParentAdapter);
     assert.equal(adapterWithParent.adapter, mockParentAdapter);
     assert.equal(adapterWithParent.massEdit, mockParentAdapter.massEdit);
     assert.equal(adapterWithParent.tokenAttacher, mockParentAdapter.tokenAttacher);
@@ -752,25 +709,18 @@ test('BaseFoundryAdapter and UnifiedAdapter abstract all utility operations clea
     assert.equal(id.length, 16);
 });
 
-test('formatDeletionUpdate contracts across FoundryV12Adapter (legacy -=), FoundryV13Adapter (legacy -=), and FoundryV14Adapter (ForcedDeletion)', () => {
-    const v12 = new FoundryV12Adapter();
+test('formatDeletionUpdate contracts across FoundryV13Adapter (-= syntax) and FoundryV14Adapter (ForcedDeletion)', () => {
     const v13 = new FoundryV13Adapter();
     const v14 = new FoundryV14Adapter();
 
-    // V12 formats legacy -= deletion syntax
-    assert.deepEqual(
-        v12.formatDeletionUpdate('flags.eskie-macros.token-masks', 'anim-123'),
-        { 'flags.eskie-macros.token-masks.-=anim-123': null }
-    );
-    assert.deepEqual(
-        v12.formatDeletionUpdate('', 'anim-123'),
-        { '-=anim-123': null }
-    );
-
-    // V13 inherits legacy -= deletion syntax
+    // V13 formats -= deletion syntax
     assert.deepEqual(
         v13.formatDeletionUpdate('flags.eskie-macros.token-masks', 'anim-123'),
         { 'flags.eskie-macros.token-masks.-=anim-123': null }
+    );
+    assert.deepEqual(
+        v13.formatDeletionUpdate('', 'anim-123'),
+        { '-=anim-123': null }
     );
 
     // V14+ FoundryV14Adapter formats modern ForcedDeletion operator
@@ -790,28 +740,19 @@ test('formatDeletionUpdate contracts across FoundryV12Adapter (legacy -=), Found
         { 'flags.eskie-macros.token-masks.anim-123': foundry.data.operators.ForcedDeletion }
     );
 
-    adapter.foundry = v12;
+    adapter.foundry = v13;
     assert.deepEqual(
         adapter.formatDeletionUpdate('flags.eskie-macros.token-masks', 'anim-123'),
         { 'flags.eskie-macros.token-masks.-=anim-123': null }
     );
 });
 
-test('fromUuidSync and fromUuid resolution across FoundryV12Adapter (global) and FoundryV13Adapter / FoundryV14Adapter (foundry.utils)', async () => {
-    const v12 = new FoundryV12Adapter();
+test('fromUuidSync and fromUuid resolution across FoundryV13Adapter and FoundryV14Adapter (foundry.utils)', async () => {
     const v13 = new FoundryV13Adapter();
     const v14 = new FoundryV14Adapter();
 
-    globalThis.fromUuidSync = (uuid) => uuid === 'Item.123' ? { id: '123', name: 'Legacy Item' } : null;
-    globalThis.fromUuid = async (uuid) => uuid === 'Item.123' ? { id: '123', name: 'Legacy Item' } : null;
-
     globalThis.foundry.utils.fromUuidSync = (uuid) => uuid === 'Item.456' ? { id: '456', name: 'Modern Item' } : null;
     globalThis.foundry.utils.fromUuid = async (uuid) => uuid === 'Item.456' ? { id: '456', name: 'Modern Item' } : null;
-
-    assert.equal(v12.fromUuidSync('Item.123')?.name, 'Legacy Item');
-    assert.equal(v12.fromUuidSync('Item.456'), null);
-    assert.equal((await v12.fromUuid('Item.123'))?.name, 'Legacy Item');
-    assert.equal(await v12.fromUuid('Item.456'), null);
 
     assert.equal(v13.fromUuidSync('Item.456')?.name, 'Modern Item');
     assert.equal(v13.fromUuidSync('Item.123'), null);
@@ -824,8 +765,7 @@ test('fromUuidSync and fromUuid resolution across FoundryV12Adapter (global) and
     assert.equal(await v14.fromUuid('Item.123'), null);
 });
 
-test('getCombatantsByToken and getCombatantByToken across FoundryV12Adapter (singular) and FoundryV13Adapter / FoundryV14Adapter (plural)', () => {
-    const v12 = new FoundryV12Adapter();
+test('getCombatantsByToken and getCombatantByToken across FoundryV13Adapter and FoundryV14Adapter (plural)', () => {
     const v13 = new FoundryV13Adapter();
     const v14 = new FoundryV14Adapter();
 
@@ -833,16 +773,9 @@ test('getCombatantsByToken and getCombatantByToken across FoundryV12Adapter (sin
     const mockCombatant1 = { id: 'c1', tokenId: 'tok1' };
     const mockCombatant2 = { id: 'c2', tokenId: 'tok1' };
 
-    const legacyCombat = {
-        getCombatantByToken: (tokenId) => tokenId === 'tok1' ? mockCombatant1 : null
-    };
-
     const modernCombat = {
         getCombatantsByToken: (token) => (token === mockToken || token?.id === 'tok1') ? [mockCombatant1, mockCombatant2] : []
     };
-
-    assert.deepEqual(v12.getCombatantsByToken(legacyCombat, mockToken), [mockCombatant1]);
-    assert.equal(v12.getCombatantByToken(legacyCombat, mockToken), mockCombatant1);
 
     assert.deepEqual(v13.getCombatantsByToken(modernCombat, mockToken), [mockCombatant1, mockCombatant2]);
     assert.equal(v13.getCombatantByToken(modernCombat, mockToken), mockCombatant1);
@@ -852,7 +785,7 @@ test('getCombatantsByToken and getCombatantByToken across FoundryV12Adapter (sin
 });
 
 test('getSceneDimensions and getSceneCenter calculate safe scene metrics and center coordinates', () => {
-    const v12 = new FoundryV12Adapter();
+    const v13 = new FoundryV13Adapter();
 
     // With canvas dimensions populated
     globalThis.canvas = {
@@ -866,13 +799,13 @@ test('getSceneDimensions and getSceneCenter calculate safe scene metrics and cen
         }
     };
 
-    const dims = v12.getSceneDimensions();
+    const dims = v13.getSceneDimensions();
     assert.equal(dims.width, 4000);
     assert.equal(dims.height, 3000);
     assert.equal(dims.size, 100);
     assert.equal(dims.distance, 5);
 
-    const center = v12.getSceneCenter();
+    const center = v13.getSceneCenter();
     assert.deepEqual(center, { x: 2000, y: 1500 });
 
     // Fallbacks without canvas.dimensions
@@ -884,23 +817,23 @@ test('getSceneDimensions and getSceneCenter calculate safe scene metrics and cen
             grid: { size: 50, distance: 10 }
         }
     };
-    const fallbackDims = v12.getSceneDimensions(mockScene);
+    const fallbackDims = v13.getSceneDimensions(mockScene);
     assert.equal(fallbackDims.width, 2000);
     assert.equal(fallbackDims.height, 1000);
     assert.equal(fallbackDims.size, 50);
     assert.equal(fallbackDims.distance, 10);
-    assert.deepEqual(v12.getSceneCenter(mockScene), { x: 1000, y: 500 });
+    assert.deepEqual(v13.getSceneCenter(mockScene), { x: 1000, y: 500 });
 });
 
 test('getCenter, getTokenDimensions, and getInterpolatedPoints calculate geometry properties correctly', () => {
-    const v12 = new FoundryV12Adapter();
+    const v13 = new FoundryV13Adapter();
     globalThis.canvas = { grid: { size: 100 } };
 
     // getCenter with various placeables / documents
-    assert.equal(v12.getCenter(null), null);
-    assert.deepEqual(v12.getCenter({ center: { x: 150, y: 250 } }), { x: 150, y: 250 });
-    assert.deepEqual(v12.getCenter({ object: { center: { x: 300, y: 400 } } }), { x: 300, y: 400 });
-    assert.deepEqual(v12.getCenter({ x: 100, y: 200, width: 2, height: 2 }), { x: 200, y: 300 });
+    assert.equal(v13.getCenter(null), null);
+    assert.deepEqual(v13.getCenter({ center: { x: 150, y: 250 } }), { x: 150, y: 250 });
+    assert.deepEqual(v13.getCenter({ object: { center: { x: 300, y: 400 } } }), { x: 300, y: 400 });
+    assert.deepEqual(v13.getCenter({ x: 100, y: 200, width: 2, height: 2 }), { x: 200, y: 300 });
 
     // getTokenDimensions
     const mockToken = {
@@ -908,7 +841,7 @@ test('getCenter, getTokenDimensions, and getInterpolatedPoints calculate geometr
         w: 200,
         h: 300
     };
-    const tokDims = v12.getTokenDimensions(mockToken);
+    const tokDims = v13.getTokenDimensions(mockToken);
     assert.equal(tokDims.widthPx, 200);
     assert.equal(tokDims.heightPx, 300);
     assert.equal(tokDims.widthUnits, 2);
@@ -916,22 +849,22 @@ test('getCenter, getTokenDimensions, and getInterpolatedPoints calculate geometr
     assert.equal(tokDims.radiusPx, 150);
 
     // getTokenRotation
-    assert.equal(v12.getTokenRotation(null), 0);
-    assert.equal(v12.getTokenRotation(mockToken), 0);
-    assert.equal(v12.getTokenRotation({ document: { rotation: 180 } }), 180);
-    assert.equal(v12.getTokenRotation({ document: { rotation: 90 } }), 90);
+    assert.equal(v13.getTokenRotation(null), 0);
+    assert.equal(v13.getTokenRotation(mockToken), 0);
+    assert.equal(v13.getTokenRotation({ document: { rotation: 180 } }), 180);
+    assert.equal(v13.getTokenRotation({ document: { rotation: 90 } }), 90);
 
     // getInterpolatedPoints
     const p1 = { x: 0, y: 0 };
     const p2 = { x: 300, y: 400 }; // dist = 500
-    const points = v12.getInterpolatedPoints(p1, p2, 100);
+    const points = v13.getInterpolatedPoints(p1, p2, 100);
     assert.equal(points.length, 6);
     assert.deepEqual(points[0], { x: 0, y: 0 });
     assert.deepEqual(points[5], { x: 300, y: 400 });
 });
 
 test('getBestAdjacentLocation calculates nearest adjacent cell to line between two tokens', () => {
-    const v12 = new FoundryV12Adapter();
+    const v13 = new FoundryV13Adapter();
     globalThis.canvas = {
         grid: {
             size: 100,
@@ -948,7 +881,7 @@ test('getBestAdjacentLocation calculates nearest adjacent cell to line between t
         center: { x: 450, y: 150 }
     };
 
-    const bestLoc = v12.getBestAdjacentLocation(caster, target);
+    const bestLoc = v13.getBestAdjacentLocation(caster, target);
     assert.ok(bestLoc);
     assert.equal(bestLoc.y, 150);
     // Closest cell on line towards target
@@ -956,27 +889,27 @@ test('getBestAdjacentLocation calculates nearest adjacent cell to line between t
 });
 
 test('getGridSize delegates to getSceneDimensions and returns grid size in pixels', () => {
-    const v12 = new FoundryV12Adapter();
+    const v13 = new FoundryV13Adapter();
     globalThis.canvas = {
         grid: { size: 100 },
         scene: { grid: { size: 100 } }
     };
-    assert.equal(v12.getGridSize(), 100);
+    assert.equal(v13.getGridSize(), 100);
     assert.equal(adapter.getGridSize(), 100);
 
     const customScene = { grid: { size: 150 }, width: 3000, height: 3000 };
-    assert.equal(v12.getGridSize(customScene), 150);
+    assert.equal(v13.getGridSize(customScene), 150);
     assert.equal(adapter.getGridSize(customScene), 150);
 });
 
 test('getCenterPoint delegates to canvas.grid.getCenterPoint or returns point', () => {
-    const v12 = new FoundryV12Adapter();
+    const v13 = new FoundryV13Adapter();
     globalThis.canvas = {
         grid: {
             getCenterPoint: ({ x, y }) => ({ x: x + 50, y: y + 50 })
         }
     };
-    assert.deepEqual(v12.getCenterPoint({ x: 100, y: 100 }), { x: 150, y: 150 });
+    assert.deepEqual(v13.getCenterPoint({ x: 100, y: 100 }), { x: 150, y: 150 });
     assert.deepEqual(adapter.getCenterPoint({ x: 100, y: 100 }), { x: 150, y: 150 });
 
     globalThis.canvas = {};
@@ -984,7 +917,7 @@ test('getCenterPoint delegates to canvas.grid.getCenterPoint or returns point', 
 });
 
 test('getMessageVisibilityUsers correctly handles all Foundry VTT roll modes', () => {
-    const v12 = new FoundryV12Adapter();
+    const v13 = new FoundryV13Adapter();
     const gmUser = { id: 'gm1', isGM: true };
     const player1 = { id: 'p1', isGM: false };
     const player2 = { id: 'p2', isGM: false };
@@ -998,7 +931,7 @@ test('getMessageVisibilityUsers correctly handles all Foundry VTT roll modes', (
     // 1. Public roll (Public as User / Public as Character - no whisper or empty whisper)
     const publicMsg = { whisper: [], author: { id: 'p1' } };
     assert.deepEqual(adapter.getMessageVisibilityUsers(publicMsg), ['gm1', 'p1', 'p2', 'p3']);
-    assert.deepEqual(v12.getMessageVisibilityUsers(null), ['gm1', 'p1', 'p2', 'p3']);
+    assert.deepEqual(v13.getMessageVisibilityUsers(null), ['gm1', 'p1', 'p2', 'p3']);
 
     // 2. Private to Gamemasters (whispered to GM, not blind)
     const gmWhisperMsg = { whisper: ['gm1'], blind: false, author: { id: 'p1' } };

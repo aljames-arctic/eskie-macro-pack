@@ -6,7 +6,6 @@ import { Dnd5eSystemAdapter } from '../../src/adapters/system/dnd5e-system-adapt
 import { Pf2eSystemAdapter } from '../../src/adapters/system/pf2e-system-adapter.js';
 import { GenericSystemAdapter } from '../../src/adapters/system/generic-system-adapter.js';
 import { BaseFoundryAdapter } from '../../src/adapters/foundry/index.js';
-import { FoundryV12Adapter } from '../../src/adapters/foundry/foundry-v12-adapter.js';
 import { FoundryV13Adapter } from '../../src/adapters/foundry/foundry-v13-adapter.js';
 import { FoundryV14Adapter } from '../../src/adapters/foundry/foundry-v14-adapter.js';
 
@@ -16,27 +15,25 @@ test('initializeSystemAdapter and BaseSystemAdapter enforce instanceof BaseFound
     assert.throws(() => new BaseSystemAdapter('dnd5e', true, 'invalid'), /BaseSystemAdapter requires a valid BaseFoundryAdapter instance/);
     await assert.rejects(async () => initializeSystemAdapter('dnd5e', {}), /initializeSystemAdapter requires a valid BaseFoundryAdapter instance/);
 
-    // All version subclasses (V12, V13, V14) satisfy instanceof BaseFoundryAdapter
-    const v12 = new FoundryV12Adapter();
+    // All version subclasses (V13, V14) satisfy instanceof BaseFoundryAdapter
     const v13 = new FoundryV13Adapter();
     const v14 = new FoundryV14Adapter();
 
-    assert.ok(v12 instanceof BaseFoundryAdapter);
     assert.ok(v13 instanceof BaseFoundryAdapter);
     assert.ok(v14 instanceof BaseFoundryAdapter);
 
     // System adapters accept any Foundry adapter version polymorphically
-    const sysV12 = await initializeSystemAdapter('dnd5e', v12);
-    assert.ok(sysV12 instanceof Dnd5eSystemAdapter);
-    assert.equal(sysV12.foundry, v12);
+    const sysDnd5e = await initializeSystemAdapter('dnd5e', v13);
+    assert.ok(sysDnd5e instanceof Dnd5eSystemAdapter);
+    assert.equal(sysDnd5e.foundry, v13);
 
-    const sysV13 = await initializeSystemAdapter('pf2e', v13);
-    assert.ok(sysV13 instanceof Pf2eSystemAdapter);
-    assert.equal(sysV13.foundry, v13);
+    const sysPf2e = await initializeSystemAdapter('pf2e', v13);
+    assert.ok(sysPf2e instanceof Pf2eSystemAdapter);
+    assert.equal(sysPf2e.foundry, v13);
 
-    const sysV14 = await initializeSystemAdapter('generic', v14);
-    assert.ok(sysV14 instanceof GenericSystemAdapter);
-    assert.equal(sysV14.foundry, v14);
+    const sysGeneric = await initializeSystemAdapter('generic', v14);
+    assert.ok(sysGeneric instanceof GenericSystemAdapter);
+    assert.equal(sysGeneric.foundry, v14);
 });
 
 test('initializeSystemAdapter instantiates matching system adapter or generic fallback', async () => {

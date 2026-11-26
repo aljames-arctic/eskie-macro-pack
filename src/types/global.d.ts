@@ -7,6 +7,7 @@ declare global {
       endEffects(options?: any): Promise<void>;
       getEffects(options?: any): any[];
     };
+    MotionManager: import('./sequencer.js').SequencerMotionManager;
     Crosshair: {
       show(config?: any, callbacks?: any): Promise<any>;
     };

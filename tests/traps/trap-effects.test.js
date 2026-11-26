@@ -10,9 +10,9 @@ import {
     setupTrap
 } from '../../src/animation/traps/trap-manager.js';
 import { MODULE_ID } from '../../src/lib/constants.js';
-import { FoundryV12Adapter } from '../../src/adapters/foundry/foundry-v12-adapter.js';
+import { FoundryV13Adapter } from '../../src/adapters/foundry/foundry-v13-adapter.js';
 
-adapter.foundry = new FoundryV12Adapter(adapter);
+adapter.foundry = new FoundryV13Adapter(adapter);
 
 test('createCasterProxy: creates Token-compatible proxy for Tile placeable', () => {
     const tile = {
@@ -1334,10 +1334,10 @@ test('Layer 2: registry-driven executeTrapEffect dispatch routes template, victi
 
 test('Layer 3: getTemplatePosition defaults primary to center on Tiles and V14 Rectangle/Polygon Regions when cfg.token is omitted', async () => {
     const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
-    const v12 = new FoundryV12Adapter(adapter);
+    const v13 = new FoundryV13Adapter(adapter);
     const v14 = new FoundryV14Adapter(adapter);
 
-    // V12/V13 Tile without cfg.token -> primary must be Tile center (300, 400), not top-left (200, 300)
+    // V13 Tile without cfg.token -> primary must be Tile center (300, 400), not top-left (200, 300)
     const tile = {
         id: 'tile-aoe',
         documentName: 'Tile',
@@ -1345,7 +1345,7 @@ test('Layer 3: getTemplatePosition defaults primary to center on Tiles and V14 R
         y: 300,
         document: { id: 'tile-aoe', documentName: 'Tile', x: 200, y: 300, width: 200, height: 200, texture: { src: 'a.png' } }
     };
-    const [tilePrimary, , tileCenter] = v12.getTemplatePosition(tile, {});
+    const [tilePrimary, , tileCenter] = v13.getTemplatePosition(tile, {});
     assert.deepEqual(tilePrimary, { x: 300, y: 400 }, 'Tile template without cfg.token must center primary');
     assert.deepEqual(tileCenter, { x: 300, y: 400 });
 

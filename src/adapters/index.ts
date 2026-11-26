@@ -19,7 +19,7 @@ const foundrySummonsAdapter = new FoundrySummonsModuleAdapter();
 
 /**
  * Unified Adapter Singleton for Eskie Macro Pack.
- * Centralizes and abstracts Foundry platform generations (V12, V13, V14+), Game Systems, and Third-Party Modules.
+ * Centralizes and abstracts Foundry platform generations (V13, V14+), Game Systems, and Third-Party Modules.
  */
 class Adapter {
     foundry: BaseFoundryAdapter;

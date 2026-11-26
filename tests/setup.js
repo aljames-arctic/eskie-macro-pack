@@ -53,6 +53,11 @@ globalThis.Sequencer = {
     EffectManager: {
         endEffects: () => {}
     },
+    MotionManager: {
+        endMotions: () => 0,
+        endAllMotions: () => 0,
+        getDisplacement: () => null
+    },
     Database: {
         getEntry(path) {
             if (!path || String(path).includes('invalid')) return null;
@@ -385,8 +390,8 @@ globalThis.canvas = {
 };
 
 globalThis.game = {
-    release: { generation: 12 },
-    version: '12.331',
+    release: { generation: 13 },
+    version: '13.341',
     system: { id: 'dnd5e', title: 'D&D 5e' },
     modules: new Map([
         ['eskie-macros', { id: 'eskie-macros', active: true, api: {} }]

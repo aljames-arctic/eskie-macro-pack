@@ -1,20 +1,19 @@
 import '../setup.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { FoundryV12Adapter } from '../../src/adapters/foundry/foundry-v12-adapter.js';
 import { FoundryV13Adapter } from '../../src/adapters/foundry/foundry-v13-adapter.js';
 import { FoundryV14Adapter } from '../../src/adapters/foundry/foundry-v14-adapter.js';
 
-test('FoundryV14Adapter: supportsRegionBehaviors and NOP isolation in V12', () => {
-    const v12 = new FoundryV12Adapter();
+test('FoundryV14Adapter: supportsRegionBehaviors and NOP isolation in V13', () => {
+    const v13 = new FoundryV13Adapter();
     const v14 = new FoundryV14Adapter();
 
-    assert.equal(v12.supportsRegionBehaviors, false, 'V12 adapter must report supportsRegionBehaviors as false');
+    assert.equal(v13.supportsRegionBehaviors, false, 'V13 adapter must report supportsRegionBehaviors as false');
     assert.equal(v14.supportsRegionBehaviors, true, 'V14 adapter must report supportsRegionBehaviors as true');
 
-    assert.deepEqual(v12.getControlledRegions(), [], 'V12 getControlledRegions must NOP returning empty array');
-    assert.deepEqual(v12.getTokensInRegion({}), [], 'V12 getTokensInRegion must NOP returning empty array');
-    assert.deepEqual(v12.formatRegionBehaviorData({}), {}, 'V12 formatRegionBehaviorData must NOP returning empty object');
+    assert.deepEqual(v13.getControlledRegions(), [], 'V13 getControlledRegions must NOP returning empty array');
+    assert.deepEqual(v13.getTokensInRegion({}), [], 'V13 getTokensInRegion must NOP returning empty array');
+    assert.deepEqual(v13.formatRegionBehaviorData({}), {}, 'V13 formatRegionBehaviorData must NOP returning empty object');
 });
 
 test('FoundryV14Adapter: getControlledRegions returns controlled region documents', () => {

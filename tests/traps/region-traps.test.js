@@ -11,8 +11,8 @@ import { log } from '../../src/lib/logger.js';
 test('setupTrap: routes dynamically based on generation and MATT availability', async () => {
     globalThis.game.user = { isGM: true, id: 'gm-user-1' };
 
-    // Case 1: Generation 12 -> routes to MATT
-    globalThis.game.release = { generation: 12 };
+    // Case 1: Generation 13 -> routes to MATT
+    globalThis.game.release = { generation: 13 };
     globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', active: true });
 
     let mattCalled = false;
@@ -22,14 +22,14 @@ test('setupTrap: routes dynamically based on generation and MATT availability', 
         return { mode: 'matt' };
     };
 
-    const resV12 = await setupTrap('eskie.traps.spike', {});
-    assert.equal(mattCalled, true, 'On V12, setupTrap must route to MATT');
-    assert.equal(resV12.mode, 'matt');
+    const resV13 = await setupTrap('eskie.traps.spike', {});
+    assert.equal(mattCalled, true, 'On V13, setupTrap must route to MATT');
+    assert.equal(resV13.mode, 'matt');
 
     // Case 2: Generation 14 without MATT -> defaults to Region setup
     mattCalled = false;
     globalThis.game.release = { generation: 14 };
-    const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
+    const { FoundryV13Adapter } = await import('../../src/adapters/foundry/foundry-v13-adapter.js');
     const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
     adapter.foundry = new FoundryV14Adapter(adapter);
     globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', active: false });
@@ -76,14 +76,14 @@ test('setupTrap: routes dynamically based on generation and MATT availability', 
 
     // Restore original MATT setup and V12 adapter
     (await import('../../src/animation/utils/matt-tiles.js')).matt.trap.setup = originalMattTrapSetup;
-    adapter.foundry = new FoundryV12Adapter(adapter);
-    globalThis.game.release = { generation: 12 };
+    adapter.foundry = new FoundryV13Adapter(adapter);
+    globalThis.game.release = { generation: 13 };
 });
 
 test('setupTrap: configures RegionDocument flags and creates executeScript RegionBehavior in region mode', async () => {
     globalThis.game.user = { isGM: true };
     globalThis.game.release = { generation: 14 };
-    const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
+    const { FoundryV13Adapter } = await import('../../src/adapters/foundry/foundry-v13-adapter.js');
     const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
     adapter.foundry = new FoundryV14Adapter(adapter);
 
@@ -196,14 +196,14 @@ test('setupTrap: configures RegionDocument flags and creates executeScript Regio
 
     delete globalThis.eskie;
 
-    adapter.foundry = new FoundryV12Adapter(adapter);
-    globalThis.game.release = { generation: 12 };
+    adapter.foundry = new FoundryV13Adapter(adapter);
+    globalThis.game.release = { generation: 13 };
 });
 
 test('setupTrap: enforces tile requirement when requiresTile is true in region mode', async () => {
     globalThis.game.user = { isGM: true };
     globalThis.game.release = { generation: 14 };
-    const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
+    const { FoundryV13Adapter } = await import('../../src/adapters/foundry/foundry-v13-adapter.js');
     const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
     adapter.foundry = new FoundryV14Adapter(adapter);
 
@@ -231,14 +231,14 @@ test('setupTrap: enforces tile requirement when requiresTile is true in region m
     assert.equal(warned, true, 'Must warn user when required tile is missing');
     assert.equal(result, undefined, 'Must abort setup when required tile is missing');
 
-    adapter.foundry = new FoundryV12Adapter(adapter);
-    globalThis.game.release = { generation: 12 };
+    adapter.foundry = new FoundryV13Adapter(adapter);
+    globalThis.game.release = { generation: 13 };
 });
 
 test('setupTrap: tileCount === 1 bypasses step 2 and uses trigger region as origin in region mode', async () => {
     globalThis.game.user = { isGM: true };
     globalThis.game.release = { generation: 14 };
-    const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
+    const { FoundryV13Adapter } = await import('../../src/adapters/foundry/foundry-v13-adapter.js');
     const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
     adapter.foundry = new FoundryV14Adapter(adapter);
 
@@ -267,14 +267,14 @@ test('setupTrap: tileCount === 1 bypasses step 2 and uses trigger region as orig
     assert.equal(result.originElements.length, 1);
     assert.equal(result.originElements[0].id, 'region-door-1');
 
-    adapter.foundry = new FoundryV12Adapter(adapter);
-    globalThis.game.release = { generation: 12 };
+    adapter.foundry = new FoundryV13Adapter(adapter);
+    globalThis.game.release = { generation: 13 };
 });
 
 test('setupTrap: tileCount === 3 embeds targetLocation in generated script in region mode', async () => {
     globalThis.game.user = { isGM: true };
     globalThis.game.release = { generation: 14 };
-    const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
+    const { FoundryV13Adapter } = await import('../../src/adapters/foundry/foundry-v13-adapter.js');
     const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
     adapter.foundry = new FoundryV14Adapter(adapter);
 
@@ -372,14 +372,14 @@ test('setupTrap: tileCount === 3 embeds targetLocation in generated script in re
     assert.equal(firePlayed, false, 'Must abort early when targetPlaceable does not exist');
 
     delete globalThis.eskie;
-    adapter.foundry = new FoundryV12Adapter(adapter);
-    globalThis.game.release = { generation: 12 };
+    adapter.foundry = new FoundryV13Adapter(adapter);
+    globalThis.game.release = { generation: 13 };
 });
 
 test('setupTrap: multiple trap regions fire simultaneously via Promise.all in region mode', async () => {
     globalThis.game.user = { isGM: true };
     globalThis.game.release = { generation: 14 };
-    const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
+    const { FoundryV13Adapter } = await import('../../src/adapters/foundry/foundry-v13-adapter.js');
     const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
     adapter.foundry = new FoundryV14Adapter(adapter);
 
@@ -464,8 +464,8 @@ test('setupTrap: multiple trap regions fire simultaneously via Promise.all in re
     assert.equal(maxConcurrent, 3, 'All 3 trap regions must execute simultaneously (maxConcurrent === 3)');
 
     delete globalThis.eskie;
-    adapter.foundry = new FoundryV12Adapter(adapter);
-    globalThis.game.release = { generation: 12 };
+    adapter.foundry = new FoundryV13Adapter(adapter);
+    globalThis.game.release = { generation: 13 };
 });
 
 test('Trap macros accept targetLocation: { x, y } coordinates directly', async () => {
@@ -777,9 +777,9 @@ test('setupTrap: targets only tokens currently or moving into trap placeables, i
     assert.ok(receivedTargets.some(t => t.id === 'tok-bob'));
 
     delete globalThis.eskie;
-    const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
-    adapter.foundry = new FoundryV12Adapter(adapter);
-    globalThis.game.release = { generation: 12 };
+    const { FoundryV13Adapter } = await import('../../src/adapters/foundry/foundry-v13-adapter.js');
+    adapter.foundry = new FoundryV13Adapter(adapter);
+    globalThis.game.release = { generation: 13 };
 });
 
 test('eskie.traps.setup: verifies Foundry version and MATT availability with accurate prompt copy', async () => {
@@ -809,14 +809,14 @@ test('eskie.traps.setup: verifies Foundry version and MATT availability with acc
 
     try {
         const { traps } = await import('../../src/animation/traps/index.js');
-        const { FoundryV12Adapter } = await import('../../src/adapters/foundry/foundry-v12-adapter.js');
+        const { FoundryV13Adapter } = await import('../../src/adapters/foundry/foundry-v13-adapter.js');
         const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
 
         globalThis.game.user = { isGM: true, id: 'gm-user-1' };
 
         // (a1) Below v14 WITHOUT MATT -> errors immediately without opening dialogs
         globalThis.game.release = { generation: 13 };
-        adapter.foundry = new FoundryV12Adapter(adapter);
+        adapter.foundry = new FoundryV13Adapter(adapter);
         globalThis.game.modules.set('monks-active-tiles', { id: 'monks-active-tiles', active: false });
 
         const errors = [];

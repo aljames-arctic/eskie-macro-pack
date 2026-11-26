@@ -61,12 +61,12 @@ export class BaseFoundryAdapter {
     }
 
     /**
-     * The major generation version of Foundry VTT (e.g. 12, 13, 14).
+     * The major generation version of Foundry VTT (e.g. 13, 14).
      * @returns {number}
      */
     get generation() {
         const major = parseInt(String(game.release?.generation ?? game.version ?? "").split('.')[0], 10);
-        return Number.isNaN(major) ? 12 : major;
+        return Number.isNaN(major) ? 13 : major;
     }
 
     /**
@@ -1354,7 +1354,7 @@ export class BaseFoundryAdapter {
 
     /**
      * Calculate bounding box and center for a Tile.
-     * In V12/V13 baseline, tile origin (x, y) is top-left (0, 0).
+     * In V13 baseline, tile origin (x, y) is top-left (0, 0).
      * @param {Tile} tile Target tile placeable
      * @returns {{ minX: number, maxX: number, minY: number, maxY: number, center: {x: number, y: number}, width: number, height: number, anchor: {x: number, y: number} }}
      */

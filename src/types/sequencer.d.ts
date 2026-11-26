@@ -1,84 +1,242 @@
-export interface MotionMoveOptions {
-  duration: number;
+export interface MotionPoint {
+  x: number;
+  y: number;
+}
+
+export interface MotionAxisOffset {
+  x?: number;
+  y?: number;
+}
+
+export interface MotionKeyframe<TValue> {
+  v: TValue;
+  duration?: number;
+  hold?: number;
   ease?: string;
-  rotate?: boolean;
-  offset?: { x?: number; y?: number };
+  inEase?: string;
+  outEase?: string;
+}
+
+export interface MotionTrackOptions<TReturnValue = any> {
+  duration?: number;
+  ease?: string;
+  delay?: number;
+  return?: boolean;
+  easeOut?: string;
+  returnDuration?: number;
+  returnValues?: Array<TReturnValue | MotionKeyframe<TReturnValue>>;
+}
+
+export interface MotionMoveToOptions extends MotionTrackOptions<MotionPoint> {
+  attachTo?: boolean;
+  ignoreMotion?: boolean;
   gridUnits?: boolean;
-  [key: string]: any;
 }
 
-export interface MotionRotateOptions {
-  duration: number;
-  ease?: string;
-  [key: string]: any;
+export interface MotionMoveByOptions extends MotionTrackOptions<MotionPoint> {
+  gridUnits?: boolean;
+  towards?: any;
+  awayFrom?: any;
+  attachTo?: boolean;
+  ignoreMotion?: boolean;
 }
 
+export type MotionRotateOptions = MotionTrackOptions<number>;
+export type MotionScaleOptions = MotionTrackOptions<number | MotionPoint>;
+export type MotionFadeOptions = MotionTrackOptions<number>;
 
-
-export interface MotionScaleOptions {
-  duration: number;
-  ease?: string;
-  [key: string]: any;
+export interface MotionTintOptions extends MotionTrackOptions<string | number> {
+  colorSpace?: 'rgb' | 'hsv';
 }
 
-export interface MotionFadeOptions {
-  duration: number;
-  ease?: string;
-  [key: string]: any;
+export type MotionNoiseStrength = number | MotionAxisOffset;
+
+export interface MotionNoiseOptions {
+  frequency: number;
+  strength?: MotionNoiseStrength;
+  strengthScaledToObject?: MotionNoiseStrength;
+  rotationStrength?: number;
+  directionMin?: number;
+  directionMax?: number;
+  duration?: number;
+  delay?: number;
+  fadeInDuration?: number;
+  fadeOutDuration?: number;
 }
 
-export interface MotionTintOptions {
-  duration: number;
-  ease?: string;
-  [key: string]: any;
+export type MotionOscillateWaveform = 'sine' | 'triangle' | 'square';
+
+export type MotionOscillatePositionAxis =
+  | { amplitude: number; phase?: number; strengthScaledToObject?: never }
+  | { strengthScaledToObject: number; phase?: number; amplitude?: never };
+
+export interface MotionOscillateScalarAxis {
+  amplitude: number;
+  phase?: number;
+}
+
+export interface MotionOscillateMultiplierAxis {
+  amplitude: number;
+  phase?: number;
+  baseline?: number;
 }
 
 export interface MotionOscillateOptions {
   period: number;
-  amplitude?: number;
-  [key: string]: any;
+  waveform: MotionOscillateWaveform;
+  duration?: number;
+  delay?: number;
+  fadeInDuration?: number;
+  fadeOutDuration?: number;
+  x?: MotionOscillatePositionAxis;
+  y?: MotionOscillatePositionAxis;
+  rotation?: MotionOscillateScalarAxis;
+  scale?: MotionOscillateMultiplierAxis;
+  alpha?: MotionOscillateMultiplierAxis;
 }
 
-export interface MotionNoiseOptions {
-  duration: number;
-  strength?: number;
-  frequency?: number;
-  gridUnits?: boolean;
-  [key: string]: any;
+export interface MotionDisplacement {
+  deltaX: number;
+  deltaY: number;
+  deltaAngle: number;
+  deltaAlpha: number;
+  scaleMultiplierX: number;
+  scaleMultiplierY: number;
+  alphaMultiplier: number;
+  tintR: number;
+  tintG: number;
+  tintB: number;
+}
+
+export interface MotionEndOptions {
+  object?: any;
+  target?: any;
+  name?: string;
+  sequenceId?: string;
+  settle?: number;
+  sceneId?: string;
+}
+
+export interface SequencerMotionManager {
+  endMotions(target: any | MotionEndOptions | null, options?: MotionEndOptions, push?: boolean): number;
+  endAllMotions(options?: MotionEndOptions, push?: boolean): number;
+  getDisplacement(target: any): MotionDisplacement | null;
 }
 
 export interface MotionSection {
+  on(target: any): MotionSection;
   name(name: string): MotionSection;
-  moveTo(target: { x: number; y: number } | any, options: MotionMoveOptions): MotionSection;
-  moveBy(offset: { x?: number; y?: number }, options: MotionMoveOptions): MotionSection;
-  rotateTo(angle: number, options: MotionRotateOptions): MotionSection;
-  rotateBy(angle: number, options: MotionRotateOptions): MotionSection;
-  scaleTo(scale: number | { x: number; y: number }, options: MotionScaleOptions): MotionSection;
-  fadeTo(opacity: number, options: MotionFadeOptions): MotionSection;
-  tintTo(color: string | number, options: MotionTintOptions): MotionSection;
-  oscillate(options: MotionOscillateOptions): MotionSection;
+  zIndex(zIndex: number): MotionSection;
+  persist(): MotionSection;
+  persistUntilUpdate(): MotionSection;
+  tieToDocuments(documents: any | any[]): MotionSection;
+
+  moveTo(
+    target: MotionPoint | any | Array<MotionPoint | MotionKeyframe<MotionPoint>>,
+    options?: MotionMoveToOptions
+  ): MotionSection;
+  moveBy(
+    offset: MotionAxisOffset | number | Array<MotionPoint | MotionKeyframe<MotionPoint>>,
+    options?: MotionMoveByOptions
+  ): MotionSection;
+  rotateTo(
+    angle: number | Array<number | MotionKeyframe<number>>,
+    options?: MotionRotateOptions
+  ): MotionSection;
+  rotateBy(
+    angle: number | Array<number | MotionKeyframe<number>>,
+    options?: MotionRotateOptions
+  ): MotionSection;
+  scaleTo(
+    scale: number | MotionAxisOffset | Array<number | MotionPoint | MotionKeyframe<number | MotionPoint>>,
+    options?: MotionScaleOptions
+  ): MotionSection;
+  scaleBy(
+    scale: number | MotionAxisOffset | Array<number | MotionPoint | MotionKeyframe<number | MotionPoint>>,
+    options?: MotionScaleOptions
+  ): MotionSection;
+  fadeTo(
+    alpha: number | Array<number | MotionKeyframe<number>>,
+    options?: MotionFadeOptions
+  ): MotionSection;
+  fadeBy(
+    delta: number | Array<number | MotionKeyframe<number>>,
+    options?: MotionFadeOptions
+  ): MotionSection;
+  tintTo(
+    color: string | number | Array<string | number | MotionKeyframe<string | number>>,
+    options?: MotionTintOptions
+  ): MotionSection;
   noise(options: MotionNoiseOptions): MotionSection;
+  oscillate(options: MotionOscillateOptions): MotionSection;
+
+  // Inherited Section & trait methods
+  delay(msMin: number, msMax?: number): MotionSection;
+  repeats(count: number, delayMin?: number, delayMax?: number): MotionSection;
+  waitUntilFinished(minDelay?: number, maxDelay?: number): MotionSection;
+  playIf(condition: boolean | (() => boolean)): MotionSection;
+  forUsers(users: any): MotionSection;
+  async(): MotionSection;
 
   // Root Sequence chaining extensions
   effect(file?: string | Function): EffectSection;
-  motion(target: any): MotionSection;
+  motion(target?: any): MotionSection;
   animation(target?: any): AnimationSection;
   sound(file?: string): SoundSection;
   wait(duration?: number): SequenceBuilder;
   thenDo(callback: () => void | Promise<void>): SequenceBuilder;
   canvasPan(options?: any): SequenceBuilder;
   shake(options?: any): SequenceBuilder;
-  play(options?: { preload?: boolean }): Promise<void>;
+  play(options?: { preload?: boolean; local?: boolean; remote?: boolean }): Promise<void>;
   addSequence(sequence: any): SequenceBuilder;
+  [key: string]: any;
+}
+
+export interface EffectLocationOptions {
+  offset?: { x?: number; y?: number };
+  randomOffset?: number;
+  gridUnits?: boolean;
+  local?: boolean;
+  cacheLocation?: boolean;
+  ignoreMotion?: boolean;
+  [key: string]: any;
+}
+
+export interface EffectAttachToOptions {
+  align?: string;
+  edge?: string;
+  offset?: { x?: number; y?: number };
+  randomOffset?: number;
+  gridUnits?: boolean;
+  local?: boolean;
+  followRotation?: boolean;
+  bindVisibility?: boolean;
+  bindAlpha?: boolean;
+  bindElevation?: boolean;
+  bindRotation?: boolean;
+  ignoreMotion?: boolean;
+  [key: string]: any;
+}
+
+export interface EffectTargetOptions {
+  attachTo?: boolean;
+  onlyX?: boolean;
+  tiling?: boolean;
+  offset?: { x?: number; y?: number };
+  randomOffset?: number;
+  gridUnits?: boolean;
+  local?: boolean;
+  cacheLocation?: boolean;
+  ignoreMotion?: boolean;
   [key: string]: any;
 }
 
 export interface EffectSection {
   file(file: string | Function): EffectSection;
   name(name: string): EffectSection;
-  atLocation(location: any, options?: any): EffectSection;
-  attachTo(target: any, options?: any): EffectSection;
-  stretchTo(target: any, options?: any): EffectSection;
+  atLocation(location: any, options?: EffectLocationOptions): EffectSection;
+  attachTo(target: any, options?: EffectAttachToOptions): EffectSection;
+  stretchTo(target: any, options?: EffectTargetOptions): EffectSection;
   scale(scale: number | { x?: number; y?: number }): EffectSection;
   scaleToObject(scale?: number, options?: any): EffectSection;
   size(size: number | { width?: number; height?: number }, options?: any): EffectSection;
@@ -90,7 +248,7 @@ export interface EffectSection {
   rotate(angle: number): EffectSection;
   rotateIn(angle: number, duration: number, options?: any): EffectSection;
   rotateOut(angle: number, duration: number, options?: any): EffectSection;
-  rotateTowards(target: any, options?: any): EffectSection;
+  rotateTowards(target: any, options?: EffectTargetOptions): EffectSection;
   randomRotation(): EffectSection;
   randomizeMirrorX(): EffectSection;
   mirrorX(mirror?: boolean): EffectSection;
@@ -102,7 +260,7 @@ export interface EffectSection {
   playbackRate(rate: number): EffectSection;
   repeats(count: number, delayMin?: number, delayMax?: number): EffectSection;
   filter(filterType: string, options?: any): EffectSection;
-  mask(target: any): EffectSection;
+  mask(target?: any): EffectSection;
   tint(color: string | number): EffectSection;
   belowTokens(below?: boolean): EffectSection;
   aboveLighting(above?: boolean): EffectSection;
@@ -111,6 +269,7 @@ export interface EffectSection {
   locally(locally?: boolean): EffectSection;
   zIndex(index: number): EffectSection;
   persist(persist?: boolean, options?: any): EffectSection;
+  tieToDocuments(documents: any | any[]): EffectSection;
   private(isPrivate?: boolean): EffectSection;
   waitUntilFinished(delay?: number): EffectSection;
   copySprite(target: any): EffectSection;
@@ -131,14 +290,14 @@ export interface EffectSection {
 
   // Root Sequence chaining extensions
   effect(file?: string | Function): EffectSection;
-  motion(target: any): MotionSection;
+  motion(target?: any): MotionSection;
   animation(target?: any): AnimationSection;
   sound(file?: string): SoundSection;
   wait(duration?: number): SequenceBuilder;
   thenDo(callback: () => void | Promise<void>): SequenceBuilder;
   canvasPan(options?: any): SequenceBuilder;
   shake(options?: any): SequenceBuilder;
-  play(options?: { preload?: boolean }): Promise<void>;
+  play(options?: { preload?: boolean; local?: boolean; remote?: boolean }): Promise<void>;
   addSequence(sequence: any): SequenceBuilder;
   [key: string]: any;
 }
@@ -146,9 +305,14 @@ export interface EffectSection {
 export interface AnimationSection {
   on(target: any): AnimationSection;
   teleportTo(location: any, options?: any): AnimationSection;
+  moveTowards(location: any, options?: any): AnimationSection;
   snapToGrid(snap?: boolean): AnimationSection;
   offset(offset: { x?: number; y?: number }): AnimationSection;
   opacity(opacity: number): AnimationSection;
+  rotate(angle: number): AnimationSection;
+  tint(color: string | number): AnimationSection;
+  fadeIn(duration: number, options?: any): AnimationSection;
+  fadeOut(duration: number, options?: any): AnimationSection;
   duration(duration: number): AnimationSection;
   waitUntilFinished(delay?: number): AnimationSection;
   show(show?: boolean): AnimationSection;
@@ -157,20 +321,24 @@ export interface AnimationSection {
 
   // Root Sequence chaining extensions
   effect(file?: string | Function): EffectSection;
-  motion(target: any): MotionSection;
+  motion(target?: any): MotionSection;
   animation(target?: any): AnimationSection;
   sound(file?: string): SoundSection;
   wait(duration?: number): SequenceBuilder;
   thenDo(callback: () => void | Promise<void>): SequenceBuilder;
   canvasPan(options?: any): SequenceBuilder;
   shake(options?: any): SequenceBuilder;
-  play(options?: { preload?: boolean }): Promise<void>;
+  play(options?: { preload?: boolean; local?: boolean; remote?: boolean }): Promise<void>;
   addSequence(sequence: any): SequenceBuilder;
   [key: string]: any;
 }
 
 export interface SoundSection {
   file(file: string): SoundSection;
+  atLocation(location: any, options?: EffectLocationOptions): SoundSection;
+  attachTo(target: any, options?: EffectAttachToOptions): SoundSection;
+  toLocation(location: any, options?: EffectLocationOptions): SoundSection;
+  tieToDocuments(documents: any | any[]): SoundSection;
   volume(vol: number): SoundSection;
   fadeInAudio(duration: number): SoundSection;
   fadeOutAudio(duration: number): SoundSection;
@@ -184,21 +352,21 @@ export interface SoundSection {
 
   // Root Sequence chaining extensions
   effect(file?: string | Function): EffectSection;
-  motion(target: any): MotionSection;
+  motion(target?: any): MotionSection;
   animation(target?: any): AnimationSection;
   sound(file?: string): SoundSection;
   wait(duration?: number): SequenceBuilder;
   thenDo(callback: () => void | Promise<void>): SequenceBuilder;
   canvasPan(options?: any): SequenceBuilder;
   shake(options?: any): SequenceBuilder;
-  play(options?: { preload?: boolean }): Promise<void>;
+  play(options?: { preload?: boolean; local?: boolean; remote?: boolean }): Promise<void>;
   addSequence(sequence: any): SequenceBuilder;
   [key: string]: any;
 }
 
 export interface SequenceBuilder {
   effect(file?: string | Function): EffectSection;
-  motion(target: any): MotionSection;
+  motion(target?: any): MotionSection;
   animation(target?: any): AnimationSection;
   sound(file?: string): SoundSection;
   wait(duration?: number): SequenceBuilder;
@@ -207,7 +375,7 @@ export interface SequenceBuilder {
   shake(options?: any): SequenceBuilder;
   preset(name: string, ...args: any[]): SequenceBuilder;
   addSequence(sequence: any): SequenceBuilder;
-  play(options?: { preload?: boolean }): Promise<void>;
+  play(options?: { preload?: boolean; local?: boolean; remote?: boolean }): Promise<void>;
   [key: string]: any;
 }
 

@@ -1,11 +1,11 @@
-import { FoundryV12Adapter } from './foundry-v12-adapter.js';
+import { BaseFoundryAdapter } from './base-foundry-adapter.js';
 
 /**
- * Foundry VTT V13 platform adapter.
- * Extends FoundryV12Adapter and encapsulates capabilities and API changes introduced in Foundry V13,
- * including namespaced constructors, modern UUID resolution, and plural combatant lookup.
+ * Foundry VTT V13 platform baseline adapter.
+ * Extends BaseFoundryAdapter and provides namespaced constructors, modern UUID resolution,
+ * plural combatant lookup, top-left tile math, MeasuredTemplate extraction, and -= deletion syntax for Foundry V13.
  */
-export class FoundryV13Adapter extends FoundryV12Adapter {
+export class FoundryV13Adapter extends BaseFoundryAdapter {
     /**
      * The active ContextMenu constructor in v13+.
      */
@@ -87,6 +87,161 @@ export class FoundryV13Adapter extends FoundryV12Adapter {
      */
     override async loadTemplates(paths: string[]): Promise<Function[]> {
         return foundry.applications.handlebars.loadTemplates(paths);
+    }
+
+    /* -------------------------------------------- */
+    /*  Tile Anchor & Coordinate Math (V13)         */
+    /* -------------------------------------------- */
+
+    /**
+     * Calculate reveal tile placement offset for Foundry V13 (top-left anchor (0, 0)).
+     * Compares token/tile size and scale to offset top-left origin.
+     *
+     * @param {PlaceableObject} object Token or Tile placeable
+     * @param {number} [scale=1] Additional scale multiplier
+     * @returns {{x: number, y: number}} Offset coordinates
+     */
+    override getRevealOffset(object: any, scale = 1) {
+        if (!object) return { x: 0, y: 0 };
+        const doc = object.document;
+        const isToken = this.isDocumentOfType(object, 'Token');
+        const widthAdjustment = isToken ? this.getGridSize() : 1;
+        const scaleXY = doc.texture?.scaleX ?? 1;
+        const totalScale = scaleXY * scale;
+        const objX = object.x;
+        const objY = object.y;
+        const docWidth = doc.width ?? 1;
+        const docHeight = doc.height ?? 1;
+
+        return {
+            x: objX - (widthAdjustment * docWidth * (totalScale - 1) / 2),
+            y: objY - (widthAdjustment * docHeight * (totalScale - 1) / 2)
+        };
+    }
+
+    /**
+     * Calculate shape tile placement offset for Foundry V13 (top-left anchor (0, 0)).
+     *
+     * @param {PlaceableObject} object Token or Tile placeable
+     * @returns {{x: number, y: number}} Offset coordinates
+     */
+    override getShapeOffset(object: any) {
+        if (!object) return { x: 0, y: 0 };
+        return {
+            x: object.x,
+            y: object.y
+        };
+    }
+
+    /* -------------------------------------------- */
+    /*  Template Position Extraction (V13)          */
+    /* -------------------------------------------- */
+
+    /**
+     * Gets position coordinates from a MeasuredTemplate or Tile document/placeable.
+     *
+     * @param {MeasuredTemplate} template The MeasuredTemplate placeable or document
+     * @param {Object} [config={}] Configuration options
+     * @returns {[ {x: number, y: number}, {x: number, y: number}, {x: number, y: number} ]} Array of [primary, secondary, center] coordinates
+     */
+    override getTemplatePosition(template: any, config: any = {}): any {
+        if (!template || typeof template !== 'object') return [];
+
+        const doc = template.document ? template.document : template;
+        const placeable = template.object ? template.object : (template.document ? template : null);
+
+        const isTile = this.isDocumentOfType(template, 'Tile') || doc?.documentName === 'Tile' || Boolean(doc?.texture && !doc?.shapes);
+        if (isTile) {
+            const center = this.getCenter(template);
+            const token = config.token ?? config.sourceToken;
+            const tokenCenter = token ? this.getCenter(token) : null;
+            const primary = tokenCenter ?? center;
+            let secondary = tokenCenter ? center : undefined;
+            if (tokenCenter && secondary && Math.hypot(secondary.x - primary.x, secondary.y - primary.y) < 1) {
+                secondary = { x: primary.x + this.getGridSize(), y: primary.y };
+            }
+            return this.resolveDistinctPositions([primary, secondary, center], config, template);
+        }
+
+        const farpoint = placeable?.ray?.B ?? doc?.ray?.B ?? template.ray?.B;
+
+        let primary = {
+            x: doc.x ?? placeable?.x ?? 0,
+            y: doc.y ?? placeable?.y ?? 0
+        };
+
+        const distance = (doc.distance !== undefined && doc.distance > 0)
+            ? doc.distance
+            : ((placeable?.distance !== undefined && placeable.distance > 0) ? placeable.distance : (config.distance ?? 0));
+        const direction = doc.direction ?? placeable?.direction ?? config.direction ?? 0;
+        const { size: gridSize, distance: gridDistance } = this.getSceneDimensions(canvas?.scene);
+        const distancePx = (distance / gridDistance) * gridSize;
+        const rad = (direction * Math.PI) / 180;
+
+        let secondary;
+        if (farpoint && (farpoint.x !== primary.x || farpoint.y !== primary.y)) {
+            secondary = { x: farpoint.x, y: farpoint.y };
+        } else if (distancePx > 0) {
+            secondary = {
+                x: primary.x + Math.cos(rad) * distancePx,
+                y: primary.y + Math.sin(rad) * distancePx
+            };
+        } else {
+            const token = config.token ?? config.sourceToken;
+            const tokenCenter = token ? this.getCenter(token) : null;
+            if (tokenCenter && Math.hypot(primary.x - tokenCenter.x, primary.y - tokenCenter.y) >= 1) {
+                secondary = primary;
+                primary = { x: tokenCenter.x, y: tokenCenter.y };
+            }
+        }
+
+        const width = doc.width ?? placeable?.width ?? 0;
+        const height = Math.sqrt(Math.max(0, distance * distance - width * width));
+
+        const center = {
+            x: primary.x + (width / 2) * (gridSize / gridDistance),
+            y: primary.y + (height / 2) * (gridSize / gridDistance)
+        };
+
+        return [primary, secondary, center];
+    }
+
+    /* -------------------------------------------- */
+    /*  Scene Background (V13)                      */
+    /* -------------------------------------------- */
+
+    /**
+     * Retrieve the background texture and offsets for a scene on Foundry V13 (Scene#background).
+     * @param {Scene} [scene=canvas.scene] Target scene document
+     * @param {Level|null} [_level=null] Unused in V13
+     * @returns {{ src: string|null, offsetX: number, offsetY: number }}
+     */
+    override getSceneBackground(scene: any = canvas?.scene, _level: any = null): any {
+        if (!scene) return { src: null, offsetX: 0, offsetY: 0 };
+        const bg = scene.background;
+        const src = typeof bg?.src === 'string' ? bg.src : (typeof bg === 'string' ? bg : null);
+        return {
+            src,
+            offsetX: Number(bg?.offsetX ?? 0),
+            offsetY: Number(bg?.offsetY ?? 0)
+        };
+    }
+
+    /* -------------------------------------------- */
+    /*  Document Deletion Format (V13)              */
+    /* -------------------------------------------- */
+
+    /**
+     * Format a document update payload to delete/remove a specific property key.
+     * In Foundry V13, formats using "-=<keyId>" deletion syntax.
+     *
+     * @param {string} path Dot-delimited parent property path (e.g. "flags.eskie-macros.token-masks")
+     * @param {string} keyId The property key to delete
+     * @returns {Record<string, *>} Update dictionary
+     */
+    override formatDeletionUpdate(path: string, keyId: string): Record<string, any> {
+        const fullKey = path ? `${path}.-=${keyId}` : `-=${keyId}`;
+        return { [fullKey]: null };
     }
 
     /**

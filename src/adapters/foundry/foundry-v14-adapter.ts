@@ -105,10 +105,13 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
             const shape = shapes[0] ?? doc.toObject?.()?.shapes?.[0] ?? null;
             const regionBounds = this.getRegionBounds(template);
 
-            let primary = {
-                x: shape?.x ?? doc.x ?? template.x ?? regionBounds.center.x,
-                y: shape?.y ?? doc.y ?? template.y ?? regionBounds.center.y
-            };
+            const isAreaShape = shape?.type === 'rectangle' || shape?.type === 'polygon';
+            let primary = isAreaShape
+                ? { x: regionBounds.center.x, y: regionBounds.center.y }
+                : {
+                    x: shape?.x ?? doc.x ?? regionBounds.center.x,
+                    y: shape?.y ?? doc.y ?? regionBounds.center.y
+                };
             const center = {
                 x: shape?.center?.x ?? doc.center?.x ?? template.center?.x ?? regionBounds.center.x,
                 y: shape?.center?.y ?? doc.center?.y ?? template.center?.y ?? regionBounds.center.y

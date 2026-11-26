@@ -146,9 +146,9 @@ export class FoundryV12Adapter extends BaseFoundryAdapter {
             const center = this.getCenter(template);
             const token = config.token ?? config.sourceToken;
             const tokenCenter = token ? this.getCenter(token) : null;
-            let primary = tokenCenter ?? { x: doc.x ?? 0, y: doc.y ?? 0 };
-            let secondary = center;
-            if (tokenCenter && Math.hypot(secondary.x - primary.x, secondary.y - primary.y) < 1) {
+            const primary = tokenCenter ?? center;
+            let secondary = tokenCenter ? center : undefined;
+            if (tokenCenter && secondary && Math.hypot(secondary.x - primary.x, secondary.y - primary.y) < 1) {
                 secondary = { x: primary.x + this.getGridSize(), y: primary.y };
             }
             return this.resolveDistinctPositions([primary, secondary, center], config, template);

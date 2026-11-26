@@ -61,6 +61,7 @@ declare global {
   type ConcreteToken = import('./animation.js').ConcreteToken;
   type ConcreteTile = import('./animation.js').ConcreteTile;
   type CasterProxy = import('./animation.js').CasterProxy;
+  type TargetProxy = import('./animation.js').TargetProxy;
   type AnimationEffectModule<TConfig = Record<string, unknown>> = import('./animation.js').AnimationEffectModule<TConfig>;
   type TrapModule<TConfig extends TrapConfig = TrapConfig> = import('./animation.js').TrapModule<TConfig>;
   type SummonOptions = import('./animation.js').SummonOptions;

@@ -1142,15 +1142,17 @@ export class BaseFoundryAdapter {
         if (Math.abs(el1 - el2) > maxElevationDiff) return false;
 
         // Bounding boxes in canvas coordinates
-        const x1Min = token.x;
-        const x1Max = token.x + token.w;
-        const y1Min = token.y;
-        const y1Max = token.y + token.h;
+        const topLeft1 = this._getPlaceableTopLeft(token);
+        const x1Min = topLeft1.x;
+        const x1Max = x1Min + token.w;
+        const y1Min = topLeft1.y;
+        const y1Max = y1Min + token.h;
 
-        const x2Min = target.x;
-        const x2Max = target.x + target.w;
-        const y2Min = target.y;
-        const y2Max = target.y + target.h;
+        const topLeft2 = this._getPlaceableTopLeft(target);
+        const x2Min = topLeft2.x;
+        const x2Max = x2Min + target.w;
+        const y2Min = topLeft2.y;
+        const y2Max = y2Min + target.h;
 
         // Gaps between bounding boxes in pixels
         const gapX = Math.max(0, x2Min - x1Max, x1Min - x2Max);
@@ -1162,6 +1164,26 @@ export class BaseFoundryAdapter {
             : (gridSize * 0.1);
 
         return gapX <= maxGapPx && gapY <= maxGapPx;
+    }
+
+    /**
+     * Resolves top-left canvas coordinates for a Token or centered trap proxy.
+     * Trap proxies store center coordinates in x/y for Sequencer, so top-left is derived from center - w/2.
+     * @param {Token|CasterProxy|TargetProxy} placeable
+     * @returns {{ x: number, y: number }}
+     * @private
+     */
+    private _getPlaceableTopLeft(placeable: any): { x: number; y: number } {
+        if (placeable.isTrapCasterProxy || placeable.isTrapTargetProxy) {
+            const w = placeable.w ?? this.getGridSize();
+            const h = placeable.h ?? this.getGridSize();
+            const center = placeable.center ?? { x: placeable.x ?? 0, y: placeable.y ?? 0 };
+            return { x: center.x - w / 2, y: center.y - h / 2 };
+        }
+        return {
+            x: placeable.x ?? placeable.document?.x ?? 0,
+            y: placeable.y ?? placeable.document?.y ?? 0
+        };
     }
 
     /**
@@ -1204,14 +1226,15 @@ export class BaseFoundryAdapter {
 
         const w = target.document.width ?? 1;
         const h = target.document.height ?? 1;
+        const targetTopLeft = this._getPlaceableTopLeft(target);
 
         let bestPoint: { x: number, y: number } | null = null;
         let bestDist2 = Infinity;
 
         for (let gx = 0; gx < w; gx++) {
             for (let gy = 0; gy < h; gy++) {
-                const cx = target.x + (gx + 0.5) * gs;
-                const cy = target.y + (gy + 0.5) * gs;
+                const cx = targetTopLeft.x + (gx + 0.5) * gs;
+                const cy = targetTopLeft.y + (gy + 0.5) * gs;
 
                 const dx = cx - srcCenter.x;
                 const dy = cy - srcCenter.y;
@@ -1253,8 +1276,9 @@ export class BaseFoundryAdapter {
         const gridSize = this.getGridSize();
         const tWidth = token.document.width ?? 1;
         const tHeight = token.document.height ?? 1;
-        const tX = token.document.x ?? token.x;
-        const tY = token.document.y ?? token.y;
+        const tokenTopLeft = this._getPlaceableTopLeft(token);
+        const tX = tokenTopLeft.x;
+        const tY = tokenTopLeft.y;
 
         const getCenterPoint = (pt: { x: number, y: number }) => {
             if ((canvas as any)?.grid?.getCenterPoint) return (canvas as any).grid.getCenterPoint(pt);
@@ -1602,6 +1626,14 @@ export class BaseFoundryAdapter {
         if (!object) {
             return { minX: 0, maxX: 0, minY: 0, maxY: 0, center: { x: 0, y: 0 }, width: 0, height: 0, anchor: { x: 0.5, y: 0.5 } };
         }
+        if (object.isTrapCasterProxy || object.isTrapTargetProxy) {
+            const width = object.w ?? this.getGridSize();
+            const height = object.h ?? this.getGridSize();
+            const center = object.center ?? { x: object.x ?? 0, y: object.y ?? 0 };
+            const minX = center.x - width / 2;
+            const minY = center.y - height / 2;
+            return { minX, maxX: minX + width, minY, maxY: minY + height, center, width, height, anchor: { x: 0.5, y: 0.5 } };
+        }
         const doc = object.document ? object.document : object;
         const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(object.shapes) || (Boolean(doc.bounds) && !doc.texture);
         if (isRegion) {
@@ -1759,8 +1791,21 @@ export class BaseFoundryAdapter {
     }
 
     /**
-     * Constructs a Token-compatible proxy object from a Tile, Region, or Document.
-     * Stands in for a caster token in animation routines (e.g. template or targeted spells fired from traps).
+     * Normalizes Foundry numeric or Region range elevations ({ bottom, top }) into a finite scalar number.
+     * @param {number|{ bottom?: number | null, top?: number | null }|null|undefined} rawElevation
+     * @returns {number}
+     * @private
+     */
+    private _normalizeElevation(rawElevation: any): number {
+        const numericElevation = rawElevation?.bottom !== undefined ? rawElevation.bottom : rawElevation;
+        return Number.isFinite(numericElevation) ? numericElevation : 0;
+    }
+
+    /**
+     * Constructs a Token-compatible Sequencer-safe synthetic proxy object from a Tile, Region, or Document.
+     * Uses `cachedLocation: true`, a synthetic non-Foundry UUID, and uniform 1x1 Medium-caster dimensions so
+     * Sequencer `.atLocation`, `.attachTo`, `.scaleToObject`, and `.mask()` behave identically across
+     * V14 Regions and MATT Tiles (including hidden tiles, non-square rectangles, and polygon Regions).
      *
      * @param {PlaceableObject|Document|null} placeable Origin Tile, Region, or Token
      * @param {{ x: number, y: number }|null} [targetLocation=null] Optional destination coordinates to orient rotation towards
@@ -1775,37 +1820,21 @@ export class BaseFoundryAdapter {
         }
 
         const doc = placeable.document ? placeable.document : placeable;
-        const center = this.getTargetLocation(placeable) ?? this.getCenter(placeable) ?? { x: doc.x ?? 0, y: doc.y ?? 0 };
+        const rawCenter = this.getTargetLocation(placeable) ?? this.getCenter(placeable) ?? { x: doc.x ?? 0, y: doc.y ?? 0 };
+        const center = { x: rawCenter.x, y: rawCenter.y };
         const gridSize = this.getGridSize();
 
         const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(placeable.shapes);
-        const isTile = this.isDocumentOfType(placeable, 'Tile') || doc.documentName === 'Tile' || Boolean(doc.texture && !doc.shapes);
 
-        let widthUnits = 1;
-        let heightUnits = 1;
-        let widthPx = gridSize;
-        let heightPx = gridSize;
-
-        if (isRegion) {
-            const bounds = this.getRegionBounds(placeable);
-            widthPx = bounds.width;
-            heightPx = bounds.height;
-            widthUnits = Math.max(1, widthPx / gridSize);
-            heightUnits = Math.max(1, heightPx / gridSize);
-        } else if (isTile) {
-            widthPx = doc.width ?? placeable.w ?? gridSize;
-            heightPx = doc.height ?? placeable.h ?? gridSize;
-            widthUnits = Math.max(1, widthPx / gridSize);
-            heightUnits = Math.max(1, heightPx / gridSize);
-        } else {
-            widthUnits = doc.width ?? 1;
-            heightUnits = doc.height ?? 1;
-            widthPx = placeable.w ?? (widthUnits * gridSize);
-            heightPx = placeable.h ?? (heightUnits * gridSize);
-        }
+        // Uniform 1x1 Medium-caster footprint prevents non-square Region/Tile stretching,
+        // polygon NaN dimensions, and multi-grid hallway offset inflation.
+        const widthUnits = 1;
+        const heightUnits = 1;
+        const widthPx = gridSize;
+        const heightPx = gridSize;
 
         let rotation = doc.rotation ?? placeable.rotation ?? 0;
-        if (targetLocation && typeof targetLocation.x === 'number' && typeof targetLocation.y === 'number') {
+        if (targetLocation && Number.isFinite(targetLocation.x) && Number.isFinite(targetLocation.y)) {
             const dx = targetLocation.x - center.x;
             const dy = targetLocation.y - center.y;
             if (Math.hypot(dx, dy) >= 1) {
@@ -1813,14 +1842,17 @@ export class BaseFoundryAdapter {
             }
         }
 
-        const docName = typeof doc.name === 'string' && doc.name.trim().length > 0 ? doc.name.trim() : null;
-        const placeableName = typeof placeable.name === 'string' && placeable.name.trim().length > 0 ? placeable.name.trim() : null;
-        const name = docName ?? placeableName ?? 'Trap Origin';
+        const trimmedDocName = doc.name?.trim?.() ?? '';
+        const trimmedPlaceableName = placeable.name?.trim?.() ?? '';
+        const name = trimmedDocName.length > 0
+            ? trimmedDocName
+            : (trimmedPlaceableName.length > 0 ? trimmedPlaceableName : 'Trap Origin');
         const id = doc.id ?? placeable.id ?? 'trap-origin';
-        const uuid = doc.uuid ?? placeable.uuid ?? `TrapOrigin.${id}`;
+        const uuid = `TrapOrigin.${id}`;
         const textureSrc = doc.texture?.src ?? placeable.texture?.src ?? '';
         const scaleX = doc.texture?.scaleX ?? 1;
         const scaleY = doc.texture?.scaleY ?? 1;
+        const elevation = this._normalizeElevation(doc.elevation ?? placeable.elevation ?? 0);
 
         return {
             id,
@@ -1831,8 +1863,13 @@ export class BaseFoundryAdapter {
             y: center.y,
             w: widthPx,
             h: heightPx,
+            width: widthPx,
+            height: heightPx,
             rotation,
+            elevation,
+            cachedLocation: true,
             isTrapCasterProxy: true,
+            isRegionOrigin: isRegion,
             document: {
                 id,
                 _id: id,
@@ -1845,42 +1882,39 @@ export class BaseFoundryAdapter {
                 width: widthUnits,
                 height: heightUnits,
                 rotation,
-                elevation: doc.elevation ?? placeable.elevation ?? 0,
+                elevation,
                 texture: {
                     src: textureSrc,
                     scaleX,
                     scaleY,
                 },
-                update: async (data: any) => doc.update?.(data) ?? placeable.update?.(data),
+                update: async () => null,
                 getFlag: (scope: string, key: string) => doc.getFlag?.(scope, key),
                 setFlag: (scope: string, key: string, val: any) => doc.setFlag?.(scope, key, val),
             },
             actor: null,
-            object: placeable.object ?? placeable,
         };
     }
 
     /**
-     * Creates a lightweight Token-like proxy object for animation effect targets,
-     * ensuring at minimum a 1x1 token scale contract.
+     * Creates a lightweight Token-like Sequencer-safe synthetic proxy object for animation effect targets,
+     * ensuring at minimum a 1x1 token scale contract without leaking live Region/Tile/Token UUIDs.
      *
      * @param {PlaceableObject|Document|object|null} target Target Token, Tile, Region, or coordinate
      * @param {object} [options={}] Optional configuration
      * @param {{ x: number, y: number }|null} [options.center=null] Center coordinates override
      * @param {number} [options.minUnits=1] Minimum width/height in grid units (default 1)
-     * @returns {object}
+     * @returns {TargetProxy}
      */
     createTargetProxy(target: any, options: { center?: { x: number; y: number } | null; minUnits?: number } = {}): any {
         const minUnits = options.minUnits ?? 1;
         const gridSize = this.getGridSize();
 
-        let center = options.center ?? (target ? this.getCenter(target) : null);
-        if (!center && target && typeof target.x === 'number' && typeof target.y === 'number') {
-            center = { x: target.x, y: target.y };
+        let rawCenter = options.center ?? (target ? this.getCenter(target) : null);
+        if (!rawCenter && target && Number.isFinite(target.x) && Number.isFinite(target.y)) {
+            rawCenter = { x: target.x, y: target.y };
         }
-        if (!center) {
-            center = { x: 0, y: 0 };
-        }
+        const center = rawCenter ? { x: rawCenter.x, y: rawCenter.y } : { x: 0, y: 0 };
 
         let widthUnits = minUnits;
         let heightUnits = minUnits;
@@ -1896,20 +1930,22 @@ export class BaseFoundryAdapter {
                 heightUnits = Math.max(minUnits, tokenDims.heightUnits);
             } else if (isRegion) {
                 const bounds = this.getRegionBounds(target);
-                widthUnits = Math.max(minUnits, bounds.width / gridSize);
-                heightUnits = Math.max(minUnits, bounds.height / gridSize);
+                const uniformSpan = Math.max(minUnits, Math.min(bounds.width, bounds.height) / gridSize);
+                widthUnits = uniformSpan;
+                heightUnits = uniformSpan;
             } else if (isTile) {
                 const doc = target.document ? target.document : target;
                 const widthPx = doc.width ?? target.w ?? gridSize;
                 const heightPx = doc.height ?? target.h ?? gridSize;
-                widthUnits = Math.max(minUnits, widthPx / gridSize);
-                heightUnits = Math.max(minUnits, heightPx / gridSize);
+                const uniformSpan = Math.max(minUnits, Math.min(widthPx, heightPx) / gridSize);
+                widthUnits = uniformSpan;
+                heightUnits = uniformSpan;
             } else if (target.document) {
                 const doc = target.document;
                 const width = doc.width ?? target.w ?? 1;
                 const height = doc.height ?? target.h ?? 1;
-                widthUnits = Math.max(minUnits, typeof width === 'number' && width > 10 ? width / gridSize : width);
-                heightUnits = Math.max(minUnits, typeof height === 'number' && height > 10 ? height / gridSize : height);
+                widthUnits = Math.max(minUnits, Number.isFinite(width) && width > 10 ? width / gridSize : width);
+                heightUnits = Math.max(minUnits, Number.isFinite(height) && height > 10 ? height / gridSize : height);
             }
         }
 
@@ -1917,11 +1953,14 @@ export class BaseFoundryAdapter {
         const heightPx = heightUnits * gridSize;
 
         const doc = target?.document ? target.document : target;
-        const docName = typeof doc?.name === 'string' && doc.name.trim().length > 0 ? doc.name.trim() : null;
-        const targetName = typeof target?.name === 'string' && target.name.trim().length > 0 ? target.name.trim() : null;
-        const name = docName ?? targetName ?? 'Target';
+        const trimmedDocName = doc?.name?.trim?.() ?? '';
+        const trimmedTargetName = target?.name?.trim?.() ?? '';
+        const name = trimmedDocName.length > 0
+            ? trimmedDocName
+            : (trimmedTargetName.length > 0 ? trimmedTargetName : 'Target');
         const id = doc?.id ?? target?.id ?? 'target-proxy';
-        const uuid = doc?.uuid ?? target?.uuid ?? `TargetProxy.${id}`;
+        const uuid = `TargetProxy.${id}`;
+        const elevation = this._normalizeElevation(doc?.elevation ?? target?.elevation ?? 0);
 
         return {
             id,
@@ -1932,7 +1971,11 @@ export class BaseFoundryAdapter {
             y: center.y,
             w: widthPx,
             h: heightPx,
+            width: widthPx,
+            height: heightPx,
             rotation: doc?.rotation ?? target?.rotation ?? 0,
+            elevation,
+            cachedLocation: true,
             isTrapTargetProxy: true,
             document: {
                 id,
@@ -1946,18 +1989,17 @@ export class BaseFoundryAdapter {
                 width: widthUnits,
                 height: heightUnits,
                 rotation: doc?.rotation ?? target?.rotation ?? 0,
-                elevation: doc?.elevation ?? target?.elevation ?? 0,
+                elevation,
                 texture: {
                     src: doc?.texture?.src ?? target?.texture?.src ?? '',
                     scaleX: 1,
                     scaleY: 1,
                 },
-                update: async (data: any) => doc?.update?.(data) ?? target?.update?.(data),
+                update: async () => null,
                 getFlag: (scope: string, key: string) => doc?.getFlag?.(scope, key),
                 setFlag: (scope: string, key: string, val: any) => doc?.setFlag?.(scope, key, val),
             },
-            actor: target?.actor ?? null,
-            object: target?.object ?? target,
+            actor: null,
         };
     }
 }

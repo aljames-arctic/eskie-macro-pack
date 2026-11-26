@@ -5,6 +5,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
+import { resolveMotionTarget } from '../../utils/motion.js';
 
 const DEFAULT_CONFIG = {
     id: 'tripAttack',
@@ -29,6 +30,7 @@ async function create(token: Token, target: Token, config: any = {}) {
     if (!targetSquare) return;
     const tokenWidth = adapter.getTokenDimensions(token).widthUnits;
     const targetRotation = adapter.getTokenRotation(target);
+    const motionTarget = resolveMotionTarget(target);
 
     const sequence = new Sequence();
     applySound(sequence, sound);
@@ -42,14 +44,9 @@ async function create(token: Token, target: Token, config: any = {}) {
             .spriteOffset({ x: effectOffset * tokenWidth }, { gridUnits: true })
             .zIndex(1)
 
-        .animation()
-            .delay(100)
-            .on(target)
-            .opacity(0)
-
         .effect()
             .copySprite(target)
-            .attachTo(target, { bindAlpha: false, bindRotation: false, local: false })
+            .attachTo(target, { bindAlpha: false, bindRotation: false, local: false, ignoreMotion: true })
             .scaleToObject(0.9, { considerTokenScale: true })
             .zIndex(0.1)
             .belowTokens()
@@ -61,27 +58,40 @@ async function create(token: Token, target: Token, config: any = {}) {
         .effect()
             .delay(100)
             .file(closest(`eskie.damage.${type}.01.yellow`))
-            .attachTo(target, { bindAlpha: false, bindRotation: false })
+            .attachTo(target, { bindAlpha: false, bindRotation: false, ignoreMotion: true })
             .scaleToObject(2, { considerTokenScale: true })
             .opacity(1)
             .zIndex(1)
             .belowTokens()
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.5, duration: 500, ease: 'easeOutCubic', gridUnits: true })
+            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.5, duration: 500, ease: 'easeOutCubic', gridUnits: true });
 
-        .effect()
-            .copySprite(target)
-            .attachTo(target, { bindAlpha: false, bindRotation: false, local: false })
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.5, duration: 500, ease: 'easeOutCubic', delay: 100, gridUnits: true })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: 0.5, duration: 250, ease: 'easeOutCubic', delay: 600, gridUnits: true })
-            .animateProperty('sprite', 'rotation', { from: 0, to: 90, duration: 250, ease: 'easeOutCubic', delay: 100 })
+    if (motionTarget) {
+        sequence
+            .motion(motionTarget)
             .zIndex(2)
-            .duration(1200)
-            .waitUntilFinished(-500)
+            .moveBy(
+                [
+                    { v: { x: 0, y: 0 } },
+                    { v: { x: 0, y: -0.5 }, duration: 500, inEase: 'easeOutCubic' },
+                    { v: { x: 0, y: 0 }, duration: 250, inEase: 'easeOutCubic' },
+                ],
+                { gridUnits: true, delay: 100, return: false }
+            )
+            .rotateBy(90, {
+                delay: 100,
+                duration: 250,
+                ease: 'easeOutCubic',
+                return: false,
+            })
+            .persistUntilUpdate();
+    }
+
+    sequence
+        .wait(700)
 
         .effect()
             .file(closest('eskie.smoke.03.white'))
-            .attachTo(target, { bindAlpha: false, bindRotation: false })
+            .attachTo(target, { bindAlpha: false, bindRotation: false, ignoreMotion: true })
             .scaleToObject(2, { considerTokenScale: true })
             .opacity(0.8)
             .belowTokens()
@@ -89,7 +99,6 @@ async function create(token: Token, target: Token, config: any = {}) {
         .animation()
             .delay(300)
             .on(target)
-            .opacity(1)
             .rotate(targetRotation + 90);
 
     return sequence;

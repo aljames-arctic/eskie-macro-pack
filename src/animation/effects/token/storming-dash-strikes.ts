@@ -6,7 +6,7 @@
 import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
-
+import { resolveMotionTarget, computeCenterDelta, endEffectsAndMotions } from '../../utils/motion.js';
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
@@ -44,10 +44,17 @@ async function create(source: Token, config: any = {}) {
     applySound(sequence, sound);
     if (!dashPositions || !dashPositions.length) return sequence;
 
+    const sourceCenter = adapter.getCenter(source);
+    const motionSource = resolveMotionTarget(source);
+
     for (let e = 0; e < dashPositions.length; e++) {
         const stepSeq = new Sequence();
-        const startPos = e === 0 ? source : dashPositions[e - 1];
+        const startPos = e === 0 ? sourceCenter : dashPositions[e - 1];
         const endPos = dashPositions[e];
+        const stepDelta = { x: endPos.x - startPos.x, y: endPos.y - startPos.y };
+        const stepDist = Math.hypot(stepDelta.x, stepDelta.y);
+        const moveDuration = Math.max(1, Math.round((stepDist / 1500) * 1000));
+        const isLast = e === dashPositions.length - 1;
 
         // Line Behind 1
         stepSeq.effect()
@@ -92,18 +99,12 @@ async function create(source: Token, config: any = {}) {
             .waitUntilFinished(-1900);
 
         if (e === 0) {
-            // First dash: hide source token
-            stepSeq.animation()
-                .on(source)
-                .opacity(0)
-                .snapToGrid();
-
-            // Ghost token movement 1
+            // Blurred ghost trail on first dash
             stepSeq.effect()
                 .copySprite(source)
                 .spriteRotation(-source.document.rotation)
                 .name('Storm Dash Strikes')
-                .atLocation(source)
+                .atLocation(sourceCenter)
                 .moveTowards(endPos, { rotate: false, ease: 'easeOutCirc' })
                 .moveSpeed(1500)
                 .duration(400)
@@ -124,80 +125,7 @@ async function create(source: Token, config: any = {}) {
                 .spriteOffset({ x: 0.5, y: 0.5 }, { gridUnits: true })
                 .randomRotation()
                 .atLocation(endPos);
-
-            // Ghost token movement 2
-            stepSeq.effect()
-                .copySprite(source)
-                .spriteRotation(-source.document.rotation)
-                .name('Storm Dash Strikes')
-                .atLocation(source)
-                .moveTowards(endPos, { rotate: false, ease: 'easeOutCirc' })
-                .moveSpeed(1500)
-                .duration(400)
-                .fadeIn(400, { ease: 'easeInCirc' })
-                .fadeOut(0)
-                .scaleToObject(1, { considerTokenScale: true })
-                .waitUntilFinished(-500);
-
-            if (dashPositions.length === 1) {
-                stepSeq.effect()
-                    .delay(200)
-                    .copySprite(source)
-                    .spriteRotation(-source.document.rotation)
-                    .scaleToObject(1, { considerTokenScale: true })
-                    .atLocation(endPos)
-                    .fadeOut(500, { ease: 'easeOutQuad' })
-                    .duration(1000)
-                    .opacity(1);
-
-                stepSeq.animation()
-                    .delay(200)
-                    .on(source)
-                    .teleportTo(endPos)
-                    .snapToGrid()
-                    .opacity(1);
-            }
-        } else if (e === dashPositions.length - 1) {
-            // Last dash
-            stepSeq.effect()
-                .file(closest('eskie.sound.roar.02'))
-                .scale(0.2)
-                .filter('Glow', { color: 0x29c9ff })
-                .atLocation(startPos)
-                .randomRotation()
-                .spriteOffset({ x: 0.5, y: 0.5 }, { gridUnits: true });
-
-            stepSeq.effect()
-                .copySprite(source)
-                .spriteRotation(-source.document.rotation)
-                .name('Storm Dash Strikes')
-                .atLocation(startPos)
-                .moveTowards(endPos, { rotate: false, ease: 'easeOutCirc' })
-                .moveSpeed(1500)
-                .duration(400)
-                .fadeIn(400, { ease: 'easeInCirc' })
-                .fadeOut(0)
-                .scaleToObject(1, { considerTokenScale: true })
-                .waitUntilFinished(-500);
-
-            stepSeq.effect()
-                .delay(200)
-                .copySprite(source)
-                .spriteRotation(-source.document.rotation)
-                .scaleToObject(1, { considerTokenScale: true })
-                .atLocation(endPos)
-                .fadeOut(500, { ease: 'easeOutQuad' })
-                .duration(1000)
-                .opacity(1);
-
-            stepSeq.animation()
-                .delay(200)
-                .on(source)
-                .teleportTo(endPos)
-                .snapToGrid()
-                .opacity(1);
         } else {
-            // Intermediate dashes
             stepSeq.effect()
                 .file(closest('eskie.sound.roar.02'))
                 .scale(0.2)
@@ -205,19 +133,38 @@ async function create(source: Token, config: any = {}) {
                 .atLocation(startPos)
                 .randomRotation()
                 .spriteOffset({ x: 0.5, y: 0.5 }, { gridUnits: true });
+        }
 
-            stepSeq.effect()
-                .copySprite(source)
-                .spriteRotation(-source.document.rotation)
+        // Additive per-segment dash motion held until the final DB teleport
+        if (motionSource && stepDist >= 1) {
+            stepSeq.motion(motionSource)
                 .name('Storm Dash Strikes')
-                .atLocation(startPos)
-                .moveTowards(endPos, { rotate: false, ease: 'easeOutCirc' })
-                .moveSpeed(1500)
-                .duration(400)
-                .fadeIn(400, { ease: 'easeInCirc' })
-                .fadeOut(0)
-                .scaleToObject(1, { considerTokenScale: true })
-                .waitUntilFinished(-500);
+                .moveBy(stepDelta, {
+                    duration: moveDuration,
+                    ease: 'easeOutCirc',
+                    return: false,
+                })
+                .persistUntilUpdate();
+        }
+
+        if (isLast) {
+            const finalDelta = computeCenterDelta(source, endPos);
+            const finalDist = Math.hypot(finalDelta.x, finalDelta.y);
+
+            stepSeq.wait(Math.max(200, moveDuration));
+
+            if (finalDist >= 1) {
+                stepSeq.animation()
+                    .on(source)
+                    .teleportTo(endPos, { relativeToCenter: true })
+                    .snapToGrid();
+            } else if (motionSource) {
+                stepSeq.thenDo(() => {
+                    Sequencer.MotionManager.endMotions(motionSource, { name: 'Storm Dash Strikes' });
+                });
+            }
+        } else {
+            stepSeq.wait(moveDuration);
         }
 
         sequence.addSequence(stepSeq);
@@ -284,12 +231,7 @@ async function play(source: Token, config: any = {}) {
 async function stop(source: Token, config: any = {}) {
     return Promise.all([
         Sequencer.EffectManager.endEffects({ name: 'StormDash Crosshair*', object: source }),
-        Sequencer.EffectManager.endEffects({ name: 'Storm Dash Strikes', object: source }),
-        new Sequence()
-            .animation()
-            .on(source)
-            .opacity(1)
-            .play(),
+        endEffectsAndMotions(source, 'Storm Dash Strikes'),
     ]);
 }
 

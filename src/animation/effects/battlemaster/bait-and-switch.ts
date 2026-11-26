@@ -5,6 +5,7 @@ import { closest } from '../../../lib/filemanager.js';
 import { settingsOverride } from '../../../lib/settings.js';
 import { adapter } from '../../../adapters/index.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
+import { resolveMotionTarget, computeCenterDelta } from '../../utils/motion.js';
 
 const DEFAULT_CONFIG = {
     id: 'baitAndSwitch',
@@ -20,6 +21,17 @@ async function create(token: Token, target: Token, config: any = {}) {
 
     const tokenCenter = adapter.getCenter(token);
     const targetCenter = adapter.getCenter(target);
+    const tokenDelta = computeCenterDelta(token, targetCenter);
+    const targetDelta = computeCenterDelta(target, tokenCenter);
+    const dist = Math.hypot(tokenDelta.x, tokenDelta.y);
+    const motionToken = resolveMotionTarget(token);
+    const motionTarget = resolveMotionTarget(target);
+
+    // Match original moveSpeed(500) for target and moveSpeed(300) for token
+    const targetMoveDuration = Math.max(1, Math.round((dist / 500) * 1000));
+    const tokenMoveDuration = Math.max(1, Math.round((dist / 300) * 1000));
+    const targetArrive = Math.max(750, 250 + targetMoveDuration);
+    const tokenArrive = Math.max(1000, 500 + tokenMoveDuration);
 
     let blurDirectionX = 0;
     let blurDirectionY = 0;
@@ -29,36 +41,39 @@ async function create(token: Token, target: Token, config: any = {}) {
     const sequence = new Sequence();
     applySound(sequence, sound);
 
+    if (dist >= 1) {
+        if (motionTarget) {
+            sequence
+                .motion(motionTarget)
+                .zIndex(0.2)
+                .moveBy(targetDelta, {
+                    delay: 250,
+                    duration: targetMoveDuration,
+                    ease: 'easeInBack',
+                    return: false,
+                })
+                .persistUntilUpdate();
+        }
+
+        if (motionToken) {
+            sequence
+                .motion(motionToken)
+                .moveBy(tokenDelta, {
+                    delay: 500,
+                    duration: tokenMoveDuration,
+                    ease: 'easeOutCubic',
+                    return: false,
+                })
+                .persistUntilUpdate();
+        }
+    }
+
     sequence
-        .animation()
-            .on(target)
-            .opacity(0)
-            .delay(150)
-
-        .animation()
-            .on(token)
-            .opacity(0)
-            .delay(250)
-
-        .effect()
-            .copySprite(target)
-            .scaleToObject(1, { considerTokenScale: true })
-            .moveTowards(token, { rotate: false, ease: 'easeInBack', delay: 250 })
-            .moveSpeed(500)
-            .duration(1000)
-            .zIndex(0.2)
-
         .effect()
             .copySprite(token)
+            .atLocation(tokenCenter)
             .scaleToObject(1, { considerTokenScale: true })
-            .moveTowards(target, { rotate: false, ease: 'easeOutCubic', delay: 500 })
-            .moveSpeed(300)
-            .duration(1250)
-
-        .effect()
-            .copySprite(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .moveTowards(target, { rotate: false, ease: 'easeOutCubic', delay: 500 })
+            .moveTowards(targetCenter, { rotate: false, ease: 'easeOutCubic', delay: 500 })
             .moveSpeed(300)
             .duration(1250)
             .opacity(0.85)
@@ -77,21 +92,22 @@ async function create(token: Token, target: Token, config: any = {}) {
             .opacity(0.4)
             .spriteOffset({ x: -0.5 }, { gridUnits: true })
             .mirrorX()
-            .spriteRotation(180)
+            .spriteRotation(180);
 
-        .animation()
-            .delay(1000)
-            .on(token)
-            .teleportTo(targetCenter, { relativeToCenter: false })
-            .snapToGrid()
-            .opacity(1)
+    if (dist >= 1) {
+        sequence
+            .animation()
+                .delay(targetArrive)
+                .on(target)
+                .teleportTo(tokenCenter, { relativeToCenter: true })
+                .snapToGrid()
 
-        .animation()
-            .delay(750)
-            .on(target)
-            .teleportTo(tokenCenter, { relativeToCenter: false })
-            .snapToGrid()
-            .opacity(1);
+            .animation()
+                .delay(tokenArrive)
+                .on(token)
+                .teleportTo(targetCenter, { relativeToCenter: true })
+                .snapToGrid();
+    }
 
     return sequence;
 }

@@ -5,6 +5,7 @@ import { closest } from '../../../lib/filemanager.js';
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
+import { resolveMotionTarget, computeCenterDelta } from "../../utils/motion.js";
 const DEFAULT_CONFIG = {
     isHit: false,
     timingAdjust: -50,
@@ -33,47 +34,42 @@ async function create(token: Token, target: Token, config: any = {}) {
     if (!location || !targetCenter) return new Sequence();
 
     // Determine travel distance
-    const gridSize = adapter.getGridSize();
-    const offsetX = (location.x - targetCenter.x) / gridSize;
-    const offsetY = (location.y - targetCenter.y) / gridSize;
+    const pullDelta = computeCenterDelta(target, location);
+    const pullDist = Math.hypot(pullDelta.x, pullDelta.y);
     const grappleEffect = isHit ? effect.hit : effect.miss;
+    const motionTarget = resolveMotionTarget(target);
 
     const sequence = new Sequence();
     applySound(sequence, mConfig.sound);
 
-    // Effect if missed
+    // Hook throw / latch effect
     sequence.effect()
         .file(closest(grappleEffect))
         .attachTo(token)
         .stretchTo(target)
         .zIndex(1)
-        .waitUntilFinished(-750)
+        .waitUntilFinished(-750);
 
-    // Turn token invisible  
-    sequence.animation()
-        .delay(100)
-        .on(target)
-        .opacity(0)
-        .playIf(isHit);
+    if (isHit && motionTarget && pullDist >= 1) {
+        const slideDelay = Math.max(0, 101 + timingAdjust);
 
-    // Create effect copy of target and pull it toward location  
-    sequence.effect()
-        .copySprite(target)
-        // When animating spriteContainer, we do not need to correct for rotation
-        //.spriteRotation(-target.document.rotation)
-        .zIndex(0)
-        .animateProperty('spriteContainer', 'position.x', { from: 0, to: offsetX, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })
-        .animateProperty('spriteContainer', 'position.y', { from: 0, to: offsetY, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })
-        .duration(700 + timingAdjust)
-        .waitUntilFinished(-100)
-        .playIf(isHit);
+        sequence.motion(motionTarget)
+            .zIndex(0)
+            .moveBy(pullDelta, {
+                delay: slideDelay,
+                duration: 500,
+                ease: 'easeInCubic',
+                return: false,
+            })
+            .persistUntilUpdate();
 
-    // Teleport target to pull location and make it visible again
-    sequence.animation()
-        .on(target)
-        .teleportTo(location, { relativeToCenter: true })
-        .opacity(1)
-        .playIf(isHit);
+        sequence.wait(slideDelay + 500);
+
+        // Teleport target to pull location
+        sequence.animation()
+            .on(target)
+            .teleportTo(location, { relativeToCenter: true });
+    }
 
     return sequence;
 }

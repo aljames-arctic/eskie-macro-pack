@@ -4,6 +4,7 @@
 import { closest, absolutePath } from "../../../lib/filemanager.js";
 import { template as templatelib } from '../../../lib/templates.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
+import { resolveMotionTarget, computeCenterDelta, endEffectsAndMotions } from "../../utils/motion.js";
 import { adapter } from "../../../adapters/index.js";
 
 const DEFAULT_CONFIG = {
@@ -13,7 +14,7 @@ const DEFAULT_CONFIG = {
 
 async function create(token: Token, config: any = {}, options: any = {}) {
     if (options?.type === "aefx") return;
-    let { id, template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
+    let { template, sound } = adapter.mergeObject(DEFAULT_CONFIG, config);
     const tokenName = token.name;
     const tokenCenter = adapter.getCenter(token);
     const tokenRotation = adapter.getTokenRotation(token);
@@ -65,19 +66,19 @@ async function create(token: Token, config: any = {}, options: any = {}) {
         }
     }
 
+    const jumpDelta = computeCenterDelta(token, position);
+    const jumpDist = Math.hypot(jumpDelta.x, jumpDelta.y);
+    const motionToken = resolveMotionTarget(token);
+    const label = `${tokenName} Step of the Wind (Jump)`;
+
     let seq = new Sequence();
     applySound(seq, sound);
     
     seq.wait(100)
 
-        .animation()
-            .delay(200)
-            .on(token)
-            .opacity(0)
-
         .effect()
             .file(closest("eskie.smoke.03.white"))
-            .atLocation(token)
+            .atLocation(tokenCenter)
             .scaleToObject(1.75)
             .belowTokens()
             .randomRotation()
@@ -87,7 +88,7 @@ async function create(token: Token, config: any = {}, options: any = {}) {
 
         .effect()
             .file(closest("eskie.nature.flower.particle.01.blue"))
-            .atLocation(token)
+            .atLocation(tokenCenter)
             .scaleToObject(1.5)
             .playbackRate(2)
             .scaleIn(0, 1000, { ease: "easeOutCubic" })
@@ -101,7 +102,7 @@ async function create(token: Token, config: any = {}, options: any = {}) {
         .effect()
             .copySprite(token)
             .spriteRotation(-tokenRotation)
-            .atLocation(token)   
+            .atLocation(tokenCenter)   
             .scaleToObject(0.9, { considerTokenScale: true })
             .opacity(0.5)
             .belowTokens()
@@ -117,31 +118,14 @@ async function create(token: Token, config: any = {}, options: any = {}) {
             .zIndex(2)
 
         .effect()
-            .name(`${tokenName} Step of the Wind (Jump)`)
-            .copySprite(token)
-            .spriteRotation(-tokenRotation)
-            .atLocation(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .opacity(1)
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -1.5, duration: upTime, gridUnits: true, ease: "easeOutCubic", delay: 200 })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: 1.5, duration: downTime, gridUnits: true, fromEnd: false, ease: "easeInSine", delay: upTime + 200 })
-            .moveTowards(position, { ease: "linear", rotate: false, delay: 200 })
-            .persist()
-            .extraEndDuration(800)
-            .duration(jumpTime + 200)
-            .animateProperty('sprite', 'rotation', { from: 0, to: 360, duration: upTime + downTime, ease: "easeInSine", delay: 200 })
-            .zIndex(5)
-
-        .effect()
-            .name(`${tokenName} Step of the Wind (Jump)`)
+            .name(label)
             .file(closest("eskie.trail.token.generic.01.white"))
             .scaleToObject(1.5, { considerTokenScale: true })
-            .atLocation(token)   
+            .atLocation(tokenCenter)   
             .opacity(1)
             .animateProperty('spriteContainer', 'position.y', { from: 0, to: -1.5, duration: upTime, gridUnits: true, ease: "easeOutCubic", delay: 200 })
             .animateProperty('spriteContainer', 'position.y', { from: 0, to: 1.5, duration: downTime, gridUnits: true, fromEnd: false, ease: "easeInSine", delay: upTime + 200 })
             .moveTowards(position, { ease: "linear", rotate: false, delay: 200 })
-            .persist()
             .fadeIn(250, { delay: 200 })
             .fadeOut(50, { ease: "easeOutQuint" })
             .duration(jumpTime + 200)
@@ -149,29 +133,49 @@ async function create(token: Token, config: any = {}, options: any = {}) {
             .mirrorX(mirrorTrail)
             .spriteOffset(trailOffset, { gridUnits: true })
             .filter("ColorMatrix", { saturate: 3 })
+            .zIndex(5);
+
+    if (motionToken) {
+        let jumpMotion = seq
+            .motion(motionToken)
+            .name(label)
             .zIndex(5)
+            .moveBy(
+                [
+                    { v: { x: 0, y: 0 } },
+                    { v: { x: 0, y: -1.5 }, duration: upTime, inEase: "easeOutCubic" },
+                    { v: { x: 0, y: 0 }, duration: downTime, inEase: "easeInSine" },
+                ],
+                { gridUnits: true, delay: 200, return: false }
+            )
+            .rotateBy(360, {
+                delay: 200,
+                duration: upTime + downTime,
+                ease: "easeInSine",
+                return: false,
+            });
+        if (jumpDist >= 1) {
+            jumpMotion = jumpMotion
+                .moveBy(jumpDelta, { delay: 200, duration: jumpTime, ease: "linear", return: false })
+                .persistUntilUpdate();
+        }
+        void jumpMotion;
+    }
 
-        .wait(jumpTime)
+    seq.wait(200 + jumpTime);
 
-        .animation()
+    if (jumpDist >= 1) {
+        seq.animation()
             .on(token)
-            .teleportTo(position)
+            .teleportTo(position, { relativeToCenter: true })
             .snapToGrid()
-            .waitUntilFinished()
+            .waitUntilFinished();
+    }
 
-        .thenDo(function(){
-            Sequencer.EffectManager.endEffects({ name: `${tokenName} Step of the Wind (Jump)` });
-        })
-
-        .animation()
-            .delay(200)
-            .on(token)
-            .opacity(1)
-            .snapToGrid()
-
+    seq
         .effect()
             .file(closest("eskie.smoke.03.white"))
-            .atLocation(token)
+            .atLocation(position)
             .scaleToObject(1.75)
             .belowTokens()
             .randomRotation()
@@ -180,7 +184,7 @@ async function create(token: Token, config: any = {}, options: any = {}) {
 
         .effect()
             .file(closest("eskie.nature.flower.particle.01.blue"))
-            .atLocation(token)
+            .atLocation(position)
             .scaleToObject(1.5)
             .playbackRate(2)
             .scaleIn(0, 1000, { ease: "easeOutCubic" })
@@ -202,7 +206,7 @@ async function play(token: Token, config: any = {}, options: any = {}) {
 }
 
 function stop(token: Token, { id = DEFAULT_CONFIG.id }: any = {}) {
-    Sequencer.EffectManager.endEffects({ name: `${token.name} Step of the Wind (Jump)` });
+    endEffectsAndMotions(token, `${token.name} Step of the Wind (Jump)`);
     Sequencer.EffectManager.endEffects({ name: `${token.name} Step of the Wind (Jump) ${id}` });
 }
 

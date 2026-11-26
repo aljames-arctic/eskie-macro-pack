@@ -3,6 +3,7 @@
 
 import { closest } from '../../../lib/filemanager.js';
 import { applySound, DEFAULT_SOUND_CONFIG } from '../../utils/sound.js';
+import { resolveMotionTarget, computeCenterDelta } from '../../utils/motion.js';
 
 import { adapter } from "../../../adapters/index.js";
 const DEFAULT_CONFIG = {
@@ -37,10 +38,11 @@ async function create(token: Token, target: Token, config: any = {}) {
     };
 
     const location = adapter.getCenterPoint(rawLocation);
-    const offsetX = (location.x - targetCenter.x) / gridSize;
-    const offsetY = (location.y - targetCenter.y) / gridSize;
+    const pullDelta = computeCenterDelta(target, location);
+    const pullDist = Math.hypot(pullDelta.x, pullDelta.y);
     const { widthUnits: targetWidth } = adapter.getTokenDimensions(target);
     const canPull = pull && (targetWidth <= 2);
+    const motionTarget = resolveMotionTarget(target);
 
     const seq = new Sequence();
     applySound(seq, sound);
@@ -81,28 +83,25 @@ async function create(token: Token, target: Token, config: any = {}) {
         .duration(1000)
         .fadeOut(250);
 
-    if (canPull) {
-        // Turn token invisible during slide
-        seq.animation()
-            .delay(100)
-            .on(target)
-            .opacity(0);
+    if (canPull && motionTarget && pullDist >= 1) {
+        const slideDelay = Math.max(0, 101 + timingAdjust);
 
-        // Copy sprite slides towards destination
-        seq.effect()
-            .copySprite(target)
-            .spriteRotation(-target.document.rotation)
+        seq.motion(motionTarget)
             .zIndex(0)
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: offsetX, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: offsetY, duration: 500, delay: 101 + timingAdjust, gridUnits: true, ease: 'easeInCubic' })
-            .duration(700 + timingAdjust)
-            .waitUntilFinished(-100);
+            .moveBy(pullDelta, {
+                delay: slideDelay,
+                duration: 500,
+                ease: 'easeInCubic',
+                return: false,
+            })
+            .persistUntilUpdate();
 
-        // Teleport target token to final snapped location and restore visibility
+        seq.wait(slideDelay + 500);
+
+        // Teleport target token to final snapped location
         seq.animation()
             .on(target)
-            .teleportTo(location, { relativeToCenter: true })
-            .opacity(1);
+            .teleportTo(location, { relativeToCenter: true });
     }
 
     return seq;

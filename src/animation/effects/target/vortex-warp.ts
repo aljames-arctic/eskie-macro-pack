@@ -5,6 +5,7 @@ import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
+import { resolveMotionTarget, computeCenterDelta } from "../../utils/motion.js";
 const DEFAULT_CONFIG = {
     position: undefined,
     sound: { ...DEFAULT_SOUND_CONFIG },
@@ -12,6 +13,12 @@ const DEFAULT_CONFIG = {
 
 async function create(target: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
+    const motionTarget = resolveMotionTarget(target);
+    const hasMove = Boolean(mConfig.position) && (() => {
+        const d = computeCenterDelta(target, mConfig.position);
+        return Math.hypot(d.x, d.y) >= 1;
+    })();
+
     let sequence = new Sequence();
     applySound(sequence, mConfig.sound);
 
@@ -29,26 +36,36 @@ async function create(target: Token, config: any = {}) {
         .belowTokens()
         .waitUntilFinished(-500);
 
-    sequence = sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-adapter.getTokenRotation(target))
-        .scaleToObject(1, { considerTokenScale: true })
-        .duration(500)
-        .scaleOut(0, 500, { ease: "easeInOutElastic" })
-        .rotateOut(180, 300, { ease: "easeOutCubic" });
-    sequence = sequence.animation()
+    if (motionTarget) {
+        let outMotion = sequence
+            .motion(motionTarget)
+            .scaleTo(0.01, { duration: 500, ease: "easeInOutElastic", return: false })
+            .rotateBy(180, { delay: 200, duration: 300, ease: "easeOutCubic", return: false });
+        if (hasMove) {
+            outMotion = outMotion.persistUntilUpdate();
+        } else {
+            outMotion = outMotion.fadeTo(0, { delay: 450, duration: 50, return: false });
+        }
+        sequence = outMotion;
+    }
+
+    sequence = sequence
+        .wait(500)
+        .animation()
         .on(target)
         .opacity(0);
 
-    sequence = sequence.animation()
-        .on(target)
-        .teleportTo(mConfig.position, { offset: { x: -1, y: -1 } })
-        .snapToGrid();
+    if (mConfig.position) {
+        sequence = sequence.animation()
+            .on(target)
+            .teleportTo(mConfig.position, { offset: { x: -1, y: -1 } })
+            .snapToGrid();
+    }
 
     // Vortex in
     sequence = sequence.effect()
         .file(closest("jb2a.portals.horizontal.vortex.purple"))
-        .atLocation(mConfig.position)
+        .atLocation(mConfig.position ?? target)
         .scaleToObject(2.5)
         .rotateIn(-360, 500, { ease: "easeOutCubic" })
         .rotateOut(360, 500, { ease: "easeOutCubic" })
@@ -56,20 +73,31 @@ async function create(target: Token, config: any = {}) {
         .scaleOut(0, 600, { ease: "easeOutCubic" })
         .opacity(1)
         .duration(2000)
-        .waitUntilFinished(-500)
-    
-    sequence = sequence.effect()
-        .copySprite(target)
-        .spriteRotation(-adapter.getTokenRotation(target))
-        .scaleToObject(1, { considerTokenScale: true })
-        .scaleIn(0, 500, { ease: "easeInOutElastic" })
-        .rotateIn(180, 300, { ease: "easeOutCubic" })
-        .duration(500)
-        .waitUntilFinished(-250);
+        .waitUntilFinished(-500);
 
     sequence = sequence.animation()
         .on(target)
         .opacity(1);
+
+    if (motionTarget) {
+        sequence = sequence
+            .motion(motionTarget)
+            .scaleTo(
+                [
+                    { v: 0.01 },
+                    { v: 1, duration: 500, inEase: "easeInOutElastic" },
+                ],
+                { return: false }
+            )
+            .rotateBy(
+                [
+                    { v: 180 },
+                    { v: 0, duration: 300, inEase: "easeOutCubic" },
+                ],
+                { return: false }
+            )
+            .waitUntilFinished(-250);
+    }
 
     return sequence;
 }

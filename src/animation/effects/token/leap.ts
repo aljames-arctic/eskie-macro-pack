@@ -7,6 +7,7 @@ import { closest } from "../../../lib/filemanager.js";
 
 import { adapter } from "../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../utils/sound.js";
+import { resolveMotionTarget, computeCenterDelta } from "../../utils/motion.js";
 const DEFAULT_CONFIG = {
     id: 'leap',
     position: undefined,
@@ -23,7 +24,7 @@ const DEFAULT_CONFIG = {
  */
 async function createLeap(token: Token, config: any = {}) {
     const mConfig = adapter.mergeObject(DEFAULT_CONFIG, config);
-    let { id, position, sound } = mConfig;
+    let { position, sound } = mConfig;
 
     // UI/Interaction Logic
     if (!position) {
@@ -40,31 +41,29 @@ async function createLeap(token: Token, config: any = {}) {
         if (position.cancelled) { return; }
     }
 
+    const startCenter = adapter.getCenter(token);
+    const delta = computeCenterDelta(token, position);
+    const dist = Math.hypot(delta.x, delta.y);
+    const motionToken = resolveMotionTarget(token);
+
     const sequence = new Sequence();
     applySound(sequence, sound);
     sequence
-        .animation()
-        .on(token)
-        .opacity(0)
-        .teleportTo(position)
-        .snapToGrid()
-        .waitUntilFinished()
-
         .effect()
         .file(closest("eskie.smoke.06.white"))
-        .atLocation(token)
+        .atLocation(startCenter)
         .scaleToObject(1.75)
         .belowTokens()
 
         .effect()
         .file(closest("eskie.smoke.03.white"))
-        .atLocation(token)
+        .atLocation(startCenter)
         .scaleToObject(1.5)
         .belowTokens()
 
         .effect()
         .file(closest("jb2a.impact.009.orange"))
-        .atLocation(token)
+        .atLocation(startCenter)
         .scaleToObject(1.5)
         .belowTokens()
 
@@ -77,7 +76,7 @@ async function createLeap(token: Token, config: any = {}) {
         .effect()
         .file(closest("jb2a.wind_stream.white"))
         .anchor({ x: 0.5, y: 1 })
-        .atLocation(token)
+        .atLocation(startCenter)
         .duration(1000)
         .opacity(1)
         .scale(token.document.width * 0.025)
@@ -88,19 +87,7 @@ async function createLeap(token: Token, config: any = {}) {
         .effect()
         .copySprite(token)
         .spriteRotation(-token.document.rotation)
-        .atLocation(token)
-        .scaleToObject(1, { considerTokenScale: true })
-        .opacity(1)
-        .duration(1000)
-        .anchor({ x: 0.5, y: 1 })
-        .loopProperty('spriteContainer', 'position.y', { values: [50, 0, 50], duration: 500 })
-        .moveTowards(position, { rotate: false })
-        .zIndex(2)
-
-        .effect()
-        .copySprite(token)
-        .spriteRotation(-token.document.rotation)
-        .atLocation(token)
+        .atLocation(startCenter)
         .scaleToObject(1, { considerTokenScale: true })
         .opacity(0.5)
         .scale(0.9)
@@ -110,13 +97,37 @@ async function createLeap(token: Token, config: any = {}) {
         .filter("ColorMatrix", { brightness: -1 })
         .filter("Blur", { blurX: 5, blurY: 10 })
         .moveTowards(position, { rotate: false })
-        .zIndex(2)
-        .waitUntilFinished()
+        .zIndex(2);
 
-        .animation()
-        .on(token)
-        .opacity(1)
-        ;
+    if (motionToken) {
+        let leapMotion = sequence
+            .motion(motionToken)
+            .zIndex(2)
+            .moveBy(
+                [
+                    { v: { x: 0, y: 0 } },
+                    { v: { x: 0, y: -50 }, duration: 500, inEase: "linear" },
+                    { v: { x: 0, y: 0 }, duration: 500, inEase: "linear" },
+                ],
+                { return: false }
+            );
+        if (dist >= 1) {
+            leapMotion = leapMotion
+                .moveBy(delta, { duration: 1000, ease: "linear", return: false })
+                .persistUntilUpdate();
+        }
+        void leapMotion;
+    }
+
+    sequence.wait(1000);
+
+    if (dist >= 1) {
+        sequence
+            .animation()
+            .on(token)
+            .teleportTo(position, { relativeToCenter: true })
+            .snapToGrid();
+    }
 
     return sequence;
 }

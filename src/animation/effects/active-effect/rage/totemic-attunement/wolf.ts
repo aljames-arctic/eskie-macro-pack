@@ -5,6 +5,7 @@ import { closest } from "../../../../../lib/filemanager.js";
 
 import { adapter } from "../../../../../adapters/index.js";
 import { applySound, DEFAULT_SOUND_CONFIG } from "../../../../utils/sound.js";
+import { resolveMotionTarget } from "../../../../utils/motion.js";
 const DEFAULT_CONFIG = {
     id: 'Wolf Totemic Attunement',
     color: 'red',
@@ -24,6 +25,9 @@ function create(token: Token, target: Token, config: any = {}) {
     const tokenCenter = adapter.getCenter(token);
     const targetCenter = adapter.getCenter(target);
     const tokenDim = adapter.getTokenDimensions(token);
+    const targetRotation = adapter.getTokenRotation(target);
+    const motionToken = resolveMotionTarget(token);
+    const motionTarget = resolveMotionTarget(target);
 
     const mid = {
         x: (targetCenter.x - tokenCenter.x) * 0.25,
@@ -38,11 +42,6 @@ function create(token: Token, target: Token, config: any = {}) {
     const seq = new Sequence();
     applySound(seq, sound);
     seq
-        .animation()
-            .delay(100)
-            .on(token)
-            .opacity(0)  
-
         .effect()
             .delay(100)
             .file(closest(`jb2a.bite.400px.${color}`))
@@ -55,97 +54,77 @@ function create(token: Token, target: Token, config: any = {}) {
         .effect()
             .delay(150)
             .copySprite(target)
-            .spriteRotation(-target.document.rotation)
+            .spriteRotation(-targetRotation)
             .attachTo(target)
             .scaleToObject(1, { considerTokenScale: true })
             .duration(1000) 
             .fadeOut(500)
-            .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 25, gridUnits:true, pingPong:true})
+            .loopProperty('spriteContainer', 'position.x', { from: -0.05, to: 0.05, duration: 25, gridUnits: true, pingPong: true })
             .tint("#ff0000")
             .opacity(0.35)  
 
         .effect()
             .delay(200)
             .file(closest(`jb2a.impact.008.${color}`))
-            .atLocation(target,{offset:{x:-mid.x,y:-mid.y}})
-            .size(tokenDim.widthUnits + 1, {gridUnits:true})
+            .atLocation(target, { offset: { x: -mid.x, y: -mid.y } })
+            .size(tokenDim.widthUnits + 1, { gridUnits: true })
             .zIndex(1)
 
         .effect()
             .name(label)  
             .file(closest(`eskie.buff.loop.simple.${color}`))
-            .atLocation(token, {offset: {y:-0.05}, gridUnits: true})
+            .attachTo(token, { offset: { y: -0.05 }, gridUnits: true, bindAlpha: false })
             .scaleToObject(1)
             .opacity(0.5)
-            .filter("ColorMatrix", {saturate: 1})
+            .filter("ColorMatrix", { saturate: 1 })
             .playbackRate(1)
             .fadeOut(500)
             .duration(1600) 
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: mid.x, duration: 250, ease:"easeOutExpo",delay:200})
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: mid.y, duration: 250, ease:"easeOutExpo",delay:200})
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -mid.x+back.x, duration: 250, ease:"easeOutExpo",delay:1000})
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -mid.y+back.y, duration: 250, ease:"easeOutExpo",delay:1000}) 
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -back.x, duration: 250, ease:"easeOutSine",delay:1250})
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -back.y, duration: 250, ease:"easeOutSine",delay:1250})
             .zIndex(0.2)
 
         .effect()
             .file(closest(`eskie.aura.token.generic.02.${color}`))
             .name(label)
-            .atLocation(token)
+            .attachTo(token, { bindAlpha: false })
             .scaleToObject(2.1)
             .startTime(500)
             .duration(2000)
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: mid.x, duration: 250, ease:"easeOutExpo",delay:200})
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: mid.y, duration: 250, ease:"easeOutExpo",delay:200})
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -mid.x+back.x, duration: 250, ease:"easeOutExpo",delay:1000})
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -mid.y+back.y, duration: 250, ease:"easeOutExpo",delay:1000}) 
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -back.x, duration: 250, ease:"easeOutSine",delay:1250})
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -back.y, duration: 250, ease:"easeOutSine",delay:1250})
-            .zIndex(0.3)
+            .zIndex(0.3);
 
-
-        .effect()
-            .copySprite(token)
-            .spriteRotation(-token.document.rotation)
-            .atLocation(token)
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: mid.x, duration: 250, ease:"easeOutExpo",delay:200})
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: mid.y, duration: 250, ease:"easeOutExpo",delay:200})
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -mid.x+back.x, duration: 250, ease:"easeOutExpo",delay:1000})
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -mid.y+back.y, duration: 250, ease:"easeOutExpo",delay:1000}) 
-            .animateProperty('spriteContainer', 'position.x', { from: 0, to: -back.x, duration: 250, ease:"easeOutSine",delay:1250})
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -back.y, duration: 250, ease:"easeOutSine",delay:1250})
+    if (motionToken) {
+        seq
+            .motion(motionToken)
             .zIndex(0.1)
-            .duration(1600)
-            .waitUntilFinished(-700)  
+            .moveBy(
+                [
+                    { v: { x: 0, y: 0 } },
+                    { v: mid, duration: 250, inEase: "easeOutExpo", hold: 550 },
+                    { v: back, duration: 250, inEase: "easeOutExpo" },
+                    { v: { x: 0, y: 0 }, duration: 250, inEase: "easeOutSine" },
+                ],
+                { delay: 200, return: false }
+            );
+    }
 
-        .animation()
-            .delay(550)  
-            .on(token)
-            .opacity(1)    
+    seq
+        .wait(900)
 
         .canvasPan()
             .shake({ duration: 1100, strength: 1, rotation: false, fadeOut: 500 })
 
         .effect()
             .file(closest(`eskie.sound.roar.01`))
-            .atLocation(target,{offset:{x:-mid.x,y:-mid.y}})
-            .size(tokenDim.widthUnits + 5,{gridUnits:true})
-
-        .animation()
-            .delay(100)
-            .on(target)
-            .opacity(0)
+            .atLocation(target, { offset: { x: -mid.x, y: -mid.y } })
+            .size(tokenDim.widthUnits + 5, { gridUnits: true })
 
         .effect()
             .copySprite(target)
-            .spriteRotation(-target.document.rotation)
-            .attachTo(target, {bindAlpha:false, bindRotation:false,local:false})
+            .spriteRotation(-targetRotation)
+            .attachTo(target, { bindAlpha: false, bindRotation: false, local: false, ignoreMotion: true })
             .scaleToObject(0.9, { considerTokenScale: true })
             .zIndex(0.1)
             .belowTokens()
-            .filter("ColorMatrix", { brightness:0 })
+            .filter("ColorMatrix", { brightness: 0 })
             .filter("Blur", { blurX: 5, blurY: 10 })
             .opacity(0.65)
             .duration(1200)
@@ -153,28 +132,40 @@ function create(token: Token, target: Token, config: any = {}) {
         .effect()
             .delay(100)
             .file(closest(`eskie.damage.piercing.01.${color}`))
-            .attachTo(target,{bindAlpha:false,bindRotation:false})
+            .attachTo(target, { bindAlpha: false, bindRotation: false, ignoreMotion: true })
             .scaleToObject(1.5)
             .opacity(1)
             .zIndex(1)
             .belowTokens()
             .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", gridUnits: true })
-            .filter("ColorMatrix", { saturate:1 })
+            .filter("ColorMatrix", { saturate: 1 });
 
-        .effect()
-            .copySprite(target)
-            .spriteRotation(-target.document.rotation)
-            .attachTo(target, {bindAlpha:false, bindRotation:false,local:false})
-            .scaleToObject(1, { considerTokenScale: true })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: -0.5, duration: 500, ease: "easeOutCubic", delay:100, gridUnits: true })
-            .animateProperty('spriteContainer', 'position.y', { from: 0, to: 0.5, duration: 250, ease: "easeOutCubic", delay:600, gridUnits: true })
-            .animateProperty('sprite', 'rotation', { from: 0, to: 90, duration: 250, ease: "easeOutCubic", delay:100 })  
-            .duration(1200)
-            .waitUntilFinished(-500)
+    if (motionTarget) {
+        seq
+            .motion(motionTarget)
+            .moveBy(
+                [
+                    { v: { x: 0, y: 0 } },
+                    { v: { x: 0, y: -0.5 }, duration: 500, inEase: "easeOutCubic" },
+                    { v: { x: 0, y: 0 }, duration: 250, inEase: "easeOutCubic" },
+                ],
+                { gridUnits: true, delay: 100, return: false }
+            )
+            .rotateBy(90, {
+                delay: 100,
+                duration: 250,
+                ease: "easeOutCubic",
+                return: false,
+            })
+            .persistUntilUpdate();
+    }
+
+    seq
+        .wait(700)
 
         .effect()
             .file(closest(`eskie.smoke.03.tan`))
-            .attachTo(target,{bindAlpha:false,bindRotation:false})
+            .attachTo(target, { bindAlpha: false, bindRotation: false, ignoreMotion: true })
             .scaleToObject(2)
             .opacity(0.8)
             .belowTokens()
@@ -182,8 +173,7 @@ function create(token: Token, target: Token, config: any = {}) {
         .animation()
             .delay(300)
             .on(target)
-            .opacity(1)
-            .rotate(target.document.rotation+90);
+            .rotate(targetRotation + 90);
 
     return seq;
 }

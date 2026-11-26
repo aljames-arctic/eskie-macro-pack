@@ -25,6 +25,7 @@ async function create(token: Token, config: any = {}, options: any = {}) {
         distance: configDistance ?? 60,
         icon: tokenImg,
         label: 'Wall of Fire',
+        token,
     };
 
     const [primary, secondary, center] = await templatelib.getPosition(template, cfg);

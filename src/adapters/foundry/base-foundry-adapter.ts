@@ -1022,7 +1022,7 @@ export class BaseFoundryAdapter {
         if (target.object?.center && typeof target.object.center.x === 'number' && typeof target.object.center.y === 'number') {
             return { x: target.object.center.x, y: target.object.center.y };
         }
-        if (typeof target.x === 'number' && typeof target.y === 'number' && !target.document && !target.object && target.width === undefined && target.height === undefined) {
+        if (typeof target.x === 'number' && typeof target.y === 'number' && !target.document && !target.object && target.width === undefined && target.height === undefined && !target.shapes && !target.bounds && target.documentName !== 'Region') {
             return { x: target.x, y: target.y };
         }
         const doc = target.document ? target.document : target;
@@ -1666,7 +1666,7 @@ export class BaseFoundryAdapter {
      */
     getTargetLocation(target: any) {
         if (!target) return null;
-        if (typeof target.x === 'number' && typeof target.y === 'number' && !target.document && !target.object && target.width === undefined && target.height === undefined && !target.shapes) {
+        if (typeof target.x === 'number' && typeof target.y === 'number' && !target.document && !target.object && target.width === undefined && target.height === undefined && !target.shapes && !target.bounds && target.documentName !== 'Region') {
             return { x: target.x, y: target.y };
         }
         const doc = target.document ? target.document : target;
@@ -1775,7 +1775,7 @@ export class BaseFoundryAdapter {
         }
 
         const doc = placeable.document ? placeable.document : placeable;
-        const center = this.getCenter(placeable) ?? { x: doc.x ?? 0, y: doc.y ?? 0 };
+        const center = this.getTargetLocation(placeable) ?? this.getCenter(placeable) ?? { x: doc.x ?? 0, y: doc.y ?? 0 };
         const gridSize = this.getGridSize();
 
         const isRegion = doc.documentName === 'Region' || Boolean(doc.shapes) || Boolean(placeable.shapes);
@@ -1827,18 +1827,21 @@ export class BaseFoundryAdapter {
             _id: id,
             name,
             center,
-            x: doc.x ?? (center.x - widthPx / 2),
-            y: doc.y ?? (center.y - heightPx / 2),
+            x: center.x,
+            y: center.y,
             w: widthPx,
             h: heightPx,
             rotation,
+            isTrapCasterProxy: true,
             document: {
                 id,
                 _id: id,
                 uuid,
                 name,
-                x: doc.x ?? (center.x - widthPx / 2),
-                y: doc.y ?? (center.y - heightPx / 2),
+                x: center.x,
+                y: center.y,
+                w: widthPx,
+                h: heightPx,
                 width: widthUnits,
                 height: heightUnits,
                 rotation,
@@ -1925,18 +1928,21 @@ export class BaseFoundryAdapter {
             _id: id,
             name,
             center,
-            x: center.x - widthPx / 2,
-            y: center.y - heightPx / 2,
+            x: center.x,
+            y: center.y,
             w: widthPx,
             h: heightPx,
             rotation: doc?.rotation ?? target?.rotation ?? 0,
+            isTrapTargetProxy: true,
             document: {
                 id,
                 _id: id,
                 uuid,
                 name,
-                x: center.x - widthPx / 2,
-                y: center.y - heightPx / 2,
+                x: center.x,
+                y: center.y,
+                w: widthPx,
+                h: heightPx,
                 width: widthUnits,
                 height: heightUnits,
                 rotation: doc?.rotation ?? target?.rotation ?? 0,

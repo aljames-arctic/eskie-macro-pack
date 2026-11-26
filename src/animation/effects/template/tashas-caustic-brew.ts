@@ -38,6 +38,7 @@ async function createCast(source: Token, config: any = {}, options: any = {}) {
         drawOutline: drawOutline,
         interval: interval,
         rememberControlled: rememberControlled,
+        token: source,
     };
 
     const [primary, secondary] = await templatelib.getPosition(mConfig.template, crosshairConfig);

@@ -833,4 +833,153 @@ test('fireball: ensures explosion target has at minimum 1x1 token scale and clea
     globalThis.Sequencer.EffectManager.endEffects = originalEndEffects;
 });
 
+test('lightningBolt as V14 Region trap originates at center of origin Region and stretches to center of target Region', async () => {
+    const { FoundryV14Adapter } = await import('../../src/adapters/foundry/foundry-v14-adapter.js');
+    const { lightningBolt } = await import('../../src/animation/effects/template/lightning-bolt.js');
+
+    const originalFoundry = adapter.foundry;
+    const originalSequence = globalThis.Sequence;
+    const originalRelease = globalThis.game.release;
+
+    adapter.foundry = new FoundryV14Adapter(adapter);
+    globalThis.game.release = { generation: 14 };
+    globalThis.game.modules.set('jb2a_patreon', { id: 'jb2a_patreon', active: true });
+    globalThis.game.modules.set('eskie-effects', { id: 'eskie-effects', active: true });
+    globalThis.game.modules.set('psfx-patreon', { id: 'psfx-patreon', active: true });
+
+    const effects = [];
+    globalThis.Sequence = class MockSequence {
+        constructor() {
+            let currentEffect = null;
+            const handler = {
+                get(_t, prop) {
+                    if (prop === 'play') return async () => proxy;
+                    if (prop === 'then') return undefined;
+                    if (prop === 'effect') {
+                        return () => {
+                            currentEffect = { files: [], atLocations: [], stretchTos: [], rotateTowards: [] };
+                            effects.push(currentEffect);
+                            return proxy;
+                        };
+                    }
+                    if (prop === 'file') {
+                        return (f) => { currentEffect?.files.push(f); return proxy; };
+                    }
+                    if (prop === 'atLocation') {
+                        return (loc) => { currentEffect?.atLocations.push(loc); return proxy; };
+                    }
+                    if (prop === 'stretchTo') {
+                        return (loc, opts) => { currentEffect?.stretchTos.push({ loc, opts }); return proxy; };
+                    }
+                    if (prop === 'rotateTowards') {
+                        return (loc) => { currentEffect?.rotateTowards.push(loc); return proxy; };
+                    }
+                    return (..._args) => proxy;
+                }
+            };
+            const proxy = new Proxy(this, handler);
+            return proxy;
+        }
+    };
+
+    try {
+        // Foundry V14 Rectangle Region placeables: PIXI container at (0, 0), shape x/y is top-left corner
+        const originRegion = {
+            id: 'reg-bolt-origin',
+            documentName: 'Region',
+            x: 0,
+            y: 0,
+            bounds: { x: 200, y: 300, width: 100, height: 100 },
+            center: { x: 250, y: 350 },
+            document: {
+                id: 'reg-bolt-origin',
+                uuid: 'Scene.scene1.Region.reg-bolt-origin',
+                name: 'Lightning Nozzle',
+                documentName: 'Region',
+                shapes: [{ type: 'rectangle', x: 200, y: 300, width: 100, height: 100, rotation: 0 }]
+            }
+        };
+
+        const targetRegion = {
+            id: 'reg-bolt-target',
+            documentName: 'Region',
+            x: 0,
+            y: 0,
+            bounds: { x: 800, y: 500, width: 200, height: 200 },
+            center: { x: 900, y: 600 },
+            document: {
+                id: 'reg-bolt-target',
+                uuid: 'Scene.scene1.Region.reg-bolt-target',
+                name: 'Lightning Target',
+                documentName: 'Region',
+                shapes: [{ type: 'rectangle', x: 800, y: 500, width: 200, height: 200, rotation: 0 }]
+            }
+        };
+
+        await executeTrapEffect(lightningBolt, originRegion, targetRegion, [], {
+            sound: { primary: { enable: false }, secondary: { enable: false } }
+        });
+
+        // Verify the main lightning bolt beam stretches from center of originRegion to center of targetRegion
+        const boltEffect = effects.find(e => e.stretchTos.length > 0);
+        assert.ok(boltEffect, 'Must have a stretched lightning bolt beam effect');
+        assert.deepEqual(
+            boltEffect.atLocations[0],
+            { x: 250, y: 350 },
+            'Lightning bolt beam must originate at the center of the origin Region (250, 350), not top-left corner'
+        );
+        assert.deepEqual(
+            boltEffect.stretchTos[0].loc,
+            { x: 900, y: 600 },
+            'Lightning bolt beam must stretch to the center of the target Region (900, 600), not top-left corner or 100ft east'
+        );
+
+        // Verify caster-origin effects receive a centered CasterProxy (so Sequencer validate_document resolves center, not top-left)
+        const casterEffects = effects.filter(e => e.atLocations[0]?.isTrapCasterProxy);
+        assert.ok(casterEffects.length >= 4, 'Caster lightning buildup/discharge effects must receive CasterProxy');
+        for (const ce of casterEffects) {
+            const proxy = ce.atLocations[0];
+            assert.deepEqual(proxy.center, { x: 250, y: 350 });
+            assert.equal(proxy.x, 250, 'CasterProxy.x must be center X for Sequencer');
+            assert.equal(proxy.y, 350, 'CasterProxy.y must be center Y for Sequencer');
+            assert.equal(proxy.document.x, 250, 'CasterProxy.document.x must be center X so Sequencer validate_document resolves center');
+            assert.equal(proxy.document.y, 350, 'CasterProxy.document.y must be center Y so Sequencer validate_document resolves center');
+            assert.equal(proxy.document.w, 100, 'CasterProxy.document.w must preserve pixel width');
+            assert.equal(proxy.document.h, 100, 'CasterProxy.document.h must preserve pixel height');
+            if (ce.rotateTowards.length > 0) {
+                assert.deepEqual(ce.rotateTowards[0], { x: 900, y: 600 }, 'Caster effects must rotate towards center of target Region');
+            }
+        }
+
+        // Also verify Polygon -> Rectangle RegionDocuments (without precomputed .center or .bounds)
+        effects.length = 0;
+        const polyOriginDoc = {
+            id: 'reg-poly-origin',
+            uuid: 'Scene.scene1.Region.reg-poly-origin',
+            documentName: 'Region',
+            shapes: [{ type: 'polygon', points: [100, 100, 300, 100, 300, 300, 100, 300] }]
+        };
+        const rectTargetDoc = {
+            id: 'reg-rect-target',
+            uuid: 'Scene.scene1.Region.reg-rect-target',
+            documentName: 'Region',
+            shapes: [{ type: 'rectangle', x: 1000, y: 400, width: 200, height: 100, rotation: 0 }]
+        };
+
+        await executeTrapEffect(lightningBolt, polyOriginDoc, rectTargetDoc, [], {
+            sound: { primary: { enable: false }, secondary: { enable: false } }
+        });
+
+        const polyBoltEffect = effects.find(e => e.stretchTos.length > 0);
+        assert.ok(polyBoltEffect);
+        assert.deepEqual(polyBoltEffect.atLocations[0], { x: 200, y: 200 }, 'Polygon origin RegionDocument must originate at bounding center (200, 200)');
+        assert.deepEqual(polyBoltEffect.stretchTos[0].loc, { x: 1100, y: 450 }, 'Rectangle target RegionDocument must stretch to bounding center (1100, 450)');
+    } finally {
+        adapter.foundry = originalFoundry;
+        globalThis.Sequence = originalSequence;
+        globalThis.game.release = originalRelease;
+    }
+});
+
+
 

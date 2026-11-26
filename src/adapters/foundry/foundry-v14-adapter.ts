@@ -89,16 +89,29 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
         const isRegion = doc?.documentName === 'Region' || Boolean(doc?.shapes) || Boolean(template.shapes);
 
         if (isRegion) {
+            const token = (config as any).token ?? (config as any).sourceToken;
+            if (token?.isTrapCasterProxy) {
+                const center = this.getTargetLocation(template) ?? this.getCenter(template);
+                const tokenCenter = this.getCenter(token);
+                let primary = tokenCenter ?? center;
+                let secondary = center;
+                if (tokenCenter && Math.hypot(secondary.x - primary.x, secondary.y - primary.y) < 1) {
+                    secondary = { x: primary.x + this.getGridSize(), y: primary.y };
+                }
+                return this.resolveDistinctPositions([primary, secondary, center], config, template);
+            }
+
             const shapes = doc.shapes?.contents ?? doc.shapes ?? template.shapes ?? [];
             const shape = shapes[0] ?? doc.toObject?.()?.shapes?.[0] ?? null;
+            const regionBounds = this.getRegionBounds(template);
 
             let primary = {
-                x: shape?.x ?? doc.x ?? template.x ?? 0,
-                y: shape?.y ?? doc.y ?? template.y ?? 0
+                x: shape?.x ?? doc.x ?? template.x ?? regionBounds.center.x,
+                y: shape?.y ?? doc.y ?? template.y ?? regionBounds.center.y
             };
             const center = {
-                x: shape?.center?.x ?? doc.center?.x ?? template.center?.x ?? primary.x,
-                y: shape?.center?.y ?? doc.center?.y ?? template.center?.y ?? primary.y
+                x: shape?.center?.x ?? doc.center?.x ?? template.center?.x ?? regionBounds.center.x,
+                y: shape?.center?.y ?? doc.center?.y ?? template.center?.y ?? regionBounds.center.y
             };
 
             const { size: gridSize, distance: gridDistance } = this.getSceneDimensions(canvas?.scene);
@@ -107,7 +120,7 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
             const gridUnits = (config as any).distance ?? doc.distance ?? shape?.distance;
             const distancePx = gridUnits !== undefined && gridUnits > 0
                 ? (gridUnits / gridDistance) * gridSize
-                : (shape?.radius ?? shape?.height ?? shape?.width ?? 0);
+                : (shape?.length ?? shape?.radius ?? shape?.height ?? shape?.width ?? 0);
 
             const rotation = shape?.rotation ?? doc.rotation ?? (config as any).direction ?? 0;
             const rad = (rotation * Math.PI) / 180;
@@ -116,7 +129,6 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
             if (distancePx > 0) {
                 secondary = { x: primary.x + Math.cos(rad) * distancePx, y: primary.y + Math.sin(rad) * distancePx };
             } else {
-                const token = (config as any).token ?? (config as any).sourceToken;
                 const tokenCenter = token ? this.getCenter(token) : null;
                 if (tokenCenter && Math.hypot(primary.x - tokenCenter.x, primary.y - tokenCenter.y) >= 1) {
                     secondary = primary;
@@ -263,7 +275,10 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
             const height = bounds.height ?? ((bounds.bottom !== undefined) ? (bounds.bottom - minY) : 0);
             const maxX = minX + width;
             const maxY = minY + height;
-            const center = placeable.center ?? doc.center ?? { x: minX + width / 2, y: minY + height / 2 };
+            const rawCenter = placeable.center ?? doc.center;
+            const center = (rawCenter && typeof rawCenter.x === 'number' && typeof rawCenter.y === 'number')
+                ? { x: rawCenter.x, y: rawCenter.y }
+                : { x: minX + width / 2, y: minY + height / 2 };
             return { minX, maxX, minY, maxY, center, width, height, anchor: { x: 0.5, y: 0.5 } };
         }
 
@@ -327,10 +342,14 @@ export class FoundryV14Adapter extends FoundryV13Adapter {
                     const sy = shape.y ?? 0;
                     const sw = shape.width ?? 0;
                     const sh = shape.height ?? 0;
-                    minX = Math.min(minX, sx);
-                    maxX = Math.max(maxX, sx + sw);
-                    minY = Math.min(minY, sy);
-                    maxY = Math.max(maxY, sy + sh);
+                    const anchorX = shape.anchorX ?? 0;
+                    const anchorY = shape.anchorY ?? 0;
+                    const rectMinX = sx - (anchorX * sw);
+                    const rectMinY = sy - (anchorY * sh);
+                    minX = Math.min(minX, rectMinX);
+                    maxX = Math.max(maxX, rectMinX + sw);
+                    minY = Math.min(minY, rectMinY);
+                    maxY = Math.max(maxY, rectMinY + sh);
                 }
             }
 

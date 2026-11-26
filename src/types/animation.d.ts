@@ -43,6 +43,7 @@ export interface CasterProxy {
     w: number;
     h: number;
     rotation: number;
+    isTrapCasterProxy?: boolean;
     document: {
         id: string;
         _id: string;
@@ -50,6 +51,8 @@ export interface CasterProxy {
         name: string;
         x: number;
         y: number;
+        w?: number;
+        h?: number;
         width: number;
         height: number;
         rotation: number;

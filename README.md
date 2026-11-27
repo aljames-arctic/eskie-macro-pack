@@ -1,367 +1,189 @@
-[![Foundry VTT Version](https://img.shields.io/badge/Foundry%20VTT-v12+-orange.svg)](https://foundryvtt.com/)
+[![Foundry VTT Version](https://img.shields.io/badge/Foundry%20VTT-v13+-orange.svg)](https://foundryvtt.com/)
+[![Latest Module Downloads](https://img.shields.io/github/downloads/aljames-arctic/eskie-macro-pack/latest/module.zip?style=flat-square&label=latest%20downloads&color=blue)](https://github.com/aljames-arctic/eskie-macro-pack/releases)
+[![Total Module Downloads](https://img.shields.io/github/downloads-pre/aljames-arctic/eskie-macro-pack/module.zip?style=flat-square&label=total%20downloads&color=success)](https://github.com/aljames-arctic/eskie-macro-pack/releases)
 
-[![Latest Module Downloads](https://img.shields.io/github/downloads/aljames-arctic/eskie-macro-pack/latest/module.zip?style=flat-square&label=latest%20downloads&color=blue)](https://github.com/aljames-arctic/eskie-macro-pack/releases) [![Total Module Downloads](https://img.shields.io/github/downloads-pre/aljames-arctic/eskie-macro-pack/module.zip?style=flat-square&label=total%20downloads&color=success)](https://github.com/aljames-arctic/eskie-macro-pack/releases)
+# Eskie Macro Pack (EMP)
 
-# Eskie Macro Package (EMP)
+A community-built Foundry VTT animation module utilizing free and premium asset libraries to animate spells, abilities, summons, traps, token effects, and cinematic scenes.
 
-## Summary
-
-A collection of community-generated macros utilizing both free and premium asset libraries to animate Foundry VTT.
-
-* [eskie Discord Channel](https://discord.gg/HgCQv2mK)
-* [Eskie Youtube Channel](https://www.youtube.com/channel/UCnES1fzHV-xSu58rEL7NcDg)
-
-Join the Discord channel! Learn Sequencer and share your own creations!
-
----
-
-## Want to Contribute?
-
-**Want to Contribute?** We'd love to have you! There are (at least) two ways to contribute to this project:
-
-1. Post your own Sequencer animations to the Discord and request integration!
-1. Create a PR following the current coding standards:
-    - `create` / `play` functions exported
-    - `DEFAULT_CONFIG` used as the base configuration
-    - Test the animation with token rotation
-    - (If integrating with AA) standardized arguments for `create` / `play` functions
-
-**Hate following coding guidelines?** Me too! I'd recommend using an AI agent to help. The code here isn't a case of life or death; it's a fun side project that shouldn't take up much of your time, please don't feel you need to spend an entire day getting a PR in. Skills have been written to help enforce the coding guidelines, just ask the agent to clean up your code following the discord to module and style guide skills.
-
-Downloading Visual Studio Code and/or an agentic IDE such as Google's Antigravity to help modify code.
-
-**Want this localized into your native language?** I don't entrust that to AI - I need native speaker help! Submit a PR and I'll be happy to give a mild vetting process and approve it.
-
-## Animation Contributors
-
-* Eskiemoh / eskie (@.eskie)
-* Bakana (@bakanabaka)
-* DerKriegs (@derkriegs)
-* Gornetron (@nefin)
-* Doomrule (@doomrule)
-* Mia Del'Mori (@.tranquilite)
-* Akane (@yamiakane)
-* Papa Nurgle (@papanurgle)
-
-## Language Contributors
-
-* Brazilian Portuguese
-    - Kharmans (@kharmans)
-* Spanish 
-    - Cerbe (@cerbe_)
+* [Eskie Discord Channel](https://discord.gg/HgCQv2mK) — learn Sequencer and share your own creations!
+* [Eskie YouTube Channel](https://www.youtube.com/channel/UCnES1fzHV-xSu58rEL7NcDg)
 
 ---
 
 ## Features
 
-* A wide variety of animations!
-* Automated Animations integration!
-* User-facing API for macro support!
-* Highly customizable variants!
-* Automated tile-based trap system!
-
-## Requirements
-
-EMP requires the following modules to be installed and active:
-
-| Module | Purpose |
-|--------|---------|
-| [Sequencer](https://foundryvtt.com/packages/sequencer) | Core animation playback engine |
-| [socketlib](https://foundryvtt.com/packages/socketlib) | Multi-client socket communication for synced effects |
+* **120+ Modular Animations** — Spells, class features, Battle Master maneuvers, Arcane Shots, auras, movement/teleports, emotes, and multi-token effects with customizable variants and per-effect sound support.
+* **Auto-Recognition Integration** — Automatic syncing with **Automated Animations (AA)** or **Boss Loot FX (BLFX)** via an in-game configuration menu.
+* **Automated Trap System** — 10 built-in interactive traps *plus* support for turning any EMP spell/effect into a trap using **Foundry V14+ native Regions** or **Monk's Active Tile Triggers (MATT)**.
+* **Summoning & Token Mask Libraries** — 12 elemental/thematic summon animations (`eskie.summon`) and 5 token dissolution/death masks (`eskie.mask`).
+* **World Scripts** — Live-toggleable automated animations such as d20 **Roll Animations** (no reload required).
+* **Macro API & Built-In Compendiums** — Full `eskie.*` API plus ready-to-use **EMP Automation Bootstrap** and **EMP Standalone Macros** (150+ standalone macros) compendiums.
 
 ---
 
-## Optional Modules
+## Requirements & Optional Modules
 
-The following modules are optional but unlock additional features when installed:
+### Required
 
-| Module | What It Enables |
-|--------|----------------|
-| [Automated Animations](https://foundryvtt.com/packages/autoanimations) | Interface with Automated Animations to play effects using AA's system. |
-| [Eskie Effects (Patreon)](https://www.patreon.com/EskieEffects) | Additional premium effect assets designed specifically for EMP (or the free variant) |
-| [Jinker's Animated Art Pack](https://foundryvtt.com/packages/jaamod) | Animated asset library used by select effects |
-| [JB2A (Patreon)](https://www.patreon.com/JB2A) | Large library of high-quality animated assets used by many EMP effects (or the free variant) |
-| [Boss Loot Assets (Patreon)](https://www.patreon.com/c/BossLoot) | Premium asset pack used by select effects (or the free variant) |
-| [Tagger](https://foundryvtt.com/packages/tagger) | Tag-based tile and token lookup; used by some trap and movement effects |
-| [Token Attacher](https://foundryvtt.com/packages/token-attacher) | Attaches tokens to tiles for movement-based trap and tile effects |
-| [Foundry Summons](https://foundryvtt.com/packages/foundry-summons) | Enables automated creature and token summoning used by EMP summon macros |
-| [Monk's Active Tile Triggers (MATT)](https://foundryvtt.com/packages/monks-active-tiles) | **Optional on V14+ / Required on V12-V13 for Traps.** Automates tile trap playback when tokens enter tiles (Foundry V14+ supports native Regions) |
+| Module | Purpose |
+|--------|---------|
+| [Sequencer](https://foundryvtt.com/packages/sequencer) (`4.3.1+`) | Core animation & motion playback engine |
+| [socketlib](https://foundryvtt.com/packages/socketlib) | Multi-client socket sync |
+
+### Optional Modules
+
+Open **Module Settings → Eskie Macro Pack → Recommended Modules** in-game to see live installation status for all companion modules:
+
+| Category | Modules |
+|----------|---------|
+| **Automation** | [Automated Animations](https://foundryvtt.com/packages/autoanimations), [Boss Loot FX (BLFX)](https://www.patreon.com/c/BossLoot) |
+| **Visual Assets** | [Eskie Effects](https://www.patreon.com/EskieEffects) (Patreon/Free), [JB2A](https://www.patreon.com/JB2A) (Patreon/Free), [Jinker's Animated Art Pack](https://foundryvtt.com/packages/jaamod), [Boss Loot Assets](https://www.patreon.com/c/BossLoot) (Patreon/Free) |
+| **Audio** | [PeriSFX (PSFX)](https://www.patreon.com/c/PeriSFX) (Patreon/Free) |
+| **Traps & Triggers** | **Foundry V14+ native Regions** (built-in) or [Monk's Active Tile Triggers (MATT)](https://foundryvtt.com/packages/monks-active-tiles) *(required for traps on V13)* |
+| **Utilities** | [Foundry Summons](https://foundryvtt.com/packages/foundry-summons) (creature summoning), [Tagger](https://foundryvtt.com/packages/tagger) (tag-based lookups), [Token Attacher](https://foundryvtt.com/packages/token-attacher) or [Mass Edit](https://foundryvtt.com/packages/multi-token-edit) (tile/token attachment) |
+
+---
+
+## Module Settings & Compendiums
+
+In **Game Settings → Module Settings → Eskie Macro Pack**:
+
+* **Recommended Modules** — Live status checklist of optional asset, automation, and utility modules.
+* **Configure Auto-Recognition** — Choose and sync EMP presets to Automated Animations or Boss Loot FX *(shown when AA or BLFX is active)*.
+* **World Scripts** — Toggle automated features in real time (e.g., **Roll Animations** for d20 ability checks and saving throws).
+* **Enable Sounds** — Global world toggle for animation sound effects (individual animations also accept a `sound` config object).
+* **Log Verbosity** — Client-side console logging level (`error`, `warn`, `info`, `debug`).
+
+Two Macro compendiums are bundled automatically:
+* **EMP Automation Bootstrap** — Helper macros used by Auto-Recognition integrations.
+* **EMP Standalone Macros** — 150+ standalone Sequencer macros ready to drop onto your hotbar.
 
 ---
 
 ## Macro API — `eskie.*`
 
-All API methods are available from any Foundry VTT macro or the browser console (F12). There are five top-level namespaces:
+All animation namespaces are exposed globally on `eskie` (accessible from any Foundry macro or DevTools console — run `console.log(eskie)` to browse everything):
 
-| Namespace | Description |
-|-----------|-------------|
-| `eskie.effect` | Token and template-based spell/ability animations |
-| `eskie.overlay` | Canvas-wide scene overlays |
-| `eskie.showcase` | Long-form cinematic sequences |
-| `eskie.traps` | Automated tile-based trap system |
-| `eskie.summon` | Creature, spirit, and token summoning animations |
+| Namespace | Purpose |
+|-----------|---------|
+| `eskie.effect` | 120+ spell, ability, maneuver, aura, emote, and movement animations |
+| `eskie.mask` | Token dissolution and death masks (`burn`, `shatter`, `tear`, `smoke`, `saoDeath`) |
+| `eskie.summon` | 12 creature/spirit summoning animations |
+| `eskie.traps` | Interactive trap setup wizard + 10 built-in traps + custom spell-as-trap |
+| `eskie.overlay` | Canvas-wide scene overlays (`cinemaBars`, `blur`) |
+| `eskie.showcase` | Long-form cinematic sequences (`attackAttack`, `mobPsycho`, `sunHaloDragon`, `vnDialog`) |
 
-> **Quick exploration:** Run `console.log(eskie)` in the browser console to browse everything available.
-
----
+Most modules share a uniform contract: `create(...)` (returns a `Sequence`), `play(...)` (builds and plays), `stop(...)` (cleans up persistent effects), and `default_config` (inspect defaults).
 
 ### Effects — `eskie.effect`
 
-Token and template-based animations for spells, abilities, and conditions. Most effects accept a `token` (or array of tokens) as the first argument, with an optional `config` object for customization.
-
-**Common API shape:**
-
-| Method | Description |
-|--------|-------------|
-| `create(token, [...], config)` | Builds and returns a Sequence without playing it |
-| `play(token, [...], config)` | Builds and immediately plays the Sequence |
-| `stop(token, config)` | Stops or reverses any persistent effects |
-| `default_config` | The default configuration object for that effect |
+Covers targeted attacks, templates/AoEs, persistent buffs & auras, Battle Master maneuvers (`eskie.effect.battlemaster.*`), Arcane Shots (`eskie.effect.arcaneShot.*`), teleports/movement (`stepOfTheWind.jump`/`move`, `mistyStep`, `fly`, `leap`), emotes (`eskie.effect.emote.*`), and multi-token utilities (`shuffle`, `cloudOfSand`, `petrifyingGaze`). Run `console.log(eskie.effect)` to list all 120+ keys.
 
 ```js
-let token = _token;
-let target = Array.from(game.user.targets)[0];
+const token = _token;
+const target = Array.from(game.user.targets)[0];
 
-// Play a persistent aura on a token
+// Persistent aura (toggle on / off)
 await eskie.effect.rage.play(token);
 await eskie.effect.rage.stop(token);
 
-// Play a targeted effect (caster → target)
+// Targeted effect & custom configuration
 await eskie.effect.divineSmite.play(token, target);
-
-// Customize with a config object
 await eskie.effect.banishment.play(token, { color: 'purple' });
-await eskie.effect.banishment.stop(token, { color: 'red' });
 
-// Build a Sequence manually without playing it
-const seq = eskie.effect.hex.create(token, target);
+// Build a Sequence manually before playing
+const seq = await eskie.effect.hex.create(token, target);
 seq.play();
 ```
 
-**Sample effects:**
+### Masks — `eskie.mask`
 
-| Key | Description |
-|-----|-------------|
-| `eskie.effect.rage` | Barbarian Rage aura |
-| `eskie.effect.banishment` | Banishment shimmer (supports `color` option) |
-| `eskie.effect.hex` | Hex curse beam to target |
-| `eskie.effect.magicMissile` | Magic Missile projectile burst |
-| `eskie.effect.divineSmite` | Divine Smite radiant flash |
-| `eskie.effect.mistyStep` | Misty Step blink teleport |
-| `eskie.effect.mirrorImage` | Mirror Image ghostly duplicates |
-| `eskie.effect.possession` | Possession overlay effect |
-| `eskie.effect.incorporeal` | Incorporeal movement shimmer |
-| `eskie.effect.callLightning` | Call Lightning storm bolt |
-| `eskie.effect.chainLightning` | Chain Lightning arc |
-| `eskie.effect.disintegrate` | Disintegrate death effect |
-| `eskie.effect.faerieFire` | Faerie Fire outline glow |
-| `eskie.effect.armorOfAgathys` | Armor of Agathys frost shield |
-| `eskie.effect.animateDead` | Animate Dead rise effect |
-| `eskie.effect.wingsV2` | Animated wings attachment |
-| `eskie.effect.tokenMask` | Token destruction (`burn`, `shatter`, `tear`, `smoke`) |
-| `eskie.effect.stepOfTheWind` | Step of the Wind (`jump`, `move` sub-keys) |
-| `eskie.effect.emote` | Floating emote display above a token |
-| `eskie.effect.shuffle` | Shuffle multiple tokens' positions simultaneously |
+Token destruction and dissolve effects: `burn`, `shatter`, `tear`, `smoke`, and `saoDeath`.
 
-> Run `console.log(eskie.effect)` to browse all 95+ available effects.
+```js
+await eskie.mask.shatter.play(token, { color: 'white' });
+await eskie.mask.shatter.stop(token);
+```
 
----
+### Summons — `eskie.summon`
+
+12 summoning styles: `default`, `air`, `celestial`, `earth`, `fiend`, `fire`, `futuristic`, `nature`, `shadow`, `water`, `ritualSummonHell`, and `tokensOfTheDeparted`. Pass an `Actor` (summons via Foundry Summons) or an existing `Token` as the second argument:
+
+```js
+const actor = game.actors.getName('Fire Elemental');
+await eskie.summon.fire.play(token, actor);          // Summons & animates from caster
+await eskie.summon.fire.play(token, existingToken);  // Animates an already-placed token
+await eskie.summon.fire.stop(token, existingToken);  // Cleans up persistent summon effects
+```
+
+### Traps — `eskie.traps`
+
+Automated traps fire when a token enters a trigger **Region (Foundry V14+ native)** or **Tile (MATT)**. Run the interactive setup wizard — it guides you through selecting trigger, origin, and target regions/tiles automatically:
+
+```js
+await eskie.traps.setup();                    // Interactive wizard (choose any built-in trap or custom effect)
+await eskie.traps.setup('fireball');          // Turn any EMP spell/effect into a trap
+await eskie.traps.projectile.setup({ projectileType: 'dart' });
+
+// Manual playback without Region/MATT triggers
+await eskie.traps.fire.play(originPlaceable, [token], { size: 4 });
+await eskie.traps.pitfall.stop(trapPlaceable);
+```
+
+| Trap | Description |
+|------|-------------|
+| `bullRushStatue` | Animated charging statue rush across a path |
+| `electricDoor` | Electrified doorway barrier shock |
+| `fallingRocks` | Collapsing ceiling boulder/debris shower |
+| `fallingSky` | Aerial drop/impact ambush from above |
+| `fire` | Directional fire cone from origin to target (`size`) |
+| `floodingRoom` | Rising water hazard across a room |
+| `pitfall` | Hidden pit reveal and falling-token animation (`reveal`, `smokeSize`, `fallenScale`) |
+| `projectile` | Repeating `arrow`, `dart`, or `javelin` volley (`projectileType`, `repeats`, `repeatDelay`) |
+| `rollingBoulder` | Rolling boulder trap crushing along a corridor |
+| `spike` | Floor spikes erupting under tokens (`delay`) |
+| *Custom Effect* | Use `eskie.traps.setup('<effectKey>')` or `eskie.traps.playEffectAsTrap(...)` for any EMP effect |
 
 ### Overlays — `eskie.overlay`
 
-Canvas-wide scene overlays that affect all players simultaneously.
-
-| Key | Description |
-|-----|-------------|
-| `eskie.overlay.cinemaBars` | Black letterbox bars at the top and bottom of the scene |
-| `eskie.overlay.blur` | Scene-wide blur / drunk effect targeting specific players |
+Canvas-wide visual overlays: `cinemaBars` (letterbox bars) and `blur` (per-user scene blur / `blur.drunk`).
 
 ```js
-// Cinematic letterbox
 await eskie.overlay.cinemaBars.play();
 await eskie.overlay.cinemaBars.stop();
 
-// Apply a blur to specific users (by name)
-let users = game.users.map(u => u.name);
+const users = Array.from(game.users);
 await eskie.overlay.blur.drunk.play(users);
 await eskie.overlay.blur.drunk.stop(users);
 ```
 
----
-
 ### Showcases — `eskie.showcase`
 
-Long-form cinematic sequences for dramatic, narrative moments.
-
-| Key | Description |
-|-----|-------------|
-| `eskie.showcase.attackAttack` | Attack on Titan-style dramatic combat sequence |
-| `eskie.showcase.mobPsycho` | Mob Psycho 100-style psychic burst sequence |
-| `eskie.showcase.sunHaloDragon` | Sun halo dragon cinematic reveal |
-| `eskie.showcase.vnDialog` | Visual Novel-style dialog boxes for narrative scenes |
+Long-form cinematic sequences: `attackAttack` (3-act anime-style duel), `mobPsycho` (psychic percentage counter), `sunHaloDragon` (cinematic dragon reveal), and `vnDialog` (visual novel dialog box).
 
 ```js
-await eskie.showcase.attackAttack.play(token);
-await eskie.showcase.mobPsycho.play(token, target);
-await eskie.showcase.sunHaloDragon.play(token);
-await eskie.showcase.vnDialog.play({ speaker: token, text: 'Hello, adventurer!' });
+await eskie.showcase.attackAttack.play(token, target);
+await eskie.showcase.mobPsycho.play(0, 100);
+await eskie.showcase.sunHaloDragon.play(token, Array.from(game.user.targets));
+await eskie.showcase.vnDialog.play(token, { text: 'Hello, adventurer!' });
 ```
+
+### Module Utility API
+
+Additional helpers are exposed on `game.modules.get('eskie-macros').api` (`adapter`, `animation`, `standaloneMacros`, and `util`: `closest`, `tokens.getDistance`, `tokens.getNearestSquareCenter`, `tokens.isAdjacent`).
 
 ---
 
-### Traps — `eskie.traps`
+## Contributing & Credits
 
-Automated traps triggered by **Foundry V14+ Regions** (native `executeScript` RegionBehaviors) or [Monk's Active Tile Triggers](https://foundryvtt.com/packages/monks-active-tiles) (MATT). Once set up, traps fire automatically whenever a token enters a designated trigger region or tile — no macro invocation required.
+Contributions are welcome! You can share Sequencer macros on the [Eskie Discord](https://discord.gg/HgCQv2mK) and request integration, or open a PR following [`docs/developer-guide.md`](docs/developer-guide.md) (exports `create`/`play`/`stop`/`default_config`, respects token rotation, and passes typecheck/tests). Don't worry about memorizing every rule — an AI coding assistant/IDE (such as VS Code or Antigravity) can format your PR using the repo's built-in skills.
 
-> ℹ️ **Foundry V14+:** Native Regions are used by default without requiring external modules. If MATT is also installed, the setup wizard will prompt you to choose between Regions and Tiles.
-> ⚠️ **Foundry V12–V13:** Requires Monk's Active Tile Triggers (MATT).
+**Localization:** Native speaker PRs for additional languages in `lang/` are always welcome (currently English, Brazilian Portuguese, and Spanish).
 
-#### Quick Start — Unified Setup Wizard
+### Animation Contributors
+Eskiemoh / eskie (`@.eskie`) · Bakana (`@bakanabaka`) · DerKriegs (`@derkriegs`) · Gornetron (`@nefin`) · Doomrule (`@doomrule`) · Mia Del'Mori (`@.tranquilite`) · Akane (`@yamiakane`) · Papa Nurgle (`@papanurgle`)
 
-```js
-// Opens an interactive dialog to pick a trap type and walks you through setup
-await eskie.traps.setup();
-```
-
-The wizard will:
-
-1. Ask which trap type to configure
-2. Ask you to select **Trigger Tile(s)** on the canvas — the tiles tokens step on to activate the trap
-3. Ask you to select **Trap Tile(s)** — where the effect plays (or launches from)
-4. For Fire and Projectile traps: ask for **Target Tile(s)** — where the effect lands
-5. Automatically write all MATT configuration and runcode to each tile
-
-#### Individual Trap Setup
-
-Each trap can also be set up independently:
-
-```js
-await eskie.traps.fire.setup();
-await eskie.traps.pitfall.setup();
-await eskie.traps.projectile.setup();   // prompts for Arrow, Dart, or Javelin
-await eskie.traps.spike.setup();
-```
-
-#### Manual Playback
-
-Traps can be triggered manually from a macro without MATT:
-
-```js
-let trapTile = canvas.tiles.get('<tile-id>');
-let token = _token;
-
-await eskie.traps.fire.play(trapTile, [token]);
-await eskie.traps.pitfall.play(trapTile, [token]);
-await eskie.traps.projectile.play(trapTile, [token]);
-await eskie.traps.spike.play(trapTile, [token]);
-```
-
----
-
-#### 🔥 Fire Trap — `eskie.traps.fire`
-
-A directional fire cone that erupts from an origin tile toward a target tile.
-
-**Tile setup:** 3 tiles — Trigger → Origin → Target
-
-| Config | Default | Description |
-|--------|---------|-------------|
-| `size` | `3.5` | Width of the fire cone in grid units |
-
-```js
-await eskie.traps.fire.play(originTile, [token], { size: 4 });
-await eskie.traps.fire.setup({ size: 4 });
-```
-
----
-
-#### 🕳️ Pitfall Trap — `eskie.traps.pitfall`
-
-A hidden pit that reveals itself and causes a token to visually fall in.
-
-**Tile setup:** 2 tiles — Trigger → Animation
-
-| Config | Default | Description |
-|--------|---------|-------------|
-| `reveal` | `true` | Whether to unhide the pit tile when triggered |
-| `smokeSize` | `2` | Multiplier for the dust cloud puff size |
-| `fallenScale` | `0.3` | Scale of the fallen token sprite shown at the pit bottom |
-
-```js
-await eskie.traps.pitfall.play(trapTile, [token]);
-await eskie.traps.pitfall.stop(trapTile);  // Fades the pit tile back to hidden
-```
-
----
-
-#### 🏹 Projectile Trap — `eskie.traps.projectile`
-
-A ranged trap that fires a projectile from a launcher tile toward tokens on a target tile. Supports three projectile types.
-
-**Tile setup:** 3 tiles — Trigger → Launcher → Target
-
-| Config | Default | Description |
-|--------|---------|-------------|
-| `projectileType` | _(prompted)_ | `'arrow'`, `'dart'`, or `'javelin'` |
-| `repeats` | `10` | Number of times the projectile fires |
-| `repeatDelay` | `50` | Milliseconds between each repeat |
-| `splashScale` | `1.5` | Scale of the hit/splash effect |
-
-| Type | Description |
-|------|-------------|
-| `arrow` | Repeating arrow volley with slight spread |
-| `dart` | Poison dart; applies a green tint and bubble markers to hit tokens |
-| `javelin` | Single javelin throw with a blood splash on impact |
-
-```js
-// Setup — prompts for projectile type
-await eskie.traps.projectile.setup();
-
-// Setup with a pre-specified type
-await eskie.traps.projectile.setup({ projectileType: 'dart' });
-
-// Manual play
-await eskie.traps.projectile.play(originTile, [token], {
-    projectileType: 'arrow',
-    repeats: 5,
-});
-```
-
----
-
-#### ⚔️ Spike Trap — `eskie.traps.spike`
-
-Spikes that shoot up from the floor under every token on the trap tile.
-
-**Tile setup:** 2 tiles — Trigger → Animation
-
-| Config | Default | Description |
-|--------|---------|-------------|
-| `delay` | `500` | Milliseconds between the spike visual and the hit effect |
-
-```js
-await eskie.traps.spike.play(trapTile, [token], { delay: 300 });
-await eskie.traps.spike.setup();
-```
-
----
-
-#### How MATT Trap Automation Works
-
-When `setup()` completes, EMP writes MATT configuration flags to your tiles. The trigger tile receives a `runcode` action that fires automatically on token entry:
-
-```js
-const playPath = tile.getFlag('eskie-macros', 'trap.playPath');
-const originTileIds = tile.getFlag('eskie-macros', 'trap.trapOriginTileIds') || [];
-if (playPath && typeof token !== 'undefined') {
-    const trap = foundry.utils.getProperty(globalThis, playPath);
-    if (trap && typeof trap.play === 'function') {
-        originTileIds.forEach(id => {
-            const originTile = canvas.tiles.get(id);
-            if (originTile) trap.play(originTile, [token]);
-        });
-    }
-}
-```
-
-The trap/origin tiles store `trap.trapTargetTileIds` (for 3-tile traps) and any extra configuration such as `projectileType`.
+### Language Contributors
+* **Brazilian Portuguese:** Kharmans (`@kharmans`)
+* **Spanish:** Cerbe (`@cerbe_`)

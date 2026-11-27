@@ -12,13 +12,15 @@ const targeted = Array.from(game.user.targets);
 let red = controlled[0];
 let blue = targeted[0] ?? controlled[1];
 
-const isPlaying = Sequencer.EffectManager.getEffects({ name: "gob" }).length > 0 ||
+const endedMotions =
+    (red ? Sequencer.MotionManager.endMotions(red, { name: "gob" }) + Sequencer.MotionManager.endMotions(red, { name: "gob-lock" }) : 0) +
+    (blue ? Sequencer.MotionManager.endMotions(blue, { name: "gob" }) + Sequencer.MotionManager.endMotions(blue, { name: "gob-lock" }) : 0);
+const isPlaying = endedMotions > 0 ||
+                  Sequencer.EffectManager.getEffects({ name: "gob" }).length > 0 ||
                   Sequencer.EffectManager.getEffects({ name: "Trail" }).length > 0;
 if (isPlaying) {
     Sequencer.EffectManager.endEffects({ name: "gob" });
     Sequencer.EffectManager.endEffects({ name: "Trail" });
-    if (red) new Sequence().animation().on(red).opacity(1).play();
-    if (blue) new Sequence().animation().on(blue).opacity(1).play();
     return ui.notifications.info("Stopped Attack Attack duel.");
 }
 
@@ -56,42 +58,48 @@ const positions = {
 };
 
 const midpoint = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+const gridSize = canvas.grid.size;
 const zoom = 1.8;
-const { b1, b2, b3, b4, r1, r2, r3, r4 } = positions;
+const { b1, b2, b3, r1, r2, r3 } = positions;
+
+const blueCharge = { x: b2.x - b1.x, y: b2.y - b1.y };
+const blueRecoil = { x: b3.x - b2.x, y: b3.y - b2.y };
+const redCharge = { x: r2.x - r1.x, y: r2.y - r1.y };
+const redRecoil = { x: r3.x - r2.x, y: r3.y - r2.y };
+const hasBlueTravel = Math.hypot(b3.x - b1.x, b3.y - b1.y) >= 1;
+const hasRedTravel = Math.hypot(r3.x - r1.x, r3.y - r1.y) >= 1;
 
 const seq = new Sequence();
 
-// Movement 1: Initial clash clash charges
-seq.animation()
-    .delay(400)
-    .on(blue)
-    .teleportTo(b1, { relativeToCenter: true })
-    .opacity(0);
-
-seq.animation()
-    .delay(400)
-    .on(red)
-    .teleportTo(r1, { relativeToCenter: true })
-    .opacity(0);
-
-seq.effect()
+// Movement 1: Initial clash charges
+const blueChargeMotion = seq.motion(blue)
     .name("gob")
-    .copySprite(blue)
-    .spriteRotation(-blue.document.rotation)
-    .scaleToObject(1, { considerTokenScale: true })
-    .moveTowards(b2, { delay: 1000, ease: "easeOutQuint", rotate: false })
-    .loopProperty("spriteContainer", "position.x", { from: 0.05, to: 0, duration: 50, pingPong: true, gridUnits: true, delay: 1500 })
-    .animateProperty("spriteContainer", "position.x", { from: 0, to: -1, duration: 250, pingPong: true, gridUnits: true, fromEnd: true, ease: "easeOutCubic" })
+    .moveBy(blueCharge, { delay: 1000, duration: 500, ease: "easeOutQuint", return: false });
+if (hasBlueTravel) blueChargeMotion.persistUntilUpdate();
+
+seq.motion(blue)
+    .name("gob-lock")
+    .oscillate({
+        period: 100,
+        waveform: "sine",
+        delay: 1500,
+        x: { amplitude: 0.025 * gridSize, phase: 0 },
+    })
     .persist();
 
-seq.effect()
+const redChargeMotion = seq.motion(red)
     .name("gob")
-    .copySprite(red)
-    .spriteRotation(-red.document.rotation)
-    .scaleToObject(1, { considerTokenScale: true })
-    .moveTowards(r2, { delay: 1000, ease: "easeOutQuint", rotate: false })
-    .loopProperty("spriteContainer", "position.x", { from: -0.05, to: 0, duration: 50, pingPong: true, gridUnits: true, delay: 1500 })
-    .animateProperty("spriteContainer", "position.x", { from: 0, to: 1, duration: 250, pingPong: true, gridUnits: true, fromEnd: true, ease: "easeOutCubic" })
+    .moveBy(redCharge, { delay: 1000, duration: 500, ease: "easeOutQuint", return: false });
+if (hasRedTravel) redChargeMotion.persistUntilUpdate();
+
+seq.motion(red)
+    .name("gob-lock")
+    .oscillate({
+        period: 100,
+        waveform: "sine",
+        delay: 1500,
+        x: { amplitude: 0.025 * gridSize, phase: Math.PI },
+    })
     .persist();
 
 seq.wait(750);
@@ -99,7 +107,7 @@ seq.wait(750);
 seq.effect()
     .name("Trail")
     .file(closest("eskie.trail.token.generic.02.blue"))
-    .atLocation(blue, { bindAlpha: false })
+    .atLocation(blue, { ignoreMotion: true })
     .scaleToObject(1.5)
     .spriteOffset({ x: -0.75 }, { gridUnits: true })
     .moveTowards(b2, { delay: 200, ease: "easeOutQuint", rotate: false })
@@ -109,7 +117,7 @@ seq.effect()
 seq.effect()
     .name("Trail")
     .file(closest("eskie.trail.token.generic.02.red"))
-    .atLocation(red, { bindAlpha: false })
+    .atLocation(red, { ignoreMotion: true })
     .scaleToObject(1.5)
     .spriteOffset({ x: 0.75 }, { gridUnits: true })
     .moveTowards(r2, { delay: 200, ease: "easeOutQuint", rotate: false })
@@ -173,9 +181,23 @@ seq.wait(1000);
 seq.thenDo(() => {
     Sequencer.EffectManager.endEffects({ name: "Trail" });
     Sequencer.EffectManager.endEffects({ name: "gob" });
+    Sequencer.MotionManager.endMotions(blue, { name: "gob-lock", settle: 0 });
+    Sequencer.MotionManager.endMotions(red, { name: "gob-lock", settle: 0 });
 });
 
-seq.animation().on(blue).opacity(1).teleportTo(b3, { relativeToCenter: true });
-seq.animation().on(red).opacity(1).teleportTo(r3, { relativeToCenter: true });
+const blueRecoilMotion = seq.motion(blue)
+    .name("gob")
+    .moveBy(blueRecoil, { duration: 250, ease: "easeOutCubic", return: false });
+if (hasBlueTravel) blueRecoilMotion.persistUntilUpdate();
+
+const redRecoilMotion = seq.motion(red)
+    .name("gob")
+    .moveBy(redRecoil, { duration: 250, ease: "easeOutCubic", return: false });
+if (hasRedTravel) redRecoilMotion.persistUntilUpdate();
+
+seq.wait(250);
+
+if (hasBlueTravel) seq.animation().on(blue).teleportTo(b3, { relativeToCenter: true });
+if (hasRedTravel) seq.animation().on(red).teleportTo(r3, { relativeToCenter: true });
 
 await seq.play({ preload: true });
